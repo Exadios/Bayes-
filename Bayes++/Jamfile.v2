@@ -29,10 +29,6 @@ variant compress_release : release : <define>BAYES_FILTER_COMPRESSED ;
 variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
 variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
 
-# Build variant to allow testing with a local boost_CVS version
-variant boost_CVS_debug : debug : <include>"../boost_CVS"  ;
-variant boost_CVS_release : release : <include>"../boost_CVS" ;
-
 # Build variant for full compiler optimization
 variant hardoptimize_release : release : 
  	<toolset>gcc <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
