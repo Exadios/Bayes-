@@ -85,8 +85,8 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	{
 		nM = feature+1;	
 		Full_filter::Filter_type* nf = fgenerator.generate(nL+nM);
-		noalias(nf->x.sub_range(0,full->x.size())) = full->x;
-		noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
+		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
+		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
 		nf->x[nL+feature] = t[0];
 		nf->X(nL+feature,nL+feature) = fom.Zv[0];
@@ -114,8 +114,8 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec
 	{
 		nM = feature+1;
 		Full_filter::Filter_type* nf = fgenerator.generate(nL+nM);
-		noalias(nf->x.sub_range(0,full->x.size())) = full->x;
-		noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
+		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
+		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
 		nf->x[nL+feature] = t[0];
 		nf->X(nL+feature,nL+feature) = T[0];
