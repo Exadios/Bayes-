@@ -1,29 +1,31 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-15">
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
 	<TITLE>Bayes++ Bayesian Filtering</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.0.1  (Linux)">
 	<META NAME="CREATED" CONTENT="20030727;11013700">
 	<META NAME="CHANGEDBY" CONTENT="Michael Stevens">
-	<META NAME="CHANGED" CONTENT="20030727;11160800">
+	<META NAME="CHANGED" CONTENT="20030727;17544600">
 </HEAD>
-<BODY LANG="de-DE">
+<BODY LANG="en-US">
 <H1 ALIGN=CENTER><U>Bayes++</U></H1>
 <H1 ALIGN=CENTER><B>Open Source Bayesian Filtering Classes</B></H1>
 <H2 ALIGN=CENTER>Michael Stevens</H2>
-<P><BR>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
 <CENTER>
 	<TABLE WIDTH=100% BORDER=5 CELLPADDING=0 CELLSPACING=4 BGCOLOR="#c0c0c0">
 		<TR VALIGN=TOP>
 			<TD WIDTH=368 HEIGHT=48>
 				<H2><A HREF="./Bayesian Filtering Classes.htm">Bayesian Filtering</A></H2>
 				<P>Overview of Bayesian filtering with the Filtering Classes 
+				</P>
 			</TD>
 			<TD WIDTH=330>
 				<H2 ALIGN=RIGHT><A HREF="mailto:michael.stevens@epost.de">michael.stevens@epost.de</A></H2>
 				<H2 ALIGN=RIGHT><A HREF="http://www.acfr.usyd.edu.au/">Australian
-				Center for Field Robotics</A></H2>
+				Centre for Field Robotics</A></H2>
 			</TD>
 		</TR>
 		<TR VALIGN=TOP>
@@ -46,12 +48,13 @@
 				Repository</A> 
 				</P>
 				<P ALIGN=RIGHT>Bayes++ uses the <A HREF="http://www.boost.org/" TARGET="_top"><FONT SIZE=5>Boost</FONT>
-				</A><BR>peer-reviewed portable C++ source libraries</TD>
+				</A><BR>peer-reviewed portable C++ source libraries</P>
+			</TD>
 		</TR>
 	</TABLE>
 </CENTER>
-<P ALIGN=JUSTIFY>Bayesian Filtering is a probabilistic technique for
-data fusion. The technique combines a concise mathematical
+<P ALIGN=JUSTIFY><BR>Bayesian Filtering is a probabilistic technique
+for data fusion. The technique combines a concise mathematical
 formulation of a system with observations of that system.
 Probabilities are used to represent the state of a system, likelihood
 functions to represent their relationships. In this form Bayesian
@@ -63,7 +66,7 @@ theorem</A>, <A HREF="http://www.wikipedia.org/wiki/Bayesian_inference">Bayesian
 Inference</A>.</P>
 <P ALIGN=JUSTIFY>For <U>discrete</U> systems the Bayesian formulation
 results in a naturally iterative data fusion solution. For <U>dynamic</U>
-systems there is a class of solutions, discreate <U>filters</U>, that
+systems there is a class of solutions, discrete <U>filters</U>, that
 combine observed inputs to the system with the dynamic model . A
 filter that iteratively incorporates new information is an <U>estimator</U>.
 For linear dynamic systems, discrete solutions such as the Kalman
@@ -76,8 +79,9 @@ hierarchy explicitly represents the variety of filtering algorithms
 and system model types.</P>
 <H2>Simple Example</H2>
 <P>This is very simple example; for those who have never used the
-Bayesian Filtering Classes before. If you wish, <A HREF="Simple/simpleExample.cpp">View
-the Source</A> online</P>
+Bayesian Filtering Classes before. If you wish to see how simple it
+is to use Bayes++ then <A HREF="Simple/simpleExample.cpp">View the
+Source</A>.</P>
 <P>The example shows how two classes are created. The first is the
 prediction model, the second the observation model. In this example
 they represent a simple linear problem with only one state variable
@@ -87,7 +91,7 @@ and observation.</P>
 <P>First <A HREF="#download">download</A> and extract <B>Bayes++</B>
 and also the <B>Boost</B> library. <B>Boost</B> is used to provide
 compiler independence, and a common build system. Two Boost header
-libraries are used: <B>uBlas</B> for linear algebra, and <B>random</B>
+libraries are used: <B>uBLAS</B> for linear algebra, and <B>random</B>
 for the PV and QuadCalib examples. The Boost headers can be placed
 anywhere relative to Bayes++, but it is easy if you follow this
 structure:</P>
@@ -113,7 +117,7 @@ structure:</P>
 			</DT><DL>
 				<DT>
 				boost 
-				</DT><DT>
+				</DT><DT STYLE="margin-bottom: 0.5cm">
 				<I>etc</I></DT></DL>
 		</DL>
 	</DL>
@@ -121,26 +125,29 @@ structure:</P>
 <P>
 Using the Boost Build system is the best way to compile the examples.
 This uses the <B>bjam</B> (Boost jam) program to compute dependencies
-and invoke the compiler.&nbsp; The documentation in your downloaded
-copy of Boost explains how to obtain bjam and the sources to compile
-it yourself. For everything to work <B>bjam</B> must be placed in the
+and invoke the compiler. The documentation in your downloaded copy of
+Boost explains how to obtain bjam and the sources to compile it
+yourself. For everything to work <B>bjam</B> must be placed in the
 path. <BR>To build Bayes++ and the examples simply execute: (Bayes++
 should be the current directory)</P>
-<PRE>        bjam -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
-If there is more then one toolset (compiler etc) available you may
+<PRE STYLE="margin-bottom: 0.5cm">        bjam -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
+If there is more then one toolsets (compiler etc) available you may
 want to tell bjam which to use. For example to use Visual C++ 7
 execute:</P>
-<PRE>        bjam -sTOOLS=&quot;vc7&quot; -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam -sTOOLS=&quot;vc7&quot; -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
-by setting it as an enviroment variable. A simple Makefile also
+by setting it as an environment variable. A simple Makefile also
 exists to encapsulate the bjam build commands.</P>
 <H4>Location of compiled examples and libraries</H4>
-<P>The executable for each example will be placed inside a directory
-heirarchy named <B>target</B>. Static libraries for debug and release
-builds of the BayesFilter library are placed in <B>target/lib</B>.
-The <B>target </B>directory and its subdirectories are created
-automatically.</P>
+<P>The executables for the three examples will be placed inside a
+directory hierarchy named <B>target</B>. Static libraries for debug
+and release builds of the <B>BayesFilter</B> library are placed in
+<B>target/lib</B>. The <B>target </B>directory and its subdirectories
+are created automatically. See the <A HREF="./Bayesian Filtering Classes.htm">Bayesian
+Filtering classes</A> overview for a description of the classes and
+all three examples. 
+</P>
 <H4>Visual C++ solution</H4>
 <P>For Visual C++ 7 you can also use the <B>Bayes++.sln</B> solution
 and the active configuration <B>uBLAS Debug</B>. The compiler options
@@ -150,7 +157,7 @@ this case the <B>boost_1_30_0</B> directory. In VC7 you should do
 this by choosing the <I>Tools/Options/Projects/VC++ Directories</I>
 option.</P>
 <H2>Licensing</H2>
-<P>All Bayes++ source code files are copyright with the licence
+<P>All Bayes++ source code files are copyright with the license
 conditions as given here. The copyright notice is that of the MIT
 license. This in no way restricts any commercial use you may wish to
 make using our source code. As long as you respect the copyright and
@@ -178,27 +185,27 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.</P>
 <H2>SLAM : Simultaneous Localization and Mapping</H2>
 <P>SLAM is one of the most interesting problems in Bayesian
-filtering. It's struture implies that it cannot be correctly solved
+filtering. It's structure implies that it cannot be correctly solved
 without using stochastic approach. This is due to mapped states being
-dependant on other mapped states and the localization state. This
-dependance also make the problem complex, therefore a simple approach
+dependent on other mapped states and the localization state. This
+dependence also make the problem complex, therefore a simple approach
 such as representing all correlations is not tractable for large
 numbers of states.</P>
 <P>Bayes++ has been used to implement various simple and some more
-advanaced SLAM solutions. In particular a full implementation of
+advanced SLAM solutions. In particular a full implementation of
 FastSLAM has been implemented. This technique is described in the
 paper &quot;FastSLAM : Factored Solution to the Simultaneous
-Localization and Mapping Problem&quot;,&nbsp; M. Montemerlo, S. Thrun
-S, D. Koller, B.Wegbreit, Proceedings of the AAAI National Conference
-on Artificial Intelligence&nbsp; 2002.</P>
-<P>The Bayes++ implemention of FastSLAM and a very simple Kalman
+Localization and Mapping Problem&quot;, M. Montemerlo, S. Thrun S, D.
+Koller, B. Wegbreit, Proceedings of the AAAI National Conference on
+Artificial Intelligence 2002.</P>
+<P>The Bayes++ implementation of FastSLAM and a very simple Kalman
 (full correlation) SLAM implementation is available as part of the
-most recent <A HREF="Bayes++.htm#download">download</A>.</P>
+most recent <A HREF="#download">download</A>.</P>
 <H2>Scilab, Matlab, MuPAD</H2>
 <P>These mathematical tools are particularly useful for visualising
 filtering results. However they are all rather slow, and it is very
 easy to produce very poorly implemented filters in their programming
-languages. Fortuneately all these tools provide mechanisms for
+languages. Fortunately all these tools provide mechanisms for
 extension with external programs. Example interface code is provided
 in the <A HREF="#CVS_Repository">Bayes++ CVS repository</A> for
 Matlab and MuPAD. An interface to Scilab is not yet available.</P>
@@ -217,8 +224,8 @@ versions of GCC 3.x.y should also run Bayes++ with ease.</P>
 <P>Previously Bayes++ was compatible with Visual C++6, but new
 releases have not been tested. Be aware that VC6 can get very
 confused! Particular when complex templates compiled. The order that
-headers are included can be important. &nbsp;Similarly VC7 often
-requires the /Zm option to be used so it can compile complex headers.</P>
+headers are included can be important. Similarly VC7 often requires
+the /Zm option to be used so it can compile complex headers.</P>
 <H2>FAQ</H2>
 <H4>Does Bayes++ do Kalman Filtering?</H4>
 <P>Yes, there are many Kalman filter implementations in Bayes++. In
@@ -227,20 +234,20 @@ implemented by the <I>Covariance_filter</I> Scheme.</P>
 <H4>How fast is Bayes++?</H4>
 <P>Pretty quick! Depends on the filter Scheme used. The <I>UD_filter</I>
 is smallest and fastest Scheme. The best way to speed things up is to
-work on optimised use of uBlas and to optimized uBlas itself for you
+work on optimised use of uBLAS and to optimized uBLAS itself for you
 compiler.</P>
 <H4>What is a 'Scheme'?</H4>
 <P>A 'Scheme' is the term used in Bayes++ to define a particular
-numerical implemention of a filter. Each Scheme is based on one of a
-few statistical representations of state. Different schemes work on
+numerical implementation of a filter. Each Scheme is based on one of
+a few statistical representations of state. Different schemes work on
 these statistics using different numerical techniques. The aim of
 Bayes++ is to provides common interfaces to Schemes so you can pick
 an choose which to use.</P>
-<H4>Why should I use Bayes++? After all, writting a Kalman filter in
+<H4>Why should I use Bayes++? After all, writing a Kalman filter in
 Matlab is not too hard.</H4>
 <P>For a simple test this may be true. If you have ever tried to deal
-with the wide variety of numerical failures and normalisations
-required to deal with discontinues model you will realises that there
+with the wide variety of numerical failures and normalizations
+required to deal with discontinues model, you will realize that there
 is more to implementing a Kalman filter then a hand full of linear
 algebra equations!</P>
 <P>Many DIY Kalman filter implementations fail as they do not
@@ -260,14 +267,15 @@ particle filter such as the <I>SIR_filter</I> scheme.</P>
 <P>Although many things have been added to Bayes++ over the last two
 years they have only added to the variety of implementations.
 Bayes++'s interface has now reached a very mature stage with little
-or no change required to add new Schemes.&nbsp;Be aware however that
-the Matrix support implementation (anything in namespace
-Bayesian_filter_matrix) may change in the future.</P>
+or no change required to add new Schemes. Be aware however that the
+Matrix support implementation (anything in namespace
+Bayesian_filter_matrix) may change to accommodate matrix library
+changes.</P>
 <P>The implementations of filtering Schemes included in the web
 release, have all been tested with a standard range angle observation
 problem. I also use the filtering Schemes for my own work, and so do
 others at the <A HREF="http://www.acfr.usyd.edu.au/">Australian
-Center for Field Robotics</A> and all over the world.</P>
+Centre for Field Robotics</A> and all over the world.</P>
 <H4>Do I need to program in C++ to use Bayes++?</H4>
 <P>Yes! Bayes++ was developed to provide the maximum functionality in
 C++. A good C++ text book will help you understand how Bayes++ works.
@@ -292,7 +300,7 @@ classes that represent the statistics used. For example the
 <H4>What Matrix library do you recommend?</H4>
 <P>As of version 1_29_0 <A HREF="http://www.boost.org/"><B>Boost</B></A>
 includes a public release of the <A HREF="http://www.boost.org/libs/numeric/ublas/doc/index.htm"><B>uBLAS</B></A>
-library. This an excellent linear algebra&nbsp; library. The
+library. This an excellent basic linear algebra library. The
 interface and syntax are easy to use. It provides a wide variety of
 matrix and vector containers and a complete set of Basic Linear
 Algebra operations. The implementation and structure can incorporate
@@ -301,7 +309,7 @@ uBLAS the more I like it! See also my note on <A HREF="http://www.crystalclearso
 uBLAS</A> on the Boost Wiki.</P>
 <P>Credit for uBLAS goes to Joerg Walter and Mathias Koch. Many
 thanks!</P>
-<P>Older releases of Bayes++ support both uBlas and <A HREF="http://www.osl.iu.edu/research/mtl/">MTL
+<P>Older releases of Bayes++ support both uBLAS and <A HREF="http://www.osl.iu.edu/research/mtl/">MTL
 the Matrix Template Library</A>. Future releases of MTL may also be
 of interest to Bayes++. However at present nothing is being publicly
 releases so I will await the outcome.</P>
@@ -319,9 +327,9 @@ been extended. It is validated ofr GCC 3.2, GCC 2.95.3, VisualC++
 <P>Jens Mauer has been working hard on getting <B>boost::random</B>
 accepted as part of the future C++ standard library. To this end
 there have been substantial changes to its interface. These have now
-be commited to Boost. The Bayes++ examples make use of boost::random.
-So things migrate smoothly I have added a new &quot;test/random.hpp&quot;
-header which hides the interface changes.</P>
+be committed to Boost. The Bayes++ examples make use of
+boost::random. So things migrate smoothly I have added a new
+&quot;test/random.hpp&quot; header which hides the interface changes.</P>
 <P>The very excellent <B>Boost Build system version 2 </B>has
 advanced a great deal recently. Bayes++ is normal built with standard
 Boost Build system. You can select the version 2 build system by
@@ -347,14 +355,14 @@ such variable does appear it is said to be an <I>alias</I>. Because
 assignment involves more then one element, the presence of an alias
 requires that an assignment first compute a temporary result before
 the aliased variable is modified.</P>
-<P><B>uBLAS</B>'s default behaviour is to create such a temporary. If
+<P><B>uBLAS</B>'s default behavior is to create such a temporary. If
 the assignment is know to be free of an alias this should be avoided.
-Previously such an optimised assignment was specified with the
+Previously such an optimized assignment was specified with the
 <B>.assign()</B> member functions. To improve the readability of code
 I have added a new syntax for assignment. Where no aliases of
 variable assigned to (lvalue) appears in the expression on the right
-hand side of the assignmment use:</P>
-<PRE> noalias(lvalue) = expression;</PRE><P>
+hand side of the assignment use:</P>
+<PRE STYLE="margin-bottom: 0.5cm"> noalias(lvalue) = expression;</PRE><P>
 This new syntax is experimental but will probably be part of a future
 <B>uBLAS</B> release. At present the implementation introduces a
 small overhead on the supported compilers. This includes GCC 3.2.</P>
@@ -362,42 +370,42 @@ small overhead on the supported compilers. This includes GCC 3.2.</P>
 <H3>Filters are named <I>_filter</I>, Schemes are named <I>_scheme</I></H3>
 <P>Abstract filters and numeric schemes previously all had names
 ending in <I>_filter</I>. To make things simpler the naming has been
-changed to make a clear seperation in what is a two level hierarchy.</P>
+changed to make a clear separation in what is a two level hierarchy.</P>
 <P>Filters lie at the base of the hierarchy. Schemes are always
 derived from one of more filters. Filters represent abstract
 concepts, such as the statistics of state representation and model
-interface. Schemes are concreate implementations of a filter with all
+interface. Schemes are concrete implementations of a filter with all
 the numeric details and interfaces completed.</P>
 <P>As part of this change the statistics of state representation have
 been made <B>virtual base classes</B>. This change is designed to
 allow multiple schemes combined together (using multiple inheritance)
-and share their reperesntation. The change adds a little more work if
+and share their representation. The change adds a little more work if
 you choose to derive from a scheme class. The constructors for the
 derived class must call the constructors for the virtual base classes
 directly.</P>
 <H3>Covariance Intersect Scheme added</H3>
 <P>Finally the <B>CI</B> algorithm has been implemented as a Scheme
 in Bayes++. CI is interesting as it provides a weaker but more robust
-fussion then traditional covariance based method such as the Kalman
+fusion then traditional covariance based method such as the Kalman
 filter. It estimates state and an upper bound of what its covariance
 could be.<BR><BR>Actually only the matrix algebra associated with CI
 has is included. The CI_filter scheme provides a virtual function
-where the user must define the actual optimisation algorithm to be
+where the user must define the actual optimization algorithm to be
 used.</P>
 <H3>Importance Resampling infrastructure added</H3>
 <P>The flexibility of the <I>SIR_filter </I>has been greatly
 improved. A new class <I>Importance_resampler</I> has been added.
-Whenever <I>SIR_filter </I>need to resample it uses and
-Importance_resampler parameter. Therefore by changing this parameter
-different resamplers can be used. 
+Whenever <I>SIR_filter </I>need to re-sample it uses and
+Importance_resampler parameter. Therefore by changing this parameter,
+different re-samplers can be used. 
 </P>
 <P>Two implementation are provided. The <I>Standard_resampler</I> and
 the <I>Systematic_resampler</I>. See the referenced publications for
-further dicussion of these methods.</P>
+further discussion of these methods.</P>
 <H3>Gappy Matrices</H3>
-<P>The matrix interface has been further improved. These improvment
+<P>The matrix interface has been further improved. These improvement
 require uBLAS from boost_1_30_0. With this version there is now
-experimantal support for using uBLAS <B>gappy</B> matrices and
+experimental support for using uBLAS <B>gappy</B> matrices and
 vectors (sparse, compressed, coordinate).</P>
 <P>The experimental support makes all of Bayes++ use a selected uBLAS
 storage type. Check <B>matSupSub.hpp </B>for macro's required to
@@ -407,21 +415,27 @@ perform better with sparse types.</P>
 with the prod_SPD interface.</P>
 <H3>Matrix Interface changes included from 2002.10</H3>
 <P>This release only supplies a matrix abstraction layer for Boost
-uBlas. The change reflects my wish to change the Bayes++ matrix
-syntax to more closely reflect that of uBlas. There are a few simple
+uBLAS. The change reflects my wish to change the Bayes++ matrix
+syntax to more closely reflect that of uBLAS. There are a few simple
 changes to note:</P>
 <OL>
-	<LI>nrows() and ncols() are now size1() and size2() 
-	<LI>set(X, 0.) should be replaced by X.clear() for any container
-	type 
-	<LI>The operator* overloading is dropped. Use the explict X =
-	prod(A,B)<BR>uBlas a has a wide variety of different product.
-	Expression complexity can be controlled by introducing a temporary.
-	For example <I>prod&lt;type&gt;(A,B)</I> can be used to compute the
-	product of A,B where the type is used to hold the temporary result. 
-	<LI>Look out for the use of X.assign(EE). This is an optimised
-	assignment (instead of =) when the result of the expression EE is
-	independant of X 
+	<LI><P STYLE="margin-bottom: 0cm">nrows() and ncols() are now
+	size1() and size2() 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm">set(X, 0.) should be replaced by
+	X.clear() for any container type 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm">The operator* overloading is
+	dropped. Use the explict X = prod(A,B)<BR>uBLAS a has a wide variety
+	of different product. Expression complexity can be controlled by
+	introducing a temporary. For example <I>prod&lt;type&gt;(A,B)</I>
+	can be used to compute the product of A,B where the type is used to
+	hold the temporary result. 
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm">Look out for the use of
+	X.assign(EE). This is an optimized assignment (instead of =) when
+	the result of the expression EE is independent of X 
+	</P>
 	<LI><P>The type Subscript has been removed. All interfaces now use
 	<B>size_t</B> instead</P>
 </OL>
