@@ -803,9 +803,9 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
 
 void UdUrecompose (SymMatrix& X, const RowMatrix& M)
 {
-						// Abuse X as a RowMatrix
+					// Abuse X as a RowMatrix
 	RowMatrix& X_matrix = X.asRowMatrix();
-		// assign elements of common top left block of R into L
+					// Assign elements of common top left block of R into L
 	size_t top = std::min(X_matrix.size1(), M.size1());
 	size_t left = std::min(X_matrix.size2(), M.size2());
 	noalias(X_matrix.sub_matrix(0,top, 0,left)) = M.sub_matrix(0,top, 0,left);
@@ -832,7 +832,7 @@ SymMatrix::value_type UdUinversePDignoreInfinity (SymMatrix& M)
 	SymMatrix::value_type rcond = rcond_ignore_infinity_internal (diag(M_matrix));
 	assert (rcond == orig_rcond || orig_rcond == 0); (void)orig_rcond;
 
-	// Only invert and recompose if PD
+					// Only invert and recompose if PD
 	if (rcond > 0) {
 		bool singular = UdUinverse (M_matrix);
 		assert (!singular); (void)singular;
@@ -855,7 +855,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
 					// Abuse as a RowMatrix
 	RowMatrix& M_matrix = M.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (M_matrix, M_matrix.size1());
-	// Only invert and recompose if PD
+					// Only invert and recompose if PD
 	if (rcond > 0) {
 		bool singular = UdUinverse (M_matrix);
 		assert (!singular); (void)singular;
@@ -872,7 +872,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM)
 					// Abuse as a RowMatrix
 	RowMatrix& M_matrix = M.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (M_matrix, M_matrix.size1());
-	// Only invert and recompose if PD
+					// Only invert and recompose if PD
 	if (rcond > 0) {
 		detM = UdUdet(M_matrix);
 		bool singular = UdUinverse (M_matrix);
@@ -898,7 +898,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 					// Abuse as a RowMatrix
 	RowMatrix& MI_matrix = MI.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (MI_matrix, MI_matrix.size1());
-	// Only invert and recompose if PD
+					// Only invert and recompose if PD
 	if (rcond > 0) {
 		bool singular = UdUinverse (MI_matrix);
 		assert (!singular); (void)singular;
@@ -914,15 +914,17 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, SymMatrix::value_type& detM, 
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	const RowMatrix& M_matrix = M.asRowMatrix();
 	RowMatrix& MI_matrix = MI.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (MI_matrix, MI_matrix.size1());
-	// Only invert and recompose if PD
-	if (rcond > 0) {
-		detM = UdUdet(M_matrix);
-		bool singular = UdUinverse (MI_matrix);
-		assert (!singular); (void)singular;
-		UdUrecompose_transpose (MI_matrix);
+	if (rcond >= 0) {
+		detM = UdUdet (MI_matrix);
+					// Only invert and recompose if PD
+		if (rcond > 0) {
+			detM = UdUdet (MI_matrix);
+			bool singular = UdUinverse (MI_matrix);
+			assert (!singular); (void)singular;
+			UdUrecompose_transpose (MI_matrix);
+		}
 	}
 	return rcond;
 }
