@@ -1,24 +1,31 @@
-BayesFilter TODO List
+Bayes++ TODO List
 
 FOR RELEASE
+		Doxygen!
 		Build GCC2.95.3 and VC7
+		Check VC7 solution
 	Check what UBLAS macros are needed
 		For exceptions/errors
 		For storage
 		Run with sparse
 		Run Simple, PV, QuadCalib
 
-TODO
-	Document
-		numeric postcondition
-		models are implicity/explictly parameterised by state
+DOCUMENTATION
+	Describe generic schemes
+	Why Gq noise model. It is always non signular. Important for any numerics
+		Q may have zeros. But if we have G then linear algebra can still use inverse.
+		This is also why inverse(G) is not needed in inverse model. It would not be defined for signular Q
+	Numeric postcondition. May not be PSD
+	Models are implicity/explictly parameterised by state
+	Use BoostBook to consistenently document pre/postconditions
 
+TODO
+	Move General_predict into SIR_model.hpp to share random and code
 	By products: add observe parameterisation for by products and temps
 		observe innovation, surely it is something that is always computable by all schemes
 			This should be the first "by_product"
 	Extended_fiilter would be the place for an update managment helper
-	Replace General_ with a form that works with functional forms
-	Replace UdU function with UdU class
+	Replace UdU function with UdU class. Requires a general uBLAS factor object
 
 NEW FILTERS
 	Factorised UKF or DDF2
@@ -28,38 +35,29 @@ NEW FILTERS
 	 This make a big difference to speed. Hard for prod(L,R) need to have oposite orienation
 
 TO REVIEW
-	Sharing state in filters: Provided constructors with state references
+	Sharing state in filters, alternative to MI is constructors with state references (closures)
 	Check consistency of model to filter
 		Validate (z to h.Z) model sizes in predict and observe
 	UDpredict catching Negative matrices in observe
 	Check normalisation: Standard form should be to normalise z. It is nice to have zp consistent with itself i.e. Hx
 	Check when numerics fail for both state and obs semidefinate
 
-ISSUES
-	Enable Cov and Inf implmentations for PSD matricies where numerically possible. At present may be PD only
-
 CODE RULES
 	filter
-		copy assigment, optimised to remove temps
+		assigment operator, optimised to remove temps
 	predict/observe
 		in BayesFlt.h	must be virtual. The types are polymorphic
 		in xxFlt.h		no vitual. These are specialised forms
 	filter_matrix
-		use Vec/Matrix x.assign (prod(a,b)); avoiding copy overhead
+		use Vec/Matrix noalias(x) = prod(a,b); avoiding copy overhead. However a=b; is automatical efficient
 
 TESTING
 	Unscented_filter
 		for q_size > x_size  Don´t forget more noise is injected into nonlinear model => different observe result!
 
-DOCUMENTATION
-	Describe generic schemes
-	Why Gq noise model. It is always non signular. Important for any numerics
-		Q may have zeros. But if we have G then linear algebra can still use inverse.
-		This is also why inverse(G) is not needed in inverse model. It would not be defined for signular Q
 
 
-
-// Hmmm this seems to be not the best algorithm numerically
+// Hmmm this seems NOT to be the best algorithm numerically
 // The good one from A+G uses element multiples
 template<class M>
 bool compact_cholesky (M &m)
@@ -85,15 +83,3 @@ bool compact_cholesky (M &m)
 	}
 	return negative;
 }
-
-UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
-{
-	assert (M.size1() == n);
-	assert (M.size2() == n);
-	bool negative = lower_cholesky(M);
-	// Estimate the reciprocal condition number
-	if (negative)
-		return -1;
-	return UCrcond (M,n);
-}
-

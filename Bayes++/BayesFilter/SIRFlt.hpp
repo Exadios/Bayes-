@@ -41,7 +41,6 @@
  *   for these samples.
  */
 #include "bayesFlt.hpp"
-#include "models.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter
@@ -203,25 +202,8 @@ public:
 			roughen_correlated (S, rougheningK);
 	}
 
-
 protected:
 	void roughen_correlated (FM::ColMatrix& P, Float K);	// Roughening using covariance of P distribution
-	// Roughening model and random normal
-	class Roughen_random : public General_LiAd_predict_model::Random
-	{
-	public:
-		Roughen_random(SIR_random& random_helper) :
-			random(random_helper)
-		{}
-		virtual void normal(FM::DenseVec& v)
-		{
-			random.normal(v);
-		}
-	
-	private:
-		SIR_random& random;
-	} rough_random;
-	General_LiAd_predict_model rough;
 private:
 	static Float scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& S);
 	void mean();

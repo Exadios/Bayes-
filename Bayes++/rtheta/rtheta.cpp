@@ -100,25 +100,11 @@ class pred_model : public General_LiInAd_predict_model
 {
 public:
 	pred_model();
-private:
-	class Predict_random : public General_LiInAd_predict_model::Random
-	/*
-	 * Uses global Random
-	 */
-	{
-	public:
-		void normal(FM::DenseVec& v)
-		{
-			::Random2.normal(v);
-		}
-	} localRandom;
-
-	Vec x_pred;
 };
 
 
 pred_model::pred_model () :
-	General_LiInAd_predict_model(NX,NQ, localRandom), x_pred(NX)
+	General_LiInAd_predict_model(NX,NQ, boost::bind(&SIR_random::normal, &Random2, _1))
 // Construct constant model
 {
 	// Build Fx, Identity all except active partition

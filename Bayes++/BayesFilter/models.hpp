@@ -11,31 +11,30 @@
  */
 
 /*
- * Predict and Observe model
- *  These model extend, adapt and simpilify the fundematale Bayes filter models
+ * Predict and Observe models
+ *  These models extend, adapt and simpilify the fundamental Bayesian filter models
  *  Simple : Simplify model construction and use
  *  General: Combine model types to form more general models
  *  Adapted: Adapt one model type into another
  */
-
+#include <boost/function.hpp>
 
 /* Filter namespace */
 namespace Bayesian_filter
 {
 
-template <class Function>
+typedef boost::function1<const FM::Vec&, const FM::Vec&> State_function;
+// A generalised function of state. Compatible with predict and observe models
+
+
 class Simple_addative_predict_model : public Addative_predict_model
 // Addative predict model initialised from function and model matricies
 {
-	Function& ff;
+boost::function1<int, int> xx;
+	State_function ff;
 public:
-	Simple_addative_predict_model (Function& f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+	Simple_addative_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init);
 	// Precondition: G, q are conformantly dimensioned (not checked)
-		Addative_predict_model (G_init.size1(), q_init.size())
-	{
-		G = G_init;
-		q = q_init;
-	}
 
 	// No default assignment operator
 
@@ -44,69 +43,55 @@ public:
 	}
 };
 
-template <class Function>
 class Simple_linrz_predict_model : public Linrz_predict_model
 // Linrz predict model initialised from function and model matricies
 {
-	Function& ff;
+	State_function ff;
 public:
-	Simple_linrz_predict_model (Function& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+	Simple_linrz_predict_model (State_function f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init);
 	// Precondition: Fx, G, q are conformantly dimensioned (not checked)
-		Linrz_predict_model (Fx_init.size1(), q_init.size())
-	{
-		Fx = Fx_init;
-		G = G_init;
-		q = q_init;
-	}
 
 	// No default assignment operator
 
 	virtual const FM::Vec& f(const FM::Vec& x) const
-	{	return ff.f(x);
+	{	return ff(x);
 	}
 };
 
-template <class Dummy>
 class Simple_linear_predict_model : public Linear_predict_model
 // Linear predict model initialised from model matricies
 {
 public:
-	Simple_linear_predict_model (const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+	Simple_linear_predict_model (const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init);
 	// Precondition: Fx, q and G are conformantly dimensioned (not checked)
-		Linear_predict_model (Fx_init.size1(), q_init.size())
-	{
-		Fx = Fx_init;
-		G = G_init;
-		q = q_init;
-	}
 };
 
 
 class Simple_linrz_correlated_observe_model : public Linrz_correlated_observe_model
 // Linrz observe model initialised from function and model matricies
 {
-	Observe_function &ff;
+	State_function ff;
 public:
-	Simple_linrz_correlated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init);
+	Simple_linrz_correlated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init);
 	// Precondition: Hx, Z are conformantly dimensioned (not checked)
 	// No default assignment operator
 
 	virtual const FM::Vec& h(const FM::Vec& x) const
-	{	return ff.h(x);
+	{	return ff(x);
 	}
 };
 
 class Simple_linrz_uncorrelated_observe_model : public Linrz_uncorrelated_observe_model
 // Linrz observe model initialised from function and model matricies
 {
-	Observe_function& ff;
+	State_function ff;
 public:
-	Simple_linrz_uncorrelated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init);
+	Simple_linrz_uncorrelated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init);
 	// Precondition: Hx, Zv are conformantly dimensioned (not checked)
 	// No default assignment operator
 
 	virtual const FM::Vec& h(const FM::Vec& x) const
-	{	return ff.h(x);
+	{	return ff(x);
 	}
 };
 
@@ -129,23 +114,18 @@ public:
 
 /*
  * Generalise a addative predict model to sampled predict model
- *  To instantiate template sqrt is required
+ *  To instantiate template std::sqrt is required
  */
-struct General_sampled_predict_random
-/* Random number generators interface
- *  Helper to allow polymorthic use of random number generators 
- */
-{
-	virtual void normal(FM::DenseVec& v) = 0;
-};
+typedef boost::function1<void, FM::DenseVec&> Normal_random_vector_function;
+// A function to compute a normally distributed random vector
 
 template <class Predict_model>
 class General_sampled_predict_model: public Predict_model, public Sampled_predict_model
 {
 public:
-	typedef General_sampled_predict_random Random;
+	typedef Normal_random_vector_function Random_function;
 
-	General_sampled_predict_model (size_t x_size, size_t q_size, Random& random_helper) :
+	General_sampled_predict_model (size_t x_size, size_t q_size, Random_function random_helper) :
 		Predict_model(x_size, q_size),
 		Sampled_predict_model(),
 		genn(random_helper),
@@ -167,7 +147,7 @@ public:
 							// Predict state using supplied functional predict model
 		xp = Predict_model::f(x);
 							// Additive random noise
-		genn.normal(n);				// independant zero mean normal
+		genn(n);				// independant zero mean normal
 									// multiply elements by std dev
 		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
@@ -189,7 +169,7 @@ public:
 		}
 	}
 private:
-	Random& genn;
+	Random_function genn;
 	mutable FM::Vec xp;
 	mutable FM::DenseVec n;
 	mutable FM::Vec rootq;		// Optimisation of sqrt(q) calculation, automatic on first use

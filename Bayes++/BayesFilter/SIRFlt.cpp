@@ -13,12 +13,13 @@
  * Bootstap filter (Sequential Importance Resampleing).
  */
 #include "bayesFlt.hpp"
+#include "models.hpp"
 #include "matSup.hpp"
 #include "SIRFlt.hpp"
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include <boost/limits.hpp>
+#include <boost/bind.hpp>
 
 namespace {
 
@@ -218,8 +219,8 @@ void
  SIR_scheme::init_S ()
 /*
  * Initialise sampling
- *		Pre: S
- *		Post: stochastic_samples := samples in S
+ *  Pre: S
+ *  Post: stochastic_samples := samples in S
  */
 {
 	stochastic_samples = S.size2();
@@ -236,11 +237,11 @@ SIR_scheme::Float
  * Post: S represent the fused distribution, n_resampled from weighted_resample
  * Exceptions:
  *  Bayes_filter_exception from resampler
- *		unchanged: S, stochastic_samples
+ *    unchanged: S, stochastic_samples
  * Return
- *		lcond, Smallest normalised weight, represents conditioning of resampling solution
- *		lcond == 1 if no resampling preformed
- *		This should by multipled by the number of samples to get the Likelihood function conditioning
+ *  lcond, Smallest normalised weight, represents conditioning of resampling solution
+ *  lcond == 1 if no resampling preformed
+ *  This should by multipled by the number of samples to get the Likelihood function conditioning
  */
 {
 	Float lcond = 1;
@@ -267,8 +268,8 @@ void
  SIR_scheme::predict (Sampled_predict_model& f)
 /*
  * Predict state posterior with sampled noise model
- *		Pre : S represent the prior distribution
- *		Post: S represent the predicted distribution, stochastic_samples := samples in S
+ *  Pre : S represent the prior distribution
+ *  Post: S represent the predicted distribution, stochastic_samples := samples in S
  */
 {
 						// Predict particles S using supplied predict model
@@ -418,11 +419,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
  */
 SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
 	SIR_scheme (x_size, s_size, random_helper),
-	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size), 
-	rough_random (random_helper),
-	rough (x_size,x_size, rough_random)
+	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size) 
 {
-	FM::identity (rough.Fx);
 }
 
 void SIR_kalman_scheme::init ()
@@ -443,10 +441,14 @@ void SIR_kalman_scheme::init ()
 	Float rcond = UdUfactor (UD, X);
 	rclimit.check_PSD(rcond, "Roughening X not PSD");
 
-						// Use predict roughening to apply initial noise
-	UdUseperate (rough.G, rough.q, UD);
-	rough.init_GqG ();
-	predict (rough);
+						// Create sampled prediction model using random
+    General_LiAd_predict_model model(x_size,x_size, boost::bind(&SIR_random::normal, &random, _1));
+	FM::identity (model.Fx);
+						// Initial prediction based on scaled variance
+	UdUseperate (model.G, model.q, UD);
+	model.init_GqG ();
+						// Predict using model to apply initial noise
+	predict (model);
 
 	SIR_scheme::init_S ();
 }
@@ -455,8 +457,8 @@ void SIR_kalman_scheme::init ()
 void SIR_kalman_scheme::mean ()
 /*
  * Update state mean
- *		Pre : S
- *		Post: x,S
+ *  Pre : S
+ *  Post: x,S
  */
 {
 						// Mean of distribution: mean of particles
@@ -490,8 +492,8 @@ void SIR_kalman_scheme::update_statistics ()
 /*
  * Update kalman statistics without resampling
  * Update mean and covariance of sampled distribution => mean and covariance of particles
- *		Pre : S (s_size >=1 enforced by state_filter base)
- *		Post: x,X,S	(X may be non PSD)
+ *  Pre : S (s_size >=1 enforced by state_filter base)
+ *  Post: x,X,S	(X may be non PSD)
  *
  * Sample Covariance := (Sum_i [transpose(S[i])*S[i]) - s_size*transpose(mean)*mean) / (s_size-1)
  *  The definition is the unbiased estimate of covariance given samples with unknown (estimated) mean
@@ -529,7 +531,7 @@ void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
  *  may be negative.
  * Exceptions:
  *   Bayes_filter_exception due colapse of P
- *		unchanged: P
+ *    unchanged: P
  */
 {
 	using namespace std;
@@ -543,17 +545,15 @@ void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
 	Float rcond = UdUfactor (UD, X);
 	rclimit.check_PSD(rcond, "Roughening X not PSD");
 
-	UdUseperate (rough.G, rough.q, UD);
-						// Apply roughening prediction based on scaled variance
-	rough.q *= VarScale;
-	rough.init_GqG();
-
-						// Predict particles P using rough model
-	const size_t nSamples = P.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Pi(P,i);
-		Pi.assign (rough.f(Pi));
-	}
+						// Create roughening model using random
+    General_LiAd_predict_model roughen(x_size,x_size, boost::bind(&SIR_random::normal, &random, _1));
+	FM::identity (roughen.Fx);
+						// Roughening prediction based on scaled variance
+	UdUseperate (roughen.G, roughen.q, UD);
+	roughen.q *= VarScale;
+	roughen.init_GqG();
+						// Predict particles P using roughening model
+	predict (roughen);
 }
 
 

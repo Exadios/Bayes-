@@ -63,7 +63,35 @@ Bayes_base::Float
 }
 
 
-Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
+Simple_addative_predict_model::Simple_addative_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+// Precondition: G, q are conformantly dimensioned (not checked)
+	Addative_predict_model (G_init.size1(), q_init.size()),
+	ff(f_init)
+{
+	G = G_init;
+	q = q_init;
+}
+
+Simple_linrz_predict_model::Simple_linrz_predict_model (State_function f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+// Precondition: Fx, G, q are conformantly dimensioned (not checked)
+	Linrz_predict_model (Fx_init.size1(), q_init.size()),
+	ff(f_init)
+{
+	Fx = Fx_init;
+	G = G_init;
+	q = q_init;
+}
+
+Simple_linear_predict_model::Simple_linear_predict_model (const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+// Precondition: Fx, q and G are conformantly dimensioned (not checked)
+	Linear_predict_model (Fx_init.size1(), q_init.size())
+{
+	Fx = Fx_init;
+	G = G_init;
+	q = q_init;
+}
+
+Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
 	Linrz_correlated_observe_model (Hx_init.size2(), Hx_init.size1()),
 	ff(f_init)
 /* Linrz observe model initialised from function and model matricies
@@ -75,7 +103,7 @@ Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (Ob
 	Z = Z_init;
 };
 
-Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
+Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
 	Linrz_uncorrelated_observe_model (Hx_init.size2(), Hx_init.size1()),
 	ff(f_init)
 /* Linrz observe model initialised from function and model matricies

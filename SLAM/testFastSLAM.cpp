@@ -19,6 +19,7 @@
 #include "BayesFilter/SIRFlt.hpp"
 #include "BayesFilter/covFlt.hpp"
 #include "BayesFilter/unsFlt.hpp"
+#include "BayesFilter/models.hpp"
 // Bayes++ SLAM
 #include "SLAM.hpp"
 #include "fastSLAM.hpp"
@@ -27,12 +28,13 @@
 #include "Test/random.hpp"
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace SLAM_filter;
 
 
-class SLAM_random : public Bayesian_filter_test::Boost_random, public BF::SIR_random, public BF::General_LiInAd_predict_model::Random
+class SLAM_random : public Bayesian_filter_test::Boost_random, public BF::SIR_random
 /*
  * Random numbers for SLAM test
  */
@@ -131,8 +133,8 @@ void SLAMDemo::OneDExperiment()
 	const unsigned nM = 2;	// Map
 
 	// Construct simple Prediction models
-	BF::General_LiAd_predict_model location_predict(nL,1, goodRandom);
-	BF::General_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
+	BF::General_LiAd_predict_model location_predict(nL,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
+	BF::General_LiAd_predict_model all_predict(nL+nM,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
 	// Stationary Prediction model (Identity)
 	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
 				// Constant Noise model
@@ -236,8 +238,8 @@ void SLAMDemo::InformationLossExperiment()
 	const unsigned nM = 2;	// Map
 
 	// Construct simple Prediction models
-	BF::General_LiAd_predict_model location_predict(nL,1, goodRandom);
-	BF::General_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
+	BF::General_LiAd_predict_model location_predict(nL,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
+	BF::General_LiAd_predict_model all_predict(nL+nM,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
 	// Stationary Prediction model (Identity)
 	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
 				// Constant Noise model
