@@ -583,33 +583,33 @@ bool UTinverse (UTriMatrix& U)
  *    singularity (of U), true iff diagonal of U has a zero element
  */
 {
-	const size_t size = U.size1();
-	assert (size == U.size2());
+	const size_t n = U.size1();
+	assert (n == U.size2());
 
 	bool singular = false;
 	// Invert U in place
-	if (size > 0)
+	if (n > 0)
 	{
-		size_t i = size-1;
+		size_t i = n-1;
 		do {
 			UTriMatrix::Row Ui(U,i);
 			UTriMatrix::value_type d = Ui[i];
-			if (d == 0.)
+			if (d == 0)
 			{
 				singular = true;
 				break;
 			}
-			d = 1./d;
+			d = 1/d;
 			Ui[i] = d;
 
-			for (size_t j = size-1; j > i; --j)
+			for (size_t j = n-1; j > i; --j)
 			{
 				UTriMatrix::value_type e = 0.;
-				for (size_t k = i; k < j; ++k)
+				for (size_t k = i+1; k <= j; ++k)
 					e -= Ui[k] * U(k,j);
-				Ui[j] = e*U(j,j);
+				Ui[j] = e*d;
 			}
-		} while (i-- > 0.);
+		} while (i-- > 0);
 	}
 
 	return singular;
