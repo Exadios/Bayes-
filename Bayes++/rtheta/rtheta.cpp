@@ -220,7 +220,6 @@ const Vec& uobs_model::h (const Vec& x) const
 {
 	Float dx = TARGET[0] - x[0];
 	Float dy = TARGET[1] - x[1];
-
 	z_pred.clear();
 	if (RA_MODEL) {
 		Float distSq = dx*dx + dy*dy;
@@ -277,13 +276,13 @@ walk::walk (const Vec start, const bool fixed) : x(start), x_pred(NX), rootq(NQ)
 void walk::predict ()
 {
 						// Correlated additive random noise
-	DenseVec n(rootq.size()), nc(x.size());
+	DenseVec n(rootq.size());
 	::Random.normal (n);		// independant zero mean normal
 								// multiply elements by std dev
 	for (DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 		*ni *= rootq[ni.index()];
 	}
-	nc = prod(G,n);				// correlate
+	DenseVec nc (prod(G,n));				// correlate
 
 	if (m_fixed) {				// Randomize based on assumed noise
 		x = m_base + nc;
@@ -611,6 +610,7 @@ int main()
 	SymMatrix X_init (NX, NX);
 
 	// Cartessian start position (in meters)
+    x_init.clear();
 	x_init[0] = INIT_XY[0];
 	x_init[1] = INIT_XY[1];
 	// Initial state covariance, correlated
