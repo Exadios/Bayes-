@@ -158,12 +158,11 @@ void SLAMDemo::OneDExperiment()
 
 
 	// Kalman_SLAM filter:
-	Full_manager<BF::Covariance_scheme> full_filter;
+	BF::Covariance_scheme location_filter(nL);
+	location_filter.init_kalman (x_init, X_init);
 
-	Kalman_SLAM kalm (nL, full_filter);
-	kalm.full->x = x_init;
-	kalm.full->X = X_init;
-	kalm.full->init();
+	Full_manager<BF::Covariance_scheme> full_filter;
+	Kalman_SLAM kalm (location_filter, full_filter);
 
 	// Fast_SLAM filter
 #ifdef NDEBUG
@@ -263,12 +262,11 @@ void SLAMDemo::InformationLossExperiment()
 	FM::Vec z(1);
 
 	// Kalman_SLAM filter
-	Full_manager<BF::Unscented_scheme> full_filter;
+	BF::Covariance_scheme location_filter(nL);
+	location_filter.init_kalman (x_init, X_init);
 
-	Kalman_SLAM kalm (nL, full_filter);
-	kalm.full->x = x_init;
-	kalm.full->X = X_init;
-	kalm.full->init();
+	Full_manager<BF::Unscented_scheme> full_filter;
+	Kalman_SLAM kalm (location_filter, full_filter);
 
 	// Fast_SLAM filter
 	unsigned nParticles = 1000;
