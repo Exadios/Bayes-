@@ -152,9 +152,9 @@ public:
 	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
-class Addative_predict_model : virtual public Predict_model_base
-/* Addative Gaussian noise predict model
-   This fundamental model for non-linear filtering with addative noise
+class Additive_predict_model : virtual public Predict_model_base
+/* Additive Gaussian noise predict model
+   This fundamental model for non-linear filtering with additive noise
     x(k|k-1) = f(x(k-1|k-1)) + G(k)w(k)
     q(k) = state noise covariance, q(k) is covariance of w(k)
     G(k) = state noise coupling
@@ -162,10 +162,10 @@ class Addative_predict_model : virtual public Predict_model_base
 */
 {
 public:
-	Addative_predict_model (size_t x_size, size_t q_size);
+	Additive_predict_model (size_t x_size, size_t q_size);
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
-	// Functional part of addative model
+	// Functional part of additive model
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 
 	FM::Vec q;		// Noise variance (always dense, use coupling to represent sparseness)
@@ -175,7 +175,7 @@ public:
 	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
-class Linrz_predict_model : public Addative_predict_model
+class Linrz_predict_model : public Additive_predict_model
 /* Linrz predict model
    This fundamental model for linear/linearised filtering
     x(k|k-1) = f(x(k-1|k-1)
@@ -288,7 +288,7 @@ public:
 	Parametised_observe_model(size_t /*z_size*/)
 	{}
 	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
-	// Functional part of addative model
+	// Functional part of additive model
 	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
 	// Discontinous h. Normalise one observation (z_denorm) from another
 	{}	//  Default normalistion, z_denorm unchanged
@@ -297,25 +297,25 @@ public:
 	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
-class Uncorrelated_addative_observe_model : public Parametised_observe_model
-/* Observation model, uncorrelated addative observation noise
+class Uncorrelated_additive_observe_model : public Parametised_observe_model
+/* Observation model, uncorrelated additive observation noise
 	Z(k) = I * Zv(k) observe noise variance vector Zv
  */
 {
 public:
-	Uncorrelated_addative_observe_model (size_t z_size) :
+	Uncorrelated_additive_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
 	FM::Vec Zv;			// Noise Variance
 };
 
-class Correlated_addative_observe_model : public Parametised_observe_model
-/* Observation model, correlated addative observation noise
+class Correlated_additive_observe_model : public Parametised_observe_model
+/* Observation model, correlated additive observation noise
     Z(k) = observe noise covariance
  */
 {
 public:
-	Correlated_addative_observe_model (size_t z_size) :
+	Correlated_additive_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
 	FM::SymMatrix Z;	// Noise Covariance (not necessarly dense)
@@ -335,7 +335,7 @@ protected: // Jacobian model is not sufficient, it is used to build Linrz observ
 	{}
 };
 
-class Linrz_correlated_observe_model : public Correlated_addative_observe_model, public Jacobian_observe_model
+class Linrz_correlated_observe_model : public Correlated_additive_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with repespect to state x (fixed size)
     correlated observation noise
     zp(k) = h(x(k-1|k-1)
@@ -345,11 +345,11 @@ class Linrz_correlated_observe_model : public Correlated_addative_observe_model,
 {
 public:
 	Linrz_correlated_observe_model (size_t x_size, size_t z_size) :
-		Correlated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
+		Correlated_additive_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 };
 
-class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_model, public Jacobian_observe_model
+class Linrz_uncorrelated_observe_model : public Uncorrelated_additive_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with repespect to state x (fixed size)
     uncorrelated observation noise
     zp(k) = h(x(k-1|k-1)
@@ -359,7 +359,7 @@ class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_mo
 {
 public:
 	Linrz_uncorrelated_observe_model (size_t x_size, size_t z_size) :
-		Uncorrelated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
+		Uncorrelated_additive_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 };
 
@@ -572,7 +572,7 @@ public:
  * Linearizable filter models - Abstract filtering property
  *  Linrz == A linear, or gradient Linearized filter
  *
- * Predict uses a Linrz_predict_model that maintains a Jacobian matrix Fx and addative noise
+ * Predict uses a Linrz_predict_model that maintains a Jacobian matrix Fx and additive noise
  * NOTE: Functional (non-stochastic) predict is NOT possible as predict requires Fx.
  *
  * Observe uses a Linrz_observe_model and a variable size observation (z)
@@ -660,7 +660,7 @@ public:
 /*
  * Sample State Filter - Abstract filtering property
  *
- * Probability distributions are represted by a finite sampling
+ * Probability distributions are represented by a finite sampling
  *
  * State (x_size) size and its sampling (s_size) are assumed to remain constant.
  * The state sampling public so they can be directly manipulated.

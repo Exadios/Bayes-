@@ -20,13 +20,13 @@
 namespace Bayesian_filter
 {
 
-/** Specific Unscented predict model for Addative noise.
+/** Specific Unscented predict model for Additive noise.
  * 
  * predict equation x(k|k-1) = f(x(k-1|k-1)) + w(x(k))
  *
  * Unscented filter requires
  *  f the function part of the non-linear model
- *  Q the covariance of the addative w(x(k)), w is specificly allow to be a function of state
+ *  Q the covariance of the additive w(x(k)), w is specificly allow to be a function of state
  */
 class Unscented_predict_model : public Predict_model_base
 {
@@ -38,11 +38,11 @@ public:
 	}
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
-	/// Functional part of addative model
+	/// Functional part of additive model
 	//  Note: Reference return value as a speed optimisation, MUST be copied by caller.
 
 	virtual const FM::SymMatrix& Q(const FM::Vec& x) const = 0;
-	/// Covariance of addative noise
+	/// Covariance of additive noise
 	//  Note: Reference return value as a speed optimisation, MUST be copied by caller.
 private:
 	friend class Unscented_filter;	// Filter implementation need to know noise size
@@ -87,11 +87,11 @@ public:
 	void predict (Unscented_predict_model& f);
 	///< Efficient Unscented predict 
 	void predict (Functional_predict_model& f);
-	void predict (Addative_predict_model& f);
+	void predict (Additive_predict_model& f);
 	Float predict (Linrz_predict_model& f)
 	{	///< Linrz_kalman_filter predict
-		predict(static_cast<Addative_predict_model&>(f));
-		return 1.;		// Always well condition for addative predict
+		predict(static_cast<Additive_predict_model&>(f));
+		return 1.;		// Always well condition for additive predict
 	}
 	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
@@ -100,7 +100,7 @@ public:
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve (static_cast<Uncorrelated_addative_observe_model&>(h), z, s,S,b);
+		return eobserve (static_cast<Uncorrelated_additive_observe_model&>(h), z, s,S,b);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	///< Linrz_kalman_filter observe
@@ -108,14 +108,14 @@ public:
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve (static_cast<Correlated_addative_observe_model&>(h), z, s,S,b);
+		return eobserve (static_cast<Correlated_additive_observe_model&>(h), z, s,S,b);
 	}
 	
-	Float eobserve (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
+	Float eobserve (Uncorrelated_additive_observe_model& h, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float eobserve (Correlated_addative_observe_model& h, const FM::Vec& z,
+	Float eobserve (Correlated_additive_observe_model& h, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	///< General addative observe models form, with explict byproduct
+	///< General additive observe models form, with explict byproduct
 	
 
 protected:

@@ -82,9 +82,9 @@ struct SLAMDemo
 			Zv[0] = i_Zv;
 		}
 	};
-	struct Simple_observe_inverse : BF::Uncorrelated_addative_observe_model
+	struct Simple_observe_inverse : BF::Uncorrelated_additive_observe_model
 	{
-		Simple_observe_inverse (Float i_Zv) : Uncorrelated_addative_observe_model(1), t(1)
+		Simple_observe_inverse (Float i_Zv) : Uncorrelated_additive_observe_model(1), t(1)
 		{
 			Zv[0] = i_Zv;
 		}

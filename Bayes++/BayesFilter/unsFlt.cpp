@@ -170,7 +170,7 @@ namespace {
 	class Adapted_model : public Unscented_predict_model
 	{
 	public:
-		Adapted_model(Addative_predict_model& am) :
+		Adapted_model(Additive_predict_model& am) :
 			Unscented_predict_model(am.G.size1()),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
@@ -185,7 +185,7 @@ namespace {
 			return QGqG;
 		}
 	private:
-		Addative_predict_model& amodel;
+		Additive_predict_model& amodel;
 		mutable SymMatrix QGqG;
 	};
 }//namespace
@@ -201,10 +201,10 @@ void Unscented_scheme::predict (Functional_predict_model& f)
 }
 
 
-/** Adapt model by creating an Unscented predict with addative noise.
+/** Adapt model by creating an Unscented predict with additive noise.
  * Computes noise covariance Q = GqG'
  */
-void Unscented_scheme::predict (Addative_predict_model& f)
+void Unscented_scheme::predict (Additive_predict_model& f)
 {
 	Adapted_model adaptedmodel(f);
 	predict (adaptedmodel);
@@ -233,7 +233,7 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 	}
 
 	init_XX ();
-						// Addative Noise predict, computed about center point
+						// Additive Noise predict, computed about center point
 	noalias(X) += f.Q( column(fXX,0) );
 }
 
@@ -244,10 +244,10 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
  *
  * ISSUE: Simplified implemenation using uncorrelated noise equations
  */
-Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
+Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_model& h, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
-	Adapted_Correlated_addative_observe_model hh(h);
+	Adapted_Correlated_additive_observe_model hh(h);
 	return eobserve (hh, z, s, S, b);
 }
 
@@ -256,7 +256,7 @@ Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_addative_observe_mode
  * @pre x,X
  * @post x,X is PSD
  */
-Bayes_base::Float Unscented_scheme::eobserve (Correlated_addative_observe_model& h, const FM::Vec& z,
+Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model& h, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	size_t z_size = z.size();

@@ -57,7 +57,7 @@ Gaussian_predict_model::Gaussian_predict_model (size_t x_size, size_t q_size) :
  */
 {}
 
-Addative_predict_model::Addative_predict_model (size_t x_size, size_t q_size) :
+Additive_predict_model::Additive_predict_model (size_t x_size, size_t q_size) :
 		q(q_size), G(x_size, q_size)
 /*
  * Set the size of things we know about
@@ -68,7 +68,7 @@ Linrz_predict_model::Linrz_predict_model (size_t x_size, size_t q_size) :
 /*
  * Set the size of things we know about
  */
-		Addative_predict_model(x_size, q_size),
+		Additive_predict_model(x_size, q_size),
 		Fx(x_size,x_size)
 {}
 
