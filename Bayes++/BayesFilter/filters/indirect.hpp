@@ -39,31 +39,38 @@ public:
 	void predict (P_model& f)
 	{
 		x = f.f(x);
-		direct.predict(f);				// May be optimised for linear f as x = 0
+		direct.predict(f);				// May be optimised for linear f as direct.x = 0
 	};
 
-	template <typename O_model>
-	void observe (O_model& h, const FM::Vec& z)
+	void observe (Linear_uncorrelated_observe_model& h, const FM::Vec& z)
 	{
 				// Observe error (explict temporary)
-		FM::Vec z_error(z.size());
-		z_error = h.h(x);
-		z_error -= z;
-		direct.observe (h, z_error);
-				// Update State estimate with error
-		x -= direct.x;
-				// Reset the error
-		direct.x.clear();
+		FM::Vec z_error (h.h(x) - z);
+		direct.observe_error (h, z_error);
+	}
+
+	void observe (Linear_correlated_observe_model& h, const FM::Vec& z)
+	{
+				// Observe error (explict temporary)
+		FM::Vec z_error (h.h(x) - z);
+		direct.observe_error (h, z_error);
 	}
 
 	template <typename O_model>
 	void observe_error (O_model& h, const FM::Vec& z_error)
+	/*
+	 * Observe with precomputed indirect observation error
+	 * The observation model here can be non-linear but must then
+	 * be modified to return h(x_error) - h(x=0)
+	 */
 	{
 		direct.observe (h, z_error);
+		direct.update ();
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
 		direct.x.clear();
+		direct.init();
 	}
 
 	void update ()
@@ -105,30 +112,35 @@ public:
 		direct.predict(f);				// May be optimised for linear f as x = 0
 	};
 
-	template <typename O_model>
-	void observe (O_model& h, const FM::Vec& z)
+	void observe (Linear_uncorrelated_observe_model& h, const FM::Vec& z)
 	{
 				// Observe error (explict temporary)
-		FM::Vec z_error(z.size());
-		z_error = h.h(x);
-		z_error -= z;
+		FM::Vec z_error (h.h(x) - z);
+		direct.observe_error (h, z_error);
+	}
+
+	void observe (Linear_correlated_observe_model& h, const FM::Vec& z)
+	{
+				// Observe error (explict temporary)
+		FM::Vec z_error (h.h(x) - z);
+		direct.observe_error (h, z_error);
+	}
+
+	template <typename O_model>
+	void observe_error (O_model& h, const FM::Vec& z_error)
+	/*
+	 * Observe with precomputed indirect observation error
+	 * The observation model here can be non-linear but must then
+	 * be modified to return h(x_error) - h(x=0)
+	 */
+	{
 		direct.observe (h, z_error);
 		direct.update();
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
 		direct.x.clear();
-		direct.init ();
-	}
-
-	template <typename O_model>
-	void observe_error (O_model& h, const FM::Vec& z_error)
-	{
-		direct.observe (h, z_error);
-				// Update State estimate with error
-		x -= direct.x;
-				// Reset the error
-		direct.clear();
+		direct.init();
 	}
 
 	void update ()
