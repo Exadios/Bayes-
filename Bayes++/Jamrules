@@ -1,0 +1,14 @@
+# Bayes++ top level Jamrules
+
+# Set some important global variables if they haven't already been set by the
+# user on the command-line or in the environment
+
+# Establish the root of Bayes++
+# $(gTOP) is the name of the variable containing the path from the invocation directory to the project root.
+BAYES_ROOT = $($(gTOP)) ;
+
+# BOOST_ROOT must be  set the root of the boost installation.
+# Bayes++ targets will want $(BOOST_ROOT) and $(BAYES_ROOT) in their #include path.
+
+path-global BOOST_ROOT ;
+path-global BAYES_ROOT ;

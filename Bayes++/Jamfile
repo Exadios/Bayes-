@@ -1,0 +1,10 @@
+# Bayes++ Jamfile - See Boost.build
+#  Project root
+
+project-root ;
+
+subinclude BayesFilter ;
+subinclude Simple ;
+subinclude PV ;
+subinclude "QuadCalib" ;
+subinclude rtheta ;
