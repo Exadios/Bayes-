@@ -208,7 +208,7 @@ namespace {
 	{
 		const FM::ColMatrix* cm;
 		size_t col;
-		ColProxy& operator=(ColProxy& a)
+		const ColProxy& operator=(const ColProxy& a)
 		{
 			col = a.col;
 			return a;
