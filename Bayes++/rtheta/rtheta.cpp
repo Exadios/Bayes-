@@ -73,7 +73,8 @@ class Rtheta_random : public Bayesian_filter_test::Boost_random, public SIR_rand
 public:
 	Float normal (const Float mean, const Float sigma)
 	{
-		return Boost_random::normal (mean, sigma);
+		Float f = Boost_random::normal (mean, sigma);
+		return f;
 	}
 	void normal (DenseVec& v)
 	{
@@ -525,6 +526,10 @@ int main()
 	extern void other_tests();
 	other_tests();
 
+	// Use a know sequence for comparisons between systems
+	Random.seed();
+	Random2.seed();
+	
 	// Setup the test filters
 	Vec x_init (NX);
 	SymMatrix X_init (NX, NX);
