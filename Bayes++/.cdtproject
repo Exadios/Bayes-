@@ -24,6 +24,11 @@
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
+<target name="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="rtheta">
+<buildCommand>bjam</buildCommand>
+<stopOnError>false</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
 <target name="debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
 <buildCommand>bjam</buildCommand>
 <buildTarget>debug</buildTarget>

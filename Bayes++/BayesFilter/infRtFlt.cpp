@@ -186,7 +186,7 @@ Bayes_base::Float
 	const std::size_t q_size = f.q.size();
 						// Column major required for LAPACK, also this property is using in indexing
 	DenseColMatrix A(q_size+x_size, q_size+x_size+unsigned(linear_r));
-	FM::identity (A);	// Prefill with identity for topleft and zero's in off diagonals
+	FM::identity (A);	// Prefill with identity for topleft and zeros in off diagonals
 
 	Matrix RFxI (prod(R, invFx));
 	noalias(A.sub_matrix(q_size,q_size+x_size, 0,q_size)) = prod(RFxI, Gqr);

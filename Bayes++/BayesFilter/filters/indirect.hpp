@@ -100,7 +100,7 @@ public:
 	/* Initialise from state and state covariance
 	*/
 	{
-		direct.x.clear();				// Zero initial error
+		direct.x.zero();				// Zero initial error
 		direct.X = X;
 		direct.init();
 	}
@@ -139,7 +139,7 @@ public:
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
-		direct.x.clear();
+		direct.x.zero();
 		direct.init();
 	}
 

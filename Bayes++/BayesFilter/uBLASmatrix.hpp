@@ -355,7 +355,7 @@ void identity(FMMatrix<Base>& I)
 							// Set common diagonal elements
 	typename Base::size_type common_size = std::min(I.size1(),I.size2());
 	typedef typename Base::value_type Base_value_type;
-	diag(I) = ublas::scalar_vector<Base_value_type>(common_size, Base_value_type(1));
+	diag(I).assign (ublas::scalar_vector<Base_value_type>(common_size, Base_value_type(1)));
 }
 
 
