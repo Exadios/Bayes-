@@ -21,7 +21,7 @@ namespace Bayesian_filter
 
 
 Information_scheme::Information_scheme (size_t x_size, size_t z_initialsize) :
-		Information_state_filter(x_size), Extended_filter(x_size),
+		Information_state_filter(x_size), Kalman_state_filter(x_size),
 		i(x_size), I(x_size,x_size),
 		ZI(Empty)
 /*
@@ -46,9 +46,8 @@ Information_scheme& Information_scheme::operator= (const Information_scheme& a)
  * Precond: matrix size conformance
  */
 {
-	Extended_filter::operator=(a);
-	y = a.y;
-	Y = a.Y;
+	Information_state_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	return *this;
 }
 

@@ -11,7 +11,7 @@
  */
  
 /*
- * Predefined filter: average1_filter
+ * Predefined filter: Average1_filter
  *  A single state averager
  */
 
@@ -20,10 +20,12 @@ namespace Bayesian_filter
 {
 	namespace FM = Bayesian_filter_matrix;
 
-template <class filter>
-class average1_filter : private filter
+template <class Filter_base>
+class Average1_filter
 {
-	typedef typename filter::Float Float;
+	Filter_base ksf;		// Kalman State Filter
+	
+	typedef typename Filter_base::Float Float;
 	class Cpredict : public Linear_predict_model
 	// Constant prediction model
 	{
@@ -48,15 +50,15 @@ class average1_filter : private filter
 	};
 
 public:
-	average1_filter (Float iQ, Float iZ, Float z);
-	average1_filter (Float iQ, Float iZ);
+	Average1_filter (Float iQ, Float iZ, Float z);
+	Average1_filter (Float iQ, Float iZ);
 	Float observe (Float zz);
 	operator Float () const
 	/* Returns filtered estimate
 	 */
 	{	if (!bInit)
-			error (Logic_exception("average1 not init"));
-		return x[0];
+			ksf.error (Logic_exception("Average1 not init"));
+		return ksf.x[0];
 	}
 
 private:
@@ -69,26 +71,27 @@ private:
 
 
 
-template <typename filter>
-average1_filter<filter>::average1_filter (Float iQ, Float iZ, Float zz)
-	: filter(1), f(iQ), h(iZ), z(1)
+template <typename Filter_base>
+Average1_filter<Filter_base>::Average1_filter (Float iQ, Float iZ, Float zz) :
+	ksf(1), f(iQ), h(iZ), z(1)
 /* Initialise noises and set sizes
  * include first observation zz */
 {
 	bInit = false;
+	
 	observe (zz);
 }
 
-template <typename filter>
-average1_filter<filter>::average1_filter (Float iQ, Float iZ)
-	: filter(1), f(iQ), h(iZ), z(1)
+template <typename Filter_base>
+Average1_filter<Filter_base>::Average1_filter (Float iQ, Float iZ) :
+	ksf(1), f(iQ), h(iZ), z(1)
 // Initialise noises and set sizes
 {
 	bInit = false;
 }
 
-template <typename filter>
-typename average1_filter<filter>::Float average1_filter<filter>::observe(Float zz)
+template <typename Filter_base>
+typename Average1_filter<Filter_base>::Float Average1_filter<Filter_base>::observe(Float zz)
 /* Observe z, first call set initial state to z
  * Returns filtered estimate
  */
@@ -96,15 +99,15 @@ typename average1_filter<filter>::Float average1_filter<filter>::observe(Float z
 	z[0] = zz;
 
 	if (!bInit) {
-		init_kalman (z, h.Z);
+		ksf.init_kalman (z, h.Z);
 		bInit = true;
 	}
 
-	filter::predict(f);
-	filter::observe(h, z);
-	update ();
+	ksf.predict(f);
+	ksf.observe(h, z);
+	ksf.update ();
 
-	return x[0];
+	return ksf.x[0];
 }
 
 }//namespace

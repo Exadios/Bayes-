@@ -41,14 +41,27 @@ void Bayes_base::error (const Filter_exception& e )
 	throw e;
 }
 
+Gaussian_predict_model::Gaussian_predict_model (size_t x_size, size_t q_size) :
+		q(q_size), G(x_size, q_size)
+/*
+ * Set the size of things we know about
+ */
+{}
+
+Addative_predict_model::Addative_predict_model (size_t x_size, size_t q_size) :
+		q(q_size), G(x_size, q_size)
+/*
+ * Set the size of things we know about
+ */
+{}
+
 Linrz_predict_model::Linrz_predict_model (size_t x_size, size_t q_size) :
 /*
  * Set the size of things we know about
  */
 		Addative_predict_model(x_size, q_size),
 		Fx(x_size,x_size)
-{
-}
+{}
 
 Linear_predict_model::Linear_predict_model (size_t x_size, size_t q_size) :
 /*
@@ -56,22 +69,19 @@ Linear_predict_model::Linear_predict_model (size_t x_size, size_t q_size) :
  */
 		Linrz_predict_model(x_size, q_size),
 		xp(x_size)
-{
-}
+{}
 
 Linear_invertable_predict_model::Linear_invertable_predict_model (size_t x_size, size_t q_size) :
 /*
  * Set the size of things we know about
  */
 		Linear_predict_model(x_size, q_size),
-		inv(x_size, q_size)
-{
-}
+		inv(x_size)
+{}
 
-Linear_invertable_predict_model::inverse_model::inverse_model (size_t x_size, size_t q_size) :
+Linear_invertable_predict_model::inverse_model::inverse_model (size_t x_size) :
 		Fx(x_size,x_size)
-{
-}
+{}
 
 
 State_filter::State_filter (size_t x_size) :
@@ -90,26 +100,7 @@ Kalman_state_filter::Kalman_state_filter (size_t x_size) :
  * Initialise filter and set the size of things we know about
  */
 		State_filter(x_size), X(x_size,x_size)
-{
-}
-
-
-Linrz_kalman_filter::Linrz_kalman_filter (size_t x_size) :
-/*
- * Initialise filter and set the size of things we know about
- */
-		Kalman_state_filter(x_size)
-{
-}
-
-
-Extended_filter::Extended_filter (size_t x_size) :
-/*
- * Initialise filter and set the size of things we know about
- */
-		Linrz_kalman_filter(x_size)
-{
-}
+{}
 
 
 Information_state_filter::Information_state_filter (size_t x_size) :
@@ -117,8 +108,7 @@ Information_state_filter::Information_state_filter (size_t x_size) :
  * Initialise filter and set the size of things we know about
  */
 		y(x_size), Y(x_size,x_size)
-{
-}
+{}
 
 
 Sample_filter::Sample_filter (size_t x_size, size_t s_size) :

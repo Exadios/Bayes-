@@ -27,7 +27,7 @@ namespace Bayesian_filter
 
 UD_scheme::
 UD_scheme (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
-		Linrz_kalman_filter(x_size),
+		Kalman_state_filter(x_size),
 		q_max(q_maxsize),
 		UD(x_size,x_size+q_max),
 		s(FM::Empty), Sd(FM::Empty),

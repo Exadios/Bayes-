@@ -34,7 +34,7 @@
 namespace Bayesian_filter
 {
 
-class Information_root_scheme : public Extended_filter
+class Information_root_scheme : public Extended_kalman_filter
 {
 public:
 	FM::Vec r;			// Information Root state
@@ -71,7 +71,7 @@ public:
  * Augments Information_root_filter with y,Y in the interface
  */
 
-class Information_root_info_scheme : public Information_root_scheme, public Information_state_filter
+class Information_root_info_scheme : public Information_root_scheme, virtual public Information_state_filter
 {
 public:
 	Information_root_info_scheme (size_t x_size, size_t z_initialsize = 0);

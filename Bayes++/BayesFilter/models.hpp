@@ -23,40 +23,62 @@
 namespace Bayesian_filter
 {
 
+template <class Function>
 class Simple_addative_predict_model : public Addative_predict_model
 // Addative predict model initialised from function and model matricies
 {
-	Predict_function& ff;
+	Function& ff;
 public:
-	Simple_addative_predict_model (Predict_function& f_init, const FM::Matrix& G_init, const FM::Vec& q_init);
+	Simple_addative_predict_model (Function& f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 	// Precondition: G, q are conformantly dimensioned (not checked)
+		Addative_predict_model (G_init.size1(), q_init.size())
+	{
+		G = G_init;
+		q = q_init;
+	}
+
 	// No default assignment operator
 
 	virtual const FM::Vec& f(const FM::Vec& x) const
-	{	return ff.fx(x);
+	{	return ff(x);
 	}
 };
 
+template <class Function>
 class Simple_linrz_predict_model : public Linrz_predict_model
 // Linrz predict model initialised from function and model matricies
 {
-	Predict_function& ff;
+	Function& ff;
 public:
-	Simple_linrz_predict_model (Predict_function& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init);
+	Simple_linrz_predict_model (Function& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 	// Precondition: Fx, G, q are conformantly dimensioned (not checked)
+		Linrz_predict_model (Fx_init.size1(), q_init.size())
+	{
+		Fx = Fx_init;
+		G = G_init;
+		q = q_init;
+	}
+
 	// No default assignment operator
 
 	virtual const FM::Vec& f(const FM::Vec& x) const
-	{	return ff.fx(x);
+	{	return ff.f(x);
 	}
 };
 
+template <class Dummy>
 class Simple_linear_predict_model : public Linear_predict_model
 // Linear predict model initialised from model matricies
 {
 public:
-	Simple_linear_predict_model (const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init);
+	Simple_linear_predict_model (const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 	// Precondition: Fx, q and G are conformantly dimensioned (not checked)
+		Linear_predict_model (Fx_init.size1(), q_init.size())
+	{
+		Fx = Fx_init;
+		G = G_init;
+		q = q_init;
+	}
 };
 
 
@@ -133,7 +155,7 @@ public:
 		first_init = true;
 	}
 
-	virtual const FM::Vec& fx(const FM::Vec& x) const
+	virtual const FM::Vec& fw(const FM::Vec& x) const
 	/*
 	 * Definition of sampler for addative noise model given state x
 	 *  Generate Gaussian correlated samples
@@ -143,7 +165,7 @@ public:
 		if (first_init)
 			init_GqG();
 							// Predict state using supplied functional predict model
-		xp = f(x);
+		xp = Predict_model::f(x);
 							// Additive random noise
 		genn.normal(n);				// independant zero mean normal
 									// multiply elements by std dev

@@ -17,7 +17,7 @@ using namespace Bayesian_filter_matrix;
 
 // Instantiate complete fileters to check the templates
 #include "BayesFilter/filters/average1.hpp"
-template average1_filter<Covariance_scheme>;
+template Average1_filter<Covariance_scheme>;
 
 #include "BayesFilter/filters/indirect.hpp"
 template Indirect_state_filter<Covariance_scheme>;

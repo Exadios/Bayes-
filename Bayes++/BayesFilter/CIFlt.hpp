@@ -36,7 +36,7 @@
 namespace Bayesian_filter
 {
 
-class CI_scheme : public Extended_filter
+class CI_scheme : public Extended_kalman_filter
 {
 public:
 	CI_scheme (size_t x_size, size_t z_initialsize = 0);

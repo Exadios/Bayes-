@@ -24,7 +24,7 @@ namespace Bayesian_filter
 
 
 Unscented_scheme::Unscented_scheme (size_t x_size, size_t z_initialsize) :
-		Linrz_kalman_filter(x_size), Functional_filter(),
+		Kalman_state_filter(x_size), Functional_filter(),
 		XX(x_size, 2*x_size+1),
 		s(Empty), S(Empty), SI(Empty),
 		fXX(x_size, 2*x_size+1)

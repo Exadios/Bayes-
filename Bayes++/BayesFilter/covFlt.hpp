@@ -32,7 +32,7 @@
 namespace Bayesian_filter
 {
 
-class Covariance_scheme : public Extended_filter
+class Covariance_scheme : public Extended_kalman_filter
 {
 public:
 	Covariance_scheme (size_t x_size, size_t z_initialsize = 0);
@@ -41,7 +41,12 @@ public:
 
 	void init ();
 	void update ();
+
 	Float predict (Linrz_predict_model& f);
+	// Standard Linrz prediction
+	Float predict (Gaussian_predict_model& f);
+	// Specialised 'stationary' prediction, only addative noise
+
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
 

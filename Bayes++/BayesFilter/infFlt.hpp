@@ -39,7 +39,7 @@
 namespace Bayesian_filter
 {
 
-class Information_scheme : public Information_state_filter, public Extended_filter
+class Information_scheme : virtual public Information_state_filter, public Extended_kalman_filter
 {
 public:
 	Information_scheme (size_t x_size, size_t z_initialsize = 0);

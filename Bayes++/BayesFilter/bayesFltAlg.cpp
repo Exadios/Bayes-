@@ -33,7 +33,7 @@ namespace Bayesian_filter
 {
 
 Bayes_base::Float
- Extended_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
+ Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 /*
  * Extended linrz correlated observe, compute innovation for observe_innovation
  */
@@ -48,9 +48,9 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Extended_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+ Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 /*
- * Extended linrz uncorrelated observe, compute innovation for observe_innovation
+ * Extended kalman uncorrelated observe, compute innovation for observe_innovation
  */
 {
 	update ();
@@ -62,43 +62,6 @@ Bayes_base::Float
 	return observe_innovation (h, s);
 }
 
-
-Simple_addative_predict_model::Simple_addative_predict_model (Predict_function& f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
-	Addative_predict_model (G_init.size1(), q_init.size()),
-	ff(f_init)
-/* Addative predict model initialised from function and model matricies
-   Precondition:
-	q and G are conformantly dimensioned (not checked)
- */
-{
-	G = G_init;
-	q = q_init;
-}
-
-Simple_linrz_predict_model::Simple_linrz_predict_model (Predict_function& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
-	Linrz_predict_model (Fx_init.size1(), q_init.size()),
-	ff(f_init)
-/* Linrz predict model initialised from function and model matricies
-   Precondition:
-	Fx, q and G are conformantly dimensioned (not checked)
- */
-{
-	Fx = Fx_init;
-	G = G_init;
-	q = q_init;
-}
-
-Simple_linear_predict_model::Simple_linear_predict_model (const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
-	Linear_predict_model (Fx_init.size1(), q_init.size())
-/* Linear predict model initialised from model matricies
-   Precondition:
-	Fx, q and G are conformantly dimensioned (not checked)
- */
-{
-	Fx = Fx_init;
-	G = G_init;
-	q = q_init;
-}
 
 Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
 	Linrz_correlated_observe_model (Hx_init.size2(), Hx_init.size1()),

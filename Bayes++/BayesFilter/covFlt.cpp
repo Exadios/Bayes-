@@ -21,7 +21,7 @@ namespace Bayesian_filter
 
 
 Covariance_scheme::Covariance_scheme (size_t x_size, size_t z_initialsize) :
-	Extended_filter(x_size),
+	Kalman_state_filter(x_size),
 	S(Empty), SI(Empty), W(Empty)
 /*
  * Initialise filter and set the size of things we know about
@@ -36,7 +36,7 @@ Covariance_scheme& Covariance_scheme::operator= (const Covariance_scheme& a)
  * Precond: matrix size conformance
  */
 {
-	Extended_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	return *this;
 }
 
@@ -55,8 +55,10 @@ void Covariance_scheme::update ()
 
 Bayes_base::Float
  Covariance_scheme::predict (Linrz_predict_model& f)
+/* Standard Linrz prediction
+ */
 {
-	x = f.f(x);			// Extended Kalman state predict is f(x) directly
+	x = f.f(x);		// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
 	RowMatrix temp(f.Fx.size1(), X.size2());
 	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
@@ -64,6 +66,19 @@ Bayes_base::Float
 	assert_isPSD (X);
 	return 1;
 }
+
+Bayes_base::Float
+ Covariance_scheme::predict (Gaussian_predict_model& f)
+/* Specialised 'stationary' prediction, only addative noise
+ */
+{
+						// Predict state covariance, simply add in noise
+	X.plus_assign(prod_SPD(f.G, f.q));
+  
+	assert_isPSD (X);
+	return 1;
+}
+
 
 void Covariance_scheme::observe_size (size_t z_size)
 /*

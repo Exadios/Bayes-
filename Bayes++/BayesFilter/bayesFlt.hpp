@@ -140,71 +140,82 @@ class Predict_model_base : public Bayes_base
 	// Empty
 };
 
-class Predict_function : public Bayes_base
-// Function object for prediction of states
-{
-public:
-	virtual const FM::Vec& fx(const FM::Vec& x) const = 0;
-	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
-};
 
-
-class Sampled_predict_model : virtual public Predict_model_base, public Predict_function
+class Sampled_predict_model : virtual public Predict_model_base
 /* Sampled stochastic prediction model
-    x*(k) = fx(x(k-1), w(k))
-   fx should generate samples from the stochastic variable w(k)
-   The fundamental model that is used instead of the prediction likelihood function L(x*|x)
+    x*(k) = fw(x(k-1), w(k))
+   fw should generate samples from the stochastic variable w(k)
+   This fundamental model is used instead of the prediction likelihood function L(x*|x)
    Since drawing samples from an arbitary L is non-trivial (see MCMC theory)
    the burden is place on the model to generate these samples.
    Defines an Interface without data members
  */
 {
-	// only fx
+public:
+	virtual const FM::Vec& fw(const FM::Vec& x) const = 0;
+	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
-class Functional_predict_model : public Sampled_predict_model
+class Functional_predict_model :virtual public Predict_model_base
 /* Functional (non-stochastic) prediction model f
     x*(k) = fx(x(k-1))
-   The fundamental model that is used instead of the prediction likelihood function L(x*|x)
-   L is a delta function which isn't much use for numerical systems.
-   Conviently the model is a Sampled_predict_model but without any 'w'
+   This fundamental model is used instead of the prediction likelihood function L(x*|x)
+   Since L is a delta function which isn't much use for numerical systems.
    Defines an Interface without data members
  */
 {
 public:
+	virtual const FM::Vec& fx(const FM::Vec& x) const = 0;
+	// Functional model
+	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
+	
 	const FM::Vec& operator()(const FM::Vec& x) const
-	// Operator form of functional model
-	{	return fx(x);
+	{	// Operator form of functional model
+		return fx(x);
 	}
+};
+
+class Gaussian_predict_model : virtual public Predict_model_base
+/* Gaussian noise prediction model
+   This fundamental noise model for linear/linearised filtering
+    x(k|k-1) = x(k-1|k-1)) + G(k)w(k)
+    G(k)w(k)
+    q(k) = state noise covariance, q(k) is covariance of w(k)
+    G(k) = state noise coupling
+*/
+{
+public:
+	Gaussian_predict_model (size_t x_size, size_t q_size);
+
+	FM::Vec q;		// Noise variance (always dense, use coupling to represent sparseness)
+	FM::Matrix G;	// Noise Coupling
 };
 
 class Addative_predict_model : virtual public Predict_model_base
 /* Addative Gaussian noise prediction model
-   This fundamental model for linear/linearised filtering
-	x(k|k-1) = f(x(k-1|k-1)) + G(k)w(k)
-	q(k) = state noise covariance, q(k) is covariance of w(k)
-	G(k) = state noise coupling
+   This fundamental model for non-linear filtering with addative noise
+    x(k|k-1) = f(x(k-1|k-1)) + G(k)w(k)
+    q(k) = state noise covariance, q(k) is covariance of w(k)
+    G(k) = state noise coupling
+   ISSUE Should be privately derived from Gaussian_predict_model but access control in GCC is broken
 */
 {
 public:
-	Addative_predict_model (size_t x_size, size_t q_size) :
-		q(q_size), G(x_size, q_size)
-	{}
-
-	FM::Vec q;		// Noise variance (always dense as Coupling used for sparseness)
-	FM::Matrix G;		// Noise Coupling
+	Addative_predict_model (size_t x_size, size_t q_size);
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
 	// Functional part of addative model
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 
-	Numerical_rcond rclimit;
+	FM::Vec q;		// Noise variance (always dense, use coupling to represent sparseness)
+	FM::Matrix G;	// Noise Coupling
 };
 
 class Linrz_predict_model : public Addative_predict_model
-/* Linrz prediction model Fx, of functional part of addative model f about state x
-	x(k|k-1) = f(x(k-1|k-1)
-	Fx(x(k-1|k-1) = Jacobian of f with respect to state x
+/* Linrz prediction model
+   This fundamental model for linear/linearised filtering
+    x(k|k-1) = f(x(k-1|k-1)
+    Fx(x(k-1|k-1) = Jacobian of of functional part fx with respect to state x
  */
 {
 public:
@@ -213,20 +224,15 @@ public:
 };
 
 class Linear_predict_model : public Linrz_predict_model
-/* Linear prediction model Fx about state x (fixed size)
-	x(k|k-1) = Fx(k-1|k-1) * x(k-1|k-1)
+/* Linear prediction model
+   Enforces linearity on f
+    x(k|k-1) = Fx(k-1|k-1) * x(k-1|k-1)
  */
 {
 public:
 	Linear_predict_model (size_t x_size, size_t q_size);
-	/* Set constant sizes for
-	    x_size of the state vector
-	    q_size of the noise vector
-	   Postcondition:
-	    Fx, q and G are conformantly dimensioned
-	*/
 	const FM::Vec& f(const FM::Vec& x) const
-	{	// Provide a linear implementation of functional f assumes model is already Linrz for Fx
+	{	// Provide the linear implementation of functional f
 		xp.assign (FM::prod(Fx,x));
 		return xp;
 	}
@@ -235,18 +241,15 @@ private:
 };
 
 class Linear_invertable_predict_model : public Linear_predict_model
-/*
- * Linear invertable prediction model
+/* Linear invertable prediction model
+   Fx has an inverse
+    x(k-1|k-1) = inv.Fx(k-1|k-1) * x(k|k-1)
  */
 {
 public:
 	Linear_invertable_predict_model (size_t x_size, size_t q_size);
-	/* The inverse model: x(k-1|k-1) = f(x(k|k-1) with
-	   inv.Fx = inverse(Fx)
-	*/
-	class inverse_model {
-	public:
-		inverse_model (size_t x_size, size_t q_size);
+	struct inverse_model {
+		inverse_model (size_t x_size);
 		FM::ColMatrix Fx;	// Model inverse (ColMatrix as usually transposed)
 	} inv;
 };
@@ -473,13 +476,13 @@ public:
 
 	virtual void predict (Functional_predict_model& f) = 0;
 	/* Predict state with functional no noise model
-		Requires x(k|k), X(k|k) or internal equivilent
-		Predicts x(k+1|k), X(k+1|k), using predict model
+	    Requires x(k|k), X(k|k) or internal equivilent
+	    Predicts x(k+1|k), X(k+1|k), using predict model
 	*/
 private:
 	virtual void observe (Functional_observe_model& /*h*/, const FM::Vec& /*z*/)
 	/* Observation z(k) with functional no noise model
-		Requires x(k|k), X(k|k)
+	    Requires x(k|k), X(k|k)
 	   PREVENTS use of this model as h needs to be invertable!
 	*/
 	{}
@@ -494,8 +497,8 @@ class State_filter : virtual public Bayes_filter_base
 public:
 	State_filter (size_t x_size);
 	/* Set constant sizes, state must not be empty (must be >=1)
-		Exceptions:
-			bayes_filter_exception is x_size < 1
+	    Exceptions:
+	     bayes_filter_exception is x_size < 1
 	 */
 
 	FM::Vec x;			// expected state
@@ -504,7 +507,7 @@ public:
 
 	virtual void update () = 0;
 	/* Update filters state
-	     Updates x(k|k)
+	    Updates x(k|k)
 	*/
 };
 
@@ -542,11 +545,11 @@ public:
 
 	virtual void init () = 0;
 	/* Initialise from current state and state covariance
-	     Requires x(k|k), X(k|k)
+	    Requires x(k|k), X(k|k)
 	*/
 	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	/* Initialise from a state and state covariance
-		 Parameters that reference the instance's x and X members are valid
+	    Parameters that reference the instance's x and X members are valid
 	*/
 	{
 		Kalman_state_filter::x = x;
@@ -555,7 +558,7 @@ public:
 	}
 	virtual void update () = 0;
 	/* Update filters state and state covariance 
-	     Updates x(k|k), X(k|k)
+	    Updates x(k|k), X(k|k)
 	*/
 
 	Numerical_rcond rclimit;	// Applies to ALL covariance matrices in algorithms
@@ -578,12 +581,12 @@ public:
 
 	virtual void init_yY () =0;
 	/* Initialise from a information state and information
-	     Requires y(k|k), Y(k|k)
-		 Parameters that reference the instance's y and Y members are valid
+	    Requires y(k|k), Y(k|k)
+	    Parameters that reference the instance's y and Y members are valid
 	*/
 	virtual void init_information (const FM::Vec& y, const FM::SymMatrix& Y)
 	/* Initialise from a information state and information
-		 Parameters that reference the instance's y and Y members are valid
+	    Parameters that reference the instance's y and Y members are valid
 	*/
 	{
 		Information_state_filter::y = y;
@@ -592,7 +595,7 @@ public:
 	}
 	virtual void update_yY () =0;
 	/* Update filters information state and information
-	     Updates y(k|k), Y(k|k)
+	    Updates y(k|k), Y(k|k)
 	*/
 };
 
@@ -617,15 +620,15 @@ public:
 
 	virtual Float predict (Linrz_predict_model& f) = 0;
 	/* Predict state using a Linrz model
-		Requires x(k|k), X(k|k) or internal equivilent
-		Returns: Reciprocal condition number of primary matrix used in predict computation (1. if none)
+	    Requires x(k|k), X(k|k) or internal equivilent
+	    Returns: Reciprocal condition number of primary matrix used in predict computation (1. if none)
 	*/
 
 	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z) = 0;
 	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z) = 0;
 	/* Observation z(k) and with (Un)correlated observation noise model
-		Requires x(k|k), X(k|k) or internal equivilent
-		Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
+	    Requires x(k|k), X(k|k) or internal equivilent
+	    Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
 	*/
 };
 
@@ -635,43 +638,44 @@ public:
  *  Kalman state representation and linearizable models
  *
  * Common abstration for many linear filters
+ *  Uses a virtual base to represent the common state
  */
-class Linrz_kalman_filter : public Linrz_filter, public Kalman_state_filter
+class Linrz_kalman_filter : public Linrz_filter, virtual public Kalman_state_filter
 {
 public:
-	Linrz_kalman_filter (size_t x_size);
+	Linrz_kalman_filter() : Kalman_state_filter(0)
+	{}	// Dummy virtual base constructor
 };
 
 
 /*
- * Extended Kalman Filter for all linearizable model with innovation observations
- *
- * Provides a Kalman state represention. The state (x) size is fixed.
+ * Extended Kalman Filter
+ *  Kalman state representation and linearizable models
  *
  * Observe is implemented using an innovation computed from the non-linear part of the
  * obseve model and linear part of the Linrz_observe_model
+ *
+ * Common abstration for many linear filters
+ *  Uses a virtual base to represent the common state
  */
-
-class Extended_filter : public Linrz_kalman_filter
-{ 
+class Extended_kalman_filter : public Linrz_kalman_filter
+{
 public:
-	Extended_filter (size_t x_size);
-
-	/* Virtual functions for filter algorithm */
-
+	Extended_kalman_filter() : Kalman_state_filter(0)
+	{}	// Dummy virtual base constructor
 	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
 	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
 	/* Observation z(k) and with (Un)correlated observation noise model
-		Requires x(k|k), X(k|k) or internal equivilent
-		Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
-		Default implementation simple computes innovation for observe_innovation
+	    Requires x(k|k), X(k|k) or internal equivilent
+	    Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
+	    Default implementation simple computes innovation for observe_innovation
 	*/
 
 	virtual Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s) = 0;
 	virtual Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s) = 0;
 	/* Observation innovation s(k) and with (Un)correlated observation noise model
-		Requires x(k|k), X(k|k) or internal equivilent
-		Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
+	    Requires x(k|k), X(k|k) or internal equivilent
+	    Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
 	*/
 };
 
@@ -701,10 +705,10 @@ public:
 
 	Sample_filter (size_t x_size, size_t s_size);
 	/* Initialise filter and set constant sizes for
-		x_size of the state vector
-		s_size sample size
-		Exceptions:
-			bayes_filter_exception is s_size < 1
+	    x_size of the state vector
+	    s_size sample size
+	    Exceptions:
+	     bayes_filter_exception is s_size < 1
 	*/
 	~Sample_filter() = 0;	// Provide unambigues distructor incase S is not distructable
 
@@ -724,9 +728,9 @@ public:
 
 	virtual Float update_resample () = 0;
 	/* Resampling update
-	 *	Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
-	 *          lcond == 1. if no resampling performed
-	 *			This should by multipled by the number of samples to get the Likelihood function conditioning
+	    Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
+	            lcond == 1. if no resampling performed
+	            This should by multipled by the number of samples to get the Likelihood function conditioning
 	 */
 
 	virtual void update ()
@@ -749,14 +753,13 @@ public:
 
 	virtual void observe_likelihood (const FM::Vec& lw) = 0;
 	/* Observation fusion directly from likelihood weights
-	 * lw may be smaller then the state sampling. Weights for additional particles are assumed to be 1
+	    lw may be smaller then the state sampling. Weights for additional particles are assumed to be 1
 	*/
 
 	size_t unique_samples () const;
-	/*
-	 * Count number of unique (unequal value) samples in S
-	 * Implementation requires std::sort on sample column references
-	 */
+	/* Count number of unique (unequal value) samples in S
+	    Implementation requires std::sort on sample column references
+	*/
 };
 
 

@@ -23,7 +23,7 @@ namespace Bayesian_filter
 
 
 CI_scheme::CI_scheme (size_t x_size, size_t z_initialsize) :
-	Extended_filter(x_size),
+	Kalman_state_filter(x_size),
 	S(Empty), SI(Empty)
 /*
  * Initialise filter and set the size of things we know about
@@ -38,7 +38,7 @@ CI_scheme& CI_scheme::operator= (const CI_scheme& a)
  * Precond: matrix size conformance
  */
 {
-	Extended_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	return *this;
 }
 

@@ -314,7 +314,9 @@ class Information_linrz_scheme : public Information_scheme
 {
 public:
 	Information_linrz_scheme (size_t x_size, size_t z_initialsize = 0) :
-		Information_scheme (x_size, z_initialsize)
+		Information_scheme (x_size, z_initialsize),
+		Information_state_filter (x_size),
+		Kalman_state_filter (x_size)
 	{}
 	Float predict (Linrz_predict_model& f)
 	// Enforce use of Linrz predict
@@ -323,40 +325,56 @@ public:
 	}
 };
 
+// Filter_schmeme Information_linrz_scheme specialisation
+template <>
+Filter_scheme<Information_linrz_scheme>::Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
+	Kalman_state_filter (x_size),
+	Information_state_filter (x_size),
+	Information_linrz_scheme (x_size, z_initialsize)
+{}
+
 /*
  * Filter under test. Initialised for state and covariance
  */
 template <class TestScheme>
-class Filter : public Filter_scheme<TestScheme>
+class Filter
 {
 public:
 	Filter (const Vec& x_init, const SymMatrix& X_init);
+	Filter_scheme<TestScheme> ts;
+	template <class P>
+	void predict (P pmodel)
+	{
+		ts.predict (pmodel);
+	}
+	template <class O>
+	void observe (O omodel, const Vec& z)
+	{
+		ts.observe (omodel, z);
+	}
+	void update ()
+	{}
+	const Vec& x()
+	{	return ts.x;
+	}
+	const SymMatrix& X()
+	{	return ts.X;
+	}
 };
 
 template <class TestScheme>
-Filter<TestScheme>::Filter (const Vec& x_init, const SymMatrix& X_init)
-	: Filter_scheme<TestScheme> (x_init.size(), NQ, NZ)
+Filter<TestScheme>::Filter (const Vec& x_init, const SymMatrix& X_init) :
+	ts (x_init.size(), NQ, NZ)
 {
-	init_kalman (x_init, X_init);
+	ts.init_kalman (x_init, X_init);
 }
 
 // Specialise for SIR_kalman
 template <>
-class Filter<SIR_kalman_scheme> : public SIR_kalman_scheme
+Filter<SIR_kalman_scheme>::Filter (const Vec& x_init, const SymMatrix& X_init) :
+	ts (x_init.size(), NS, ::Random2)
 {
-public:
-	Filter (const Vec& x_init, const SymMatrix& X_init);
-	Float update_resample ()
-	// Modifiy Default SIR_scheme update
-	{
-		return SIR_scheme::update_resample (Systematic_resampler());
-	}
-};
-
-Filter<SIR_kalman_scheme>::Filter (const Vec& x_init, const SymMatrix& X_init)
-	: SIR_kalman_scheme (x_init.size(), NS, ::Random2)
-{
-	init_kalman (x_init, X_init);
+	ts.init_kalman (x_init, X_init);
 }
 
 
@@ -430,11 +448,13 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 	{
 		using std::cout; using std::endl;
 		using boost::format;
+		const Vec& f1x = f1.x(); const SymMatrix& f1X = f1.X();
+		const Vec& f2x = f2.x(); const SymMatrix& f2X = f2.X();
 
 		// Compomparision and truth line
 		//	x(0)diff, x(1)diff, truth.x(0), truth.x(1), zx, zy)
 		cout << format("*%11.4g %11.4g * %10.3f %10.3f  %10.3f %10.3f")
-			 	% (f1.x[0]-f2.x[0]) % (f1.x[1]-f2.x[1])
+			 	% (f1x[0]-f2x[0]) % (f1x[1]-f2x[1])
 			 	% truth.x[0] % truth.x[1] % zx % zy << endl;
 
 		format state(" %11.4g %11.4g * %10.3f %10.3f");
@@ -442,16 +462,16 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 
 		// Filter f1 performace
 		//		x[0]err, x[1]err, x[0], x[1],  Xpred*3, X*3
-		cout << state % (f1.x[0]-truth.x[0]) % (f1.x[1]-truth.x[1])
-				% f1.x[0] % f1.x[1] << endl;
+		cout << state % (f1x[0]-truth.x[0]) % (f1x[1]-truth.x[1])
+				% f1x[0] % f1x[1] << endl;
 		cout << covariance % f1_Xpred(0,0) % f1_Xpred(1,1) % f1_Xpred(1,0);
-		cout << covariance % f1.X(0,0) % f1.X(1,1) % f1.X(1,0) << endl;
+		cout << covariance % f1X(0,0) % f1X(1,1) % f1X(1,0) << endl;
 		// Filter f2 performace
 		//		x[0]err, x[1]err, x[0], x[1], x[01]dist,  Xpred*3, X*3
-		cout << state % (f2.x[0]-truth.x[0]) % (f2.x[1]-truth.x[1])
-				% f2.x[0] % f2.x[1] << endl;
+		cout << state % (f2x[0]-truth.x[0]) % (f2x[1]-truth.x[1])
+				% f2x[0] % f2x[1] << endl;
 		cout << covariance % f2_Xpred(0,0) % f2_Xpred(1,1) % f2_Xpred(1,0);
-		cout << covariance % f2.X(0,0) % f2.X(1,1) % f2.X(1,0) << endl;
+		cout << covariance % f2X(0,0) % f2X(1,1) % f2X(1,0) << endl;
 	}
 }
 
@@ -470,8 +490,8 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 		// Update the filter
 		f1.update (); f2.update ();
 
-		f1_xpred = f1.x; f2_xpred = f2.x;
-		f1_Xpred = f1.X; f2_Xpred = f2.X;
+		f1_xpred = f1.x(); f2_xpred = f2.x();
+		f1_Xpred = f1.X(); f2_Xpred = f2.X();
 
 		// Observation, true and Randomize based on an uncorrelated noise model
 		ztrue = uh.h(truth.x);
@@ -485,13 +505,13 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 		// Observe using model linearised about filter state estimate
 		if (Z_CORRELATION == 0.)
 		{
-			uh.state(f1.x);	f1.observe (uh, z);
-			uh.state(f2.x); f2.observe (uh, z);
+			uh.state(f1.x());	f1.observe (uh, z);
+			uh.state(f2.x()); f2.observe (uh, z);
 		}
 		else
 		{
-			ch.state(f1.x);	f1.observe (ch, z);
-			ch.state(f2.x);	f2.observe (ch, z);
+			ch.state(f1.x());	f1.observe (ch, z);
+			ch.state(f2.x());	f2.observe (ch, z);
 		}
 
 		// Update the filter

@@ -142,40 +142,6 @@ QCobserve::QCobserve () :
 }
 
 
-/*
- * Quadratic Filter
- *  Derived for FilterScheme class
- */
-class QCfilter : public FilterScheme {
-public:
-	QCfilter (const Float SystemStateGuess);
-private:
-};
-
-QCfilter::QCfilter (const Float SystemStateGuess)
-	: FilterScheme (NX)
-/*
- * Construct the filter
- *  Numerical alogrithm requires construction with fixed dimensions
- * Parameters:
- *  An initial guess for the system state
- */
-{
-	// Initialise filter state and covaince
-
-	// Initial State
-	x[0] = SystemStateGuess;
-	x[1] = 1.;		// Assumed initial Scale
-	x[2] = 0.;		// Assumed initial Bias
-	X.clear();
-	X(0,0) = sqr(i_X_NOISE);
-	X(1,1) = sqr(i_S_NOISE);
-	X(2,2) = sqr(i_B_NOISE);
-
-	init ();
-}
-
-
 int main()
 {
 	// Global setup for test output
@@ -194,10 +160,20 @@ int main()
 
 
 	// Construct Prediction and Observation model and Calibration filter
-	// Give the filter an initial guess of the system state
 	QCpredict linearPredict;
 	QCobserve nonlinObserve;
-	QCfilter obsAndCalib (x_true[0]);
+	FilterScheme obsAndCalib (NX);
+
+	// Give the filter an initial guess of the system state
+	obsAndCalib.x[0] = x_true[0];
+	obsAndCalib.x[1] = 1.;		// Assumed initial Scale
+	obsAndCalib.x[2] = 0.;		// Assumed initial Bias
+	obsAndCalib.X.clear();
+	obsAndCalib.X(0,0) = sqr(i_X_NOISE);
+	obsAndCalib.X(1,1) = sqr(i_S_NOISE);
+	obsAndCalib.X(2,2) = sqr(i_B_NOISE);
+
+	obsAndCalib.init ();
 
 	// Iterate the filter with test observations
 	FM::Vec u(1), z_true(1), z(1);

@@ -100,7 +100,7 @@ class Systematic_resampler : public Importance_resampler
 };
 
 
-class SIR_scheme : public Sample_filter
+class SIR_scheme : virtual public Sample_filter
 /*
  * Sampling Importance Resampleing Filter Scheme.
  *  Implement a general form of SIR filter
@@ -163,14 +163,14 @@ private:
 };
 
 
-class Kalman_filter_init : public Kalman_state_filter
+class Kalman_filter_init : virtual public Kalman_state_filter
 /* Rename init to init_from_kalman
  * Required for GCC2.95 which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
  */
 {
 protected:
-	Kalman_filter_init (size_t x_size) : Kalman_state_filter(x_size)
-	{}
+	Kalman_filter_init() : Kalman_state_filter(0)
+	{}	// Dummy virtual base constructor
 	void init() {
 		init_from_kalman();
 	}

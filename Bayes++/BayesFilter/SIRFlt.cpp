@@ -188,9 +188,9 @@ const SIR_scheme::Float SIR_scheme::rougheningKinit = 1;
 		// use 1 std.dev. per sample as default roughening
 
 SIR_scheme::SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
-		Sample_filter(x_size, s_size),
-		random(random_helper),
-		resamples(s_size), wir(s_size)
+		Sample_filter (x_size, s_size),
+		random (random_helper),
+		resamples (s_size), wir (s_size)
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -274,7 +274,7 @@ void
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Si(S,i);
-		Si.assign (f.fx(Si));
+		Si.assign (f.fw(Si));
 	}
 	stochastic_samples = S.size2();
 }
@@ -412,9 +412,9 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
  * SIR implementation of a Kalman filter
  */
 SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
-	SIR_scheme(x_size, s_size, random_helper), Kalman_filter_init(x_size),
-	rough_random(random_helper),
-	rough(x_size,x_size, rough_random)
+	Kalman_state_filter(x_size), Sample_filter (x_size, s_size), SIR_scheme (x_size, s_size, random_helper),
+	rough_random (random_helper),
+	rough (x_size,x_size, rough_random)
 {
 	FM::identity (rough.Fx);
 }
@@ -545,7 +545,7 @@ void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
 	const size_t nSamples = P.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Pi(P,i);
-		Pi.assign (rough.fx(Pi));
+		Pi.assign (rough.f(Pi));
 	}
 }
 

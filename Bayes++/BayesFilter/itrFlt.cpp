@@ -31,7 +31,7 @@ bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance
 
 
 Iterated_covariance_scheme::Iterated_covariance_scheme(size_t x_size, size_t z_initialsize) :
-		Linrz_kalman_filter(x_size),
+		Kalman_state_filter(x_size),
 		S(Empty), SI(Empty),
 		s(Empty), HxT(Empty)
 /*`
