@@ -29,6 +29,7 @@
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
 #ifdef BAYES_FILTER_SPARSE
+#include <map>
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #endif
@@ -61,9 +62,9 @@ typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseDens
 typedef ublas::banded_matrix<Float> BaseDenseDiagMatrix;
 							// Sparse types
 #ifdef BAYES_FILTER_SPARSE
-typedef ublas::sparse_vector<Float> BaseSparseVector;
-typedef ublas::sparse_matrix<Float, ublas::row_major> BaseSparseRowMatrix;
-typedef ublas::sparse_matrix<Float, ublas::column_major> BaseSparseColMatrix;
+typedef ublas::sparse_vector<Float, std::map<size_t,Float> > BaseSparseVector;
+typedef ublas::sparse_matrix<Float, ublas::row_major, std::map<size_t,Float> > BaseSparseRowMatrix;
+typedef ublas::sparse_matrix<Float, ublas::column_major, std::map<size_t,Float> > BaseSparseColMatrix;
 #endif
 
 							// Default types Dense or Sparse
