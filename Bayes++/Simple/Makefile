@@ -1,9 +1,8 @@
 # Bayes++ GCC Makefile
-# PV - Position Velocity filter
+# Simple filter example
 
-UBLASLIB ?= ..
-BOOSTLIB ?= ../../boost_1_28_0
-INC = -I.. -I../uBLASmatSup -I${UBLASLIB} -I${BOOSTLIB}
+BOOST ?= ../../boost_1_29_0
+INC = -I.. -I../uBLASmatSup -I${BOOST}
 CPPFLAGS = -DNDEBUG -Wall $(INC)
 
 all : simpleFilter

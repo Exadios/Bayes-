@@ -11,7 +11,7 @@
  * Implement a NON-LINEAR range angle observer
  */
 
-#include <limits>
+#include <boost/limits.hpp>
 #include <ctime>
 #include <cmath>
 #include <iostream>

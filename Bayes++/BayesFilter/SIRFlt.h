@@ -163,7 +163,6 @@ private:
 };
 
 
-namespace {
 class Kalman_filter_init : public Kalman_filter
 /* Rename init to init_from_kalman
  * Required for GCC which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
@@ -177,7 +176,7 @@ protected:
 	}
 	virtual void init_from_kalman() = 0;
 };
-}//namespace
+
 
 class SIR_kalman_filter : public SIR_filter, public Kalman_filter_init
 /*

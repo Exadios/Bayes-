@@ -1,11 +1,11 @@
 # Bayes++ GCC Makefile
 # Bayesian filtering library
 
-BOOSTLIB ?= ../../boost_1_29_0
-INC = -I.. -I../uBLASmatSup -I${BOOSTLIB}
+BOOST ?= ../../boost_1_29_0
+INC = -I.. -I../uBLASmatSup -I${BOOST}
 CPPFLAGS = -O3 -DNDEBUG -Wall $(INC)
 
-OBJS=bayesFlt.o bayesFltAlg.o matSup.o UdU.o covFlt.o infFlt.o infRtFlt.o itrFlt.o SIRFlt.o UDFlt.o unsFlt.o
+OBJS=bayesFlt.o bayesFltAlg.o matSup.o UdU.o covFlt.o infFlt.o infRtFlt.o itrFlt.o SIRFlt.o UDFlt.o unsFlt.o CIFlt.o
 
 all : bayesFilter_gcc.lib
 

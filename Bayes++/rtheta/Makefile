@@ -1,15 +1,16 @@
 # Bayes++ GCC Makefile
 # Range Angle test for all filter schemse
 
-UBLASLIB ?= ..
-BOOSTLIB ?= ../../boost_1_28_0
-INC=-I.. -I../UBLASmatSup -I${UBLASLIB} -I${BOOSTLIB}
-CC=g++
-CPPFLAGS=-O3 -DNDEBUG -finline-limit=1000 $(INC)
- 
-OBJS=rtheta.o test.o
+TESTING ?= ../../libs
+BOOST ?= ../../boost_1_29_0
+INC=-I.. -I../uBLASmatSup -I${BOOST} -I$(TESTING)
+CC=g77	# g77 Required to link correctly with lapack which requires fortran library but not startup code
+CPPFLAGS=-O3 -DNDEBUG $(INC)
+LDFLAGS=-llapack -lstdc++
 
-all : rtheta 
+OBJS=rtheta.o tests.o
 
-rtheta : $(OBJS) ../BayesFilter/bayesFilter_gcc3.lib
+all : rtheta
+
+rtheta : $(OBJS) ../BayesFilter/bayesFilter_gcc.lib
 

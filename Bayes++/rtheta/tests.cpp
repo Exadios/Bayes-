@@ -3,11 +3,11 @@
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
  * See Bayes++.htm for copyright license details
  */
-#include <limits>
 #include <ctime>
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <boost/limits.hpp>
 #include <boost/random.hpp>
 #include "timing.h"
 #include "angle.h"
@@ -24,7 +24,7 @@ using namespace angleArith;
 #include "BayesFilter/filters/average1.h"
 template average1_filter<Covariance_filter>;
 
-// Square 
+// Square
 template <class scalar>
 inline scalar sqr(scalar x)
 {
@@ -233,6 +233,8 @@ void test_info_init()
 	FM::print_vector(iri.y); FM::print_all_matrix(iri.Y);
 }
 #endif
+
+/*
 void test_addative()
 {
 	Matrix G(2,1);
@@ -243,6 +245,7 @@ void test_addative()
 	} f;
 	Simple_addative_predict_model s(f,G,q);
 }
+*/
 
 void other_tests()
 {
