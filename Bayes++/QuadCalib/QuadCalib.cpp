@@ -40,9 +40,6 @@ namespace
 		return x*x;
 	}
 
-	// Random numbers from Boost
-	Bayesian_filter_test::Boost_random localRng;
-
 	// Constant Dimensions
 	const unsigned NX = 3;			// Filter State dimension 	(SystemState, Scale, Bias)
 
@@ -131,6 +128,9 @@ int main()
 {
 	// Global setup for test output
 	std::cout.flags(std::ios::scientific); std::cout.precision(6);
+
+	// Random numbers from Boost
+	Bayesian_filter_test::Boost_random localRng;
 
 	// Setup the test filters
 	FM::Vec x_true (NX);
