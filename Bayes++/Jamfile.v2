@@ -10,11 +10,11 @@ build-project PV ;
 build-project QuadCalib ;
 
 # Get Boost locaton from environment
-BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
+BOOST = [ modules.peek : BOOST ] ;
 
 # Project requirements
 project
-    : requirements <include>$(BOOST_ROOT)
+    : requirements <include>$(BOOST)
     : build-dir "target"
     ;
 
