@@ -13,11 +13,11 @@
  * TODO
  *	Update can be done directly in factorised form
  */
-#include "matSup.h"
+#include "unsFlt.hpp"
+#include "matSup.hpp"
+#include "models.hpp"
 #include <cmath>
 
-#include "unsFlt.h"
-#include "models.h"
 
 /* Filter namespace */
 namespace Bayesian_filter

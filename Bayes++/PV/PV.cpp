@@ -22,8 +22,8 @@
  *	[1] "Bayesian Multiple Target Tracking" Lawrence D Stone, Carl A Barlow, Thomas L Corwin
  */
 
-#include "BayesFilter/allFlt.h"
-#include "BayesFilter/filters/indirect.h"
+#include "BayesFilter/allFilters.hpp"
+#include "BayesFilter/filters/indirect.hpp"
 #include <cmath>
 #include <iostream>
 #include <boost/random.hpp>

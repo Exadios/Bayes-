@@ -1,3 +1,4 @@
+#include <exception>
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -11,17 +12,13 @@
  * Implement a NON-LINEAR range angle observer
  */
 
-#include <boost/limits.hpp>
-#include <ctime>
+#include "BayesFilter/allFilters.hpp"
+#include <angle.hpp>			// Angle arithmatic header from Ms
 #include <cmath>
 #include <iostream>
-#include <iomanip>
 #include <boost/random.hpp>
-#include "timing.h"
-#include "format.h"
-#include "angle.h"
-
-#include "BayesFilter/allFlt.h"
+#include <boost/format.hpp>
+#include <boost/limits.hpp>
 
 
 using namespace Bayesian_filter;
@@ -29,15 +26,15 @@ using namespace Bayesian_filter_matrix;
 using namespace angleArith;
 
 
-const size_t NQ = 2;				// State dimension of noise
+const size_t NQ = 2;			// State dimension of noise
 const size_t NX = NQ+0;			// State dimension (x,y) and some empty dummies so things are semidefinate
-const size_t NZ = 2;				// Observation dimension
+const size_t NZ = 2;			// Observation dimension
 const size_t NS = 1000;			// Number of samples for a sampled representation
 
-const bool RA_MODEL = true;			// Use Range angle NON-linear model (requires normalising angle)
+const bool RA_MODEL = true;		// Use Range angle NON-linear model (requires normalising angle)
 const bool NOISE_MODEL = true;		// Add noise to truth model
 const bool TRUTH_STATIONARY = false;// Truth model setup
-const double INIT_XY[2] = {1.,-0.2};// XY initial position 
+const double INIT_XY[2] = {1.,-0.2};// XY initial position
 const double TARGET[2] = {-11.,0.};	// XY position of target
 
 const double RANGE_NOISE = NOISE_MODEL ? 0.1 : 1e-6;
@@ -454,32 +451,30 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 
 	// Comparison
 	{
-		using std::cout;
-		using float_format::Form;
-		Form gen3_10(3); gen3_10.width(10);
-		Form fixed3_10(3); fixed3_10.fixed(); fixed3_10.width(10);
-		Form sci5(5); sci5.scientific();
-		Form sci5_15(5); sci5_15.scientific(); sci5_15.width(15);
-		Form sci5_13(5); sci5_13.scientific(); sci5_13.width(13);
+		using std::cout; using std::endl;
+		using boost::format;
 
 		// Compomparision and truth line
-		//	* x(0)diff, x(1)diff, truth.x(0), truth.x(1), zx, zy)
-		cout << '*' << gen3_10(f1.x[0]-f2.x[0]) << gen3_10(f1.x[1]-f2.x[1])
-			 << fixed3_10(truth.x[0]) << fixed3_10(truth.x[1]) << fixed3_10(zx) << fixed3_10(zy) << std::endl;
+		//	x(0)diff, x(1)diff, truth.x(0), truth.x(1), zx, zy)
+		cout << format("*%11.4g %11.4g * %10.3f %10.3f  %10.3f %10.3f")
+			 	% (f1.x[0]-f2.x[0]) % (f1.x[1]-f2.x[1])
+			 	% truth.x[0] % truth.x[1] % zx % zy << endl;
+
+		format state(" %11.4g %11.4g * %10.3f %10.3f");
+		format covariance(" %12.5e %12.5e %12.5e");
+
 		// Filter f1 performace
-		//		x[0], x[1], x[0]err, x[1]err, x[01]dist,  Xpred*3, X*3
-		cout << fixed3_10(f1.x[0]) << fixed3_10(f1.x[1]);
-		cout << sci5_15(f1.x[0]-truth.x[0]) << sci5_15(f1.x[1]-truth.x[1]) <<
-				sci5_15(sqrt ((f1.x[0]-truth.x[0])*(f1.x[0]-truth.x[0]) + (f1.x[1]-truth.x[1])*(f1.x[1]-truth.x[1]))) << std::endl;
-		cout << sci5_13(f1_Xpred(0,0)) << sci5_13(f1_Xpred(1,1)) << sci5_13(f1_Xpred(1,0)) <<
-				sci5_13(f1.X(0,0)) << sci5_13(f1.X(1,1)) << sci5_13(f1.X(1,0)) << std::endl;
+		//		x[0]err, x[1]err, x[0], x[1],  Xpred*3, X*3
+		cout << state % (f1.x[0]-truth.x[0]) % (f1.x[1]-truth.x[1])
+				% f1.x[0] % f1.x[1] << endl;
+		cout << covariance % f1_Xpred(0,0) % f1_Xpred(1,1) % f1_Xpred(1,0);
+		cout << covariance % f1.X(0,0) % f1.X(1,1) % f1.X(1,0) << endl;
 		// Filter f2 performace
-		//		x[0], x[1], x[0]err, x[1]err, x[01]dist,  Xpred*3, X*3
-		cout << fixed3_10(f2.x[0]) << fixed3_10(f2.x[1]);
-		cout << sci5_15(f2.x[0]-truth.x[0]) << sci5_15(f2.x[1]-truth.x[1]) <<
-				sci5_15(sqrt ((f2.x[0]-truth.x[0])*(f2.x[0]-truth.x[0]) + (f2.x[1]-truth.x[1])*(f2.x[1]-truth.x[1])) ) << std::endl;
-		cout << sci5_13(f2_Xpred(0,0)) << sci5_13(f2_Xpred(1,1)) << sci5_13(f2_Xpred(1,0)) <<
-				sci5_13(f2.X(0,0)) << sci5_13(f2.X(1,1)) << sci5_13(f2.X(1,0)) << std::endl;
+		//		x[0]err, x[1]err, x[0], x[1], x[01]dist,  Xpred*3, X*3
+		cout << state % (f2.x[0]-truth.x[0]) % (f2.x[1]-truth.x[1])
+				% f2.x[0] % f2.x[1] << endl;
+		cout << covariance % f2_Xpred(0,0) % f2_Xpred(1,1) % f2_Xpred(1,0);
+		cout << covariance % f2.X(0,0) % f2.X(1,1) % f2.X(1,0) << endl;
 	}
 }
 
@@ -532,9 +527,7 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 
 int main()
 {
-	// Global setup for test output
-	std::cout.flags(std::ios::scientific); std::cout.precision(6);
-
+try {
 	// Other things I might want to test
 	extern void other_tests();
 	other_tests();
@@ -572,6 +565,10 @@ int main()
 	Random.reseed();
 	CCompare<Filter<CI_filter>, Filter<SIR_kalman_filter> > test3(x_init, X_init, 4);
 	std::cout << std::endl;
-
+}
+catch (std::exception e)
+{
+	std::cout << e.what() << std::endl;
+}
 	return 0;
 }

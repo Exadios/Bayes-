@@ -16,10 +16,10 @@
 #include <map>
 #include <iostream>
 // Include all the Bayes++ Bayesian filtering library
-#include "BayesFilter/allFlt.h"
-#include "SLAM.h"
-#include "fastSLAM.h"
-#include "kalmanSLAM.h"
+#include "BayesFilter/allFilters.hpp"
+#include "SLAM.hpp"
+#include "fastSLAM.hpp"
+#include "kalmanSLAM.hpp"
 
 
 using namespace SLAM_filter;

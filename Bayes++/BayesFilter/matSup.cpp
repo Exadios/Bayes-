@@ -12,10 +12,10 @@
  * Relies on Bayesian_filter::Bayes_filter for exception
  * thrown by internal matrix checks
  */
-#include "matSup.h"
+#include "bayesFlt.hpp"		// Require Excecptions
+#include "matSup.hpp"
 #include <cassert>
 
-#include "bayesFlt.h"		// Require Excecptions
 
 namespace {
 

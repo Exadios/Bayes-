@@ -16,11 +16,9 @@
 #include <vector>
 #include <map>
 // Include Bayesian filtering library
-#include "BayesFilter/matSup.h"
-#include "BayesFilter/bayesFlt.h"
-#include "BayesFilter/SIRFlt.h"
-#include "SLAM.h"
-#include "fastSLAM.h"
+#include "BayesFilter/SIRFlt.hpp"
+#include "SLAM.hpp"
+#include "fastSLAM.hpp"
 
 
 namespace {

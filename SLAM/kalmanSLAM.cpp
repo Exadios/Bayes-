@@ -12,10 +12,9 @@
  */
 
 // Include Bayesian filtering library
-#include "BayesFilter/matSup.h"
-#include "BayesFilter/bayesFlt.h"
-#include "SLAM.h"
-#include "kalmanSLAM.h"
+#include "BayesFilter/bayesFlt.hpp"
+#include "SLAM.hpp"
+#include "kalmanSLAM.hpp"
 
 
 namespace SLAM_filter

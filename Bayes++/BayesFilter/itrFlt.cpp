@@ -10,9 +10,9 @@
 /*
  * Iterated Covariance Filter.
  */
-#include "matSup.h"
-#include "itrFlt.h"
-#include "models.h"
+#include "itrFlt.hpp"
+#include "matSup.hpp"
+#include "models.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter

@@ -11,11 +11,11 @@
  * Bayesian_filter Implemention:
  *  algorithm that require additional resources to implement
  */
-#include "matSup.h"
+#include "bayesFlt.hpp"
+#include "matSup.hpp"
+#include "models.hpp"
 #include <vector>		// Only for unique_samples
 
-#include "bayesFlt.h"
-#include "models.h"
 
 namespace {
 

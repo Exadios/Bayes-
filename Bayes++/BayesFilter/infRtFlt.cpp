@@ -10,10 +10,9 @@
 /*
  * Information Root Filter.
  */
-#include "matSup.h"
-#include "infRtFlt.h"
-
-#include "uLAPACK.h"	// Common LAPACK interface
+#include "infRtFlt.hpp"
+#include "matSup.hpp"
+#include "uLAPACK.hpp"	// Common LAPACK interface
 
 
 /* Filter namespace */

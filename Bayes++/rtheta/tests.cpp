@@ -3,26 +3,25 @@
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
  * See Bayes++.htm for copyright license details
  */
-#include <ctime>
+#include "BayesFilter/allFilters.hpp"
 #include <cmath>
 #include <iostream>
-#include <iomanip>
 #include <boost/limits.hpp>
 #include <boost/random.hpp>
-#include "timing.h"
-#include "angle.h"
-
-#include "BayesFilter/allFlt.h"
 
 
 using namespace Bayesian_filter;
 using namespace Bayesian_filter_matrix;
-using namespace angleArith;
 
 
-// Instantiate Average1_filter to check the template
-#include "BayesFilter/filters/average1.h"
+// Instantiate complete fileters to check the templates
+#include "BayesFilter/filters/average1.hpp"
 template average1_filter<Covariance_filter>;
+
+#include "BayesFilter/filters/indirect.hpp"
+template Indirect_state_filter<State_filter>;
+template Indirect_kalman_filter<Kalman_filter>;
+
 
 // Square
 template <class scalar>
@@ -274,6 +273,8 @@ void test_addative()
 void other_tests()
 {
 	//	test_();
-	test_SPD_all();
-	test_temp_prod();
+//		using boost::format;
+//		cout << sci5_13%1.1 << sci5_13%1.2 << std::endl;
+//	test_SPD_all();
+//	test_temp_prod();
 }

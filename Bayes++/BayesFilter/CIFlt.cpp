@@ -10,9 +10,9 @@
 /*
  * Covariance Intersection Filter.
  */
-#include "matSup.h"
-#include "CIFlt.h"
-#include "models.h"
+#include "CIFlt.hpp"
+#include "matSup.hpp"
+#include "models.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter

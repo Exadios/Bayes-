@@ -13,7 +13,7 @@
 
 #include <iostream>
 // Include all the Bayes++ Bayesian filtering classes
-#include "BayesFilter/allFlt.h"
+#include "BayesFilter/allFilters.hpp"
 
 using namespace std;
 using namespace Bayesian_filter;

@@ -21,12 +21,12 @@
  *  LD format of LdL' factor 
  *   strict_lower_triangle(UD) = strict_lower_triangle(U), diagonal(UD) = d, strict_upper_triangle(UD) ignored or zeroed
  */
-#include "matSup.h"
+#include "bayesFlt.hpp"
+#include "matSup.hpp"
+#include "compatibility.hpp"
 #include <cassert>
 #include <cmath>
 
-#include "bayesFlt.h"
-#include "compatibility.h"
 
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix

@@ -13,10 +13,9 @@
  *  exceptions
  *  numeric constants
  */
-#include "matSup.h" 
+#include "bayesFlt.hpp"
 #include <boost/limits.hpp>
 
-#include "bayesFlt.h"
 
 /* Filter namespace */
 namespace Bayesian_filter

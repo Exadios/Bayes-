@@ -10,7 +10,7 @@
 
 # Modify these settings to locate Boost and bjam
 BOOST_ROOT ?= ../boost_1_29_0
-BJAM ?= ${BOOST_ROOT}/bjam
+BJAM ?= bjam
 TOOL ?= gcc
 ALL_LOCATE_TARGET ?= bin
 

@@ -12,13 +12,12 @@
  *
  * Bootstap filter (Sequential Importance Resampleing).
  */
-#include "matSup.h"
+#include "SIRFlt.hpp"
+#include "matSup.hpp"
 #include <algorithm>
 #include <iterator>
 #include <vector>
 #include <boost/limits.hpp>
-
-#include "SIRFlt.h"
 
 namespace {
 

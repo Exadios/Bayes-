@@ -17,7 +17,7 @@
  *	The system model is a 1D brownian motion with a known pertubation.
  */
 
-#include "BayesFilter/allFlt.h"
+#include "BayesFilter/allFilters.hpp"
 #include <cmath>
 #include <iostream>
 #include <boost/random.hpp>

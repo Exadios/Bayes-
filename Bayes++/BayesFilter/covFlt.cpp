@@ -6,12 +6,12 @@
  * $Header$
  * $NoKeywords: $
  */
- 
+
 /*
  * Covariance Filter.
  */
-#include "matSup.h"
-#include "covFlt.h"
+#include "covFlt.hpp"
+#include "matSup.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter

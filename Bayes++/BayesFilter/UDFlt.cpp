@@ -16,9 +16,9 @@
  *  Extend Observe function to deal with PSD
  *  Make rcond return overall conditioning not minium of each sequential
  */
-#include "matSup.h"
+#include "UDFlt.hpp"
+#include "matSup.hpp"
 #include <boost/limits.hpp>
-#include "UDFlt.h"
 
 /* Filter namespace */
 namespace Bayesian_filter
