@@ -135,7 +135,7 @@ public:
 		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
 		}
-		xp += FM::prod(G,n);			// add correlated noise
+		FM::noalias(xp) += FM::prod(G,n);			// add correlated noise
 		return xp;
 	}
 
