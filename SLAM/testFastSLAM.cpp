@@ -11,15 +11,21 @@
  *  A linear filter with one state and constant noises
  */
 
-#include <boost/random.hpp>
+// Types Required for SLAM classes
 #include <vector>
 #include <map>
-#include <iostream>
+
 // Include all the Bayes++ Bayesian filtering library
 #include "BayesFilter/allFilters.hpp"
 #include "SLAM.hpp"
 #include "fastSLAM.hpp"
 #include "kalmanSLAM.hpp"
+
+#include <boost/random.hpp>
+#include <iostream>
+#include <boost/numeric/ublas/io.hpp>
+
+
 
 
 using namespace SLAM_filter;
