@@ -7,7 +7,7 @@
  */
 
 /*
- * SLAM : Simulataneous Location and Mapping
+ * SLAM : Simultaneous Locatization and Mapping
  *  FastSLAM augmented particle algorithm see Ref[1]
  *
  * Reference

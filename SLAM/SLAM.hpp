@@ -7,7 +7,7 @@
  */
 
 /*
- * SLAM : Simulataneous Location and Mapping
+ * SLAM : Simultaneous Locatization and Mapping
  */
 
 namespace SLAM_filter

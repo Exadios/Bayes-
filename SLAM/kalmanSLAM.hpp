@@ -7,9 +7,13 @@
  */
 
 /*
- * KalmanSLAM : Simultanious Location and Mapping
+ * SLAM : Simultaneous Locatization and Mapping
  *  Kalman filter representing representation of SLAM
  *  A VERY simple fixed size implementation
+ *
+ * Reference
+ *  [1] "A Solution to the Simultaneous Localization and Map Building (SLAM) Problem"
+ *   MWM Gamini Dissanayake, Paul Newman, Steven Clark, Hugh Durrant-Wyte, M Csorba, IEEE T Robotics and Automation vol.17 no.3 June 2001
  */
 
 
