@@ -4,7 +4,6 @@
 # Propagated usage requirements
 project BayesFilter
      : usage-requirements <include>".."
-     : default-build release
 ;
 
 # Base names of the source files for BayesFilter
