@@ -34,18 +34,18 @@ const size_t NS = 1000;			// Number of samples for a sampled representation
 const bool RA_MODEL = true;		// Use Range angle NON-linear model (requires normalising angle)
 const bool NOISE_MODEL = true;		// Add noise to truth model
 const bool TRUTH_STATIONARY = false;// Truth model setup
-const Float INIT_XY[2] = {1.,-0.2};// XY initial position
+const Float INIT_XY[2] = {1.,Float(-0.2)};// XY initial position
 const Float TARGET[2] = {-11.,0.};	// XY position of target
 
-const Float RANGE_NOISE = NOISE_MODEL ? 0.1 : 1e-6;
-const Float ANGLE_NOISE = NOISE_MODEL ? (5. * angled::Pi / 180.) : 1e-6;
-const Float Z_CORRELATION = 0e-1;	// Correlated observation model
-const Float X_NOISE = 0.05;		// Prediction model
-const Float Y_NOISE = 0.09;
-const Float XY_NOISE_COUPLING = 0.05;
-const Float INIT_X_NOISE = 0.07;
-const Float INIT_Y_NOISE = 0.10;
-const Float INIT_XY_NOISE_CORRELATION = 0.04;
+const Float RANGE_NOISE = NOISE_MODEL ? Float(0.1) : Float(1e-6);
+const Float ANGLE_NOISE = NOISE_MODEL ? Float(5. * angle<Float>::Pi / 180.) : Float(1e-6);
+const Float Z_CORRELATION = Float(0e-1);	// Correlated observation model
+const Float X_NOISE = Float(0.05);		// Prediction model
+const Float Y_NOISE = Float(0.09);
+const Float XY_NOISE_COUPLING = Float(0.05);
+const Float INIT_X_NOISE = Float(0.07);
+const Float INIT_Y_NOISE = Float(0.10);
+const Float INIT_XY_NOISE_CORRELATION = Float(0.04);
 
 
 // Square 
@@ -66,7 +66,7 @@ public:
 	{}
 	Float normal(const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937> gen(rng, mean, sigma);
+		boost::normal_distribution<boost::mt19937, Float> gen(rng, mean, sigma);
 		return gen();
 	}
 	void normal(Vec& v)
@@ -83,8 +83,8 @@ public:
 	}
 private:
 	boost::mt19937 rng;
-	boost::normal_distribution<boost::mt19937> gen_normal;
-	boost::uniform_01<boost::mt19937> gen_uniform;
+	boost::normal_distribution<boost::mt19937, Float> gen_normal;
+	boost::uniform_01<boost::mt19937, Float> gen_uniform;
 } Random, Random2;
 
 
@@ -122,8 +122,8 @@ pred_model::pred_model () :
 	FM::identity (Fx);
 	Fx(0,0) = 1.;
 	Fx(0,1) = 0.;
-	Fx(1,0) = 0.1;
-	Fx(1,1) = 0.9;
+	Fx(1,0) = Float(0.1);
+	Fx(1,1) = Float(0.9);
 
 	// Build q,G, Zero all except active partition
 	q.clear();
@@ -139,19 +139,19 @@ pred_model::pred_model () :
 	FM::identity (inv.Fx);
 	inv.Fx(0,0) = 1.;
 	inv.Fx(0,1) = 0.;
-	inv.Fx(1,0) = -1./9.;
-	inv.Fx(1,1) = 1./0.9;
+	inv.Fx(1,0) = Float(-1./9.);
+	inv.Fx(1,1) = Float(1./0.9);
 
 	// Build Inverse q, G, 1/0 all except active partition!!
 	inv.q.clear();
-	inv.q[0] = 1. / sqr(X_NOISE);
-	inv.q[1] = 1. / sqr(Y_NOISE);
+	inv.q[0] = Float(1.) / sqr(X_NOISE);
+	inv.q[1] = Float(1.) / sqr(Y_NOISE);
 	
 	// No inverse for empty parts of G
 	inv.G.assign(ublas::scalar_matrix<Float>(inv.G.size1(),inv.G.size2(),
 			std::numeric_limits<Float>::infinity() ) );
-	Float Gdet = sqr(1.) - sqr(XY_NOISE_COUPLING);
-	inv.G(0,0) = inv.G(1,1) = 1./ Gdet;
+	Float Gdet = sqr(Float(1.)) - sqr(XY_NOISE_COUPLING);
+	inv.G(0,0) = inv.G(1,1) = Float(1.)/ Gdet;
 	inv.G(0,1) = inv.G(1,0) = -XY_NOISE_COUPLING / Gdet;
 }
 
@@ -261,7 +261,7 @@ const Vec& cobs_model::h (const Vec& x) const
 void uobs_model::normalise (Vec& z_denorm, const Vec& z_from) const
 {
 	if (RA_MODEL)
-		z_denorm[1] = angled(z_denorm[1]).from (z_from[1]);
+		z_denorm[1] = angle<Float>(z_denorm[1]).from (z_from[1]);
 }
 
 void cobs_model::normalise (Vec& z_denorm, const Vec& z_from) const

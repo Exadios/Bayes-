@@ -73,9 +73,9 @@ void test_inverse()
 
 	Matrix U (3,3);
 	U.clear();
-	U(0,0) = sqr(1.);
-	U(1,1) = sqr(1.);
-	U(2,2) = sqr(1.);
+	U(0,0) = sqr(Float(1.));
+	U(1,1) = sqr(Float(1.));
+	U(2,2) = sqr(Float(1.));
 	U(0,1) = 2.;
 	U(0,2) = 3.;
 	U(1,2) = 5.;
