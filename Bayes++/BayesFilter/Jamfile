@@ -16,4 +16,10 @@ lib BayesFilter : $(CPP_SOURCES).cpp
     : debug release
 ;
 
+# Provide the static libraries in convenient location named "lib"
+#   debug libraries are given a "d" suffix
+stage ../lib  :  <lib>BayesFilter
+    :  <tag><debug>"d"
+    : debug release
+;
 
