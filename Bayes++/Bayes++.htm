@@ -338,10 +338,15 @@ in Bayes++   itself.</p>
                                
 <h2><a name="whatsnew"></a>Whats new?</h2>
    
-<h3>Filters are Filters, Schemes are Schemes<br>
+<h3>Filters are _filters, Schemes are _schemes<br>
   </h3>
-  ddd<br>
-                                 
+  Abstract filters and numeric schemes previously all had names ending in
+<i>_filter</i>. To make things simpler the naming has been changed to make
+a clear seperation in what is a two level hierarchy.<br>
+Filters lie at the base of the hierarchy. Schemes are always derived from
+one of more filters. Filters represent abstract concepts, such as the state
+representation and model interface. Schemes are concreate implementations
+of a filter with all the numeric details and interfaces completed.<br>
 <h3>Covariance Intersect Scheme added</h3>
                  Finally the <b>CI</b> algorithm has been implemented as
 a  Scheme    in  Bayes++.   CI is interesting as it provides a weaker but
@@ -355,7 +360,7 @@ covariance  could be.<br>
                              
 <h3>Importance Resampling infrastructure added</h3>
                  The flexibility of the <i>SIR_filter </i>has been greatly
- improved.      A  new  class<i>Importance_resampler</i> has been added.
+ improved.      A  new  class <i>Importance_resampler</i> has been added.
 Whenever  <i>SIR_filter        </i>need to resample it uses and Importance_resampler
  parameter. Therefore        by changing this parameter different resamplers
  can be used. <br>
@@ -363,7 +368,7 @@ Whenever  <i>SIR_filter        </i>need to resample it uses and Importance_resam
    and   the   <i>Systematic_resampler</i>.  See the referenced publications 
    for further    dicussion of these methods.<br>
                        
-<h3>Matrix Interface changes</h3>
+<h3>Gappy Matrices</h3>
                        
 <p>The matrix interface has been further improved. These improvment require
       uBLAS from boost_1_30_0. With this version there is now experimantal

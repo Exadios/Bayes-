@@ -152,37 +152,17 @@ in the EKF- reducing linearisation errors in all cases.</p>
         </td>
         <td valign="top" width="43%">                                   
                                                  
-      <p>Inverse Covariance or Information form filter. Non-linear prediction 
-   requires conversion back to state representation. Update, directly on information
-   using modified innovation formulation.</p>
+      <p>Information (inverse covariance) filter.</p>
+      <p>Invertible linear model allows direct information form prediction.<br>
+Non-linear prediction    requires conversion back to state representation.<br>
+Observe with modified innovation formulation equivilient to EKF.</p>
         </td>
         <td valign="top" width="25%">                                   
                                                  
       <p>State, observation and innovation covariance invertible</p>
         </td>
         </tr>
-        <tr>
-        <td valign="top" width="30%">                                   
-                                                 
-      <h4>Information_joseph_filter</h4>
-                                                                        
-                   
-      <p>EIF with linear prediction</p>
-                                                                        
-                   
-      <p><a href="#References">See Reference[7]</a></p>
-        </td>
-        <td valign="top" width="43%">                                   
-                                                 
-      <p>Invertible linear model allows direct information form prediction 
-   - avoids EIF conversion back to state and covariance.</p>
-        </td>
-        <td valign="top" width="25%">                                   
-                                                 
-      <p>Joseph prediction, observation and innovation covariance invertible</p>
-        </td>
-        </tr>
-        <tr>
+                <tr>
         <td valign="top" width="30%">                                   
                                                  
       <h4>Information_root_scheme</h4>
@@ -196,7 +176,7 @@ in the EKF- reducing linearisation errors in all cases.</p>
         <td valign="top" width="43%">                                   
                                                  
       <p>Numerically stable solution using factorisation of inverse covariance 
-  as RTR</p>
+  as R'R</p>
         </td>
         <td valign="top" width="25%">                                   
                                                  
@@ -343,14 +323,14 @@ for Bayesian filtering. This is achieved by hierarchical composition of related
         Represents only the filter state and an update on that state</td>
         </tr>
         <tr>
-        <td valign="top" width="35%"><strong>Kalman_filter</strong></td>
-        <td valign="top" width="65%"> Kalman representation of state statistic.<br>
+        <td valign="top" width="35%"><strong>Kalman_state_filter</strong></td>
+        <td valign="top" width="65%"> Kalman representation of state statistics.<br>
         Represents a state vector and a covariance matrix. That is the 1st
  (mean)   and 2nd (covariance) moments of a distribution.</td>
         </tr>
         <tr>
         <td valign="top" width="35%"><strong>Linrz_filter</strong></td>
-        <td valign="top" width="65%"> Base class for a linear or gradient 
+        <td valign="top" width="65%"> Model interface for a linear or gradient 
 linearized    Kalman filters.<br>
         Specifies filter operation using predict and observe functions</td>
         </tr>
@@ -878,9 +858,9 @@ Vol.3 No.6 1969</p>
              
 <p>[7] "Stochastic Models, Estimation, and Control", Peter S Maybeck, Academic 
    Press, ISBN 0-12-480701-1</p>
-             
-<p>[8] "Covariance Intersect"</p>
-             
+             [8] "A non-divergent Estimation Algorithm in th Presence of
+Unknown Correlaltion", SJ Julier, JK Uhlmann, Proc. American Control Conference
+6/1997<span class="m"><font size="-1"></font></span>             
 <p>[9] "Exception-Safety in Generic Components", David Abrahams, Proc. of 
    a   Dagstuhl Seminar 'Generic Programming', Lecture Notes on Computer Science
    1766, <a href="http://www.boost.org/more/error_handling.html"
