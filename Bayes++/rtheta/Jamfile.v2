@@ -18,7 +18,5 @@ exe rtheta :
      rtheta.cpp  tests.cpp
      ../BayesFilter//BayesFilter lapack
      : <toolset>intel-linux:<cxxflags>TEST
-#: <toolset>intel,<toolset-intel:platform>linux:<cxxflags>TEST
-#: <toolset-intel:platform>linux:<cxxflags>TEST
      : debug
 ;
