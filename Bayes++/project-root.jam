@@ -8,12 +8,12 @@ variant hardoptimize_release : release :
  	<toolset>gcc <cflags>"-march=pentium4 -msse2" <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
 
 # Build variants for gappy container types
-variant uBLAS_sparse_debug : debug : <define>BAYES_FILTER_SPARSE ;
-variant uBLAS_sparse_release : release : <define>BAYES_FILTER_SPARSE ;
-variant uBLAS_compressed_debug : debug : <define>BAYES_FILTER_COMPRESSED ;
-variant uBLAS_compressed_release : release : <define>BAYES_FILTER_COMPRESSED ;
-variant uBLAS_coordinate_debug : debug : <define>BAYES_FILTER_COORDINATE ;
-variant uBLAS_coordinate_release : release : <define>BAYES_FILTER_COORDINATE ;
+variant mapped_debug : debug : <define>BAYES_FILTER_MAPPED ;
+variant mapped_release : release : <define>BAYES_FILTER_MAPPED ;
+variant compressed_debug : debug : <define>BAYES_FILTER_COMPRESSED ;
+variant compressed_release : release : <define>BAYES_FILTER_COMPRESSED ;
+variant coordinate_debug : debug : <define>BAYES_FILTER_COORDINATE ;
+variant coordinate_release : release : <define>BAYES_FILTER_COORDINATE ;
 
 # Build variant to allow testing with a local uBLAS version seperated from Boost. It named @uBLAS so it sorted name is included first
 variant uBLAS_seperate_debug : debug : <include>"../Boost/@uBLAS" ;
