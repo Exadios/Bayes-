@@ -52,7 +52,7 @@ void Information_root_scheme::init ()
 	bool singular = UTinverse (R);
 	assert (!singular); (void)singular;
 						// Information Root state r=R*x
-	r.assign (prod(R,x));
+	r .noA()= prod(R,x);
 }
 
 void Information_root_info_scheme::init_yY ()
@@ -93,7 +93,7 @@ void Information_root_info_scheme::init_yY ()
 	RI = R;
 	bool singular = UTinverse(RI);
 	assert (!singular); (void)singular;
-	r.assign (prod(FM::trans(RI),y));
+	r .noA()= prod(FM::trans(RI),y);
 }
 
 void Information_root_scheme::update ()
@@ -112,8 +112,8 @@ void Information_root_scheme::update ()
 	if (singular)
 		error (Numeric_exception("R not PD"));
 
-	X.assign (prod_SPD(RI));		// X = RI*RI'
-	x.assign (prod(RI,r));
+	X .noA()= prod_SPD(RI);		// X = RI*RI'
+	x .noA()= prod(RI,r);
 
 	assert_isPSD (X);
 }
@@ -130,8 +130,8 @@ void Information_root_info_scheme::update_yY ()
  */
 {
 	Information_root_scheme::update();
-	Y.assign (prod(trans(R),R));		// Y = R'*R
-	y.assign (prod(Y,x));
+	Y .noA()= prod(trans(R),R);		// Y = R'*R
+	y .noA()= prod(Y,x);
 }
 
 
@@ -192,10 +192,10 @@ Bayes_base::Float
 	FM::identity (A);	// Prefill with identity for topleft and zero's in off diagonals
 
 	Matrix RFxI (prod(R, invFx));
-	A.sub_matrix(q_size,q_size+x_size, 0,q_size).assign (prod(RFxI, Gqr));
-	A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size).assign (RFxI);
+	A.sub_matrix(q_size,q_size+x_size, 0,q_size) .assign (prod(RFxI, Gqr) );
+	A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) .assign (RFxI);
 	if (linear_r)
-		A.sub_column(q_size,q_size+x_size, q_size+x_size).assign (r);
+		A.sub_column(q_size,q_size+x_size, q_size+x_size) .assign (r);
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(q_size+x_size);
@@ -205,9 +205,9 @@ Bayes_base::Float
 						// Extract the roots, junk in strict lower triangle
 	R = UpperTri( A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) );
     if (linear_r)
-		r = A.sub_column(q_size,q_size+x_size, q_size+x_size);
+		r .noA()= A.sub_column(q_size,q_size+x_size, q_size+x_size);
 	else
-		r.assign (prod(R,f.f(x)));	// compute r using f(x)
+		r .noA()= prod(R,f.f(x));	// compute r using f(x)
 
 	return UCrcond(R);	// compute rcond of result
 }
@@ -264,10 +264,10 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 	assert (!singular); (void)singular;
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
-	A.sub_matrix(0,x_size, 0,x_size).assign (R);
-	A.sub_matrix(x_size,x_size+z_size, 0,x_size).assign (prod(Zir, h.Hx));
-	A.sub_column(0,x_size, x_size).assign (r);
-	A.sub_column(x_size,x_size+z_size, x_size).assign (prod(Zir, s+prod(h.Hx,x)));
+	A.sub_matrix(0,x_size, 0,x_size) .assign (R);
+	A.sub_matrix(x_size,x_size+z_size, 0,x_size) .assign (prod(Zir, h.Hx));
+	A.sub_column(0,x_size, x_size) .assign (r);
+	A.sub_column(x_size,x_size+z_size, x_size) .assign (prod(Zir, s+prod(h.Hx,x)));
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(x_size+1);
@@ -275,8 +275,8 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 	if (info != 0)
 			error (Numeric_exception("Observe no QR factor"));
 						// Extract the roots, junk in strict lower triangle
-	R = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
-	r = A.sub_column(0,x_size, x_size);
+	R .noA()= UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
+	r .noA()= A.sub_column(0,x_size, x_size);
 
 	return UCrcond(R);	// compute rcond of result
 }
@@ -309,10 +309,10 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 	}
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
-	A.sub_matrix(0,x_size, 0,x_size).assign (R);
-	A.sub_matrix(x_size,x_size+z_size, 0,x_size).assign (prod(Zir, h.Hx));
-	A.sub_column(0,x_size, x_size).assign (r);
-	A.sub_column(x_size,x_size+z_size, x_size).assign (prod(Zir, s+prod(h.Hx,x)));
+	A.sub_matrix(0,x_size, 0,x_size) .assign (R);
+	A.sub_matrix(x_size,x_size+z_size, 0,x_size) .assign (prod(Zir, h.Hx));
+	A.sub_column(0,x_size, x_size) .assign (r);
+	A.sub_column(x_size,x_size+z_size, x_size) .assign (prod(Zir, s+prod(h.Hx,x)));
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(x_size+1);
@@ -320,8 +320,8 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 	if (info != 0)
 			error (Numeric_exception("Observe no QR factor"));
 						// Extract the roots, junk in strict lower triangle
-	R = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
-	r = A.sub_column(0,x_size, x_size);
+	R .noA()= UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
+	r .noA()= A.sub_column(0,x_size, x_size);
 
 	return UCrcond(R);	// compute rcond of result
 }

@@ -274,7 +274,7 @@ void
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Si(S,i);
-		Si.assign (f.fw(Si));
+		Si .assign (f.fw(Si));
 	}
 	stochastic_samples = S.size2();
 }
@@ -332,7 +332,7 @@ void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::R
 		--si;
 		if (*pri > 0) {
 			--livei;
-			FM::column(P,livei).assign (FM::column(P,si));
+			FM::column(P,livei) .assign (FM::column(P,si));
 		}
 	}
 	assert(si == 0);
@@ -343,7 +343,7 @@ void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::R
 		size_t res = *pi;
 		if (res > 0) {
 			do  {
-				FM::column(P,si).assign (FM::column(P,livei));
+				FM::column(P,si) .assign (FM::column(P,livei));
 				++si; --res;
 			} while (res > 0);
 			++livei;
@@ -371,8 +371,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 	Float SigmaScale = K * pow (Float(P.size2()), -1/Float(x_size));
 
 						// Find min and max states in all P, precond P not empty
-	Vec xmin(x_size); xmin.assign (column(P,0));
-	Vec xmax(x_size); xmax.assign (xmin);
+	Vec xmin(x_size); xmin .noA()= column(P,0);
+	Vec xmax(x_size); xmax .noA()= xmin;
 	ColMatrix::iterator2 pi = P.begin2();
 	while (pi != P.end2())		// Loop includes 0 to simplify code
 	{
@@ -391,7 +391,7 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
    						// Roughening st.dev max-min
 	Vec rootq(x_size);
 	rootq = xmax;
-	rootq.minus_assign (xmin);
+	rootq .noA()-= xmin;
 	rootq *= SigmaScale;
    						// Apply roughening prediction based on scaled variance
 	DenseVec n(x_size);
@@ -402,7 +402,7 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 			*ni *= rootq[ni.index()];
 		}
 		FM::ColMatrix::Column Pi(P,pi.index2());
-		n.plus_assign (Pi);			// add to P
+		n .noA()+= Pi;			// add to P
 		Pi = n;
 	}
 }

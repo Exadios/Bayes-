@@ -73,7 +73,7 @@ Bayes_base::Float
  */
 {
 						// Predict state covariance, simply add in noise
-	X.plus_assign(prod_SPD(f.G, f.q));
+	X .noA()+= prod_SPD(f.G, f.q);
   
 	assert_isPSD (X);
 	return 1;
@@ -106,18 +106,18 @@ Bayes_base::Float
 
 						// Innovation covariance
 	Matrix temp_XZ (prod(X, trans(h.Hx)));
-	S.assign (prod(h.Hx, temp_XZ) + h.Z);
+	S .noA()= prod(h.Hx, temp_XZ) + h.Z;
 
 						// Inverse innovation covariance
 	Float rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
 						// Kalman gain, X*Hx'*SI
-	W.assign (prod(temp_XZ, SI));
+	W .noA()= prod(temp_XZ, SI);
 
 						// State update
-	x.plus_assign (prod(W, s));
-	X.minus_assign (prod_SPD(W, S, temp_XZ));
+	x .noA()+= prod(W, s);
+	X .noA()-= prod_SPD(W, S, temp_XZ);
 
 	assert_isPSD (X);
 	return rcond;
@@ -136,7 +136,7 @@ Bayes_base::Float
 
 						// Innovation covariance
 	Matrix temp_XZ (prod(X, trans(h.Hx)));
-	S.assign (prod(h.Hx, temp_XZ));
+	S .noA()= prod(h.Hx, temp_XZ);
 	for (size_t i = 0; i < h.Zv.size(); ++i)
 		S(i,i) += h.Zv[i];
 
@@ -145,11 +145,11 @@ Bayes_base::Float
 	rclimit.check_PD(rcond, "S not PD in observe");
 
 						// Kalman gain, X*Hx'*SI
-	W.assign (prod(temp_XZ, SI));
+	W .noA()= prod(temp_XZ, SI);
 
 						// State update
-	x.plus_assign (prod(W, s));
-	X.minus_assign (prod_SPD(W, S, temp_XZ));
+	x .noA()+= prod(W, s);
+	X .noA()-= prod_SPD(W, S, temp_XZ);
 
 	assert_isPSD (X);
 	return rcond;

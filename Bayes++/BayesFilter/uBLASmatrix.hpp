@@ -58,16 +58,46 @@ public:
 	{}	// vector_expression convsersion copy constructor, hides the implict copy required for matrix column access
 
 	template <class E>
-	FMVec& operator=(const ublas::vector_expression<E>& r)
-	{	// Expression assignment, may be dependant on r
+	FMVec& operator= (const ublas::vector_expression<E>& r)
+	{	// Expression assignment; may be dependant on r
 		VecBase::operator=(r);
 		return *this;
 	}
-	FMVec& operator=(const FMVec& r)
+	FMVec& operator= (const FMVec& r)
 	{	// Vector assignment; independant
 		assign(r);
 		return *this;
 	}
+private:
+	template <class B>
+	struct NoAliasAssign
+	{
+		NoAliasAssign (B& b) : b_(b)
+		{}
+		template <class E>
+		void operator= (const E& e)
+		{	
+			b_ .assign (e);
+		}
+		template <class E>
+		void operator+= (const E& e)
+		{	
+			b_ .plus_assign (e);
+		}
+		template <class E>
+		void operator-= (const E& e)
+		{	
+			b_ .minus_assign (e);
+		}
+	    private:
+	        B& b_;
+	}; 
+public:
+	NoAliasAssign<FMVec> noA()
+	{	// Return a no alias assignment proxy
+		return NoAliasAssign<FMVec>(*this);
+	}
+
 
 	const ublas::vector_range<const VecBase> operator()(size_t b, size_t e) const
 	{	// Range selection operator
@@ -100,16 +130,45 @@ public:
 	explicit FMMatrix(const ublas::matrix_expression<E>& e) : MatrixBase(e)
 	{}	// matrix_expression constructor
 
-	FMMatrix& operator=(const FMMatrix& r)
-	{	// Matrix assignment
-		assign(r);
-		return *this;
-	}
 	template <class E>
-	FMMatrix& operator=(const ublas::matrix_expression<E>& r)
-	{	// Expression assignment, may be dependant on r
+	FMMatrix& operator= (const ublas::matrix_expression<E>& r)
+	{	// Expression assignment; may be dependant on r
 		MatrixBase::operator=(r);
 		return *this;
+	}
+	FMMatrix& operator= (const FMMatrix& r)
+	{	// Matrix assignment; independant
+		assign (r);
+		return *this;
+	}
+private:
+	template <class B>
+	struct NoAliasAssign
+	{
+		NoAliasAssign (B& b) : b_(b)
+		{}
+		template <class E>
+		void operator= (const E& e)
+		{	
+			b_ .assign (e);
+		}
+		template <class E>
+		void operator+= (const E& e)
+		{	
+			b_ .plus_assign (e);
+		}
+		template <class E>
+		void operator-= (const E& e)
+		{	
+			b_ .minus_assign (e);
+		}
+	    private:
+	        B& b_;
+	}; 
+public:
+	NoAliasAssign<FMMatrix> noA()
+	{	// Return a no alias assignment proxy
+		return NoAliasAssign<FMMatrix>(*this);
 	}
 
 	// Row,Column vector proxies
@@ -283,23 +342,24 @@ typedef FMMatrix<detail::SymMatrixWrapper<detail::BaseSparseRowMatrix> > SparseS
  * Filter Matrix Adaptors, simply hide the uBLAS details
  */
 template <class M>
-const ublas::triangular_adaptor<const M, typename UTriMatrix::functor1_type>
+const ublas::triangular_adaptor<const M, ublas::upper>
  UpperTri(const M& m)
 /*
  * View Upper triangle of m
+ * ISSUE VC7 cannot cope with UTriMatrix::functor1_type
  */
 {
-	return ublas::triangular_adaptor<const M, typename UTriMatrix::functor1_type>(m);
+	return ublas::triangular_adaptor<const M, ublas::upper>(m);
 }
 
 template <class M>
-const ublas::triangular_adaptor<const M, typename LTriMatrix::functor1_type>
+const ublas::triangular_adaptor<const M, ublas::lower>
  LowerTri(const M& m)
 /*
  * View Lower triangle of m
  */
 {
-	return ublas::triangular_adaptor<const M, typename LTriMatrix::functor1_type>(m);
+	return ublas::triangular_adaptor<const M, ublas::lower>(m);
 }
 
 
@@ -453,7 +513,7 @@ struct prod_expression_result
 template <class X>
 struct prod_matrix_result
 {	// Provide ET result type XXT of prod(X,trans(X))
-	typedef typename X::expression_type EX;
+	typedef BOOST_UBLAS_TYPENAME X::expression_type EX;
 	typedef BOOST_UBLAS_TYPENAME prod_expression_result<EX,EX>::E1E2T_type  XXT_type;
 
 	// Provide ET result type XTX of prod(trans(X),X)

@@ -143,24 +143,24 @@ Bayes_base::Float
 							// Observation model, linearize about new x
 		const Vec& zp = h.h(x);
 		
-		HxT.assign (trans(h.Hx));
+		HxT .noA()= trans(h.Hx);
 							// Innovation
 		h.normalise(s = z, zp);
-		s.minus_assign (zp);
+		s .noA()-= zp;
 							// Innovation covariance
-		S = prod_SPD(h.Hx, Xpred, HxXtemp) + h.Z;
+		S .noA()= prod_SPD(h.Hx, Xpred, HxXtemp) + h.Z;
 							// Inverse innovation covariance
 		rcond = UdUinversePD (SI, S);
 		rclimit.check_PD(rcond, "S not PD in observe");
 
 							// Iterative observe
-		temp3.assign (prod_SPD(HxT,SI, temp2));
-		temp1.assign (prod(Xpred,temp3));
-		X.assign (Xpred - prod(temp1,Xpred));
+		temp3 .noA()= prod_SPD(HxT,SI, temp2);
+		temp1 .noA()= prod(Xpred,temp3);
+		X .noA()= Xpred - prod(temp1,Xpred);
 		assert_isPSD (X);
 							// New state iteration
-		temp2.assign (prod(X,HxT));
-		temp1.assign (prod(X,XpredI));
+		temp2 .noA()= prod(X,HxT);
+		temp1 .noA()= prod(X,XpredI);
 		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));
 	} while (!term.term_or_relinearize(*this));
 	return rcond;

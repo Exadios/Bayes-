@@ -138,7 +138,7 @@ namespace {
 			Unscented_predict_model(am.G.size1()),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
-			QGqG.assign (prod_SPD(am.G, am.q));
+			QGqG .noA()= prod_SPD(am.G, am.q);
 		}
 		const Vec& f(const Vec& x) const
 		{
@@ -200,9 +200,9 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 	}
 
 						// Mean of predicted distribution: x
-	x.assign (column(fXX,0) * Kappa);
+	x .noA()= column(fXX,0) * Kappa;
 	for (i = 1; i < XX_size; ++i) {
-		x.plus_assign (column(fXX,i) / Float(2)); // ISSUE uBlas may not be able to promote integer 2
+		x .noA()+= column(fXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
 	}
 	x /= x_Kappa;
 						// Covariance of distribution: X
@@ -213,17 +213,17 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 							// Center point, premult here by 2 for efficency
     {
 		ColMatrix::Column fXX0 = column(fXX,0);
-		X.assign (FM::outer_prod(fXX0, fXX0));
+		X .noA()= FM::outer_prod(fXX0, fXX0);
 		X *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (i = 1; i < XX_size; ++i) {
 		ColMatrix::Column fXXi = column(fXX,i);
-		X.plus_assign (FM::outer_prod(fXXi, fXXi));
+		X .noA()+= FM::outer_prod(fXXi, fXXi);
 	}
 	X /= 2*x_Kappa;
 						// Addative Noise Prediction, computed about center point
-	X.plus_assign (f.Q( column(fXX,0) ));
+	X .noA()+= f.Q( column(fXX,0) );
 
 	assert_isPSD (X);
 }
@@ -283,19 +283,20 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 						// Predict points of XX using supplied observation model
 	{
 		Vec zXXi(z_size), zXX0(z_size);
-		column(zXX,0).assign ( zXX0 = h.h( column(XX,0) ) );
+		zXX0 = h.h( column(XX,0) );
+		column(zXX,0) = zXX0;
 		for (size_t i = 1; i < XX.size2(); ++i) {
 			zXXi = h.h( column(XX,i) );
 						// Normalise relative to zXX0
 			h.normalise (zXXi, zXX0);
-			column(zXX,i).assign (zXXi);
+			column(zXX,i) = zXXi;
 		}
 	}
 
 						// Mean of predicted distribution: zp
-	zp.assign (column(zXX,0) * Kappa);
+	zp .noA()= column(zXX,0) * Kappa;
 	for (size_t i = 1; i < zXX.size2(); ++i) {
-		zp.plus_assign (column(zXX,i) / Float(2)); // ISSUE uBlas may not be able to promote integer 2
+		zp .noA()+= column(zXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
 	}
 	zp /= x_Kappa;
 
@@ -307,45 +308,46 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 							// Center point, premult here by 2 for efficency
 	{
 		ColMatrix::Column zXX0 = column(zXX,0);
-		Xzz.assign (FM::outer_prod(zXX0, zXX0));
+		Xzz .noA()= FM::outer_prod(zXX0, zXX0);
 		Xzz *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (size_t i = 1; i < zXX.size2(); ++i) {
 		ColMatrix::Column zXXi = column(zXX,i);
-		Xzz.plus_assign (FM::outer_prod(zXXi, zXXi));
+		Xzz .noA()+= FM::outer_prod(zXXi, zXXi);
 	}
 	Xzz /= 2*x_Kappa;
 
 						// Correlation of state with observation: Xxz
 							// Center point, premult here by 2 for efficency
 	{
-		Xxz.assign (FM::outer_prod(column(XX,0) - x, column(zXX,0)));
+		Xxz .noA()= FM::outer_prod(column(XX,0) - x, column(zXX,0));
 		Xxz *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (size_t i = 1; i < zXX.size2(); ++i) {
-		Xxz.plus_assign (FM::outer_prod(column(XX,i) - x, column(zXX,i)));
+		Xxz .noA()+= FM::outer_prod(column(XX,i) - x, column(zXX,i));
 	}
 	Xxz /= 2* (Float(x_size) + Kappa);
 
 						// Innovation covariance
 	S = Xzz;
-	S.plus_assign (h.Z);
+	S .noA()+= h.Z;
 						// Inverse innovation covariance
 	Float rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 						// Kalman gain
-	W.assign (prod(Xxz,SI));
+	W .noA()= prod(Xxz,SI);
 
 						// Normalised innovation
-	h.normalise(s = z, zp);
-	s.minus_assign (zp);
+	s = z;
+	h.normalise(s, zp);
+	s .noA()-= zp;
 
 						// Filter update
-	x.plus_assign (prod(W,s));
+	x .noA()+= prod(W,s);
 	RowMatrix WStemp(W.size1(), S.size2());
-	X.minus_assign (prod_SPD(W,S, WStemp) );
+	X .noA()-= prod_SPD(W,S, WStemp);
 
 	assert_isPSD (X);
 
