@@ -73,7 +73,7 @@ private:
 struct SLAMDemo
 {
 	void OneDExperiment ();
-	void InformationLooseExperiment ();
+	void InformationLossExperiment ();
 	
 	Boost_random goodRandom;
 
@@ -224,8 +224,8 @@ void SLAMDemo::OneDExperiment()
 }
 
 
-void SLAMDemo::InformationLooseExperiment()
-// Experiment with information loose due to resampling
+void SLAMDemo::InformationLossExperiment()
+// Experiment with information loss due to resampling
 {
 	// State size
 	const unsigned nL = 1;	// Location
@@ -341,5 +341,5 @@ int main()
 	// Create test and run experiments
 	SLAMDemo test;
 	test.OneDExperiment();
-	test.InformationLooseExperiment();
+	//test.InformationLossExperiment();
 }
