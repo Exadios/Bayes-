@@ -180,7 +180,6 @@ Fast_SLAM::Float
 		FeatureCondMap fmr(nparticles);		// Resampled feature map
 		for (AllFeature::iterator fi = M.begin(); fi != M.end(); ++fi)	// All Features
 		{
-			const unsigned feature = (*fi).first;	// Feature number
 			FeatureCondMap& fm = (*fi).second;		// Reference the feature map
 										// Iterate over All feature particles
 			FeatureCondMap::iterator fmi, fmi_begin = fm.begin(), fmi_end = fm.end();

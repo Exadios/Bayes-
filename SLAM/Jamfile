@@ -9,7 +9,7 @@ subproject "SLAM" ;
 # The executable for testing
 
 exe testfastslam :
-     testFastSlam.cpp
+     testFastSLAM.cpp
      fastSLAM.cpp
      kalmanSLAM.cpp
      <lib>../BayesFilter/BayesFilter

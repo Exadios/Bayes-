@@ -49,7 +49,7 @@ public:
 	virtual void update()
 	// Default update, simple resample
 	{
-		Float lcond_ignore = update_resample (Bayesian_filter::Standard_resampler());
+		(void)update_resample (Bayesian_filter::Standard_resampler());
 	}
 
 	unsigned feature_unique_samples( unsigned feature );

@@ -153,10 +153,10 @@ SLAMDemo::SLAMDemo()
 	Kalman_SLAM kalm(full_filter, nL);
 
 	// Fast_SLAM filter
-#ifdef _DEBUG
-	unsigned nParticles = 20;
-#else
+#ifdef NDEBUG
 	unsigned nParticles = 1000000;
+#else
+	unsigned nParticles = 20;
 #endif
 	BF::SIR_kalman_filter fast_location(nL, nParticles, goodRandom);
 	fast_location.init_kalman(x_init, X_init);

@@ -7,4 +7,5 @@ subinclude BayesFilter ;
 subinclude Simple ;
 subinclude PV ;
 subinclude "QuadCalib" ;
+subinclude "SLAM" ;
 subinclude rtheta ;

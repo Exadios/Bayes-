@@ -6,21 +6,33 @@
 # a BayesFilter static library.
 #
 # This Makefile just wraps up the bjam command for those used to make.
+# Use ARGS='xx' to pass arguments to bjam
 
 # Modify these settings to locate Boost and bjam
 BOOST_ROOT ?= ../boost_1_29_0
 BJAM ?= ${BOOST_ROOT}/bjam
 TOOL ?= gcc
-BJAMFLAGS ?= -sALL_LOCATE_TARGET=bin
+ALL_LOCATE_TARGET ?= bin
+
+GOBJAM = ${BJAM} -sBOOST_ROOT=$(BOOST_ROOT) -sALL_LOCATE_TARGET=$(ALL_LOCATE_TARGET)  $(ARGS)
 
 # Build everything
-bayes++:
-	${BJAM} -sBOOST_ROOT=$(BOOST_ROOT) ${BJAMFLAGS}
+all:
+	${GOBJAM}
 
 
 # Build individual examples
-simple:
-	${BJAM} -sBOOST_ROOT=$(BOOST_ROOT) ${BJAMFLAGS} '<Simple>simple'
+Simpletest:
+	${GOBJAM} '<Simple>simple'
 
-rthetatest:
-	${BJAM} -sBOOST_ROOT=$(BOOST_ROOT) ${BJAMFLAGS} '<rtheta>rtheta'
+PVtest:
+	${GOBJAM} '<PV>PV'
+
+QuadCalibtest:
+	${GOBJAM} '<QuadCalib>Quadcalib'
+
+RThetatest:
+	${GOBJAM} '<rtheta>rtheta'
+
+FastSLAMtest:
+	${GOBJAM} '<SLAM>testfastslam'
