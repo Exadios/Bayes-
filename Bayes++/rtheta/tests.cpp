@@ -289,37 +289,36 @@ void numeric_tested()
 	std::cout << (d>=0) <<','<< (d<=0) << std::endl;
 }
 
+	typedef ublas::vector_range<ublas::matrix_column<Matrix> > special_matrix_vector_slice_base;
+	struct special_matrix_vector_slice : special_matrix_vector_slice_base {
+		special_matrix_vector_slice(Matrix& mb, size_t s1, size_t e1, size_t s2) :
+			special_matrix_vector_slice_base(col,ublas::range(s1,e1)), col(mb, s2)
+		{}
+		ublas::matrix_column<Matrix> col;
+	};
+	special_matrix_vector_slice
+	sub_column(Matrix& m, size_t s1, size_t e1, size_t s2)
+	// Column vector s2 with rows [s1,e1)
+	{
+		return special_matrix_vector_slice(m, s1,e1, s2);
+	}
+
+void test_double_proxy()
+{
+	// The old double proxy workaround
+	// Very dangerous as col is constructed after the vector_range.
+	// boost_1_30_0 fails because of this
+	Matrix M(2,2);
+	Vec v(1);
+	special_matrix_vector_slice (M, 0,1,1).assign( v);
+	sub_column (M, 0,1,1).assign( v);
+}
 
 void other_tests()
 {
 	// Other things I might want to benchmark
 	extern void other_bench();
+
 //	other_bench();
 //	test_small_inverse();
-}
-
-
-/* Boost Random
-namespace {
-template boost::uniform_smallint<boost::mt19937, int>;
-template boost::uniform_int<boost::mt19937, int>;
-typedef double Float;
-template boost::uniform_01<boost::mt19937, Float>;
-template boost::uniform_real<boost::mt19937, Float>;
-template boost::triangle_distribution<boost::mt19937, Float>;
-template boost::bernoulli_distribution<boost::mt19937, Float>;
-template boost::cauchy_distribution<boost::mt19937, Float>;
-template boost::exponential_distribution<boost::mt19937, Float>;
-template boost::geometric_distribution<boost::mt19937, Float>;
-template boost::normal_distribution<boost::mt19937, Float>;
-template boost::lognormal_distribution<boost::mt19937, Float>;
-template boost::uniform_on_sphere<boost::mt19937, Float>;
-}
-*/
-
-void test_random()
-{
-	Test_random<Float> x;
-	DenseVec v(2);
-	x.lognormal(v);
 }

@@ -13,7 +13,7 @@ BAYES_ROOT = $($(gTOP)) ;
 path-global BOOST_ROOT ;
 path-global BAYES_ROOT ;
 
-# Default Traget Output in Project Root
+# Target output in Project Root
 ALL_LOCATE_TARGET ?= target ;
 
 # Build variant to allow testing with a local uBLAS version seperated from Boost
