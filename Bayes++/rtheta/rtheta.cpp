@@ -137,7 +137,15 @@ pred_model::pred_model () :
  *  Correlated represtation is just the uncorrelated adapted so the
  *  correlation term are added.
  */
-class uobs_model : public General_LzUnAd_observe_model
+#ifndef MODEL_LINEAR
+	typedef General_LzUnAd_observe_model Observe_un_special;
+	typedef General_LzCoAd_observe_model Observe_co_special;
+#else
+	typedef General_LiUnAd_observe_model Observe_un_special;
+	typedef General_LiCoAd_observe_model Observe_co_special;
+#endif
+
+class uobs_model : public Observe_un_special
 {
 public:
 	uobs_model();
@@ -148,7 +156,7 @@ private:
 	mutable Vec z_pred;
 };
 
-class cobs_model : public General_LzCoAd_observe_model
+class cobs_model : public Observe_co_special
 {
 public:
 	cobs_model(uobs_model& u);
@@ -160,7 +168,7 @@ private:
 };
 
 uobs_model::uobs_model() :
-	General_LzUnAd_observe_model(NX,NZ),
+	Observe_un_special(NX,NZ),
 	z_pred(NZ)
 {
 	// Observation covariance uncorrelated
@@ -170,7 +178,7 @@ uobs_model::uobs_model() :
 }
 
 cobs_model::cobs_model(uobs_model& u) :
-	General_LzCoAd_observe_model(NX,NZ),
+	Observe_co_special(NX,NZ),
 	uobs(u)
 {
 	FM::identity (Z);
@@ -284,7 +292,7 @@ void walk::predict ()
 	else {
 		x_pred = f(x);
 		x = x_pred;
-		x += nc;
+		noalias(x) += nc;
 	}
 }
 
