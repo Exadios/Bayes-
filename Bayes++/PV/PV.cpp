@@ -48,12 +48,14 @@ namespace
 	boost::mt19937 localRng;
 	inline void randNormal(Vec& v)
 	{
-		boost::normal_distribution<boost::mt19937> gen(localRng);
+		boost::normal_distribution<Float> dist;
+		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
 		std::generate (v.begin(), v.end(), gen);
 	}
 	inline void randNormal(Vec& v, const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937> gen(localRng, mean, sigma);
+		boost::normal_distribution<Float> dist(mean, sigma);
+		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
 		std::generate (v.begin(), v.end(), gen);
 	}
 

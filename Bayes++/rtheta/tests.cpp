@@ -8,6 +8,7 @@
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/limits.hpp>
+#include <boost/bind.hpp>
 #include <boost/random.hpp>
 
 
@@ -15,7 +16,7 @@ using namespace Bayesian_filter;
 using namespace Bayesian_filter_matrix;
 
 
-// Instantiate complete fileters to check the templates
+// Instantiate complete schemes to check the templates
 #include "BayesFilter/filters/average1.hpp"
 template Average1_filter<Covariance_scheme>;
 
@@ -23,6 +24,7 @@ template Average1_filter<Covariance_scheme>;
 template Indirect_state_filter<Covariance_scheme>;
 template Indirect_kalman_filter<Covariance_scheme>;
 
+#ifdef REMOVED
 
 // Square
 template <class scalar>
@@ -39,28 +41,28 @@ class Test_random : public SIR_random
  */
 {
 public:
-	Test_random() : gen_normal(rng), gen_lognormal(rng), gen_uniform(rng), gen_exponential(rng, 1.)
+	Test_random() : gen_normal(), gen_lognormal(), gen_exponential(1.), gen_uniform(rng)
 	{}
 	Float normal(const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937, Float> gen(rng, mean, sigma);
-		return gen();
+		boost::normal_distribution<Float> gen(mean, sigma);
+		return gen(rng);
 	}
 	void normal(DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), gen_normal);
+		std::generate (v.begin(), v.end(), boost::bind(gen_normal,rng));
 	}
 	void lognormal(DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), gen_lognormal);
+		std::generate (v.begin(), v.end(), boost::bind(gen_lognormal, rng));
+	}
+	void exponential_1(DenseVec& v)
+	{
+		std::generate (v.begin(), v.end(), boost::bind(gen_exponential, rng));
 	}
 	void uniform_01(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_uniform);
-	}
-	void exponential_1(DenseVec& v)
-	{
-		std::generate (v.begin(), v.end(), gen_exponential);
 	}
 	void reseed()
 	{
@@ -69,10 +71,10 @@ public:
 private:
 	typedef boost::mt19937 good_random;
 	good_random rng;
-	boost::normal_distribution<good_random,Float> gen_normal;
-	boost::lognormal_distribution<good_random,Float> gen_lognormal;
+	boost::normal_distribution<Float> gen_normal;
+	boost::lognormal_distribution<Float> gen_lognormal;
+	boost::exponential_distribution<Float> gen_exponential;
 	boost::uniform_01<good_random,Float> gen_uniform;
-	boost::exponential_distribution<good_random,Float> gen_exponential;
 };
 
 void test_inverse()
@@ -289,36 +291,29 @@ void numeric_tested()
 	std::cout << (d>=0) <<','<< (d<=0) << std::endl;
 }
 
-	typedef ublas::vector_range<ublas::matrix_column<Matrix> > special_matrix_vector_slice_base;
-	struct special_matrix_vector_slice : special_matrix_vector_slice_base {
-		special_matrix_vector_slice(Matrix& mb, size_t s1, size_t e1, size_t s2) :
-			special_matrix_vector_slice_base(col,ublas::range(s1,e1)), col(mb, s2)
-		{}
-		ublas::matrix_column<Matrix> col;
-	};
-	special_matrix_vector_slice
-	sub_column(Matrix& m, size_t s1, size_t e1, size_t s2)
-	// Column vector s2 with rows [s1,e1)
-	{
-		return special_matrix_vector_slice(m, s1,e1, s2);
-	}
+#endif
 
-void test_double_proxy()
+void test_sym_proxy()
+/*
+ * Problems accessing the symmetric half via a proxy
+ * IF packed proxy assign is used then only the represented half is copied
+ * in the assign. The internal equality test will pickup the error
+ */
 {
-	// The old double proxy workaround
-	// Very dangerous as col is constructed after the vector_range.
-	// boost_1_30_0 fails because of this
-	Matrix M(2,2);
-	Vec v(1);
-	special_matrix_vector_slice (M, 0,1,1).assign( v);
-	sub_column (M, 0,1,1).assign( v);
+	ublas::symmetric_matrix<double,ublas::upper> S(2,2);
+	ublas::vector<double> v(2);
+	S(0,0) = 1; S(1,0) = 2; S(1,1) = 3;
+	v(0) = 5; v(1) = 6;
+	ublas::row(S, 0).assign(v);		// OK top row is all in upper
+	ublas::row(S, 1).assign(v);		// ERROR only one element in upper for packed proxy assign
 }
+
 
 void other_tests()
 {
 	// Other things I might want to benchmark
 	extern void other_bench();
-
 //	other_bench();
-//	test_small_inverse();
+
+	test_sym_proxy();
 }

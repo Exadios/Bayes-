@@ -41,19 +41,16 @@ namespace
 
 	// Random numbers from Boost
 	boost::mt19937 localRng;
-	inline void randNormal(FM::Vec& v)
+	inline void randNormal(Vec& v)
 	{
-		boost::normal_distribution<boost::mt19937> gen(localRng);
+		boost::normal_distribution<Float> dist;
+		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
 		std::generate (v.begin(), v.end(), gen);
 	}
-	inline void randNormal(FM::Vec& v, const Float mean, const Float sigma)
+	inline void randNormal(Vec& v, const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937> gen(localRng, mean, sigma);
-		std::generate (v.begin(), v.end(), gen);
-	}
-	inline void randUniform01(FM::Vec& v)
-	{
-		boost::uniform_01<boost::mt19937> gen(localRng);
+		boost::normal_distribution<Float> dist(mean, sigma);
+		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
 		std::generate (v.begin(), v.end(), gen);
 	}
 

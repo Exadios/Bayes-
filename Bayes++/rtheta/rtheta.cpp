@@ -18,6 +18,7 @@
 #include <cmath>
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/bind.hpp>
 #include <boost/random.hpp>
 #include <boost/format.hpp>
 #include <boost/limits.hpp>
@@ -70,20 +71,23 @@ class Boost_random : public SIR_random
  */
 {
 public:
-	Boost_random() : gen_normal(rng), gen_uniform(rng)
+	Boost_random() : dist_normal(), dist_uniform()
 	{}
 	Float normal(const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937, Float> gen(rng, mean, sigma);
+		boost::normal_distribution<Float> dist(mean, sigma);
+		boost::variate_generator<boost::mt19937&,boost::normal_distribution<Float> > gen(rng, dist);
 		return gen();
 	}
 	void normal(DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), gen_normal);
+		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(rng, dist_normal);
+		std::generate (v.begin(), v.end(), gen);
 	}
 	void uniform_01(DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), gen_uniform);
+		boost::variate_generator<boost::mt19937&, boost::uniform_real<Float> > gen(rng, dist_uniform);
+		std::generate (v.begin(), v.end(), gen);
 	}
 	void reseed()
 	{
@@ -91,8 +95,8 @@ public:
 	}
 private:
 	boost::mt19937 rng;
-	boost::normal_distribution<boost::mt19937, Float> gen_normal;
-	boost::uniform_01<boost::mt19937, Float> gen_uniform;
+	boost::normal_distribution<Float> dist_normal;
+	boost::uniform_real<Float> dist_uniform;
 } Random, Random2;
 
 
