@@ -39,7 +39,7 @@ class Test_random : public SIR_random
  */
 {
 public:
-	Test_random() : gen_normal(rng), gen_uniform(rng), gen_exponential(rng, 1.)
+	Test_random() : gen_normal(rng), gen_lognormal(rng), gen_uniform(rng), gen_exponential(rng, 1.)
 	{}
 	Float normal(const Float mean, const Float sigma)
 	{
@@ -49,6 +49,10 @@ public:
 	void normal(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_normal);
+	}
+	void lognormal(DenseVec& v)
+	{
+		std::generate (v.begin(), v.end(), gen_lognormal);
 	}
 	void uniform_01(DenseVec& v)
 	{
@@ -66,6 +70,7 @@ private:
 	typedef boost::mt19937 good_random;
 	good_random rng;
 	boost::normal_distribution<good_random,Float> gen_normal;
+	boost::lognormal_distribution<good_random,Float> gen_lognormal;
 	boost::uniform_01<good_random,Float> gen_uniform;
 	boost::exponential_distribution<good_random,Float> gen_exponential;
 };
@@ -298,7 +303,7 @@ void other_tests()
 namespace {
 template boost::uniform_smallint<boost::mt19937, int>;
 template boost::uniform_int<boost::mt19937, int>;
-typedef float Float;
+typedef double Float;
 template boost::uniform_01<boost::mt19937, Float>;
 template boost::uniform_real<boost::mt19937, Float>;
 template boost::triangle_distribution<boost::mt19937, Float>;
@@ -311,3 +316,10 @@ template boost::lognormal_distribution<boost::mt19937, Float>;
 template boost::uniform_on_sphere<boost::mt19937, Float>;
 }
 */
+
+void test_random()
+{
+	Test_random<float> x;
+	Vec v(2);
+	x.lognormal(v);
+}
