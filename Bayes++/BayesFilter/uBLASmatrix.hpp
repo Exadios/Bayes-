@@ -212,7 +212,6 @@ public:
 
 /*
  * Helper template to allow member construction before base class
- *  Boost version does not work as it passes by value
  */
 template <typename MemberType>
 class BaseFromMember
@@ -239,7 +238,7 @@ protected:
  */
 template <class MatrixBase>
 class SymMatrixWrapper :
-	private BaseFromMember<MatrixBase>,  // allow construction of rm before symmertic_adaptor
+	private BaseFromMember<MatrixBase>,  // allow construction of MatrixBase member before symmetric_adaptor
 	public ublas::symmetric_adaptor<MatrixBase, ublas::upper>
 {
 	typedef BaseFromMember<MatrixBase> matrix_type;
