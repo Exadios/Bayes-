@@ -20,7 +20,6 @@
 /* Filter namespace */
 namespace Bayesian_filter
 {
-	namespace FM = Bayesian_filter_matrix;
 
 
 template <typename Error_base>

@@ -18,7 +18,6 @@
 /* Filter namespace */
 namespace Bayesian_filter
 {
-	namespace FM = Bayesian_filter_matrix;
 
 template <class Filter_base>
 class Average1_filter
