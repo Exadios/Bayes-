@@ -138,11 +138,11 @@ downloaded copy of Boost explains how to obtain compile the latest
 version of bjam yourself. For everything to work <B>bjam</B> must be
 placed in the path. <BR>To build Bayes++ and the examples simply
 execute: (Bayes++ should be the current directory)</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam –v2 -s&quot;BOOST_ROOT=../boost_1_31_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam –-v2 -sBOOST_ROOT=&quot;../boost_1_31_0&quot;</PRE><P>
 If there is more then one toolsets (compiler etc) available you may
 want to tell bjam which to use. For example to use Visual C++
 execute:</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam –v2 msvc -s&quot;BOOST_ROOT=../boost_1_31_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam –-v2 msvc -sBOOST_ROOT=&quot;../boost_1_31_0&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
 by setting it as an environment variable.</P>
