@@ -28,7 +28,24 @@ using namespace Bayesian_filter_matrix;
 class Uncorrelated_observe : public Linear_uncorrelated_observe_model
 {
 public:
-	Uncorrelated_observe () :	Linear_uncorrelated_observe_model(2,1)
+	Simple_predict() : Linear_predict_model(1,1)
+	// Construct a constant model
+	{
+				// Stationary Prediction model (Identity)
+		Fx(0,0) = 1.;
+				// Constant Noise model with a large variance
+		q[0] = 2.0;
+		G(0,0) = 1.;
+	}
+};
+
+/*
+ * Simple Observation model
+ */
+class Simple_observe : public Linear_uncorrelated_observe_model
+{
+public:
+	Simple_observe () :	Linear_uncorrelated_observe_model(1,1)
 	// Construct a constant model
 	{
 				// Linear model
@@ -64,9 +81,8 @@ int main()
 	cout << "Initial  " << my_filter.x << my_filter.X << endl;
 
 	// Make an observation
-	Vec z(2);
-	z[0] = 1.;			// Observe
-	z[1] = 3.;			// Observe
+	Vec z(1);
+	z[0] = 11.;			// Observe that we should be at 11
 	my_filter.observe (my_observe, z);
 	my_filter.update();		// Update the filter to state and covariance are available
 
