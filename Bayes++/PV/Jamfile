@@ -1,0 +1,16 @@
+# Bayes++ Jamfile - See Boost.build
+# PV - Position Velocity filter
+
+# Declare the location of this subproject relative to the project root.
+subproject PV ;
+
+# The executable for the example
+
+exe PV :
+     PV.cpp
+     <lib>../BayesFilter/BayesFilter
+    :
+     <include>$(BOOST_ROOT)
+     <include>$(BAYES_ROOT)
+    : debug
+;
