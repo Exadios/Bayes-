@@ -3,11 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="BayesFilter"
-	ProjectGUID="{F90E045F-A6E0-4933-9477-1C135987F920}"
-	SccProjectName=""
-	SccAuxPath=""
-	SccLocalPath=""
-	SccProvider="">
+	ProjectGUID="{F90E045F-A6E0-4933-9477-1C135987F920}">
 	<Platforms>
 		<Platform
 			Name="Win32"/>

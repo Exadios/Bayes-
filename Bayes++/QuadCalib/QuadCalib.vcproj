@@ -3,11 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="Quadradtic Calib"
-	ProjectGUID="{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}"
-	SccProjectName=""
-	SccAuxPath=""
-	SccLocalPath=""
-	SccProvider="">
+	ProjectGUID="{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
