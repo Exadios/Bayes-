@@ -13,10 +13,10 @@
 #include <map>
 								// MF macro is define by MuPAD module system
 #undef MF
-#include "BayesFilter/allFlt.h" // Include all of Bayesian Filtering library
+#include "BayesFilter/allFilters.hpp" // Include all of Bayesian Filtering library
 #include <boost/random.hpp>		// Fast and good random numbers
 #include "TNear.h"				// Nearest neighbour
-#include "MuPadConvert.h"
+#include "MuPadConvert.hpp"
 
 MMG( info = "Module: Bayesian Filtering" ) 
 
@@ -1126,7 +1126,7 @@ public:
 	V()	// Empty for return value
 	{
 	}
-	V( const FM::ColMatrix& colmat, size_t i) : dp(colmat,i)
+	V( const FM::ColMatrix& colmat, std::size_t i) : dp(colmat,i)
 	{
 	}
 	NNVec dp;	// Vec data pointer
@@ -1139,7 +1139,7 @@ FM::Vec find_nearest(const FM::ColMatrix& S, double radius, const FM::Vec& loc)
 {
 	// Construct NN tree of samples
 	CNearTree<V> sampleTree;
-	for (size_t si = 0; si != S.size2(); ++si) {
+	for (std::size_t si = 0; si != S.size2(); ++si) {
 		sampleTree.m_fnInsert( V(S,si) );
 	}
 	// Create a location as same type as a sample

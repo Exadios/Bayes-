@@ -16,12 +16,12 @@ void Array(mxArray* ma, const FilterMatrix& M)
  * Convert Filter Matrix into a mxArray
  */
 {
-	size_t rows = M.size1(), cols = M.size2();
+	std::std::size_t rows = M.size1(), cols = M.size2();
 
 	double *mai = mxGetPr(ma);
-	for (size_t c = 0; c < cols; ++c)
+	for (std::std::size_t c = 0; c < cols; ++c)
 	{
-		for (size_t r = 0; r < rows; ++r)
+		for (std::std::size_t r = 0; r < rows; ++r)
 		{
 			*mai++ = M(r,c);
 		}
@@ -34,7 +34,7 @@ mxArray* Array(const FilterMatrix& M)
  * Convert Filter Matrix into a mxArray
  */
 {
-	size_t rows = M.size1(), cols = M.size2();
+	std::std::size_t rows = M.size1(), cols = M.size2();
 	mxArray* ma = mxCreateDoubleMatrix(rows,cols, mxREAL);
 
 	Array (ma, M);
@@ -47,13 +47,13 @@ mxArray* ArrayTranspose(const FilterMatrix& M)
  * Convert Filter Matrix's transpose into a mxArray
  */
 {
-	size_t rows = M.size1(), cols = M.size2();
+	std::std::size_t rows = M.size1(), cols = M.size2();
 	mxArray* ma = mxCreateDoubleMatrix(cols,rows, mxREAL);
 
 	double *mai = mxGetPr(ma);
-	for (size_t r = 0; r < rows; ++r)
+	for (std::std::size_t r = 0; r < rows; ++r)
 	{
-		for (size_t c = 0; c < cols; ++c)
+		for (std::size_t c = 0; c < cols; ++c)
 		{
 			*mai++ = M(r,c);
 		}
@@ -66,9 +66,9 @@ void Array(mxArray* ma, const Bayesian_filter_matrix::Vec& V)
  * Convert Vec into a mxArray column vector
  */
 {
-	size_t size = V.size();
+	std::size_t size = V.size();
 	double *mai = mxGetPr(ma);
-	for (size_t r = 0; r < size; ++r)
+	for (std::size_t r = 0; r < size; ++r)
 	{
 		*mai++ = V[r];
 	}
@@ -79,7 +79,7 @@ mxArray* Array(const Bayesian_filter_matrix::Vec& V)
  * Convert Vec into a mxArray column vector
  */
 {
-	size_t size = V.size();
+	std::size_t size = V.size();
 	mxArray* ma = mxCreateDoubleMatrix(size,1, mxREAL);
 
 	Array (ma, V);
