@@ -500,7 +500,7 @@ Bayes_base::Float
 void SIR_kalman_scheme::update_statistics ()
 /*
  * Update kalman statistics without resampling
- * Update mean and covariance of sampled distribution => mean and covariance of particles
+ * Update mean and covariance estimate of sampled distribution => mean and covariance of particles
  *  Pre : S (s_size >=1 enforced by state_filter base)
  *  Post: x,X,S	(X may be non PSD)
  *
@@ -513,6 +513,12 @@ void SIR_kalman_scheme::update_statistics ()
  *  As this situation is quite common and due to the normal circumstances and
  *  not an algorithm failure no assertion is made.
  *  Use with care and check the results of any algorithms relying on X
+ * Sample Covariance := Sum_i [transpose(S[i]-mean)*(S[i]-mean)] / (s_size)
+ *  The definition is the Maximum Likelihood (biased) estimate of covariance given samples with unknown (estimated) mean
+ * Numerics
+ *  No check is made for the conditioning of samples with regard to mean and covariance
+ *  Extreme ranges or very large sample sizes will result in inaccuracy
+ *  The covariance should always remain PSD however
  */
 {
     mean ();
@@ -523,7 +529,7 @@ void SIR_kalman_scheme::update_statistics ()
         FM::ColMatrix::Column Si(S,i);
         X.plus_assign (FM::outer_prod(Si-x, Si-x));
     }
-    X /= Float(nSamples-1);
+	X /= Float(nSamples);
 }
 
 
