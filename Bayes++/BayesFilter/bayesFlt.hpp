@@ -264,7 +264,7 @@ protected:
 
 class Functional_observe_model : virtual public Observe_model_base, public Observe_function
 /* Functional (non-stochastic) observe model h
- *  z(k) = hx(x(k|k-1))
+ *  zp(k) = hx(x(k|k-1))
  * This is a seperate fundamental model and not derived from likelihood because:
  *  L is a delta function which isn't much use for numerical systems
  * Defines an Interface without data members
@@ -294,8 +294,7 @@ public:
 	// Functional part of addative model
 	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
 	// Discontinous h. Normalise one observation (z_denorm) from another
-	//  Default normalistion does not change z_denorm
-	{}
+	{}	//  Default normalistion, z_denorm unchanged
 	
 	Numerical_rcond rclimit;
 	// Reciprocal condition number limit of linear components when factorised or inverted
@@ -328,6 +327,7 @@ public:
 class Jacobian_observe_model : virtual public Observe_model_base
 /* Linrz observation model Hx, h about state x (fixed size)
     Hx(x(k|k-1) = Jacobian of h with respect to state x
+	Normalisation consistency Hx: Assume normalise will be from h(x(k|k-1)) so result is consistent with Hx
  */
 {
 public:
@@ -341,7 +341,7 @@ protected: // Jacobian model is not sufficient, it is used to build Linrz observ
 class Linrz_correlated_observe_model : public Correlated_addative_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with repespect to state x (fixed size)
     correlated observation noise
-    z(k) = h(x(k-1|k-1)
+    zp(k) = h(x(k-1|k-1)
     Hx(x(k|k-1) = Jacobian of f with respect to state x
     Z(k) = observe noise covariance
  */
@@ -355,7 +355,7 @@ public:
 class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with repespect to state x (fixed size)
     uncorrelated observation noise
-    z(k) = h(x(k-1|k-1)
+    zp(k) = h(x(k-1|k-1)
     Hx(x(k|k-1) = Jacobian of f with respect to state x
     Zv(k) = observe noise covariance
  */
@@ -368,8 +368,8 @@ public:
 
 class Linear_correlated_observe_model : public Linrz_correlated_observe_model
 /* Linear observation model, correlated observation noise
-    z(k) = Hx(k) * x(k|k-1)
-    Enforces linear model invariant. Careful when deriving!
+    zp(k) = Hx(k) * x(k|k-1)
+    Enforces linear model invariant. Careful when deriving to to change this invariant!
  */
 {
 public:
@@ -387,8 +387,8 @@ private:
 
 class Linear_uncorrelated_observe_model : public Linrz_uncorrelated_observe_model
 /* Linear observation model, uncorrelated observation noise
-    z(k) = Hx(k) * x(k|k-1)
-    Enforces linear model invariant. Careful when deriving!
+    zp(k) = Hx(k) * x(k|k-1)
+    Enforces linear model invariant. Careful when deriving to to change this invariant!
  */
 {
 public:
