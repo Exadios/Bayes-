@@ -7,4 +7,4 @@ help:
 
 SFWEBLIST = *.htm Simple/simpleExample.cpp "ClassDocumentation"
 uploadweb:
-	rsync -vztre ssh $(SFWEBLIST)  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs
+	rsync --verbose --recursive --relative --compress --times --rsh=ssh $(SFWEBLIST)  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs
