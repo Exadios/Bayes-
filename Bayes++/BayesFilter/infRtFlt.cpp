@@ -22,7 +22,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_root_filter::Information_root_filter (size_t x_size, size_t /*z_initialsize*/) :
+Information_root_scheme::Information_root_scheme (size_t x_size, size_t /*z_initialsize*/) :
 		Extended_filter(x_size),
 		r(x_size), R(x_size,x_size)
 /*
@@ -30,13 +30,13 @@ Information_root_filter::Information_root_filter (size_t x_size, size_t /*z_init
  */
 {}
 
-Information_root_info_filter::Information_root_info_filter (size_t x_size, size_t z_initialsize) :
-		Information_form_filter (x_size),
-		Information_root_filter (x_size, z_initialsize)
+Information_root_info_scheme::Information_root_info_scheme (size_t x_size, size_t z_initialsize) :
+		Information_root_scheme (x_size, z_initialsize),
+		Information_state_filter (x_size)
 {}
 
 
-void Information_root_filter::init ()
+void Information_root_scheme::init ()
 /*
  * Inialise the filter from x,X
  * Predcondition:
@@ -55,7 +55,7 @@ void Information_root_filter::init ()
 	r.assign (prod(R,x));
 }
 
-void Information_root_info_filter::init_yY ()
+void Information_root_info_scheme::init_yY ()
 /*
  * Special Initialisation directly from Information form
  * Predcondition:
@@ -83,7 +83,7 @@ void Information_root_info_filter::init_yY ()
 						// Multiply columns by square of non zero diagonal. TODO use column operation
 			for (j = i+1; j < n; ++j)
 			{
-				LC(j,i) *= sd;		
+				LC(j,i) *= sd;
 			}
 		}
 	}
@@ -96,7 +96,7 @@ void Information_root_info_filter::init_yY ()
 	r.assign (prod(FM::trans(RI),y));
 }
 
-void Information_root_filter::update ()
+void Information_root_scheme::update ()
 /*
  * Recompute x,X from r,R
  * Precondition:
@@ -118,7 +118,7 @@ void Information_root_filter::update ()
 	assert_isPSD (X);
 }
 
-void Information_root_info_filter::update_yY ()
+void Information_root_info_scheme::update_yY ()
 /*
  * Recompute y,Y from r,R
  * Precondition:
@@ -129,13 +129,13 @@ void Information_root_info_filter::update_yY ()
  *		y = Y*x
  */
 {
-	Information_root_filter::update();
+	Information_root_scheme::update();
 	Y.assign (prod(trans(R),R));		// Y = R'*R
 	y.assign (prod(Y,x));
 }
 
 
-void Information_root_filter::inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx)
+void Information_root_scheme::inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx)
 /*
  * Numerical Inversion of Fx using LU factorisation
  * Required LAPACK getrf (with PIVOTING) and getrs
@@ -159,7 +159,7 @@ void Information_root_filter::inverse_Fx (FM::DenseColMatrix& invFx, const FM::M
 
 
 Bayes_base::Float
- Information_root_filter::predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
+ Information_root_scheme::predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
 /* Linrz Prediction: using precomputed inverse of f.Fx
  * Precondition:
  *   r(k|k),R(k|k)
@@ -214,8 +214,8 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Information_root_filter::predict (Linrz_predict_model& f)
-/* Linrz Prediction: computes inverse model using inverse_Fx 
+ Information_root_scheme::predict (Linrz_predict_model& f)
+/* Linrz Prediction: computes inverse model using inverse_Fx
  */
 {
 						// Require inverse(Fx)
@@ -227,7 +227,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Information_root_filter::predict (Linear_predict_model& f)
+ Information_root_scheme::predict (Linear_predict_model& f)
 /* Linear Prediction: computes inverse model using inverse_Fx
  */
 {
@@ -239,7 +239,7 @@ Bayes_base::Float
 }
 
 
-Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
+Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
 /* Extended linrz correlated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)
@@ -282,7 +282,7 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_
 }
 
 
-Bayes_base::Float Information_root_filter::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
+Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
 /* Extended linrz uncorrelated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)

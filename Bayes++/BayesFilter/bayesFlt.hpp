@@ -484,27 +484,23 @@ public:
 
 
 /*
- * Kalman Filter: Linear filter for 1st (mean) and 2nd (covariance) moments of a distribution
+ * Kalman State Filter - Abstract filtering property
+ * Linear filter representation for 1st (mean) and 2nd (covariance) moments of a distribution
  *
  * Probability distributions are represted by state vector (x) and a covariance matix.(X)
  *
  * State (x) sizes is assumed to remain constant.
- * The filter is operated by performing a
- * 	predict*, observe* cycle. (* -> 0 or more)
  * The state and state covariance are public so they can be directly manipulated.
  *  init: Should be called if x or X are altered
  *  update: Guarantees that any internal changes made by predict or observe are
- *	reflected in x,X. This allows considerable flexibility so filter implemtations can
+ *  reflected in x,X. This allows considerable flexibility so filter implemtations can
  *  use different numerical representations
- *
- * Because Kalman filters can use a variety of noise models we do not specialise the functional
- * (no noise) form.
  *
  * Derived filters supply definititions for the abstract functions and determine the algorithm used
  * to implement the filter.
  */
 
-class Kalman_filter : public State_filter
+class Kalman_state_filter : public State_filter
 {
 public:
 	FM::SymMatrix X;	// state covariance
@@ -512,7 +508,7 @@ public:
 	Float rcond_limit;	// Minimum allowable reciprocal condition number for PD Matrix factorisations
 						// Applies to state covariance or its derived matrices
 
-	Kalman_filter (size_t x_size);
+	Kalman_state_filter (size_t x_size);
 	/* Initialise filter and set constant sizes
 	 */
 
@@ -527,8 +523,8 @@ public:
 		 Parameters that reference the instance's x and X members are valid
 	*/
 	{
-		Kalman_filter::x = x;
-		Kalman_filter::X = X;
+		Kalman_state_filter::x = x;
+		Kalman_state_filter::X = X;
 		init();
 	}
 	virtual void update () = 0;
@@ -541,15 +537,16 @@ public:
 
 
 /*
- * Information form filter: A filter that works in information space
+ * Information State Filter - Abstract filtering property
+ * Linear filter information space representation for 1st (mean) and 2nd (covariance) moments of a distribution
  *   Y = inv(X)   Information
  *   y = Y*x      Information state
  */
 
-class Information_form_filter : virtual public Bayes_filter_base
+class Information_state_filter : virtual public Bayes_filter_base
 {
 public:
-	Information_form_filter (size_t x_size);
+	Information_state_filter (size_t x_size);
 	FM::Vec y;				// Information state
 	FM::SymMatrix Y;		// Information
 
@@ -563,8 +560,8 @@ public:
 		 Parameters that reference the instance's y and Y members are valid
 	*/
 	{
-		Information_form_filter::y = y;
-		Information_form_filter::Y = Y;
+		Information_state_filter::y = y;
+		Information_state_filter::Y = Y;
 		init_yY ();
 	}
 	virtual void update_yY () =0;
@@ -575,13 +572,10 @@ public:
 
 
 /*
- * Generic Kalman type filter for all linearizable model
- *  Linrz == Linearizable (or Extended Kalman Filter)
- *	A linear, or gradient Linearized filter as an Abstract class
+ * Linearizable filter models - Abstract filtering property
+ *  Linrz == A linear, or gradient Linearized filter
  *
- * State (x) size is fixed.
- * Predict uses a Linrz_predict_model that maintains a Jacobian matrix Fx
- * and a prediction covariance Q
+ * Predict uses a Linrz_predict_model that maintains a Jacobian matrix Fx and addative noise
  * NOTE: Functional (non-stochastic) predict is NOT possible as predict requires Fx.
  *
  * Observe uses a Linrz_observe_model and a variable size observation (z)
@@ -590,11 +584,9 @@ public:
  * the algorithm used to implement the filter.
  */
 
-class Linrz_filter : public Kalman_filter
+class Linrz_filter : virtual public Bayes_filter_base
 { 
 public:
-	Linrz_filter (size_t x_size);
-
 	/* Virtual functions for filter algorithm */
 
 	virtual Float predict (Linrz_predict_model& f) = 0;
@@ -613,15 +605,28 @@ public:
 
 
 /*
- * Extended Kalman type filter for all linearizable model with innovation observations
+ * Linearizable Kalman Filter
+ *  Kalman state representation and linearizable models
  *
- * As Linrz_filter
+ * Common abstration for many linear filters
+ */
+class Linrz_kalman_filter : public Linrz_filter, public Kalman_state_filter
+{
+public:
+	Linrz_kalman_filter (size_t x_size);
+};
+
+
+/*
+ * Extended Kalman Filter for all linearizable model with innovation observations
+ *
+ * Provides a Kalman state represention. The state (x) size is fixed.
  *
  * Observe is implemented using an innovation computed from the non-linear part of the
  * obseve model and linear part of the Linrz_observe_model
  */
 
-class Extended_filter : public Linrz_filter
+class Extended_filter : public Linrz_kalman_filter
 { 
 public:
 	Extended_filter (size_t x_size);

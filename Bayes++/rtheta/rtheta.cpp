@@ -145,7 +145,7 @@ pred_model::pred_model () :
 
 	// Build inverse Fx, Identity all except active partition
 	DenseColMatrix denseinvFx (Fx.size1(), Fx.size2());
-	Information_root_filter::inverse_Fx (denseinvFx, Fx);
+	Information_root_scheme::inverse_Fx (denseinvFx, Fx);
 	inv.Fx = denseinvFx;
 }
 
@@ -309,17 +309,17 @@ void walk::predict ()
 }
 
 
-// Special for Information filter using Linrz predict
-class Information_linrz_filter : public Information_filter
+// Special for Information scheme using Linrz predict
+class Information_linrz_scheme : public Information_scheme
 {
 public:
-	Information_linrz_filter (size_t x_size, size_t z_initialsize = 0) :
-		Information_filter (x_size, z_initialsize)
+	Information_linrz_scheme (size_t x_size, size_t z_initialsize = 0) :
+		Information_scheme (x_size, z_initialsize)
 	{}
 	Float predict (Linrz_predict_model& f)
 	// Enforce use of Linrz predict
 	{
-		return Information_filter::predict (f);
+		return Information_scheme::predict (f);
 	}
 };
 
@@ -342,19 +342,19 @@ Filter<TestScheme>::Filter (const Vec& x_init, const SymMatrix& X_init)
 
 // Specialise for SIR_kalman
 template <>
-class Filter<SIR_kalman_filter> : public SIR_kalman_filter
+class Filter<SIR_kalman_scheme> : public SIR_kalman_scheme
 {
 public:
 	Filter (const Vec& x_init, const SymMatrix& X_init);
 	Float update_resample ()
-	// Modifiy Default SIR_filter update
+	// Modifiy Default SIR_scheme update
 	{
-		return SIR_filter::update_resample (Systematic_resampler());
+		return SIR_scheme::update_resample (Systematic_resampler());
 	}
 };
 
-Filter<SIR_kalman_filter>::Filter (const Vec& x_init, const SymMatrix& X_init)
-	: SIR_kalman_filter (x_init.size(), NS, ::Random2)
+Filter<SIR_kalman_scheme>::Filter (const Vec& x_init, const SymMatrix& X_init)
+	: SIR_kalman_scheme (x_init.size(), NS, ::Random2)
 {
 	init_kalman (x_init, X_init);
 }
@@ -528,22 +528,22 @@ int main()
 	// Initialise and do the comparison
 	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<UD_filter>, Filter<Unscented_filter> > test1(x_init, X_init, 4);
+	CCompare<Filter<UD_scheme>, Filter<Unscented_scheme> > test1(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<Covariance_filter>, Filter<Information_linrz_filter> > test2(x_init, X_init, 4);
+	CCompare<Filter<Covariance_scheme>, Filter<Information_linrz_scheme> > test2(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "irfilter, ilfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<Information_root_filter>, Filter<Information_filter> > test3(x_init, X_init, 4);
+	CCompare<Filter<Information_root_scheme>, Filter<Information_scheme> > test3(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "sfilter, itfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<SIR_kalman_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
+	CCompare<Filter<SIR_kalman_scheme>, Filter<Iterated_covariance_scheme> > test4(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	return 0;

@@ -67,8 +67,8 @@ int main()
 	Simple_predict my_predict;
 	Simple_observe my_observe;
 
-	// Use an 'unscented' filter with one state
-	Unscented_filter my_filter(1);
+	// Use an 'unscented' filter scheme with one state
+	Unscented_scheme my_filter(1);
 
 	// Setup the initial state and covariance
 	Vec x_init (1); SymMatrix X_init (1, 1);

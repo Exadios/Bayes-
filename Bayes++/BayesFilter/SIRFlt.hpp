@@ -10,8 +10,8 @@
  * $NoKeywords: $
  */
 
-/*							
- * Sampling Importance Resampleing Filter.
+/*
+ * Sampling Importance Resampleing Filter Scheme.
  *  Also know as a weighted Booststrap
  *
  * References
@@ -100,21 +100,21 @@ class Systematic_resampler : public Importance_resampler
 };
 
 
-class SIR_filter : public Sample_filter
+class SIR_scheme : public Sample_filter
 /*
- * Sampling Importance Resampleing Filter.
- *  Implement a general form of SIR filter.
+ * Sampling Importance Resampleing Filter Scheme.
+ *  Implement a general form of SIR filter
  *  Importance resampling is delayed until an update is required. The sampler used
  *  is a parameter of update to allow a wide variety of usage.
  *  A stochastic sample is defined as a sample with a unqiue stochastic history other then roughening
  */
 {
-	friend class SIR_kalman_filter;
+	friend class SIR_kalman_scheme;
 public:
 	size_t stochastic_samples;	// Number of stochastic samples in S
 
-	SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper);
-	SIR_filter& operator= (const SIR_filter&);
+	SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper);
+	SIR_scheme& operator= (const SIR_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	/* Specialisations for filter algorithm */
@@ -163,13 +163,13 @@ private:
 };
 
 
-class Kalman_filter_init : public Kalman_filter
+class Kalman_filter_init : public Kalman_state_filter
 /* Rename init to init_from_kalman
  * Required for GCC2.95 which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
  */
 {
 protected:
-	Kalman_filter_init (size_t x_size) : Kalman_filter(x_size)
+	Kalman_filter_init (size_t x_size) : Kalman_state_filter(x_size)
 	{}
 	void init() {
 		init_from_kalman();
@@ -178,7 +178,7 @@ protected:
 };
 
 
-class SIR_kalman_filter : public SIR_filter, public Kalman_filter_init
+class SIR_kalman_scheme : public SIR_scheme, public Kalman_filter_init
 /*
  * SIR implementation of a Kalman filter
  *  Updates Kalman statistics of SIR_filter
@@ -187,7 +187,7 @@ class SIR_kalman_filter : public SIR_filter, public Kalman_filter_init
 {
 public:
 	using Kalman_filter_init::x;
-	SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper);
+	SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper);
 
 	/* Specialisations for filter algorithm */
 
@@ -200,7 +200,7 @@ public:
 	virtual void update ()
 	// Implement Kalman_filter::update identically to SIR_filter
 	{
-		(void)SIR_filter::update_resample();
+		(void)SIR_scheme::update_resample();
 	}
 
 	Float update_resample (const Importance_resampler& resampler);

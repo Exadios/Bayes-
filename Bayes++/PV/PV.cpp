@@ -34,8 +34,8 @@ namespace
 	using namespace Bayesian_filter;
 	using namespace Bayesian_filter_matrix;
 
-	// Choose Filtering class to use to perform numerical
-	typedef UD_filter FilterNumericalAlgorithm;
+	// Choose Filtering Scheme to use
+	typedef UD_scheme FilterScheme;
 
 	// Square 
 	template <class scalar>
@@ -126,7 +126,7 @@ PVobserve::PVobserve () :
 }
 
 
-void initialise (Kalman_filter& kf, const Vec& initState)
+void initialise (Kalman_state_filter& kf, const Vec& initState)
 /*
  * Initialise Kalman filter with an initial guess for the system state and fixed covariance
  */
@@ -165,12 +165,12 @@ int main()
 	std::cout << "Guess Initial " << x_guess << std::endl;
 
 	// f1 Direct filter construct and initialize with initial state guess
-	FilterNumericalAlgorithm f1(NX,NX);
+	FilterScheme f1(NX,NX);
 	initialise (f1, x_guess);
 
 	// f2 Indirect filter construct and Initialize with initial state guess
-	FilterNumericalAlgorithm error_filter(NX,NX);
-	Indirect_kalman_filter<FilterNumericalAlgorithm> f2(error_filter);
+	FilterScheme error_filter(NX,NX);
+	Indirect_kalman_filter<FilterScheme> f2(error_filter);
 	initialise (f2, x_guess);
 
 

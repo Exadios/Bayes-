@@ -20,8 +20,8 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_filter::Information_filter (size_t x_size, size_t z_initialsize) :
-		Information_form_filter(x_size), Extended_filter(x_size),
+Information_scheme::Information_scheme (size_t x_size, size_t z_initialsize) :
+		Information_state_filter(x_size), Extended_filter(x_size),
 		i(x_size), I(x_size,x_size),
 		ZI(Empty)
 /*
@@ -33,7 +33,7 @@ Information_filter::Information_filter (size_t x_size, size_t z_initialsize) :
 	update_required = true;	// Not a valid state, init is required before update can be used
 }
 
-Information_filter::Linear_predict_byproducts::Linear_predict_byproducts (size_t x_size, size_t q_size) :
+Information_scheme::Linear_predict_byproducts::Linear_predict_byproducts (size_t x_size, size_t q_size) :
 /* Set size of by-products for linear predict
  */
 		 tempA(x_size,x_size), A(x_size,x_size), tempG(q_size,x_size),
@@ -41,7 +41,7 @@ Information_filter::Linear_predict_byproducts::Linear_predict_byproducts (size_t
 		 invq(q_size)
 {}
 
-Information_filter& Information_filter::operator= (const Information_filter& a)
+Information_scheme& Information_scheme::operator= (const Information_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
@@ -53,7 +53,7 @@ Information_filter& Information_filter::operator= (const Information_filter& a)
 }
 
 
-void Information_filter::init ()
+void Information_scheme::init ()
 /*
  * Initialise the filter from x,X
  * Precondition:
@@ -71,7 +71,7 @@ void Information_filter::init ()
 	update_required = false;
 }
 
-void Information_filter::init_yY ()
+void Information_scheme::init_yY ()
 /*
  * Initialisation directly from Information
  * Precondition:
@@ -86,7 +86,7 @@ void Information_filter::init_yY ()
 	update_required = true;
 }
 
-void Information_filter::update_yY ()
+void Information_scheme::update_yY ()
 /*
  * Postcondition:
  *		y, Y is PSD
@@ -94,7 +94,7 @@ void Information_filter::update_yY ()
 {
 }
 
-void Information_filter::update ()
+void Information_scheme::update ()
 /*
  * Recompute x,X from y,Y
  *  Optimised using update_required (postcondition met iff update_required false)
@@ -116,7 +116,7 @@ void Information_filter::update ()
 }
 
 Bayes_base::Float
- Information_filter::predict (Linrz_predict_model& f)
+ Information_scheme::predict (Linrz_predict_model& f)
 /*
  * Extented linrz information prediction
  *  Computation is through state to accommodate linearied model
@@ -136,7 +136,7 @@ Bayes_base::Float
 	return rcond;
 }
 
-Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b)
+Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b)
 /*
  * Linear information prediction
  *  Computation is through information state only
@@ -144,7 +144,7 @@ Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_pr
  * Prediction is done completely on y,Y
  * Requires y(k|k), Y(k|k)
  * Predicts y(k+1|k), Y(k+1|k)
- * 
+ *
  * The numerical solution used is particularly flexible. It takes
  * particular care to avoid invertibilty requirements for the noise and noise coupling g,Q
  * Therefore both zero noises and zeros in the couplings can be used
@@ -163,7 +163,7 @@ Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_pr
 		b.invq[i] = Float(1) / f.q[i];
 	}
 	diag(b.B).plus_assign (b.invq);
-	
+
 						// invert B ,Addative noise
 	Float rcond = UdUinversePDignoreInfinity (b.B);
 	rclimit.check_PD(rcond, "(G'invFx'.Y.invFx.G + invQ) not PD in predict");
@@ -178,14 +178,14 @@ Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_pr
 	Y.assign (prod(b.tempY,b.A));
 						// Information state
 	y = prod(prod(b.tempY,trans(f.inv.Fx)), y);
-	
+
 	update_required = true;
 	assert_isPSD (Y);
 	return rcond;
 }
 
 
-inline void Information_filter::observe_size (size_t z_size)
+inline void Information_scheme::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -198,7 +198,7 @@ inline void Information_filter::observe_size (size_t z_size)
 }
 
 Bayes_base::Float
- Information_filter::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
+ Information_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
 /* correlated innovation observe
  */
 {
@@ -229,7 +229,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Information_filter::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
+ Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
 /* Extended linrz uncorrelated observe
  */
 {

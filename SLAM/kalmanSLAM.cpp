@@ -28,7 +28,7 @@ inline void clear(FM::ublas::matrix_range<Base> A)
 	A.assign(FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type()) );
 }
 
-Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_filter& full_filter, unsigned full_nL ) :
+Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter, unsigned full_nL ) :
 	SLAM(), full(full_filter), nL(full_nL)
 {
 	nM = 0;

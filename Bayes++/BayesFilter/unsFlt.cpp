@@ -23,8 +23,8 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Unscented_filter::Unscented_filter (size_t x_size, size_t z_initialsize) :
-		Linrz_filter(x_size),
+Unscented_scheme::Unscented_scheme (size_t x_size, size_t z_initialsize) :
+		Linrz_kalman_filter(x_size), Functional_filter(),
 		XX(x_size, 2*x_size+1),
 		s(Empty), S(Empty), SI(Empty),
 		fXX(x_size, 2*x_size+1)
@@ -32,23 +32,23 @@ Unscented_filter::Unscented_filter (size_t x_size, size_t z_initialsize) :
  * Initialise filter and set the size of things we know about
  */
 {
-	Unscented_filter::x_size = x_size;
-	Unscented_filter::XX_size = 2*x_size+1;
+	Unscented_scheme::x_size = x_size;
+	Unscented_scheme::XX_size = 2*x_size+1;
 	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
 	observe_size (z_initialsize);
 }
 
-Unscented_filter& Unscented_filter::operator= (const Unscented_filter& a)
+Unscented_scheme& Unscented_scheme::operator= (const Unscented_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
 {
-	Linrz_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	XX = a.XX;
 	return *this;
 }
 
-void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& X, Float scale)
+void Unscented_scheme::unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale)
 /*
  * Generate the unscented point representing a distribution
  * Fails if scale is negative
@@ -71,21 +71,21 @@ void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& 
 	}
 }
 
-Unscented_filter::Float Unscented_filter::predict_Kappa (size_t size) const
+Unscented_scheme::Float Unscented_scheme::predict_Kappa (size_t size) const
 // Default Kappa for prediction: state augmented with predict noise
 {
 	// Use the rule to minimise mean squared error of 4 order term
 	return Float(3-signed(size));
 }
 
-Unscented_filter::Float Unscented_filter::observe_Kappa (size_t size) const
+Unscented_scheme::Float Unscented_scheme::observe_Kappa (size_t size) const
 // Default Kappa for observation: state on its own
 {
 	// Use the rule to minimise mean squared error of 4 order term
 	return Float(3-signed(size));
 }
 
-void Unscented_filter::init ()
+void Unscented_scheme::init ()
 /*
  * Initialise unscented state
  *		Pre : x,X
@@ -97,7 +97,7 @@ void Unscented_filter::init ()
 		filter_error ("Initial X not PSD");
 }
 
-void Unscented_filter::update ()
+void Unscented_scheme::update ()
 /*
  * Update state variables
  *		Pre : x,X
@@ -155,7 +155,7 @@ namespace {
 }//namespace
 
 
-void Unscented_filter::predict (Functional_predict_model& f)
+void Unscented_scheme::predict (Functional_predict_model& f)
 /*
  * Adapt model by creating an Unscented predict with zero noise
  * ISSUE: A simple specialisation is possible, rather then this adapted implemenation
@@ -166,7 +166,7 @@ void Unscented_filter::predict (Functional_predict_model& f)
 }
 
 
-void Unscented_filter::predict (Addative_predict_model& f)
+void Unscented_scheme::predict (Addative_predict_model& f)
 /*
  * Adapt model by creating an Unscented predict with addative noise
  *  Computes noise covariance Q = GqG'
@@ -177,7 +177,7 @@ void Unscented_filter::predict (Addative_predict_model& f)
 }
 
 
-void Unscented_filter::predict (Unscented_predict_model& f)
+void Unscented_scheme::predict (Unscented_predict_model& f)
 /*
  * Predict forward
  *		Pre : x,X represent the prior distribution
@@ -187,7 +187,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 {
 	size_t i;
 	const size_t XX_size = XX.size2();
-				
+
 						// Create unscented distribution
 	Float Kappa = predict_Kappa(x_size);
 	Float x_Kappa = Float(x_size) + Kappa;
@@ -198,7 +198,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 	for (i = 0; i < XX_size; ++i) {
 		column(fXX,i).assign (f.f( column(XX,i) ));
 	}
-						
+
 						// Mean of predicted distribution: x
 	x.assign (column(fXX,0) * Kappa);
 	for (i = 1; i < XX_size; ++i) {
@@ -229,7 +229,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 }
 
 
-void Unscented_filter::observe_size (size_t z_size)
+void Unscented_scheme::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -244,7 +244,7 @@ void Unscented_filter::observe_size (size_t z_size)
 }
 
 
-Bayes_base::Float Unscented_filter::observe (Uncorrelated_addative_observe_model& h, const Vec& z)
+Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z)
 /*
  * Observation fusion
  *		Pre : x,X represent the predicted distribution
@@ -259,7 +259,7 @@ Bayes_base::Float Unscented_filter::observe (Uncorrelated_addative_observe_model
 }
 
 
-Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& h, const Vec& z)
+Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& h, const FM::Vec& z)
 /*
  * Observation fusion
  *		Pre : x,X represent the predicted distribution

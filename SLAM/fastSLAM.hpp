@@ -29,7 +29,7 @@ class Fast_SLAM : public SLAM
  */
 {
 public:
-	Fast_SLAM( Bayesian_filter::SIR_filter& L_filter );
+	Fast_SLAM( Bayesian_filter::SIR_scheme& L_filter );
 	// Construct Fast_SLAM filter using referenced filter for resampling
 
 									// Single Feature observations (single element vectors)
@@ -67,7 +67,7 @@ protected:
 	};
 	typedef std::map<unsigned, FeatureCondMap> AllFeature;	// Particle Maps for all features: associative container keys by feature number
 
-	Bayesian_filter::SIR_filter& L;		// Location part of state (particle form). Reference to filter parameter in constructor
+	Bayesian_filter::SIR_scheme& L;		// Location part of state (particle form). Reference to filter parameter in constructor
 	AllFeature M;						// Map part of state (augmentation to particles)
 
 private:
@@ -83,15 +83,15 @@ class Fast_SLAM_Kstatistics : public Fast_SLAM
  */
 {
 public:
-	Fast_SLAM_Kstatistics( BF::SIR_kalman_filter& L_filter);
+	Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter);
 	// Construct Fast_SLAM filter using referenced filter for resampling
 	
-	unsigned statistics( BF::Kalman_filter& kstats);
+	unsigned statistics( BF::Kalman_state_filter& kstats);
 	// Compute statistics of particles. Return: Number of features in map
 	//  Sample mean and covariance of particle.
 
 protected:
-	BF::SIR_kalman_filter& L;			// Reference to filter parameter in constructor
+	BF::SIR_kalman_scheme& L;			// Reference to filter parameter in constructor
 };
 
 }//namespace SLAM

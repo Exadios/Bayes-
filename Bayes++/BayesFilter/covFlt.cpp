@@ -20,7 +20,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Covariance_filter::Covariance_filter (size_t x_size, size_t z_initialsize) :
+Covariance_scheme::Covariance_scheme (size_t x_size, size_t z_initialsize) :
 	Extended_filter(x_size),
 	S(Empty), SI(Empty), W(Empty)
 /*
@@ -31,7 +31,7 @@ Covariance_filter::Covariance_filter (size_t x_size, size_t z_initialsize) :
 	observe_size (z_initialsize);
 }
 
-Covariance_filter& Covariance_filter::operator= (const Covariance_filter& a)
+Covariance_scheme& Covariance_scheme::operator= (const Covariance_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
@@ -41,20 +41,20 @@ Covariance_filter& Covariance_filter::operator= (const Covariance_filter& a)
 }
 
 
-void Covariance_filter::init ()
+void Covariance_scheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
 		filter_error ("Initial X not PSD");
 }
 
-void Covariance_filter::update ()
+void Covariance_scheme::update ()
 {
 	// Nothing to do, implicit in observation
 }
 
 Bayes_base::Float
- Covariance_filter::predict (Linrz_predict_model& f)
+ Covariance_scheme::predict (Linrz_predict_model& f)
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
@@ -65,7 +65,7 @@ Bayes_base::Float
 	return 1;
 }
 
-void Covariance_filter::observe_size (size_t z_size)
+void Covariance_scheme::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -80,7 +80,7 @@ void Covariance_filter::observe_size (size_t z_size)
 }
 
 Bayes_base::Float
- Covariance_filter::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
+ Covariance_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
 /* correlated innovation observe
  */
 {
@@ -110,7 +110,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Covariance_filter::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
+ Covariance_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
 /* uncorrelated innovation observe
  */
 {

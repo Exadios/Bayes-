@@ -17,11 +17,11 @@ using namespace Bayesian_filter_matrix;
 
 // Instantiate complete fileters to check the templates
 #include "BayesFilter/filters/average1.hpp"
-template average1_filter<Covariance_filter>;
+template average1_filter<Covariance_scheme>;
 
 #include "BayesFilter/filters/indirect.hpp"
-template Indirect_state_filter<State_filter>;
-template Indirect_kalman_filter<Kalman_filter>;
+template Indirect_state_filter<Covariance_scheme>;
+template Indirect_kalman_filter<Covariance_scheme>;
 
 
 // Square
@@ -211,8 +211,8 @@ void test_ident()
 
 void test_info_init()
 {
-	Information_root_info_filter iri(2);
-	Information_filter i(2);
+	Information_root_info_scheme iri(2);
+	Information_scheme i(2);
 	SymMatrix X(2,2);
 	X(0,0) = 2.;
 	X(1,0) = X(0,1) = 1.1;
@@ -250,7 +250,7 @@ void test_unique()
 	x[1] = 7.;
 
 	Test_random<Float> r;
-	SIR_kalman_filter sf(2, 100, r);
+	SIR_kalman_scheme sf(2, 100, r);
 	sf.init_kalman (x,X);
 
 	std::cout << sf.unique_samples() <<',' << sf.stochastic_samples << std::endl;

@@ -11,8 +11,8 @@
  */
 
 /*
- * Covariance Filter.
- *	Implemention of extended Kalman filter
+ * Covariance Filter Scheme.
+ *  Implemention of extended Kalman filter
  * 
  * To work with with Linear and Linrz models
  *  a) a state seperate from covariance prediction is used.
@@ -32,11 +32,11 @@
 namespace Bayesian_filter
 {
 
-class Covariance_filter : public Extended_filter
+class Covariance_scheme : public Extended_filter
 {
 public:
-	Covariance_filter (size_t x_size, size_t z_initialsize = 0);
-	Covariance_filter& operator= (const Covariance_filter&);
+	Covariance_scheme (size_t x_size, size_t z_initialsize = 0);
+	Covariance_scheme& operator= (const Covariance_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();

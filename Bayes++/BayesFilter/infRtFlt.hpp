@@ -11,8 +11,8 @@
  */
 
 /*
- * Information Root Filter.
- *	A extended 'Square-root' Information filter as an Abstract class
+ * Information Root Filter Scheme.
+ *  A extended 'Square-root' Information filter as an Abstract class
  *
  * Algorithm: Square-root information propogation using QR factorisation
  * Ref:	P. Dyer and S. McReynolds, "Extension of Square-Root Filtering to Include Process Noise",
@@ -34,13 +34,13 @@
 namespace Bayesian_filter
 {
 
-class Information_root_filter : public Extended_filter
+class Information_root_scheme : public Extended_filter
 {
 public:
 	FM::Vec r;			// Information Root state
 	FM::UTriMatrix R;	// Information Root
 
-	Information_root_filter (size_t x_size, size_t z_initialsize = 0);
+	Information_root_scheme (size_t x_size, size_t z_initialsize = 0);
 
 	void init ();
 	void update ();
@@ -67,14 +67,14 @@ public:
 
 
 /*
- * Information Root Filter with exposed information state
+ * Information Root Filter Scheme with exposed information state
  * Augments Information_root_filter with y,Y in the interface
  */
 
-class Information_root_info_filter : public Information_form_filter, public Information_root_filter
+class Information_root_info_scheme : public Information_root_scheme, public Information_state_filter
 {
 public:
-	Information_root_info_filter (size_t x_size, size_t z_initialsize = 0);
+	Information_root_info_scheme (size_t x_size, size_t z_initialsize = 0);
 
 	void init_yY ();
 	void update_yY ();

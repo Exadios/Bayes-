@@ -22,7 +22,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-CI_filter::CI_filter (size_t x_size, size_t z_initialsize) :
+CI_scheme::CI_scheme (size_t x_size, size_t z_initialsize) :
 	Extended_filter(x_size),
 	S(Empty), SI(Empty)
 /*
@@ -33,7 +33,7 @@ CI_filter::CI_filter (size_t x_size, size_t z_initialsize) :
 	observe_size (z_initialsize);
 }
 
-CI_filter& CI_filter::operator= (const CI_filter& a)
+CI_scheme& CI_scheme::operator= (const CI_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
@@ -43,20 +43,20 @@ CI_filter& CI_filter::operator= (const CI_filter& a)
 }
 
 
-void CI_filter::init ()
+void CI_scheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
 		filter_error ("Initial X not PSD");
 }
 
-void CI_filter::update ()
+void CI_scheme::update ()
 {
 	// Nothing to do, implicit in observation
 }
 
 Bayes_base::Float
- CI_filter::predict (Linrz_predict_model& f)
+ CI_scheme::predict (Linrz_predict_model& f)
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
@@ -67,7 +67,7 @@ Bayes_base::Float
 	return 1;
 }
 
-void CI_filter::observe_size (size_t z_size)
+void CI_scheme::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -80,8 +80,9 @@ void CI_filter::observe_size (size_t z_size)
 	}
 }
 
+
 Bayes_base::Float
- CI_filter::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
+ CI_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -93,14 +94,14 @@ Bayes_base::Float
 						// ISSUE: Implement simplified uncorrelated noise equations
 	size_t z_size = s.size();
 	SymMatrix Z(z_size,z_size);
-	
+
 	Adapted_Linrz_correlated_observe_model hh(h);
 	return observe_innovation (hh, s);
 }
 
 
 Bayes_base::Float
- CI_filter::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
+ CI_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
 /* Correlated innovation observe
  */
 {

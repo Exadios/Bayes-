@@ -39,7 +39,7 @@ namespace Bayesian_filter
 
 
 Standard_resampler::Float
- Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
+ Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const
 /*
  * Standard resampler from [1]
  * Algorithm:
@@ -111,7 +111,7 @@ Standard_resampler::Float
 
 
 Systematic_resampler::Float
- Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
+ Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const
 /*
  * Systematic resample algorithm from [2]
  * Algorithm:
@@ -184,10 +184,10 @@ Systematic_resampler::Float
 /*
  * SIR filter implementation
  */
-const SIR_filter::Float SIR_filter::rougheningKinit = 1;
+const SIR_scheme::Float SIR_scheme::rougheningKinit = 1;
 		// use 1 std.dev. per sample as default roughening
 
-SIR_filter::SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
+SIR_scheme::SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
 		Sample_filter(x_size, s_size),
 		random(random_helper),
 		resamples(s_size), wir(s_size)
@@ -195,11 +195,11 @@ SIR_filter::SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper)
  * Initialise filter and set the size of things we know about
  */
 {
-	SIR_filter::x_size = x_size;
+	SIR_scheme::x_size = x_size;
 	rougheningK = rougheningKinit;
 }
 
-SIR_filter& SIR_filter::operator= (const SIR_filter& a)
+SIR_scheme& SIR_scheme::operator= (const SIR_scheme& a)
 /* Optimise copy assignment to only copy explict filter state (particles)
  * random helper is not part of filter state
  * Precond: matrix size conformance
@@ -214,7 +214,7 @@ SIR_filter& SIR_filter::operator= (const SIR_filter& a)
 
 
 void
- SIR_filter::init ()
+ SIR_scheme::init ()
 /*
  * Initialise sampling
  *		Pre: S
@@ -227,8 +227,8 @@ void
 }
 
 
-SIR_filter::Float
- SIR_filter::update_resample (const Importance_resampler& resampler)
+SIR_scheme::Float
+ SIR_scheme::update_resample (const Importance_resampler& resampler)
 /*
  * Resample particles using weights and roughen
  * Pre : S represent the predicted distribution
@@ -246,7 +246,7 @@ SIR_filter::Float
 	if (wir_update)		// Resampleing only required if weights have been updated
 	{
 		// Resample based on likelihood weights
-		size_t R_unique; 
+		size_t R_unique;
 		lcond = resampler.resample (resamples, R_unique, wir, random);
 
 							// No resampling exceptions: update S
@@ -263,7 +263,7 @@ SIR_filter::Float
 
 
 void
- SIR_filter::predict (Sampled_predict_model& f)
+ SIR_scheme::predict (Sampled_predict_model& f)
 /*
  * Predict state posterior with sampled noise model
  *		Pre : S represent the prior distribution
@@ -281,11 +281,11 @@ void
 
 
 void
- SIR_filter::observe (Likelihood_observe_model& h, const Vec& z)
+ SIR_scheme::observe (Likelihood_observe_model& h, const FM::Vec& z)
 /*
  * Observation fusion using Likelihood at z
  * Pre : wir previous particle likelihood weights
- * Post: wir fused (multiplicative) particle likehood weights 
+ * Post: wir fused (multiplicative) particle likehood weights
  */
 {
 	h.Lz (z);			// Observe likelihood at z
@@ -299,12 +299,12 @@ void
 }
 
 void
- SIR_filter::observe_likelihood (const Vec& lw)
+ SIR_scheme::observe_likelihood (const FM::Vec& lw)
 /*
  * Observation fusion directly from likelihood weights
  * lw may be smaller then the number of particles. Weights for additional particles are assumed to be 1
  * Pre : wir previous particle likelihood weights
- * Post: wir fused (multiplicative) particle likehood weights 
+ * Post: wir fused (multiplicative) particle likehood weights
  */
 {
 					// Weight Particles. Fused with previous weight
@@ -316,9 +316,9 @@ void
 }
 
 
-void SIR_filter::copy_resamples (ColMatrix& P, const Importance_resampler::Resamples_t& presamples)
+void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::Resamples_t& presamples)
 /*
- * Update P by selectively copying presamples 
+ * Update P by selectively copying presamples
  * Uses a in-place copying alogorithm
  * Algorithm: In-place copying
  *  First copy the live samples (those resampled) to end of P
@@ -353,7 +353,7 @@ void SIR_filter::copy_resamples (ColMatrix& P, const Importance_resampler::Resam
 }
 
 
-void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
+void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 /*
  * Roughening
  *  Uses algorithm from Ref[1] using max-min in each state of P
@@ -411,15 +411,15 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 /*
  * SIR implementation of a Kalman filter
  */
-SIR_kalman_filter::SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
-	SIR_filter(x_size, s_size, random_helper), Kalman_filter_init(x_size),
+SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
+	SIR_scheme(x_size, s_size, random_helper), Kalman_filter_init(x_size),
 	rough_random(random_helper),
 	rough(x_size,x_size, rough_random)
 {
 	FM::identity (rough.Fx);
 }
 
-void SIR_kalman_filter::init_from_kalman ()
+void SIR_kalman_scheme::init_from_kalman ()
 /*
  * Initialise sampling from kalman statistics
  *	Pre: x,X
@@ -442,11 +442,11 @@ void SIR_kalman_filter::init_from_kalman ()
 	rough.init_GqG();
 	predict (rough);
 
-	SIR_filter::init();
+	SIR_scheme::init();
 }
 
 
-void SIR_kalman_filter::mean ()
+void SIR_kalman_scheme::mean ()
 /*
  * Update state mean
  *		Pre : S
@@ -464,14 +464,14 @@ void SIR_kalman_filter::mean ()
 }
 
 
-SIR_kalman_filter::Float
- SIR_kalman_filter::update_resample (const Importance_resampler& resampler)
+Bayes_base::Float
+ SIR_kalman_scheme::update_resample (const Importance_resampler& resampler)
 /*
- * Modified SIR_filter update implementation
+ * Modified SIR_scheme update implementation
  *  update mean and covariance of sampled distribution with update_statistics
  */
 {
-	Float lcond = SIR_filter::update_resample(resampler);	// Resample particles
+	Float lcond = SIR_scheme::update_resample(resampler);	// Resample particles
 
 	update_statistics();			// Estimate sample mean and covariance
 
@@ -479,7 +479,7 @@ SIR_kalman_filter::Float
 	return lcond;
 }
 
-void SIR_kalman_filter::update_statistics ()
+void SIR_kalman_scheme::update_statistics ()
 /*
  * Update kalman statistics without resampling
  * Update mean and covariance of sampled distribution => mean and covariance of particles
@@ -510,7 +510,7 @@ void SIR_kalman_filter::update_statistics ()
 }
 
 
-void SIR_kalman_filter::roughen_correlated (ColMatrix& P, Float K)
+void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
 /*
  * Roughening
  *  Uses a roughening noise based on covariance of P

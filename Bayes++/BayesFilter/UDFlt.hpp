@@ -10,11 +10,11 @@
  */
 
 /*
- * UdU' Factorisation of Covariance Filter.
+ * UdU' Factorisation of covariance Filter Scheme.
  *  Implementation of a 'Square-root' linearised kalman filter
  * 
  * Bierman's UD factorisatised update algorithm using Agee-Turner UdU' factorisation rank 1 update
- * Thornton's MWG-S factorisation prediction  algorithm
+ * Thornton's MWG-S factorisation prediction algorithm
  * References
  * [1] "Factorisation Methods for Discrete Sequential Estimation" Gerald J. Bierman ISBN 0-12-097350-2
  * [2] "Kalman Filtering, Theory and Practice", Mohinder S. Grewal, Angus P. Andrews ISBN 0-13-211335-X
@@ -49,7 +49,7 @@ public:
 };
 
 
-class UD_filter : public Linrz_filter
+class UD_scheme : public Linrz_kalman_filter
 {
 private:
 	size_t q_max;	// Maxiumum size allocated for noise model, constructed before UD
@@ -59,8 +59,8 @@ public:
 	FM::Vec s;		// Innovation
 	FM::Vec Sd;		// Innovation Covariance 
 
-	UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize = 0);
-	UD_filter& operator= (const UD_filter&);
+	UD_scheme (size_t x_size, size_t q_maxsize, size_t z_initialsize = 0);
+	UD_scheme& operator= (const UD_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();

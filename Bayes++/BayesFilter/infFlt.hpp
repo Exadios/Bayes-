@@ -11,8 +11,8 @@
  */
 
 /*
- * Information Filter.
- *  A possibly non-linear Information filter as an Abstract class
+ * Information Filter Scheme.
+ *  A possibly non-linear Information filter
  *
  * References
  * [1] "Stochastic Models, Estimation, and Control} Peter S Maybeck, Academic Press, ISBN 0-12-480701-1
@@ -39,11 +39,11 @@
 namespace Bayesian_filter
 {
 
-class Information_filter : public Information_form_filter, public Extended_filter
+class Information_scheme : public Information_state_filter, public Extended_filter
 {
 public:
-	Information_filter (size_t x_size, size_t z_initialsize = 0);
-	Information_filter& operator= (const Information_filter&);
+	Information_scheme (size_t x_size, size_t z_initialsize = 0);
+	Information_scheme& operator= (const Information_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	struct Linear_predict_byproducts

@@ -11,7 +11,7 @@
  */
 
 /*
- * Covariance Intersection Filter.
+ * Covariance Intersection Filter Scheme.
  *
  * References
  *  [1] "A Non divergent Estimation Algorithm in the Presence of Unknown Correlations"
@@ -36,11 +36,11 @@
 namespace Bayesian_filter
 {
 
-class CI_filter : public Extended_filter
+class CI_scheme : public Extended_filter
 {
 public:
-	CI_filter (size_t x_size, size_t z_initialsize = 0);
-	CI_filter& operator= (const CI_filter&);
+	CI_scheme (size_t x_size, size_t z_initialsize = 0);
+	CI_scheme& operator= (const CI_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();

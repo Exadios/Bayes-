@@ -21,7 +21,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance_filter& f)
+bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance_scheme& f)
 {
 	--i;
 	if (i != 0)
@@ -30,8 +30,8 @@ bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance
 }
 
 
-Iterated_covariance_filter::Iterated_covariance_filter(size_t x_size, size_t z_initialsize) :
-		Linrz_filter(x_size),
+Iterated_covariance_scheme::Iterated_covariance_scheme(size_t x_size, size_t z_initialsize) :
+		Linrz_kalman_filter(x_size),
 		S(Empty), SI(Empty),
 		s(Empty), HxT(Empty)
 /*`
@@ -42,30 +42,30 @@ Iterated_covariance_filter::Iterated_covariance_filter(size_t x_size, size_t z_i
 	observe_size (z_initialsize);
 }
 
-Iterated_covariance_filter&
- Iterated_covariance_filter::operator= (const Iterated_covariance_filter& a)
+Iterated_covariance_scheme&
+ Iterated_covariance_scheme::operator= (const Iterated_covariance_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
 {
-	Linrz_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	return *this;
 }
 
-void Iterated_covariance_filter::init ()
+void Iterated_covariance_scheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
 		filter_error ("Initial X not PSD");
 }
 
-void Iterated_covariance_filter::update ()
+void Iterated_covariance_scheme::update ()
 {
 	// Nothing to do, implicit in observation
 }
 
 Bayes_base::Float
- Iterated_covariance_filter::predict (Linrz_predict_model& f)
+ Iterated_covariance_scheme::predict (Linrz_predict_model& f)
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
@@ -77,7 +77,7 @@ Bayes_base::Float
 }
 
 
-void Iterated_covariance_filter::observe_size (size_t z_size)
+void Iterated_covariance_scheme::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -93,7 +93,7 @@ void Iterated_covariance_filter::observe_size (size_t z_size)
 }
 
 Bayes_base::Float
- Iterated_covariance_filter::observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const Vec& z)
+ Iterated_covariance_scheme::observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -108,7 +108,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Iterated_covariance_filter::observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const Vec& z)
+ Iterated_covariance_scheme::observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)

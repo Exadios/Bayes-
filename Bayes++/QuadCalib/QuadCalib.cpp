@@ -8,13 +8,14 @@
 
 /*
  * Example of using Bayesian Filter Class to solve a simple problem.
+ *
  * The example implements a simple quadratic observer.
- *	This trys to estimate the state of system while also trying to
- *	calibrate a simple linear model of the system which includes
- *	a scale factor and a bias.
- *	Estimating both the system state and a scale factor results in a
- *	quadtratic (product of two states and therefore non-linear) observation.
- *	The system model is a 1D brownian motion with a known pertubation.
+ *  This trys to estimate the state of system while also trying to
+ *  calibrate a simple linear model of the system which includes
+ *  a scale factor and a bias.
+ *  Estimating both the system state and a scale factor results in a
+ *  quadtratic (product of two states and therefore non-linear) observation.
+ *  The system model is a 1D brownian motion with a known pertubation.
  */
 
 #include "BayesFilter/allFilters.hpp"
@@ -28,8 +29,8 @@ namespace
 	namespace FM = Bayesian_filter_matrix;
 	using namespace FM;
 
-	// Choose Filtering class to use to perform numerical
-	typedef Bayesian_filter::Information_filter FilterNumericalAlgorithm;
+	// Choose Filtering Scheme to use
+	typedef Bayesian_filter::Information_scheme FilterScheme;
 
 	// Square 
 	template <class scalar>
@@ -143,16 +144,16 @@ QCobserve::QCobserve () :
 
 /*
  * Quadratic Filter
- *  Derived for FilterNumericalAlgorithm class
+ *  Derived for FilterScheme class
  */
-class QCfilter : public FilterNumericalAlgorithm {
+class QCfilter : public FilterScheme {
 public:
 	QCfilter (const Float SystemStateGuess);
 private:
 };
 
 QCfilter::QCfilter (const Float SystemStateGuess)
-	: FilterNumericalAlgorithm (NX)
+	: FilterScheme (NX)
 /*
  * Construct the filter
  *  Numerical alogrithm requires construction with fixed dimensions

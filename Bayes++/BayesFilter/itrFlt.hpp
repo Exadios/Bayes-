@@ -11,8 +11,8 @@
  */
 
 /*
- * Iterated Covariance Filter.
- *  A non-linear Covariance (Kalman) filter as an Abstract class
+ * Iterated Covariance Filter Scheme.
+ *  A non-linear Covariance (Kalman) filter with relinearisation and iteration
  *
  * The observe algorithm uses the iterated non-linear formulation 
  * from Bar-Shalom and Fortmann p.119 (full scheme)
@@ -29,7 +29,7 @@
 namespace Bayesian_filter
 {
 
-class Iterated_covariance_filter;
+class Iterated_covariance_scheme;
 
 class Iterated_observe_model : virtual public Observe_model_base
 /* Linrz observation model which can be iterated
@@ -59,7 +59,7 @@ class Iterated_terminator : public Bayes_base
  */
 {
 public:
-	virtual bool term_or_relinearize (const Iterated_covariance_filter& f)
+	virtual bool term_or_relinearize (const Iterated_covariance_scheme& f)
 	{
 		return true;
 	}
@@ -74,20 +74,20 @@ public:
 	Counted_iterated_terminator (Iterated_observe_model& model, unsigned iterations) :
 		m(model), i(iterations)
 	{}
-	bool term_or_relinearize (const Iterated_covariance_filter& f);
+	bool term_or_relinearize (const Iterated_covariance_scheme& f);
 	Iterated_observe_model& m;
 	unsigned i;
 };
 
 
 
-class Iterated_covariance_filter : public Linrz_filter
+class Iterated_covariance_scheme : public Linrz_kalman_filter
 {
 public:
-	Iterated_covariance_filter (size_t x_size, size_t z_initialsize = 0);
+	Iterated_covariance_scheme (size_t x_size, size_t z_initialsize = 0);
 	/* Initialised filter requries an addition iteration limit for the
 	   observe algorithm */
-	Iterated_covariance_filter& operator= (const Iterated_covariance_filter&);
+	Iterated_covariance_scheme& operator= (const Iterated_covariance_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();

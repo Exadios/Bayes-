@@ -85,7 +85,7 @@ State_filter::State_filter (size_t x_size) :
 }
 
 
-Kalman_filter::Kalman_filter (size_t x_size) :
+Kalman_state_filter::Kalman_state_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -94,11 +94,11 @@ Kalman_filter::Kalman_filter (size_t x_size) :
 }
 
 
-Linrz_filter::Linrz_filter (size_t x_size) :
+Linrz_kalman_filter::Linrz_kalman_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */
-		Kalman_filter(x_size)
+		Kalman_state_filter(x_size)
 {
 }
 
@@ -107,11 +107,12 @@ Extended_filter::Extended_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */
-		Linrz_filter(x_size)
+		Linrz_kalman_filter(x_size)
 {
 }
 
-Information_form_filter::Information_form_filter (size_t x_size) :
+
+Information_state_filter::Information_state_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */

@@ -32,7 +32,7 @@ namespace {
 namespace SLAM_filter
 {
 
-Fast_SLAM::Fast_SLAM( BF::SIR_filter& L_filter ) :
+Fast_SLAM::Fast_SLAM( BF::SIR_scheme& L_filter ) :
 	SLAM(),
 	L(L_filter),
 	wir(L.S.size2())
@@ -265,13 +265,13 @@ unsigned Fast_SLAM::feature_unique_samples( unsigned feature )
 /*
  * Fast_SLAM_Kstatistics
  */
-Fast_SLAM_Kstatistics::Fast_SLAM_Kstatistics( BF::SIR_kalman_filter& L_filter ) :
+Fast_SLAM_Kstatistics::Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter ) :
 	Fast_SLAM(L_filter), L(L_filter)
 // Construct filter using referenced SIR_filter for resampling
 {
 }
 
-unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_filter& kstat )
+unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_state_filter& kstat )
 /*
  * Compute sample mean and covariance statistics of filter
  *  

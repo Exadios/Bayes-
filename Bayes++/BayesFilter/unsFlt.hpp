@@ -11,8 +11,8 @@
  */
 
 /*
- * Unscented Filter.
- *  A Julier-Uhlmann Unscented non-linear Kalman filter as an Abstract class.
+ * Unscented Filter Scheme.
+ *  A Julier-Uhlmann Unscented non-linear Kalman filter
  *  Uses the classic implementation of Duplex Unscented transform.
  * The Unscented transform is used for non-linear state and observation predictions
  *
@@ -68,15 +68,15 @@ private:
 };
 
 
-class Unscented_filter : public Linrz_filter, public Functional_filter
+class Unscented_scheme : public Linrz_kalman_filter, public Functional_filter
 {
 private:
 	size_t q_max;			// Maxiumum size allocated for noise model, constructed before XX
 	FM::ColMatrix XX;		// Unscented form of state
 public:
 
-	Unscented_filter (size_t x_size, size_t z_initialsize = 0);
-	Unscented_filter& operator= (const Unscented_filter&);
+	Unscented_scheme (size_t x_size, size_t z_initialsize = 0);
+	Unscented_scheme& operator= (const Unscented_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();

@@ -45,7 +45,7 @@ Filter_scheme<Scheme>::Filter_scheme(size_t x_size) :
 	Scheme (x_size)
 {}
 
-// Defaults allowing specialisations for Linrz_filters
+// Defaults allowing specialisations for Linrz_filters and Extened_filters
 //   They only require x_size, and can make use of z_initalsize
 template <class Scheme>
 Filter_scheme<Scheme>::Filter_scheme(size_t x_size, size_t z_initalsize) :
@@ -59,11 +59,11 @@ Filter_scheme<Scheme>::Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_i
 
 // UD_filter specialisation, only one constructor
 template <>
-class Filter_scheme<UD_filter> : public UD_filter
+class Filter_scheme<UD_scheme> : public UD_scheme
 {
 public:
 	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
-		UD_filter (x_size, q_maxsize, z_initialsize)
+		UD_scheme (x_size, q_maxsize, z_initialsize)
 	{}
 };
 

@@ -10,7 +10,7 @@
 /*
  * UdU' Factorisation of Covariance Filter.
  *
- * For efficiency UD_filter requires to know the maximum q_size of the predict_model
+ * For efficiency UD_scheme requires to know the maximum q_size of the predict_model
  * ISSUES:
 *  observeUD is restricted to a positive definate UD matrix, it could be extended to deal with semi definate case
  * observe functions: returned rcond is the minimum of each sequential update, an overall conditioning would be better
@@ -25,19 +25,19 @@ namespace Bayesian_filter
 {
 
 
-UD_filter::
-UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
-		Linrz_filter(x_size)
-		, q_max(q_maxsize)
-		, UD(x_size,x_size+q_max)
-		, s(FM::Empty), Sd(FM::Empty)
-		, d(x_size+q_max), dv(x_size+q_max), v(x_size+q_max)
-		, a(x_size), b(x_size)
-		, h1(x_size), w(x_size)
-		, zp(FM::Empty)
-		, UHx(FM::Empty)
-		, zdecol(FM::Empty)
-		, Gz(FM::Empty)
+UD_scheme::
+UD_scheme (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
+		Linrz_kalman_filter(x_size),
+		q_max(q_maxsize),
+		UD(x_size,x_size+q_max),
+		s(FM::Empty), Sd(FM::Empty),
+		d(x_size+q_max), dv(x_size+q_max), v(x_size+q_max),
+		a(x_size), b(x_size),
+		h1(x_size), w(x_size),
+		zp(FM::Empty),
+		UHx(FM::Empty),
+		zdecol(FM::Empty),
+		Gz(FM::Empty)
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -46,21 +46,21 @@ UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 	observe_size (z_initialsize);
 }
 
-UD_filter&
- UD_filter::operator= (const UD_filter& a)
+UD_scheme&
+ UD_scheme::operator= (const UD_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
 {
-	Linrz_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	q_max = a.q_max;
 	UD = a.UD;
 	return *this;
 }
 
 
-void 
- UD_filter::init ()
+void
+ UD_scheme::init ()
 /*
  * Initialise from a state and state coveriance
  * Computes UD factor from initial covaiance
@@ -77,8 +77,8 @@ void
 }
 
 
-void 
- UD_filter::update ()
+void
+ UD_scheme::update ()
 /*
  * Defactor UD back into X
  * Predcondition:
@@ -92,8 +92,8 @@ void
 }
 
 
-UD_filter::Float
- UD_filter::predict (Linrz_predict_model& f)
+UD_scheme::Float
+ UD_scheme::predict (Linrz_predict_model& f)
 /*
  * Prediction using a diagonalised noise q, and its coupling G
  *  q can have order less then x and a matching G so GqG' has order of x
@@ -112,8 +112,8 @@ UD_filter::Float
 }
 
 
-UD_filter::Float
- UD_filter::predictGq (const FM::Matrix& Fx, const FM::Matrix& G, const FM::Vec& q)
+UD_scheme::Float
+ UD_scheme::predictGq (const FM::Matrix& Fx, const FM::Matrix& G, const FM::Vec& q)
 /*
  * MWG-S prediction from Bierman  p.132
  *  q can have order less then x and a matching G so GqG' has order of x
@@ -156,7 +156,7 @@ UD_filter::Float
 						// Prepare d(0)..d(j) as temporary
 			for (i = 0; i <= j; ++i)	// 0..j
 				d[i] = UD(i,j);
-			
+
 						// Lower triangle of UD is implicity empty
 			for (i = 0; i < n; ++i) 	// 0..n-1
 			{
@@ -252,8 +252,8 @@ Negative:
 }
 
 
-void 
- UD_filter::observe_size (size_t z_size)
+void
+ UD_scheme::observe_size (size_t z_size)
 /*
  * Optimised dyamic observation sizing
  */
@@ -267,9 +267,9 @@ void
 	}
 }
 
-Bayes_base::Float 
- UD_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
-/* 
+Bayes_base::Float
+ UD_scheme::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+/*
  * Standard linrz observe
  *  Uncorrelated observations are applied sequentialy in the order they appear in z
  *  The sequential observation updates state x
@@ -297,7 +297,7 @@ Bayes_base::Float
 		h.normalise(zp, z);
 		h1 = row(h.Hx,o);
 								// Check Z precondition
-		if (h.Zv[o] < 0.) 
+		if (h.Zv[o] < 0.)
 			filter_error("Zv not PSD in observe");
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h1, h.Zv[o]);
@@ -307,14 +307,14 @@ Bayes_base::Float
 		s = z[o]-zp[o];
 		x += w * s;
 								// Copy s and Sd
-		UD_filter::s[o] = s;
-		UD_filter::Sd[o] = S;
+		UD_scheme::s[o] = s;
+		UD_scheme::Sd[o] = S;
 	}
 	return rcondmin;
 }
 
 Bayes_base::Float
- UD_filter::observe (Linrz_correlated_observe_model& /*h*/, const FM::Vec& /*z*/)
+ UD_scheme::observe (Linrz_correlated_observe_model& /*h*/, const FM::Vec& /*z*/)
 /* No solution for Correlated noise and Linearised model */
 {
 	filter_error ("observe no Linrz_correlated_observe_model solution");
@@ -322,8 +322,8 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- UD_filter::observe (Linear_correlated_observe_model& h, const FM::Vec& z)
-/* 
+ UD_scheme::observe (Linear_correlated_observe_model& h, const FM::Vec& z)
+/*
  * Special Linear Hx observe for correlated Z
  *  Z must be PD and will be decorrelated
  * Applies observations sequentialy in the order they appear in z
@@ -340,7 +340,7 @@ Bayes_base::Float
 	const size_t x_size = x.size();
 	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
-						
+
 					// Dynamic sizing
 	if (z_size != last_z_size) {
 		zdecol.resize(z_size);
@@ -418,14 +418,14 @@ Bayes_base::Float
 			x[j] += w[j] * s;
 		}
 								// Copy s and Sd
-		UD_filter::s[o] = s;
-		UD_filter::Sd[o] = S;
+		UD_scheme::s[o] = s;
+		UD_scheme::Sd[o] = S;
 	}
 	return rcondmin;
 }
 
 Bayes_base::Float
- UD_filter::observe (UD_sequential_observe_model& h, const FM::Vec& z)
+ UD_scheme::observe (UD_sequential_observe_model& h, const FM::Vec& z)
 /*
  * Special observe using observe_model_sequential for fast uncorrelated linrz operation
  * Uncorrelated observations are applied sequentialy in the order they appear in z
@@ -454,7 +454,7 @@ Bayes_base::Float
 		zp = h.ho(x, o);
 		h.normalise(zp, z);
 								// Check Z precondition
-		if (h.Zv[o] < 0.) 
+		if (h.Zv[o] < 0.)
 			filter_error("Zv not PSD in observe");
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h.Hx_o, h.Zv[o]);
@@ -467,15 +467,15 @@ Bayes_base::Float
 			x[j] += w[j] * s;
 		}
 								// Copy s and Sd
-		UD_filter::s[o] = s;
-		UD_filter::Sd[o] = S;
+		UD_scheme::s[o] = s;
+		UD_scheme::Sd[o] = S;
 	}
 	return rcondmin;
 }
 
 
-UD_filter::Float
- UD_filter::observeUD (FM::Vec& gain, Float & alpha, const FM::Vec& h, const Float r)
+UD_scheme::Float
+ UD_scheme::observeUD (FM::Vec& gain, Float & alpha, const FM::Vec& h, const Float r)
 /*
  * Linear UD factorisation update
  *  Bierman UdU' factorisation update. Bierman p.100

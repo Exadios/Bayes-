@@ -99,15 +99,15 @@ struct SLAMDemo
 		mutable FM::Vec t;
 	};
 
-	class Kalman_statistics : public BF::Kalman_filter
+	class Kalman_statistics : public BF::Kalman_state_filter
 	// Kalman_statistics without any filtering
 	{	public:
-		Kalman_statistics (size_t x_size) : Kalman_filter(x_size) {}
+		Kalman_statistics (size_t x_size) : Kalman_state_filter(x_size) {}
 		void init() {}
 		void update() {}
 	};
 
-	void display( const std::string label, const BF::Kalman_filter& stats)
+	void display( const std::string label, const BF::Kalman_state_filter& stats)
 	{
 		std::cout << label << stats.x << stats.X << std::endl;
 	}
@@ -151,7 +151,7 @@ SLAMDemo::SLAMDemo()
 	FM::Vec z(1);
 
 	// Kalman_SLAM filter
-	BF::Unscented_filter full_filter(nL+nM);
+	BF::Unscented_scheme full_filter(nL+nM);
 	full_filter.x.clear(); full_filter.X.clear();
 	full_filter.x[0] = x_init[0];
 	full_filter.X(0,0) = X_init(0,0);
@@ -164,7 +164,7 @@ SLAMDemo::SLAMDemo()
 #else
 	unsigned nParticles = 20;
 #endif
-	BF::SIR_kalman_filter fast_location(nL, nParticles, goodRandom);
+	BF::SIR_kalman_scheme fast_location(nL, nParticles, goodRandom);
 	fast_location.init_kalman(x_init, X_init);
 	Fast_SLAM_Kstatistics fast(fast_location);
 

@@ -79,14 +79,14 @@ private:
 
 
 template <typename Error_base>
-class Indirect_kalman_filter : public Kalman_filter {
+class Indirect_kalman_filter : public Kalman_state_filter {
 /*
  * Indirect kalman filter
  *  Estimates state using an associated observation error filter
  */
 public:
 	Indirect_kalman_filter (Error_base& error_filter)
-		: Kalman_filter(error_filter.x.size()), direct(error_filter)
+		: Kalman_state_filter(error_filter.x.size()), direct(error_filter)
 	{	
 	}
 

@@ -20,7 +20,7 @@ namespace SLAM_filter
 class Kalman_SLAM : public SLAM
 {
 public:
-	Kalman_SLAM( Bayesian_filter::Linrz_filter& full_filter, unsigned full_nL);
+	Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter, unsigned full_nL);
 	void predict( Bayesian_filter::Linear_predict_model& m ); 	// TODO Allow nonlinear
 
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z);
@@ -36,7 +36,7 @@ public:
 	void decorrelate( Bayesian_filter::Bayes_base::Float d);
 
 protected:
-	Bayesian_filter::Linrz_filter& full;		// Full Kalman representation of state. Reference to filter parameter in constructor
+	Bayesian_filter::Linrz_kalman_filter& full;		// Full Kalman representation of state. Reference to filter parameter in constructor
 
 private:
 	unsigned nL;		// No of location states
