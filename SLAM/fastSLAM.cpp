@@ -112,19 +112,21 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	if (Ht == 0.)
 		error (BF::Numeric_exception("observe Hx feature component zero"));
 
+								// Observation weight for each particle
 	FM::Vec x2(nL+1);					// Augmented state (particle + feature mean)
-
+	FM::Vec znorm(z.size());
 	for (size_t pi = 0; pi < nparticles; ++pi)
 	{
 		Feature_1& m1 = afm[pi];		// Associated feature's map particle
 							
-		x2.sub_range(0,nL) = L.S.column(pi);			// Build Augmented state x2
+		x2.sub_range(0,nL) = L.S.column(pi);		// Build Augmented state x2
 		x2[nL] = m1.x;
-		FM::Vec zp = fom.h(x2);				// Observation model
-		fom.normalise(zp, z);
+		const FM::Vec& zp = fom.h(x2);	// Observation model
+		znorm = z;						// Normalised observation
+		fom.normalise(znorm, zp);
 
 		const Float zpp = zp[0] - Ht*m1.x;	// Extended State observation for non-linear h
-		const Float p = (z[0] - zpp) / Ht;
+		const Float p = (znorm[0] - zpp) / Ht;
 		const Float P = fom.Zv[0] /sqr(Ht) ;
 		const Float q = m1.x;
 		const Float Q = m1.X;
@@ -136,11 +138,12 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 								// Estimate associated features conditional map for resampled particles
 	for (size_t pi = 0; pi < nparticles; ++pi)
 	{
-		Feature_1& m1 = afm[pi];	// Associated feature's map particle
+		Feature_1& m1 = afm[pi];		// Associated feature's map particle
 		x2.sub_range(0,nL) = L.S.column(pi);		// Build Augmented state x2
 		x2[nL] = m1.x;
 		FM::Vec zp = fom.h(x2);			// Observation model
-		fom.normalise(zp, z);
+		znorm = z;						// Normalised observation
+		fom.normalise(znorm, zp);
 
 								// EKF for conditional feature observation - specialised for 1D and zero state uncertianty
 		Float Sf = m1.X*sqr(Ht) + fom.Zv[0];	// Innovation variance
@@ -148,7 +151,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 			error (BF::Numeric_exception("Conditional feature estimate not PD"));
 		Float Wf = m1.X*Ht / Sf;
 		
-		m1.x += Wf*(z[0] - zp[0]);
+		m1.x += Wf*(znorm[0] - zp[0]);
 		m1.X -= sqr(Wf) * Sf;
 	}
 }
