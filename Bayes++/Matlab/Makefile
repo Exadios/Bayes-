@@ -11,6 +11,10 @@ LIBS = $(BAYESFILTER)/VClib/BayesFilter_UBLAS_MD7.lib $(CLAPACKLIB)
 
 all : bf_all slam_all
 
+clean:
+	del *.dll *.ilk *.pdb
+
+
 bf_all : \
 	bf_scheme.dll \
 	bf_predict_functional.dll \
@@ -33,9 +37,6 @@ slam_all : \
 # To be added 
 # slam_observe_new.dll
 	
-clean:
-	del *.dll *.ilk *.pdb
-
 bf_scheme.dll : bf_scheme.cpp matlabConvert.h bfilter.h
 	mex $(MEXOPTS) bf_scheme.cpp $(LIBS)
 

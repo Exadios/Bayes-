@@ -22,7 +22,7 @@ release : bfilterR.mdm
 	copy bfilterR.mdm "$(MODULES)/bfilter.mdm"
 
 clean:
-	del *.mdm
+	del *.mdm *.pdb
 
 # Use release clapack as can't find debug symbols
 bfilterD.mdm : bfilter.cpp MuPadConvert.h "../VClib/BayesFilter_uBLAS_MD7d.lib" Makefile
