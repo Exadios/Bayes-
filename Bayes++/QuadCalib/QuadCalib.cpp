@@ -141,7 +141,7 @@ int main()
 	x_true[2] = 0.0;	// Bias
 
 	std::cout << "Quadratic Calibration" << std::endl;
-	std::cout << x_true << std::endl;
+	std::cout << "Init " << x_true << std::endl;
 
 
 	// Construct Prediction and Observation model and Calibration filter
@@ -149,7 +149,7 @@ int main()
 	QCobserve nonlinObserve;
 	FilterScheme obsAndCalib (NX);
 
-	// Give the filter an initial guess of the system state
+	// Give the filter an true initial guess of the system state
 	obsAndCalib.x[0] = x_true[0];
 	obsAndCalib.x[1] = 1.;		// Assumed initial Scale
 	obsAndCalib.x[2] = 0.;		// Assumed initial Bias
@@ -164,7 +164,7 @@ int main()
 	FM::Vec u(1), z_true(1), z(1);
 	for (unsigned i = 0; i < 100; i++ )
 	{
-		// Predict true state using control input brownian
+		// Predict true state using Brownian control input 
 		localRng.normal (u);				// normally distributed
 		x_true[0] += u[0];
 		linearPredict.predict (u);
@@ -187,8 +187,8 @@ int main()
 	obsAndCalib.update ();
 
 	// Print everything: True, filter, covariance
-	std::cout << x_true <<  std::endl;
-	std::cout << obsAndCalib.x << std::endl;
+	std::cout << "True " << x_true <<  std::endl;
+	std::cout << "Calb " << obsAndCalib.x << std::endl;
 	std::cout << obsAndCalib.X << std::endl;
 	return 0;
 }
