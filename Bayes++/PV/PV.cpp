@@ -87,23 +87,17 @@ PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 
 
 /*
- * Position Observation model
- * Linear observation is addative uncorrelated model
+ * Observation model
+ * Linear observation of position with addative noise
  */
-class PVobserve : public Linrz_uncorrelated_observe_model
+class Pobserve : public Linear_uncorrelated_observe_model
 {
-	mutable Vec z_pred;
 public:
-	PVobserve ();
-	const Vec& h(const Vec& x) const
-	{
-		z_pred[0] = x[0];
-		return z_pred;
-	};
+	Pobserve ();
 };
 
-PVobserve::PVobserve () :
-	Linrz_uncorrelated_observe_model(NX,1), z_pred(1)
+Pobserve::Pobserve () :
+	Linear_uncorrelated_observe_model (NX,1)
 {
 	// Linear model
 	Hx(0,0) = 1;
@@ -148,18 +142,18 @@ int main()
 	// Construct Prediction and Observation model and filter
 	// Give the filter an initial guess of the system state
 	PVpredict linearPredict;
-	PVobserve linearObserve;
+	Pobserve linearObserve;
 	Vec x_guess(NX);
 	x_guess[0] = 900.;
 	x_guess[1] = 1.5;
 	std::cout << "Guess Initial " << x_guess << std::endl;
 
 	// f1 Direct filter construct and initialize with initial state guess
-	FilterScheme f1(NX,NX);
+	FilterScheme f1(NX, 1);
 	initialise (f1, x_guess);
 
 	// f2 Indirect filter construct and Initialize with initial state guess
-	FilterScheme error_filter(NX,NX);
+	FilterScheme error_filter(NX, 1);
 	Indirect_kalman_filter<FilterScheme> f2(error_filter);
 	initialise (f2, x_guess);
 
@@ -184,7 +178,7 @@ int main()
 		if (obs_time <= time)
 		{
 			// True Observation
-			z_true[0] = x_true[0];
+			z_true = linearObserve.h (x_true);
 
 			// Observation with addative noise
 			localRng.normal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
