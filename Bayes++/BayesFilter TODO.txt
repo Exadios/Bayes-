@@ -1,0 +1,47 @@
+BayesFilter TODO List
+
+TODO
+	Sharing state in filters: Provided constructors with state references
+	observe_model structure changed
+		Extened_filter observe_innovation parametrs is only Linear part of model
+	replace General_ with a form that works with functional forms
+	generalise Sampling infrastructure in SIR
+
+	infRoot: Use seperate G and q predict, check linrz form
+	split bayesFlt.h: (predict.h+observe.h)bayesFlt.h
+	add a common base of h() in observe
+	In MTL can OneDRef be made consistent with a Vec (probably problem due to index form i[index], *i works better
+	add a polymorphic observe s,S extraction mechanism
+
+NEW FILTERS
+	Factorised UKF or DDF2
+	VSDF (factorised from) from Matt Deans
+	SIR with Auxilary variables
+	Sparse matrix implementations
+
+TO REVIEW
+	Allow sub models of smaller dimensions then representation? Causes problems for multiply conformance
+	Check consistency of model to filter
+		Validate (z to h.Z) model sizes in predict and observe
+	UDpredict catching Negative matrices in observe
+	filter assert_isPSD may catch NaN faults caused by NaN in model
+	Check normalisation
+	Check when numerics fail for both state and obs semidefinate
+	Check consitent zeroing of unintisalised variables
+
+ISSUES
+	Enable Cov and Inf implmentations for PSD matricies where numerically possible. At present may be PD only
+	Should UdUrcond at least check U values are numeric values (maybe we need a UdUisPSD)
+	NaN in Information_Joseph are different when run under debugger or release in VC6!!!
+
+CODE RULES
+	filter
+		copy assigment, optimised to remove temps
+	predict/observe
+		in BayesFlt.h	must be virtual. The types are polymorphic
+		in xxFlt.h		no vitual. These are specialised forms
+	filter_matrix
+		use Vec/Matrix x = a*b; where possible it has no copy overhead
+DOCUMENTATION
+	Describe generic schemes
+

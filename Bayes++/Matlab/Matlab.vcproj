@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.00"
+	Name="Matlab"
+	ProjectGUID="{FCBC0D8A-EAEB-41B2-8DDD-0D8FFFEE5BF1}"
+	SccProjectName="-- using Perforce --"
+	SccAuxPath=""
+	SccLocalPath=".."
+	SccProvider="MSSCCI:Perforce SCM"
+	Keyword="MakeFileProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="uBLAS Debug|Win32"
+			OutputDirectory="uBlas Debug"
+			IntermediateDirectory="uBlas Debug"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /f Makefile"
+				ReBuildCommandLine="nmake /A /f Makefile"
+				CleanCommandLine="nmake /f Makefile clean"/>
+		</Configuration>
+		<Configuration
+			Name="uBLAS Release|Win32"
+			OutputDirectory="uBlas Release"
+			IntermediateDirectory="uBlas Release"
+			ConfigurationType="0">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /f Makefile"
+				ReBuildCommandLine="nmake /A /f Makefile"
+				CleanCommandLine="nmake /f Makefile clean"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
+			<File
+				RelativePath="bf_cov.cpp">
+			</File>
+			<File
+				RelativePath="bf_mean.cpp">
+			</File>
+			<File
+				RelativePath="bf_observe_likelihood.cpp">
+			</File>
+			<File
+				RelativePath="bf_observe_linear_correlated.cpp">
+			</File>
+			<File
+				RelativePath="bf_observe_linear_uncorrelated.cpp">
+			</File>
+			<File
+				RelativePath="bf_observe_linrz_correlated.cpp">
+			</File>
+			<File
+				RelativePath="bf_observe_linrz_uncorrelated.cpp">
+			</File>
+			<File
+				RelativePath="bf_predict_addative.cpp">
+			</File>
+			<File
+				RelativePath="bf_predict_functional.cpp">
+			</File>
+			<File
+				RelativePath="bf_predict_linear.cpp">
+			</File>
+			<File
+				RelativePath="bf_predict_linrz.cpp">
+			</File>
+			<File
+				RelativePath="bf_sample.cpp">
+			</File>
+			<File
+				RelativePath="bf_scheme.cpp">
+			</File>
+			<File
+				RelativePath="bf_stochastic_samples.cpp">
+			</File>
+			<File
+				RelativePath="bf_unique_samples.cpp">
+			</File>
+			<File
+				RelativePath="slam_observe.cpp">
+			</File>
+			<File
+				RelativePath="slam_observe_new.cpp">
+			</File>
+			<File
+				RelativePath="slam_scheme.cpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc">
+			<File
+				RelativePath="bfilter.h">
+			</File>
+			<File
+				RelativePath="matlabConvert.h">
+			</File>
+		</Filter>
+		<File
+			RelativePath="Makefile">
+		</File>
+		<File
+			RelativePath="bf_test.m">
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
