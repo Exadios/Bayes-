@@ -213,7 +213,7 @@ public:
 
 /*
  * uBLAS Base Types
- *  We require static type converion between RowMatrix and SymMatrix
+ *  We require static type conversion between RowMatrix and SymMatrix
  *  This requires they both use the same dense represenation. Therefore
  *  we use a symmetric_adaptor to provide the base for symmetric matrices.
  */
@@ -515,33 +515,27 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 
 
 /*
- * uBLAS Expression templates for X*X' and X*X'
- * There is no point in including composite X*S*X' form as they require tempories
+ * prod_SPD - uBLAS Expression templates for X*X' and X*X'
  * Functions are only defined for the type for which the operation is efficient
- * ISSUE Although numerically symmetric there is no way the ET produced can define this property
+ * ISSUE Although numerically symmetric, uBlas has no expression type to represent this property
  *  The result must be assigned to a symmetric container to exploit the symmetry
  */
 
 template <class X>
 struct prod_SPD_matrix_traits
-{	// Provide ET result type for prod(X,trans(X))
-	// ISSUE Although numerically symmetric there is no way this can be added to the ET produced here
-	typedef ublas::matrix_unary2_traits<X, ublas::scalar_identity<typename X::value_type> >::result_type  XT_type;
-	typedef ublas::matrix_matrix_binary_traits<typename X::value_type, X,
-                                        XT_type::value_type, XT_type>::result_type  XXT_type;
-};
+{	// Provide ET result type XXT for prod(X,trans(X))
+	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<X, ublas::scalar_identity<BOOST_UBLAS_TYPENAME X::value_type> >::result_type  XT_type;
+	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME X::value_type, X,
+                                        BOOST_UBLAS_TYPENAME XT_type::value_type, XT_type>::result_type  XXT_type;
 
-template <class X>
-struct prod_SPDT_matrix_traits
-{	// Provide ET result type for prod(trans(X),X)
-	// ISSUE Although numerically symmetric there is no way this can be added to the ET produced here
-	typedef ublas::matrix_unary2_traits<X, ublas::scalar_identity<typename X::value_type> >::result_type  XT_type;
-	typedef ublas::matrix_matrix_binary_traits<XT_type::value_type, XT_type,
-                                        typename X::value_type, X>::result_type  XTX_type;
+	// Provide ET result type XTX for prod(trans(X),X)
+	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME XT_type::value_type, XT_type,
+                                        BOOST_UBLAS_TYPENAME X::value_type, X>::result_type  XTX_type;
+
 };
 
 inline
-prod_SPD_matrix_traits<RowMatrix>::XXT_type 
+prod_SPD_matrix_traits<RowMatrix>::XXT_type
  prod_SPD (const RowMatrix& X, const SymMatrix& S, RowMatrix& XStemp)
 /*
  * Symmetric Positive (Semi) Definate product: X*(X*S)'
@@ -591,7 +585,7 @@ inline Vec::value_type prod_SPD (const Vec& x, const Vec& s)
 
 
 inline
-prod_SPDT_matrix_traits<ColMatrix>::XTX_type 
+prod_SPD_matrix_traits<ColMatrix>::XTX_type
  prod_SPDT (const ColMatrix& X)
 /*
  * Symmetric Positive (Semi) Definate product: X'*X

@@ -149,8 +149,8 @@ pred_model::pred_model () :
 	inv.q.clear();
 	inv.q[0] = 1. / sqr(X_NOISE);
 	inv.q[1] = 1. / sqr(Y_NOISE);
+	
 	// No inverse for empty parts of G
-	const double zero = 0.;
 	inv.G.assign(ublas::scalar_matrix<Float>(inv.G.size1(),inv.G.size2(),
 			std::numeric_limits<Float>::infinity() ) );
 	double Gdet = sqr(1.) - sqr(XY_NOISE_COUPLING);
@@ -247,7 +247,7 @@ const Vec& uobs_model::h (const Vec& x) const
 		z_pred.clear();
 		z_pred[0] = dist;
 		using namespace std;
-		double ang = z_pred[1] = atan2 (dy, dx);
+		z_pred[1] = atan2 (dy, dx);
 	}
 	else {
 		z_pred[0] = dx;
@@ -286,7 +286,7 @@ private:
 	Vec m_base;
 };
 
-walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), m_base(NX), rootq(NX)
+walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), rootq(NX), m_base(NX)
 {
 	m_fixed = fixed;
 	m_base = start;
@@ -409,7 +409,7 @@ private:
 	void dumpCompare ();
 
 	Vec ztrue, z;
-						
+
 	Vec f1_xpred, f2_xpred;
 	SymMatrix f1_Xpred;
 	SymMatrix f2_Xpred;
@@ -420,12 +420,13 @@ CCompare<Tf1,Tf2>::CCompare (const Vec x_init, const SymMatrix X_init, unsigned 
 	f1(x_init, X_init),
 	f2(x_init, X_init),
 	truth (x_init, TRUTH_STATIONARY),
+	uh(),
+	ch(uh),
 	ztrue(NZ), z(NZ),
 	f1_xpred (NX),
 	f2_xpred (NX),
 	f1_Xpred (NX, NX),
-	f2_Xpred (NX, NX),
-	ch(uh)
+	f2_Xpred (NX, NX)
 {
 	// Initialises test variables
 	z.clear();

@@ -34,7 +34,7 @@ namespace Bayesian_filter_matrix
 	using Bayesian_filter::Bayes_filter_exception;
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 void assert_isSymmetric (const SymMatrix &M)
 /*
  * Assert a Matrix is Square and Symmetric
@@ -95,6 +95,7 @@ bool isPSD (const SymMatrix &M)
 bool isSymmetric (const SymMatrix &M)
 /*
  * Check a Symmetric Matrix really is Square and Symmetric
+ * The later may be implied by the SymMatrix type
  * Implictly also checks matrix is without IEC 559 NaN values as they are always !=
  * Return:
  *  true iff M is Square and Symmetric and without NaN 
@@ -105,7 +106,7 @@ bool isSymmetric (const SymMatrix &M)
 		throw Bayes_filter_exception ("SymMatrix is not square");
 	}
 
-	// Check Symmetric
+	// Check equality of upper and lower
 	bool bSym = true;
 	size_t size = M.size1();
 	for (size_t r = 0; r < size; ++r) {
@@ -119,7 +120,7 @@ bool isSymmetric (const SymMatrix &M)
 }
 
 
-void forceSymmetric (SymMatrix &M, bool bUpperToLower)
+void forceSymmetric (Matrix &M, bool bUpperToLower)
 /*
  * Force Matrix Symmetry
  *	Normally Copies ower triangle to upper or
@@ -128,7 +129,7 @@ void forceSymmetric (SymMatrix &M, bool bUpperToLower)
 {
 	// Check Square
 	if (M.size1() != M.size2() ) {
-		throw Bayes_filter_exception ("SymMatrix is not square");
+		throw Bayes_filter_exception ("Matrix is not square");
 	}
 
 	size_t size = M.size1();

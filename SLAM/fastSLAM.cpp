@@ -9,6 +9,7 @@
 /*
  * SLAM : Simulataneous Location and Mapping
  *  FastSLAM augmented particle algorithm
+ *  Direct implementation without log(n) tree pruneing for associated observations
  */
 
 #include <cmath>

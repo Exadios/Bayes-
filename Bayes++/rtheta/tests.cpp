@@ -155,9 +155,8 @@ void test_SPD_all()
 	x[0] = 1.;
 
 	double v1 = ublas::inner_prod (x, ublas::prod(S,x) );
-
 	double v2 = prod_SPDT(x,S);
-
+	(void)v1,(void)v2;
 	test_SPD();
 }
 

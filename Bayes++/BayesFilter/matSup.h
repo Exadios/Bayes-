@@ -41,7 +41,7 @@ inline void assert_isPSD (const SymMatrix &M) {}
  */
 bool isPSD (const SymMatrix &M);
 bool isSymmetric (const SymMatrix &M);
-void forceSymmetric (SymMatrix &M, bool bUpperToLower = false);
+void forceSymmetric (Matrix &M, bool bUpperToLower = false);
 
 /*
  * UdU' and LdL' and UU' Cholesky Factorisation and function

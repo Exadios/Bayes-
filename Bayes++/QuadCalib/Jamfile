@@ -1,13 +1,13 @@
 # Bayes++ Jamfile - See Boost.build
-# Simple - Simple filter example
+# Quadratic Calibration -  filter example
 
 # Declare the location of this subproject relative to the project root.
-subproject Simple ;
+subproject "QuadCalib" ;
 
 # The executable for the example
 
-exe simple :
-     simpleExample.cpp 
+exe quadcalib :
+     "QuadCalib.cpp"
      <lib>../BayesFilter/BayesFilter
     :
      <include>$(BOOST_ROOT)

@@ -8,7 +8,11 @@
 
 /*
  * SLAM : Simulataneous Location and Mapping
- *  FastSLAM augmented particle algorithm
+ *  FastSLAM augmented particle algorithm see Ref[1]
+ *
+ * Reference
+ *  [1] "FastSLAM: Factored Solution to the Simultaneous Localization and Mapping Problem"
+ *   Montemerlo, M. and Thrun, S. and Koller, D. and Wegbreit, B. Proceedings of the AAAI National Conference on Artificial Intelligence  2002
  */
 
 
