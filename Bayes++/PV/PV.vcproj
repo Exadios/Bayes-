@@ -4,10 +4,10 @@
 	Version="7.00"
 	Name="PV"
 	ProjectGUID="{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}"
-	SccProjectName="-- using Perforce --"
+	SccProjectName=""
 	SccAuxPath=""
-	SccLocalPath=".."
-	SccProvider="MSSCCI:Perforce SCM">
+	SccLocalPath=""
+	SccProvider="">
 	<Platforms>
 		<Platform
 			Name="Win32"/>

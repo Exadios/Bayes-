@@ -16,46 +16,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SLAM", "SLAM\FastSLAM.vcproj", "{302C014F-09BC-4073-8A81-3C2E0B3B7592}"
 EndProject
 Global
-	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 9
-		SccProjectName0 = --\u0020using\u0020Perforce\u0020--
-		SccLocalPath0 = .
-		SccProvider0 = MSSCCI:Perforce\u0020SCM
-		CanCheckoutShared = true
-		SolutionUniqueID = {BABB6ED6-AA51-454D-ACCA-68B6B89DFC27}
-		SccProjectUniqueName1 = VClib\\VClib.vcproj
-		SccLocalPath1 = .
-		CanCheckoutShared = true
-		SccProjectFilePathRelativizedFromConnection1 = VClib\\
-		SccProjectUniqueName2 = simple\\simple.vcproj
-		SccLocalPath2 = .
-		CanCheckoutShared = true
-		SccProjectFilePathRelativizedFromConnection2 = simple\\
-		SccProjectUniqueName3 = PV\\PV.vcproj
-		SccLocalPath3 = .
-		CanCheckoutShared = true
-		SccProjectFilePathRelativizedFromConnection3 = PV\\
-		SccProjectUniqueName4 = Quadradtic\u0020Calib\\Quadradtic\u0020Calib.vcproj
-		SccLocalPath4 = .
-		CanCheckoutShared = true
-		SccProjectFilePathRelativizedFromConnection4 = Quadradtic\u0020Calib\\
-		SccProjectUniqueName5 = rtheta\\rtheta.vcproj
-		SccProjectName5 = \u0022$/BayesFilter/rtheta\u0022,\u0020UBDAAAAA
-		SccLocalPath5 = rtheta
-		CanCheckoutShared = true
-		SccProjectUniqueName6 = MuPad\\MuPAD.vcproj
-		SccProjectName6 = \u0022$/BayesFilter/MuPAD\u0022,\u0020CCGAAAAA
-		SccLocalPath6 = MuPad
-		CanCheckoutShared = true
-		SccProjectUniqueName7 = Matlab\\Matlab.vcproj
-		SccLocalPath7 = .
-		CanCheckoutShared = true
-		SccProjectFilePathRelativizedFromConnection7 = Matlab\\
-		SccProjectUniqueName8 = SLAM\\FastSLAM.vcproj
-		SccLocalPath8 = .
-		CanCheckoutShared = true
-		SccProjectFilePathRelativizedFromConnection8 = SLAM\\
-	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
 		ConfigName.0 = uBLAS Debug
 		ConfigName.1 = uBLAS Release

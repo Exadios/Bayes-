@@ -4,10 +4,10 @@
 	Version="7.00"
 	Name="Matlab"
 	ProjectGUID="{FCBC0D8A-EAEB-41B2-8DDD-0D8FFFEE5BF1}"
-	SccProjectName="-- using Perforce --"
+	SccProjectName=""
 	SccAuxPath=""
-	SccLocalPath=".."
-	SccProvider="MSSCCI:Perforce SCM"
+	SccLocalPath=""
+	SccProvider=""
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform

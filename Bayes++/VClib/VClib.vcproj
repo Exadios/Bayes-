@@ -4,10 +4,10 @@
 	Version="7.00"
 	Name="VClib"
 	ProjectGUID="{F90E045F-A6E0-4933-9477-1C135987F920}"
-	SccProjectName="-- using Perforce --"
+	SccProjectName=""
 	SccAuxPath=""
-	SccLocalPath=".."
-	SccProvider="MSSCCI:Perforce SCM">
+	SccLocalPath=""
+	SccProvider="">
 	<Platforms>
 		<Platform
 			Name="Win32"/>

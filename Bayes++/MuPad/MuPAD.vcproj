@@ -4,10 +4,10 @@
 	Version="7.00"
 	Name="MuPAD"
 	ProjectGUID="{BA999D94-196F-4D33-A42C-6378D5ED3FA9}"
-	SccProjectName="&quot;$/BayesFilter/MuPAD&quot;, CCGAAAAA"
+	SccProjectName=""
 	SccAuxPath=""
-	SccLocalPath="."
-	SccProvider="MSSCCI:Perforce SCM"
+	SccLocalPath=""
+	SccProvider=""
 	Keyword="MakeFileProj">
 	<Platforms>
 		<Platform
@@ -60,21 +60,12 @@
 	<Files>
 		<File
 			RelativePath="Makefile">
-			<FileConfiguration
-				Name="uBLAS(Development) Debug|Win32">
-			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\MuPadConvert.h">
-			<FileConfiguration
-				Name="uBLAS(Development) Debug|Win32">
-			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\bfilter.cpp">
-			<FileConfiguration
-				Name="uBLAS(Development) Debug|Win32">
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

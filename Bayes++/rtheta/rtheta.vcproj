@@ -4,10 +4,10 @@
 	Version="7.00"
 	Name="rtheta"
 	ProjectGUID="{974A5075-556F-4E42-B1AE-846D73FFE7B3}"
-	SccProjectName="&quot;$/BayesFilter/rtheta&quot;, UBDAAAAA"
+	SccProjectName=""
 	SccAuxPath=""
-	SccLocalPath="."
-	SccProvider="MSSCCI:Perforce SCM">
+	SccLocalPath=""
+	SccProvider="">
 	<Platforms>
 		<Platform
 			Name="Win32"/>
