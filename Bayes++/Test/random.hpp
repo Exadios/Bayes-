@@ -43,9 +43,8 @@ namespace
 class Boost_random
 {
 public:
-	// ISSUE mt19937 is failing on x86_64
-	//	typedef boost::mt19937 Boost_gen;
-	typedef boost::ranlux3 Boost_gen;	
+	// ISSUE mt19937 results incorrect on x86_64 GCC version 3.3.3 (SuSE Linux)
+	typedef boost::mt19937 Boost_gen;
 
 	typedef Bayesian_filter_matrix::Float Float;
 	typedef boost::uniform_01<Boost_gen, Float> UGen;
