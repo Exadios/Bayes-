@@ -9,9 +9,8 @@ build-project Simple ;
 build-project PV ;
 build-project QuadCalib ;
 
-# Boost requirements: ISSUE should come from environment
-BOOST_ROOT ?= "../boost/boost_CVS" ;
-echo BOOST_ROOT $(BOOST_ROOT) ;
+# Get Boost locaton from environment
+BOOST_ROOT = [ modules.peek : BOOST_ROOT ] ;
 
 # Project requirements
 project
