@@ -242,8 +242,9 @@ const Vec& cobs_model::h (const Vec& x) const
 
 void uobs_model::normalise (Vec& z_denorm, const Vec& z_from) const
 {
-	if (RA_MODEL)
+	if (RA_MODEL) {
 		z_denorm[1] = angle<Float>(z_denorm[1]).from (z_from[1]);
+	}
 }
 
 void cobs_model::normalise (Vec& z_denorm, const Vec& z_from) const
@@ -377,6 +378,11 @@ void Filter<Information_root_scheme>::dump_state()
 	std::cout << ts.r << ts.R << std::endl;
 }
 
+template <>
+void Filter<Unscented_scheme>::dump_state()
+{	// output any additional state variables
+	std::cout << ts.XX << std::endl;
+}
 
 /*
  * Compare Two filters
@@ -435,7 +441,7 @@ template<class Tf1, class Tf2>
 void CCompare<Tf1, Tf2>::dumpCompare ()
 {
 	// Additional Scheme state
-	//	f1.dump_state(); f2.dump_state();
+	//f1.dump_state(); f2.dump_state();
 
 	Float zx, zy;
 	if (RA_MODEL) {
