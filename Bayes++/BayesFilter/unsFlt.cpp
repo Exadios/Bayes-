@@ -359,8 +359,7 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	noalias(W) = prod(Xxz,SI);
 
 						// Normalised innovation
-	s = z;
-	h.normalise(s, zp);
+	h.normalise(s = z, zp);
 	noalias(s) -= zp;
 
 						// Filter update
