@@ -12,7 +12,7 @@
  */
 
 #include <iostream>
-// Include all the Bayes++ Bayesian filtering library
+// Include all the Bayes++ Bayesian filtering classes
 #include "BayesFilter/allFlt.h"
 
 using namespace std;
@@ -92,7 +92,7 @@ int main()
 
 	// Make an observation
 	Vec z(1);
-	z[0] = 20.;				// Observe that we should be at 20
+	z[0] = 20.;			// Observe that we should be at 20
 	my_filter.observe (my_observe, z);
 	my_filter.update();		// Update the filter to state and covariance are available
 
