@@ -45,7 +45,7 @@ void Covariance_scheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
-		filter_error ("Initial X not PSD");
+		error (Numeric_exception("Initial X not PSD"));
 }
 
 void Covariance_scheme::update ()
@@ -86,7 +86,7 @@ Bayes_base::Float
 {
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
@@ -116,7 +116,7 @@ Bayes_base::Float
 {
 						// Size consistency, z to model
 	if (s.size() != h.Zv.size())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance

@@ -27,10 +27,8 @@ namespace Bayesian_filter_matrix
  * Assertion support
  */
 #ifndef NDEBUG
-void assert_isSymmetric (const SymMatrix &M);
 void assert_isPSD (const SymMatrix &M);
 #else
-inline void assert_isSymmetric (const SymMatrix &M) {}
 inline void assert_isPSD (const SymMatrix &M) {}
 #endif
 
@@ -38,7 +36,7 @@ inline void assert_isPSD (const SymMatrix &M) {}
  * Local support functions
  */
 bool isPSD (const SymMatrix &M);
-bool isSymmetric (const SymMatrix &M);
+bool isSymmetric (const Matrix &M);
 void forceSymmetric (Matrix &M, bool bUpperToLower = false);
 
 /*

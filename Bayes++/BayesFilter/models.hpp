@@ -162,7 +162,7 @@ public:
 		first_init = false;
 		for (FM::Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
 			if (*qi < 0.)
-				throw Bayesian_filter::Bayes_filter_exception ("Negative q in init_GqG");
+				error (Numeric_exception("Negative q in init_GqG"));
 			rootq[qi.index()] = std::sqrt(*qi);
 		}
 	}

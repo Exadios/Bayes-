@@ -159,7 +159,7 @@ Bayes_base::Float
 {
 	using namespace FM;
 	if (!zset)
-		Bayes_filter_exception ("General_observe_model used without Lz set");
+		error (Logic_exception("General_observe_model used without Lz set"));
 					// Predict observations using supplied observe model
 	const Vec& zp = h(x);
 					// Normalise Innovation about z
@@ -213,7 +213,7 @@ Bayes_base::Float
  */
 {
 	if (!zset)
-		Bayes_filter_exception ("General_observe_model used without Lz set");
+		error (Logic_exception ("General_observe_model used without Lz set"));
 						// Predict observations using supplied observe model
 	const FM::Vec& zp = h(x);
 						// Normalise Innovation about z

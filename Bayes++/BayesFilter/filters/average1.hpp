@@ -54,7 +54,8 @@ public:
 	operator Float () const
 	/* Returns filtered estimate
 	 */
-	{	if (!bInit)	filter_error("average1 not init");
+	{	if (!bInit)
+			error (Logic_exception("average1 not init"));
 		return x[0];
 	}
 

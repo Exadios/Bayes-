@@ -47,7 +47,7 @@ void CI_scheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
-		filter_error ("Initial X not PSD");
+		error (Numeric_exception("Initial X not PSD"));
 }
 
 void CI_scheme::update ()
@@ -108,7 +108,7 @@ Bayes_base::Float
 	const Float one = 1;
 						// size consistency, z to model
 	if (s.size() != h.Z.size1())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());	// dynamic sizing
 
 						// Linear conditioning for omega

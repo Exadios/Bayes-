@@ -110,7 +110,7 @@ void Information_root_scheme::update ()
 	UTriMatrix RI (R);	// Invert Cholesky factor
 	bool singular = UTinverse (RI);
 	if (singular)
-		filter_error ("R not PD");
+		error (Numeric_exception("R not PD"));
 
 	X.assign (prod_SPD(RI));		// X = RI*RI'
 	x.assign (prod(RI,r));
@@ -148,12 +148,12 @@ void Information_root_scheme::inverse_Fx (FM::DenseColMatrix& invFx, const FM::M
 
 	int info = LAPACK::getrf(FxLU, ipivot);
 	if (info < 0)
-		throw Bayes_filter_exception ("Fx not LU factorisable");
+		error (Numeric_exception("Fx not LU factorisable"));
 
 	FM::identity(invFx);				// Invert
 	info = LAPACK::getrs('N', FxLU, ipivot, invFx);
 	if (info != 0)
-		throw Bayes_filter_exception ("Predict Fx not LU invertable");
+		error (Numeric_exception("Predict Fx not LU invertable"));
 }
 
 
@@ -181,7 +181,7 @@ Bayes_base::Float
 	for (Vec::const_iterator qi = f.q.begin(); qi != f.q.end(); ++qi)
 	{
 		if (*qi < 0)
-			filter_error ("Predict q Not PSD");
+			error (Numeric_exception("Predict q Not PSD"));
 		column(Gqr, qi.index()) *= std::sqrt(*qi);
 	}
 						// Form Augmented matrix for factorisation
@@ -201,7 +201,7 @@ Bayes_base::Float
 	DenseVec tau(q_size+x_size);
 	int info = LAPACK::geqrf (A, tau);
 	if (info != 0)
-			filter_error ("Predict no QR factor");
+			error (Numeric_exception("Predict no QR factor"));
 						// Extract the roots, junk in strict lower triangle
 	R = UpperTri( A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) );
     if (linear_r)
@@ -254,7 +254,7 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 	const size_t z_size = s.size();
 						// Size consistency, z to model
 	if (z_size != h.Z.size1())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 
 						// Require Inverse of Root of uncorrelated observe noise
 	UTriMatrix Zir(z_size,z_size);
@@ -273,7 +273,7 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 	DenseVec tau(x_size+1);
 	int info = LAPACK::geqrf (A, tau);
 	if (info != 0)
-			filter_error ("Observe no QR factor");
+			error (Numeric_exception("Observe no QR factor"));
 						// Extract the roots, junk in strict lower triangle
 	R = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
 	r = A.sub_column(0,x_size, x_size);
@@ -298,15 +298,14 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 	const size_t z_size = s.size();
 						// Size consistency, z to model
 	if (z_size != h.Zv.size())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 
 						// Require Inverse of Root of uncorrelated observe noise
 	DiagMatrix Zir(z_size,z_size);
 	Zir.clear();
 	for (size_t i = 0; i < z_size; ++i)
 	{
-		using namespace std;
-		Zir(i,i) = 1 / sqrt(h.Zv[i]);
+		Zir(i,i) = 1 / std::sqrt(h.Zv[i]);
 	}
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
@@ -319,7 +318,7 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 	DenseVec tau(x_size+1);
 	int info = LAPACK::geqrf (A, tau);
 	if (info != 0)
-			filter_error ("Observe no QR factor");
+			error (Numeric_exception("Observe no QR factor"));
 						// Extract the roots, junk in strict lower triangle
 	R = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
 	r = A.sub_column(0,x_size, x_size);

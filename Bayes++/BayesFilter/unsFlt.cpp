@@ -94,7 +94,7 @@ void Unscented_scheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
-		filter_error ("Initial X not PSD");
+		error (Numeric_exception("Initial X not PSD"));
 }
 
 void Unscented_scheme::update ()

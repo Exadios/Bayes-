@@ -33,26 +33,9 @@ inline scalar sqr(scalar x)
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {
-	using Bayesian_filter::Bayes_filter_exception;
 
 
 #ifndef NDEBUG
-void assert_isSymmetric (const SymMatrix &M)
-/*
- * Assert a Matrix is Square and Symmetric
- *  Requires 'cerr' and 'assert' to about execution
- */
-{
-	bool bSym = isSymmetric(M);
-	if (!bSym)
-	{
-		// Display Asymmetry
-		std::cerr.flags(std::ios::scientific); std::cerr.precision(17);
-		std::cerr << M;
-	}
-	assert(bSym);
-}
-
 void assert_isPSD (const SymMatrix &M)
 /*
  * Assert a Matrix is Positive Semi Definate via the alogrithm in isPSD
@@ -83,10 +66,6 @@ bool isPSD (const SymMatrix &M)
  *  true iff M isSymetric and is PSD by the above algorithm
  */
 {
-	// Precondition Square and Symmetric
-	if (!isSymmetric (M))
-		return false;
-
 	RowMatrix UD(M.size1(),M.size1());
 
 	RowMatrix::value_type rcond = UdUfactor(UD, M);
@@ -94,7 +73,7 @@ bool isPSD (const SymMatrix &M)
 }
 
 
-bool isSymmetric (const SymMatrix &M)
+bool isSymmetric (const Matrix &M)
 /*
  * Check a Symmetric Matrix really is Square and Symmetric
  * The later may be implied by the SymMatrix type
@@ -105,7 +84,7 @@ bool isSymmetric (const SymMatrix &M)
 {
 	// Check Square
 	if (M.size1() != M.size2() ) {
-		throw Bayes_filter_exception ("SymMatrix is not square");
+		return false;
 	}
 
 	// Check equality of upper and lower
@@ -131,7 +110,8 @@ void forceSymmetric (Matrix &M, bool bUpperToLower)
 {
 	// Check Square
 	if (M.size1() != M.size2() ) {
-		throw Bayes_filter_exception ("Matrix is not square");
+		using namespace Bayesian_filter;
+		Bayes_base::error (Logic_exception ("Matrix is not square"));
 	}
 
 	size_t size = M.size1();

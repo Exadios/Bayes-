@@ -56,19 +56,19 @@ public:
 	typedef std::vector<unsigned> afeatures_t;	// Use a vector to store feature assocations
 	virtual void observe( afeatures_t& features, const Feature_observe& fom, const FM::Vec& z)
 	{
-		filter_error("Unimplemented");
+		error (BF::Logic_exception("Unimplemented"));
 	}
 	virtual void observe_new( afeatures_t& features, const Feature_observe_inverse& fom, const FM::Vec& z)
 	{
-		filter_error("Unimplemented");
+		error (BF::Logic_exception("Unimplemented"));
 	}
 	virtual void observe_new( afeatures_t& features, const FM::Vec& t, const FM::Vec& T)
 	{
-		filter_error("Unimplemented");
+		error (BF::Logic_exception("Unimplemented"));
 	}
 	virtual void forget( afeatures_t& features, bool must_exist = true)
 	{
-		filter_error("Unimplemented");
+		error (BF::Logic_exception("Unimplemented"));
 	}
 
 	virtual void update () = 0;

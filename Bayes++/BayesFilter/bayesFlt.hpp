@@ -29,6 +29,46 @@ namespace Bayesian_filter
 	// Allow use of a short name for matrix namespace
 	namespace FM = Bayesian_filter_matrix;
 
+
+class Filter_exception : public std::exception
+/*
+ *	Base class for all exception produced by filter heirachy
+ */
+{
+protected:
+	Filter_exception (const char* description)
+	{	error_description = description;
+	};
+	const char *what() const throw()
+	{	return error_description;
+	}
+private:
+	const char* error_description;
+};
+
+class Logic_exception : public Filter_exception
+/*
+ * Logic Exception
+ */
+{
+public:
+	Logic_exception (const char* description) :
+		Filter_exception (description)
+	{};
+};
+
+class Numeric_exception : public Filter_exception
+/*
+ * Numeric Exception
+ */
+{
+public:
+	Numeric_exception (const char* description) :
+		Filter_exception (description)
+	{};
+};
+
+
 /*
  * Abstraction support classes, at the base of the heirarchy
  */
@@ -44,36 +84,21 @@ public:
 
 	virtual ~Bayes_base() = 0;
 	// Polymorphic
-protected:
-	void filter_error (const char* error_description) const;
-	// Report a filter error, throw a Bayes_filter_exception
-	// No exception saftey rules are specified, assume the object is invalid
+
+	static void error (const Filter_exception& a);
+	// Report a filter, throw a Filter_exception
+	//  No exception saftey rules are specified, assume the object is invalid
+	// May have side effects for debuging
 };
 
 
-class Bayes_filter_exception : public std::exception {
-/*
- * Bayesian Filter Exception
- *	Base class for all exception produced by filter heirachy
- */
-public:
-	Bayes_filter_exception (const char* description)
-	{	error_description = description;
-	};
-	const char *what() const throw()
-	{	return error_description;
-	}
-private:
-	const char* error_description;
-};
-
-
-class Numerical_rcond : private Bayes_base {
+class Numerical_rcond : private Bayes_base
 /*
  * Numerical comparison of reciprocal condition numbers
  *  Required for all linear algebra in models and filters
  *  Implements minimum allowable reciprocal condition number for PD Matrix factorisations
  */
+{
 public:
 	Numerical_rcond()
 	{	limit_PD = limit_PD_init;
@@ -87,7 +112,7 @@ public:
 	 * Inverting condition provides a test for IEC 559 NaN values
 	 */
 	{	if (!(rcond >= 0))
-			throw Bayes_filter_exception (error_description);
+			error (Numeric_exception (error_description));
 	}
 
 	inline void check_PD (Float rcond, const char* error_description) const
@@ -97,7 +122,7 @@ public:
 	 * Inverting condition provides a test for IEC 559 NaN values
 	 */
 	{	if (!(rcond >= limit_PD))
-			throw Bayes_filter_exception (error_description);
+			error (Numeric_exception (error_description));
 	}
 private:
 	Float limit_PD;		

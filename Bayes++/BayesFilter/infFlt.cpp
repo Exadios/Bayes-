@@ -82,7 +82,7 @@ void Information_scheme::init_yY ()
 {
 						// Postconditions
 	if (!isPSD (Y))
-		filter_error ("Initial Y not PSD");
+		error (Numeric_exception("Initial Y not PSD"));
 	update_required = true;
 }
 
@@ -159,7 +159,7 @@ Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_pr
 	for (size_t i = 0; i < f.q.size(); ++i)
 	{
 		if (f.q[i] < 0)	// allow PSD q, let infinity propogate into B
-			filter_error ("Predict q Not PSD");
+			error (Numeric_exception("Predict q Not PSD"));
 		b.invq[i] = Float(1) / f.q[i];
 	}
 	diag(b.B).plus_assign (b.invq);
@@ -204,7 +204,7 @@ Bayes_base::Float
 {
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());// Dynamic sizing
 
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
@@ -235,7 +235,7 @@ Bayes_base::Float
 {
 						// Size consistency, z to model
 	if (s.size() != h.Zv.size())
-		filter_error("observation and model size inconsistent");
+		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());// Dynamic sizing
 
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object

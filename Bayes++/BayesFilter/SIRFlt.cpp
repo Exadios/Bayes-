@@ -65,12 +65,12 @@ Standard_resampler::Float
 		wcum = *wi = wcum + *wi;
 	}
 	if (wmin < 0)		// Bad weights
-		filter_error("negative weight");
+		error (Numeric_exception("negative weight"));
 	if (wcum <= 0)		// Bad cumulative weights (previous check should actually prevent -ve
-		filter_error("zero cumulative weight sum");
+		error (Numeric_exception("zero cumulative weight sum"));
 						// Any numerical failure should cascade into cummulative sum
 	if (wcum != wcum)	// Inequality due to NaN
-		filter_error("NaN cumulative weight sum");
+		error (Numeric_exception("NaN cumulative weight sum"));
 
 						// Sorted uniform random distribution [0..1) for each resample
 	DenseVec ur(w.size());
@@ -103,7 +103,7 @@ Standard_resampler::Float
 	}
 	assert(pri==presamples.end());
 	if (ui != ui_end)				// Resample failed due no non numeric weights
-		filter_error("weights cannot be resampled");
+		error (Numeric_exception("weights are not numeric and cannot be resampled"));
 	
 	uresamples = unique;
 	return wmin / wcum;
@@ -139,12 +139,12 @@ Systematic_resampler::Float
 		wcum = *wi = wcum + *wi;
 	}
 	if (wmin < 0)		// Bad weights
-		filter_error("negative weight");
+		error (Numeric_exception("negative weight"));
 	if (wcum <= 0)		// Bad cumulative weights (previous check should actually prevent -ve
-		filter_error("total likelihood zero");
+		error (Numeric_exception("total likelihood zero"));
 						// Any numerical failure should cascade into cummulative sum
 	if (wcum != wcum)
-		filter_error("total likelihood numerical error");
+		error (Numeric_exception("total likelihood numerical error"));
 
 						// Stratified step
 	Float wstep = wcum / Float(nParticles);

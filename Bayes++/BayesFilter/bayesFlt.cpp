@@ -33,12 +33,12 @@ Bayes_base::~Bayes_base()
  */
 {}
 
-void Bayes_base::filter_error (const char* errorText) const
+void Bayes_base::error (const Filter_exception& e )
 /*
- * Generic error
+ * Filter error
  */
 {
-	throw Bayes_filter_exception (errorText);
+	throw e;
 }
 
 Linrz_predict_model::Linrz_predict_model (size_t x_size, size_t q_size) :
@@ -81,7 +81,7 @@ State_filter::State_filter (size_t x_size) :
  */
 {
 	if (x_size < 1)
-		filter_error ("Zero state filter constructed");
+		error (Logic_exception("Zero state filter constructed"));
 }
 
 
@@ -131,7 +131,7 @@ Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
  */
 {
 	if (s_size < 1)
-		filter_error ("Zero sample filter constructed");
+		error (Logic_exception("Zero sample filter constructed"));
 }
 
 

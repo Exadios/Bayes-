@@ -52,7 +52,7 @@ void Kalman_SLAM::observe (unsigned feature, const Feature_observe& fom, const F
 {
 	// Assume features added sequenatialy
 	if (feature >= nM) {
-		filter_error ("Observe non existing feature");
+		error (BF::Logic_exception("Observe non existing feature"));
 		return;
 	}
 	// TODO Implement nonlinear form
@@ -69,7 +69,7 @@ void Kalman_SLAM::observe_new (unsigned feature, const Feature_observe_inverse& 
 // fom: must have a the special from required for SLAM::obeserve_new
 {
 	if (nL+feature >= full.x.size()) {
-		filter_error ("Observe_new no feature space");
+		error (BF::Logic_exception("Observe_new no feature space"));
 		return;
 	}
 	++nM;
@@ -89,7 +89,7 @@ void Kalman_SLAM::observe_new (unsigned feature, const Feature_observe_inverse& 
 void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T)
 {
 	if (nL+feature >= full.x.size()) {
-		filter_error ("Observe_new no feature space");
+		error (BF::Logic_exception("Observe_new no feature space"));
 		return;
 	}
 	++nM;

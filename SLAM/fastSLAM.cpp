@@ -100,7 +100,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	const AllFeature::iterator inmap = M.find(feature);
 	if (inmap == M.end())
 	{
-		filter_error ("Observe non existing feature");
+		error (BF::Logic_exception("Observe non existing feature"));
 		return;
 	}
 								// Existing feature
@@ -110,7 +110,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 
 	Float Ht = fom.Hx(0,nL);
 	if (Ht == 0.)
-		filter_error("observe Hx feature component zero");
+		error (BF::Numeric_exception("observe Hx feature component zero"));
 
 	FM::Vec x2(nL+1);					// Augmented state (particle + feature mean)
 
@@ -145,7 +145,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 								// EKF for conditional feature observation - specialised for 1D and zero state uncertianty
 		Float Sf = m1.X*sqr(Ht) + fom.Zv[0];	// Innovation variance
 		if (Sf <= 0.)
-			filter_error("Condition feature estimate not PD");
+			error (BF::Numeric_exception("Conditional feature estimate not PD"));
 		Float Wf = m1.X*Ht / Sf;
 		
 		m1.x += Wf*(z[0] - zp[0]);
@@ -205,7 +205,7 @@ void Fast_SLAM::forget( unsigned feature, bool must_exist )
 {
 	AllFeature::size_type n = M.erase(feature);
 	if (n==0 && must_exist)
-		filter_error( "Forget non existing feature" );
+		error (BF::Logic_exception("Forget non existing feature" ));
 }
 
 unsigned Fast_SLAM::feature_unique_samples( unsigned feature )
@@ -216,7 +216,7 @@ unsigned Fast_SLAM::feature_unique_samples( unsigned feature )
 	const AllFeature::iterator inmap = M.find(feature);
 	if (inmap == M.end())
 	{
-		filter_error ("feature_unique_samples non existing feature");
+		error (BF::Logic_exception("feature_unique_samples non existing feature"));
 		return 0;
 	}
 								// Existing feature
@@ -294,7 +294,7 @@ unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_state_filter& kstat )
 
 								// Get Location statistics
 	if (nL > kstat.x.size())
-		filter_error ("kstat to small to hold filter locatition statistics");
+		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
 	L.update_statistics();
 	kstat.x(0,nL) = L.x;
 	kstat.X.sub_matrix(0,nL, 0,nL) = L.X;

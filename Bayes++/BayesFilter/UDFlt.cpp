@@ -133,7 +133,7 @@ UD_scheme::Float
 	Float e;
 					// Check preallocated space for q size
 	if (Nq > q_max)
-		filter_error("Predict model q larger than preallocated space");
+		error (Logic_exception("Predict model q larger than preallocated space"));
 
 	if (n > 0)		// Simplify reverse loop termination
 	{
@@ -298,7 +298,7 @@ Bayes_base::Float
 		h1 = row(h.Hx,o);
 								// Check Z precondition
 		if (h.Zv[o] < 0.)
-			filter_error("Zv not PSD in observe");
+			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h1, h.Zv[o]);
 		rclimit.check_PD(rcond, "X not PD in observe");
@@ -317,7 +317,7 @@ Bayes_base::Float
  UD_scheme::observe (Linrz_correlated_observe_model& /*h*/, const FM::Vec& /*z*/)
 /* No solution for Correlated noise and Linearised model */
 {
-	filter_error ("observe no Linrz_correlated_observe_model solution");
+	error (Logic_exception("observe no Linrz_correlated_observe_model solution"));
 	return 0.;	// never reached
 }
 
@@ -455,7 +455,7 @@ Bayes_base::Float
 		h.normalise(zp, z);
 								// Check Z precondition
 		if (h.Zv[o] < 0.)
-			filter_error("Zv not PSD in observe");
+			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h.Hx_o, h.Zv[o]);
 		rclimit.check_PD(rcond, "X not PD in observe");
