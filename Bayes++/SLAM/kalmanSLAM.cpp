@@ -51,8 +51,8 @@ void Kalman_SLAM::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 		// generate full filter
 	full = fgenerator.generate(nL);
 		// initialise location states
-	full->x.sub_range(0,nL) = x;
-	full->X.sub_matrix(0,nL,0,nL) = X;
+	noalias (full->x.sub_range(0,nL)) = x;
+	noalias (full->X.sub_matrix(0,nL,0,nL)) = X;
 	full->init();
 }
 
