@@ -17,6 +17,6 @@ alias lapack : "../../CLAPACK3/clapack-7.a" : <toolset>msvc ;
 exe rtheta :
      rtheta.cpp  tests.cpp
      ../BayesFilter//BayesFilter lapack
-     : <toolset>intel-linux:<cxxflags>TEST
+     : 
      : debug
 ;
