@@ -16,9 +16,9 @@
  * not intended to be stable. Nor is this a general purpose adapator for uBLAS
  *
  * Note on row_major matrices
- *  The implementation uses row major extensively. The computation of symetric products P*P' is 
- *  most efficient with row operations. These products are used extensively so the default
- *  is to use row_major matrices
+ *  The computation of symetric products P*P' is can be efficiently computed with row operations. 
+ *  These products are used extensively in covariance calculation. Therefore we use
+ *  row_major as the default matrix representation.
  */
 
 /* Filter Matrix Namespace */
@@ -445,13 +445,15 @@ struct prod_expression_result
 
  
 template<class E> inline
-typename prod_expression_result<E,const E>::E1E2T_type
+typename prod_expression_result<E,E>::E1E2T_type
  prod_SPD (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X*X'
  */
 {
-	return prod( X, trans(X) );
+	// ISSUE: uBLAS post Boost 1_31_0 introduces a trans(const matrix_expression<E>& e) which propogates the const expression type
+	// Bypass this to avoid having to detect the Boost version
+	return prod( X, trans(const_cast<ublas::matrix_expression<E>&>(X) ));
 }
 
 template<class E1, class E2> inline
@@ -479,13 +481,14 @@ SymMatrix prod_SPD (const RowMatrix& X, const Vec& s)
 
 
 template<class E> inline
-typename prod_expression_result<const E,E>::E1TE2_type
+typename prod_expression_result<E,E>::E1TE2_type
  prod_SPDT (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X'*X
  */
 {
-	return prod( trans(X), X );
+	// ISSUE: See prod_SPD
+	return prod( trans(const_cast<ublas::matrix_expression<E>&>(X) ), X);
 }
 
 template<class E1, class E2> inline
