@@ -10,9 +10,8 @@
 /*
  * Iterated Covariance Filter.
  */
-#include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "itrFlt.hpp"
+#include "matSup.hpp"
 #include "models.hpp"
 
 /* Filter namespace */
@@ -137,6 +136,7 @@ Bayes_base::Float
 	RowMatrix HxXtemp(h.Hx.size1(),X.size2());
 	RowMatrix temp1(x_size,x_size), temp2(x_size,z_size);
 	SymMatrix temp3(x_size,x_size);
+	Vec tempz(z_size);
 
 	do {
 							// Observation model, linearize about new x
@@ -160,7 +160,8 @@ Bayes_base::Float
 							// New state iteration
 		noalias(temp2) = prod(X,HxT);
 		noalias(temp1) = prod(X,XpredI);
-		x += prod(temp2,prod<Vec>(ZI,s)) - prod(temp1, (x - xpred));
+		noalias(tempz) = prod(ZI,s);
+		x += prod(temp2, tempz) - prod(temp1, (x - xpred));
 	} while (!term.term_or_relinearize(*this));
 	return rcond;
 }

@@ -10,9 +10,8 @@
 /*
  * Unscented Filter.
  */
-#include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "unsFlt.hpp"
+#include "matSup.hpp"
 #include "models.hpp"
 #include <cmath>
 
@@ -66,8 +65,8 @@ void Unscented_scheme::unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM:
 
 	for (size_t c = 0; c < x_size; ++c) {
 		UTriMatrix::Column SigmaCol = column(Sigma,c);
-		column(XX,c+1).assign (x  + SigmaCol);
-		column(XX,x_size+c+1).assign (x - SigmaCol);
+		noalias(column(XX,c+1)) = x  + SigmaCol;
+		noalias(column(XX,x_size+c+1)) = x - SigmaCol;
 	}
 }
 
@@ -233,7 +232,7 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 						// Predict points of XX using supplied predict model
 							// State covariance
 	for (size_t i = 0; i < XX_size; ++i) {
-		column(fXX,i).assign (f.f( column(XX,i) ));
+		noalias(column(fXX,i)) = f.f( column(XX,i) );
 	}
 
 	init_XX ();

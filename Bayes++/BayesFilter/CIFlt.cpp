@@ -11,9 +11,8 @@
  * Covariance Intersection Filter.
  * TODO: Implement useful Omega based on iterative optimization algorithm from the authors of reference [1]
  */
-#include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "CIFlt.hpp"
+#include "matSup.hpp"
 #include "models.hpp"
 
 /* Filter namespace */

@@ -478,7 +478,7 @@ RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
  *    see in-place UdUfactor
  */
 {
-	UD.assign (M);
+	noalias(UD) = M;
 	RowMatrix::value_type rcond = UdUfactor (UD, M.size1());
 
 	Lzero (UD);	// Zero lower triangle ignored by UdUfactor
@@ -497,7 +497,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  *    see in-place LdLfactor
  */
 {
-	LD.assign (M);
+	noalias(LD) = M;
 	LTriMatrix::value_type rcond = LdLfactor (LD, M.size1());
 
 	return rcond;
@@ -515,7 +515,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& UC, const SymMatrix& M)
  *    see in-place UCfactor
  */
 {
-	UC.assign (UpperTri(M));
+	noalias(UC) = UpperTri(M);
 	UTriMatrix::value_type rcond = UCfactor (UC, UC.size1());
 
 	return rcond;
@@ -808,7 +808,7 @@ void UdUrecompose (SymMatrix& X, const RowMatrix& M)
 		// assign elements of common top left block of R into L
 	size_t top = std::min(X_matrix.size1(), M.size1());
 	size_t left = std::min(X_matrix.size2(), M.size2());
-	X_matrix.sub_matrix(0,top, 0,left).assign( M.sub_matrix(0,top, 0,left) );
+	noalias(X_matrix.sub_matrix(0,top, 0,left)) = M.sub_matrix(0,top, 0,left);
 
 	UdUrecompose (X_matrix);
 }

@@ -12,10 +12,9 @@
  *
  * Bootstap filter (Sequential Importance Resampleing).
  */
-#include "bayesFlt.hpp"
-#include "models.hpp"
-#include "matSup.hpp"
 #include "SIRFlt.hpp"
+#include "matSup.hpp"
+#include "models.hpp"
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -66,22 +65,21 @@ Standard_resampler::Float
 		}
 		wcum = *wi = wcum + *wi;
 	}
-	if (wmin < 0)		// Bad weights
+	if (wmin < 0)		// bad weights
 		error (Numeric_exception("negative weight"));
-	if (wcum <= 0)		// Bad cumulative weights (previous check should actually prevent -ve
+	if (wcum <= 0)		// bad cumulative weights (previous check should actually prevent -ve
 		error (Numeric_exception("zero cumulative weight sum"));
 						// Any numerical failure should cascade into cummulative sum
-	if (wcum != wcum)	// Inequality due to NaN
+	if (wcum != wcum)		// inequality due to NaN
 		error (Numeric_exception("NaN cumulative weight sum"));
 
 						// Sorted uniform random distribution [0..1) for each resample
 	DenseVec ur(w.size());
 	r.uniform_01(ur);
-	std::sort (ur.begin(), ur.end());
-	assert(ur[0] >= 0 && ur[ur.size()-1] < 1);		// Very bad if random is incorrect
+	std::sort  (ur.begin(), ur.end());
+	assert (ur[0] >= 0 && ur[ur.size()-1] < 1);	// very bad if random is incorrect
 						// Scale ur to cummulative sum
 	ur *= wcum;
-
 						// Resamples based on cumulative weights from sorted resample random values
 	Resamples_t::iterator pri = presamples.begin();
 	wi = w.begin();
@@ -90,7 +88,7 @@ Standard_resampler::Float
 
 	while (wi != wi_end)
 	{
-		size_t Pres = 0;			// assume P not resampled until find out otherwise
+		size_t Pres = 0;		// assume P not resampled until find out otherwise
 		if (ui != ui_end && *ui < *wi)
 		{
 			++unique;
@@ -103,8 +101,9 @@ Standard_resampler::Float
 		++wi;
 		*pri++ = Pres;
 	}
-	assert(pri==presamples.end());
-	if (ui != ui_end)				// Resample failed due no non numeric weights
+	assert (pri==presamples.end());	// must traverse all of P
+	
+	if (ui != ui_end)				// resample failed due no non numeric weights
 		error (Numeric_exception("weights are not numeric and cannot be resampled"));
 	
 	uresamples = unique;
@@ -140,9 +139,9 @@ Systematic_resampler::Float
 		}
 		wcum = *wi = wcum + *wi;
 	}
-	if (wmin < 0)		// Bad weights
+	if (wmin < 0)		// bad weights
 		error (Numeric_exception("negative weight"));
-	if (wcum <= 0)		// Bad cumulative weights (previous check should actually prevent -ve
+	if (wcum <= 0)		// bad cumulative weights (previous check should actually prevent -ve
 		error (Numeric_exception("total likelihood zero"));
 						// Any numerical failure should cascade into cummulative sum
 	if (wcum != wcum)
@@ -151,15 +150,15 @@ Systematic_resampler::Float
 						// Stratified step
 	Float wstep = wcum / Float(nParticles);
 						
-	DenseVec ur(1);			// Single uniform for initialisation
+	DenseVec ur(1);				// single uniform for initialisation
 	r.uniform_01(ur);
-	assert(ur[0] >= 0 && ur[0] < 1);		// Very bad if random is incorrect
+	assert (ur[0] >= 0 && ur[0] < 1);		// bery bad if random is incorrect
 
 						// Resamples based on cumulative weights
 	Importance_resampler::Resamples_t::iterator pri = presamples.begin();
 	wi = w.begin();
 	size_t unique = 0;
-	Float s = ur[0] * wstep;	// Random initialisation
+	Float s = ur[0] * wstep;		// random initialisation
 
 	while (wi != wi_end)
 	{
@@ -167,7 +166,7 @@ Systematic_resampler::Float
 		if (s < *wi)
 		{
 			++unique;
-			do						// count resamples
+			do							// count resamples
 			{
 				++Pres;
 				s += wstep;
@@ -176,7 +175,7 @@ Systematic_resampler::Float
 		++wi;
 		*pri++ = Pres;
 	}
-	assert(pri==presamples.end());
+	assert (pri==presamples.end());	// must traverse all of P
 
 	uresamples = unique;
 	return wmin / wcum;
@@ -276,7 +275,7 @@ void
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Si(S,i);
-		Si .assign (f.fw(Si));
+		noalias(Si) = f.fw(Si);
 	}
 	stochastic_samples = S.size2();
 }
@@ -334,10 +333,10 @@ void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::R
 		--si;
 		if (*pri > 0) {
 			--livei;
-			FM::column(P,livei) .assign (FM::column(P,si));
+			noalias(FM::column(P,livei)) = FM::column(P,si);
 		}
 	}
-	assert(si == 0);
+	assert (si == 0);
 							// Replicate live samples
 	si = 0;
 	Importance_resampler::Resamples_t::const_iterator pi, pi_end = presamples.end();
@@ -345,13 +344,13 @@ void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::R
 		size_t res = *pi;
 		if (res > 0) {
 			do  {
-				FM::column(P,si) .assign (FM::column(P,livei));
+				noalias(FM::column(P,si)) = FM::column(P,livei);
 				++si; --res;
 			} while (res > 0);
 			++livei;
 		}
 	}
-	assert(si == P.size2()); assert(livei == P.size2());
+	assert (si == P.size2()); assert (livei == P.size2());
 }
 
 
@@ -435,7 +434,7 @@ void SIR_kalman_scheme::init ()
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Si(S,i);
-		Si.assign (x);
+		noalias(Si) = x;
 	}
 						// Decorrelate init state noise
 	Matrix UD(x_size,x_size);

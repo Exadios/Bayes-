@@ -190,10 +190,10 @@ Bayes_base::Float
 	FM::identity (A);	// Prefill with identity for topleft and zero's in off diagonals
 
 	Matrix RFxI (prod(R, invFx));
-	A.sub_matrix(q_size,q_size+x_size, 0,q_size) .assign (prod(RFxI, Gqr) );
-	A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) .assign (RFxI);
+	noalias(A.sub_matrix(q_size,q_size+x_size, 0,q_size)) = prod(RFxI, Gqr);
+	noalias(A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size)) =RFxI;
 	if (linear_r)
-		A.sub_column(q_size,q_size+x_size, q_size+x_size) .assign (r);
+		noalias(A.sub_column(q_size,q_size+x_size, q_size+x_size)) = r;
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(q_size+x_size);
@@ -262,10 +262,10 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 	assert (!singular); (void)singular;
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
-	A.sub_matrix(0,x_size, 0,x_size) .assign (R);
-	A.sub_matrix(x_size,x_size+z_size, 0,x_size) .assign (prod(Zir, h.Hx));
-	A.sub_column(0,x_size, x_size) .assign (r);
-	A.sub_column(x_size,x_size+z_size, x_size) .assign (prod(Zir, s+prod(h.Hx,x)));
+	noalias(A.sub_matrix(0,x_size, 0,x_size)) = R;
+	noalias(A.sub_matrix(x_size,x_size+z_size, 0,x_size)) = prod(Zir, h.Hx);
+	noalias(A.sub_column(0,x_size, x_size)) = r;
+	noalias(A.sub_column(x_size,x_size+z_size, x_size)) = prod(Zir, s+prod(h.Hx,x));
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(x_size+1);
@@ -307,10 +307,10 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 	}
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
-	A.sub_matrix(0,x_size, 0,x_size) .assign (R);
-	A.sub_matrix(x_size,x_size+z_size, 0,x_size) .assign (prod(Zir, h.Hx));
-	A.sub_column(0,x_size, x_size) .assign (r);
-	A.sub_column(x_size,x_size+z_size, x_size) .assign (prod(Zir, s+prod(h.Hx,x)));
+	noalias(A.sub_matrix(0,x_size, 0,x_size)) = R;
+	noalias(A.sub_matrix(x_size,x_size+z_size, 0,x_size)) = prod(Zir, h.Hx);
+	noalias(A.sub_column(0,x_size, x_size)) = r;
+	noalias(A.sub_column(x_size,x_size+z_size, x_size)) = prod(Zir, s+prod(h.Hx,x));
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(x_size+1);

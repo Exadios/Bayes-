@@ -14,9 +14,8 @@
  * ISSUES:
  *  observe functions: returned rcond is the minimum of each sequential update, an overall conditioning would be better
  */
-#include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "UDFlt.hpp"
+#include "matSup.hpp"
 #include <boost/limits.hpp>
 
 /* Filter namespace */
@@ -72,7 +71,7 @@ void
 {
 					// Factorise X into left partition of UD
 	size_t x_size = UD.size1();
-	UD.sub_matrix(0,x_size, 0,x_size).assign( X );
+	FM::noalias(UD.sub_matrix(0,x_size, 0,x_size)) = X;
 	Float rcond = FM::UdUfactor (UD, x_size);
 	rclimit.check_PSD(rcond, "Initial X not PSD");
 }

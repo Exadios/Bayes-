@@ -10,9 +10,8 @@
 /*
  * Covariance Filter.
  */
-#include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "covFlt.hpp"
+#include "matSup.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter

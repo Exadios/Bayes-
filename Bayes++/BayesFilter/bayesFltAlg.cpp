@@ -274,7 +274,7 @@ void Sample_filter::predict (Functional_predict_model& f)
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Si(S,i);
-		Si .assign (f.fx(Si));
+		FM::noalias(Si) = f.fx(Si);
 	}
 }
 

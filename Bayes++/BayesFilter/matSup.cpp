@@ -12,7 +12,7 @@
  * Relies on Bayesian_filter::Bayes_filter for exception
  * thrown by internal matrix checks
  */
-#include "bayesFlt.hpp"		// Excecptions Required
+#include "bayesFlt.hpp"		// Exceptions required
 #include "matSup.hpp"
 #include <cassert>
 #ifndef NDEBUG

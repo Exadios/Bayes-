@@ -24,7 +24,7 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 // Zero a matrix_rangec
 {	// Note A cannot be a reference
 	typedef typename Base::value_type Base_value_type;
-	A .assign (FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type()) );
+	noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type());
 }
 
 Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& location_filter, Full_filter& filter_generator ) :
@@ -84,8 +84,8 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	{
 		nM = feature+1;	
 		Full_filter::Filter_type* nf = fgenerator.generate(nL+nM);
-		nf->x.sub_range(0,full->x.size()) .assign (full->x);
-		nf->X.sub_matrix(0,full->x.size(),0,full->x.size()) .assign (full->X);
+		noalias(nf->x.sub_range(0,full->x.size())) = full->x;
+		noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
 		nf->x[nL+feature] = t[0];
 		nf->X(nL+feature,nL+feature) = fom.Zv[0];
@@ -113,8 +113,8 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec
 	{
 		nM = feature+1;
 		Full_filter::Filter_type* nf = fgenerator.generate(nL+nM);
-		nf->x.sub_range(0,full->x.size()) .assign (full->x);
-		nf->X.sub_matrix(0,full->x.size(),0,full->x.size()) .assign (full->X);
+		noalias(nf->x.sub_range(0,full->x.size())) = full->x;
+		noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
 		nf->x[nL+feature] = t[0];
 		nf->X(nL+feature,nL+feature) = T[0];

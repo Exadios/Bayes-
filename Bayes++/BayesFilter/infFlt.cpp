@@ -10,9 +10,8 @@
 /*
  * Information Filter.
  */
-#include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "infFlt.hpp"
+#include "matSup.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter

@@ -147,12 +147,12 @@ void test_SPD()
 
 	// Try prod_SPD
 	RowMatrix RStemp(R.size1(), S.size2());
-	P.assign( prod_SPD(R,S, RStemp) );
+	noalias(P) = prod_SPD(R,S, RStemp);
 	std::cout << P << std::endl;
 
 	// Try prod_SPD
 	ColMatrix RT(1,2);
-	P.assign (prod_SPDT (RT, Stemp));
+	noalias(P) = prod_SPDT (RT, Stemp);
 }
 
 void test_SPD_all()
@@ -298,8 +298,8 @@ void test_sym_proxy()
 	ublas::vector<double> v(2);
 	S(0,0) = 1; S(1,0) = 2; S(1,1) = 3;
 	v(0) = 5; v(1) = 6;
-	ublas::row(S, 0).assign(v);		// OK top row is all in upper
-	ublas::row(S, 1).assign(v);		// ERROR only one element in upper for packed proxy assign
+	noalias(ublas::row(S, 0)) = v;		// OK top row is all in upper
+	noalias(ublas::row(S, 1)) = v;		// ERROR only one element in upper for packed proxy assign
 }
 
 void utinverse_test()
