@@ -12,7 +12,7 @@ exe rtheta :
      tests.cpp
      <lib>../BayesFilter/BayesFilter
     :
-     <include>$(BOOST_ROOT)
+     <include>$(BOOST)
      <include>$(BAYES++)
      <sysinclude>../../include
      <gcc><*><find-library>"lapack -lg2c"	# LAPACK required, usualy built with g77 for gcc tools

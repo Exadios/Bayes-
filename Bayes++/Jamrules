@@ -13,7 +13,6 @@ path-global "BAYES++" ;
 path-global "BOOST_ROOT" ;
 BOOST ?= $(BOOST_ROOT) ;
 
-
 # Target output in Project Root
 ALL_LOCATE_TARGET ?= target ;
 

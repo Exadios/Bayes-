@@ -10,7 +10,7 @@ exe quadcalib :
      "QuadCalib.cpp"
      <lib>../BayesFilter/BayesFilter
     :
-     <include>$(BOOST_ROOT)
+     <include>$(BOOST)
      <include>$(BAYES++)
     : release
 ;
