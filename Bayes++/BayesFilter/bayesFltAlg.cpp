@@ -293,9 +293,9 @@ namespace {
 		// Provide a ordering on columns
 		static bool less(const ColProxy& a, const ColProxy& b)
 		{
-			FM::ColMatrix::const_iterator1 sai = a.cm->find_first1(1, 0,a.col);
-			FM::ColMatrix::const_iterator1 sai_end = a.cm->find_last1(1, a.cm->size1(),a.col); 
-			FM::ColMatrix::const_iterator1 sbi = b.cm->find_first1(1,0, b.col);
+			FM::ColMatrix::const_iterator1 sai = a.cm->find1(1, 0,a.col);
+			FM::ColMatrix::const_iterator1 sai_end = a.cm->find1(1, a.cm->size1(),a.col); 
+			FM::ColMatrix::const_iterator1 sbi = b.cm->find1(1,0, b.col);
 			while (sai != sai_end)
 			{
 				if (*sai < *sbi)
