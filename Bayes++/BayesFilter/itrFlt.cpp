@@ -160,7 +160,7 @@ Bayes_base::Float
 							// New state iteration
 		noalias(temp2) = prod(X,HxT);
 		noalias(temp1) = prod(X,XpredI);
-		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));
+		x += prod(temp2,prod<Vec>(ZI,s)) - prod(temp1, (x - xpred));
 	} while (!term.term_or_relinearize(*this));
 	return rcond;
 }
