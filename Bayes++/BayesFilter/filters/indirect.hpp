@@ -33,7 +33,7 @@ public:
 	Indirect_state_filter (Error_base& error_filter)
 		: State_filter(error_filter.x.size()), direct(error_filter)
 	{	// Construct and zero initial error filter
-		FM::set(direct.x, 0.);
+		direct.x.clear();
 	}
 
 	template <typename P_model>
@@ -54,7 +54,7 @@ public:
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
-		FM::set (direct.x, 0.);
+		direct.x.clear();
 	}
 
 	template <typename O_model>
@@ -64,7 +64,7 @@ public:
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
-		FM::set (direct.x, 0.);
+		direct.x.clear();
 	}
 
 	void update ()
@@ -96,7 +96,7 @@ public:
 	{
 		direct.x.clear();				// Zero initial error
 		direct.X = X;
-		direct.init();		
+		direct.init();
 	}
 
 	template <typename P_model>
@@ -129,7 +129,7 @@ public:
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
-		FM::set (direct.x, 0.);
+		direct.clear();
 	}
 
 	void update ()

@@ -12,4 +12,4 @@
  * Replace this header to replace matrix support functions
  */
 
-#include "uBLASmatrix.h"
+#include "uBLASmatrix.hpp"
