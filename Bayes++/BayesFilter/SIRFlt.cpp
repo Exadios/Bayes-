@@ -490,7 +490,7 @@ void SIR_kalman_scheme::update_statistics ()
  *		Pre : S (s_size >=1 enforced by state_filter base)
  *		Post: x,X,S	(X may be non PSD)
  *
- * Sample Covariance := (1/(s_size-1)* Sum_i [transpose(S[i])*S[i] - transpose(mean)*mean]
+ * Sample Covariance := (1/(s_size-1)* Sum_i [transpose(S[i])*S[i]] - transpose(mean)*mean
  *  The definition is the unbiased estimate of covariance given samples with unknown (estimated) mean
  *  Implies X is indeterminate when size == 1
  * Semi-definate covariance X due to colapse of S:
