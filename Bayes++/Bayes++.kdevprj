@@ -22,8 +22,14 @@ install=false
 install_location=
 type=HEADER
 
+[BayesFilter/Jamfile]
+dist=true
+install=false
+install_location=
+type=DATA
+
 [BayesFilter/Makefile.am]
-files=BayesFilter/allFilters.hpp,BayesFilter/bayesFlt.cpp,BayesFilter/bayesFlt.hpp,BayesFilter/bayesFltAlg.cpp,BayesFilter/CIFlt.cpp,BayesFilter/CIFlt.hpp,BayesFilter/compatibility.hpp,BayesFilter/covFlt.cpp,BayesFilter/covFlt.hpp,BayesFilter/infFlt.cpp,BayesFilter/infFlt.hpp,BayesFilter/infRtFlt.cpp,BayesFilter/infRtFlt.hpp,BayesFilter/itrFlt.cpp,BayesFilter/itrFlt.hpp,BayesFilter/matSup.cpp,BayesFilter/matSup.hpp,BayesFilter/unsFlt.hpp,BayesFilter/unsFlt.cpp,BayesFilter/uLAPACK.hpp,BayesFilter/UdU.cpp,BayesFilter/uBLASmatrix.hpp,BayesFilter/UDFlt.cpp,BayesFilter/SIRFlt.hpp,BayesFilter/SIRFlt.cpp,BayesFilter/schemeFlt.hpp,BayesFilter/matSupSub.hpp,BayesFilter/models.hpp,BayesFilter/UDFlt.hpp
+files=BayesFilter/allFilters.hpp,BayesFilter/bayesFlt.cpp,BayesFilter/bayesFlt.hpp,BayesFilter/bayesFltAlg.cpp,BayesFilter/CIFlt.cpp,BayesFilter/CIFlt.hpp,BayesFilter/compatibility.hpp,BayesFilter/covFlt.cpp,BayesFilter/covFlt.hpp,BayesFilter/infFlt.cpp,BayesFilter/infFlt.hpp,BayesFilter/infRtFlt.cpp,BayesFilter/infRtFlt.hpp,BayesFilter/itrFlt.cpp,BayesFilter/itrFlt.hpp,BayesFilter/matSup.cpp,BayesFilter/matSup.hpp,BayesFilter/unsFlt.hpp,BayesFilter/unsFlt.cpp,BayesFilter/uLAPACK.hpp,BayesFilter/UdU.cpp,BayesFilter/uBLASmatrix.hpp,BayesFilter/UDFlt.cpp,BayesFilter/SIRFlt.hpp,BayesFilter/SIRFlt.cpp,BayesFilter/schemeFlt.hpp,BayesFilter/matSupSub.hpp,BayesFilter/models.hpp,BayesFilter/UDFlt.hpp,BayesFilter/Jamfile
 sub_dirs=filters
 type=static_library
 
@@ -213,7 +219,7 @@ cflags=
 cppflags=
 cxxflags=\s-O0 -g3 -Wall
 ldadd=
-ldflags=\s                                        \s
+ldflags=\s                                                      \s
 libtool_dir=
 path_to_bin_program=target/rtheta/bin/rtheta/gcc/debug/runtime-link-dynamic
 
@@ -224,8 +230,8 @@ configure_args=\s--build=i386-linux --host=i386-linux --target=i386-linux\s
 dir_where_make_will_be_called=
 email=
 kdevprj_version=1.3
-lfv_open_groups=Headers,Others,Sources
-make_options=\s-j1 ARGS='-sBUILD=debug -sALL_LOCATE_TARGET=target'\s
+lfv_open_groups=Headers,Sources
+make_options=\s-j1
 makefiles=Makefile.am,kmake/Makefile.am,kmake/docs/Makefile.am,kmake/docs/en/Makefile.am,Simple/Makefile.am,PV/Makefile.am,QuadCalib/Makefile.am,BayesFilter/Makefile.am,BayesFilter/filters/Makefile.am,rtheta/Makefile.am
 modifyMakefiles=false
 project_name=Bayes++
@@ -235,6 +241,18 @@ sub_dir=kmake/
 version=1.0
 version_control=CVS
 workspace=1
+
+[Jamfile]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[Jamrules]
+dist=true
+install=false
+install_location=
+type=DATA
 
 [LFV Groups]
 Headers=*.h,*.hh,*.hxx,*.hpp,*.H
@@ -249,12 +267,18 @@ install_location=
 type=DATA
 
 [Makefile.am]
-files=Bayes++.kdevprj,BayesFilter TODO.txt,Makefile
+files=Bayes++.kdevprj,BayesFilter TODO.txt,Makefile,Jamfile,Jamrules
 sub_dirs=kmake,Simple,PV,QuadCalib,BayesFilter,rtheta
 type=normal
 
+[PV/Jamfile]
+dist=true
+install=false
+install_location=
+type=DATA
+
 [PV/Makefile.am]
-files=PV/PV.cpp
+files=PV/PV.cpp,PV/Jamfile
 sharedlib_LDFLAGS=-version-info 0:0:0
 sharedlib_rootname=PV
 sub_dirs=
@@ -266,8 +290,14 @@ install=false
 install_location=
 type=SOURCE
 
+[QuadCalib/Jamfile]
+dist=true
+install=false
+install_location=
+type=DATA
+
 [QuadCalib/Makefile.am]
-files=QuadCalib/QuadCalib.cpp
+files=QuadCalib/QuadCalib.cpp,QuadCalib/Jamfile
 sharedlib_LDFLAGS=-version-info 0:0:0
 sharedlib_rootname=QuadCalib
 sub_dirs=
@@ -279,8 +309,14 @@ install=false
 install_location=
 type=SOURCE
 
+[Simple/Jamfile]
+dist=true
+install=false
+install_location=
+type=DATA
+
 [Simple/Makefile.am]
-files=Simple/simpleExample.cpp
+files=Simple/simpleExample.cpp,Simple/Jamfile
 sharedlib_LDFLAGS=-version-info 0:0:0
 sharedlib_rootname=Simple
 sub_dirs=
@@ -305,6 +341,12 @@ type=normal
 sub_dirs=
 type=normal
 
+[rtheta/Jamfile]
+dist=true
+install=false
+install_location=
+type=DATA
+
 [rtheta/Makefile]
 dist=true
 install=false
@@ -312,7 +354,7 @@ install_location=
 type=DATA
 
 [rtheta/Makefile.am]
-files=rtheta/rtheta.cpp,rtheta/Makefile
+files=rtheta/rtheta.cpp,rtheta/Makefile,rtheta/Jamfile
 sharedlib_LDFLAGS=-version-info 0:0:0
 sharedlib_rootname=rtheta
 sub_dirs=

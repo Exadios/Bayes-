@@ -47,7 +47,7 @@ public:
 	 */
 
 	virtual void update()
-	// Default update, simple resample
+	// Default update, standard resample
 	{
 		(void)update_resample (Bayesian_filter::Standard_resampler());
 	}
@@ -87,8 +87,8 @@ public:
 	// Construct Fast_SLAM filter using referenced filter for resampling
 	
 	unsigned statistics( BF::Kalman_filter& kstats);
-	// Compute sample mean and covariance statistics of filter. Return: Number of features in map
-	// Be aware to use update_resample first so L updated
+	// Compute statistics of particles. Return: Number of features in map
+	//  Sample mean and covariance of particle.
 
 protected:
 	BF::SIR_kalman_filter& L;			// Reference to filter parameter in constructor

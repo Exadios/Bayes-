@@ -281,9 +281,9 @@ unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_filter& kstat )
  * Return: Number of features in map
  * Precond:
  *   nparticles >=1 (enforced by Sample_filter contruction)
- *   kstat
+ *   kstat must have space for Location statistics
  * Postcond:
- *  kstat complete sample statisics of filter. Unused elements are not modified
+ *  kstat complete sample statisics of filter
  */
 {	
 	const unsigned nL = L.S.size1();	// No of location states
@@ -319,7 +319,7 @@ unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_filter& kstat )
 		}
 		var = var / Float(nparticles-1) - sqr(mean);
 
-		kstat.x[fs] = mean;					// Copy into Kalman statistics
+		kstat.x[fs] = mean;				// Copy into Kalman statistics
 		kstat.X(fs,fs) = var;
 
 										// Location,feature covariance
@@ -332,7 +332,7 @@ unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_filter& kstat )
 				++spi;
 			}
 			covar = covar / Float(nparticles) - mean*kstat.x[si];
-			kstat.X(si,fs) = kstat.X(fs,si) = covar;
+			kstat.X(si,fs) = covar;
 		}
 
 										// Feature,feature covariance. Iterate over previous features with means already computed
@@ -346,7 +346,7 @@ unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_filter& kstat )
 				++fpj;
 			}
 			covar = covar / Float(nparticles) - mean*kstat.x[fsj];
-			kstat.X(fs,fsj) = kstat.X(fsj,fs) = covar;
+			kstat.X(fs,fsj) = covar;
 		}
 	}//all feature
 
