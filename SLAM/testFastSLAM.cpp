@@ -72,7 +72,10 @@ private:
  */
 struct SLAMDemo
 {
-	SLAMDemo();
+	void OneDExperiment ();
+	void InformationLooseExperiment ();
+	
+	Boost_random goodRandom;
 
 	// Relative Observation with  Noise model
 	struct Simple_observe : BF::Linear_uncorrelated_observe_model
@@ -113,16 +116,13 @@ struct SLAMDemo
 	}
 };
 
-SLAMDemo::SLAMDemo()
-{
-	// Global setup for test output
-	std::cout.flags(std::ios::fixed); std::cout.precision(4);
 
+void SLAMDemo::OneDExperiment()
+// Experiment with a one dimensional problem
+{
 	// State size
 	const unsigned nL = 1;	// Location
 	const unsigned nM = 2;	// Map
-
-	Boost_random goodRandom;
 
 	// Construct simple Prediction models
 	BF::General_LiAd_predict_model location_predict(nL,1, goodRandom);
@@ -221,50 +221,125 @@ SLAMDemo::SLAMDemo()
 	kalm.update(); display("Forget Kalm", full_filter);
 	fast.forget(0);
 	fast.update(); fast.statistics(stat); display("Forget Fast", stat);
+}
 
 
-#ifdef REMOVED_ALTERNATIVE_EXPERIMENT
-	// Experiment with information loose due to resampling
+void SLAMDemo::InformationLooseExperiment()
+// Experiment with information loose due to resampling
+{
+	// State size
+	const unsigned nL = 1;	// Location
+	const unsigned nM = 2;	// Map
+
+	// Construct simple Prediction models
+	BF::General_LiAd_predict_model location_predict(nL,1, goodRandom);
+	BF::General_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
+	// Stationary Prediction model (Identity)
+	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
+				// Constant Noise model
+	location_predict.q[0] = 1000.;	all_predict.q[0] = 1000.;
+	location_predict.G.clear(); all_predict.G.clear();
+	location_predict.G(0,0) = 1.; all_predict.G(0,0) = 1.;
+
+	// Relative Observation with  Noise model
+	Simple_observe observe0(5.), observe1(3.);
+	Simple_observe_inverse observe_new0(5.), observe_new1(3.);
+
+	// Setup the initial state and covariance
+	// Location with no uncertainty
+	FM::Vec x_init(nL); FM::SymMatrix X_init(nL, nL);
+	x_init[0] = 20.;
+	X_init(0,0) = 0.;
+
+	// Truth model : location plus one map feature
+	FM::Vec true0(nL+1), true1(nL+1);
+	true0(0,nL) = x_init; true0[nL] = 50.;
+	true1(0,nL) = x_init; true1[nL] = 70.;
+	FM::Vec z(1);
+
+	// Kalman_SLAM filter
+	BF::Unscented_scheme full_filter(nL+nM);
+	full_filter.x.clear(); full_filter.X.clear();
+	full_filter.x[0] = x_init[0];
+	full_filter.X(0,0) = X_init(0,0);
+	full_filter.init();
+	Kalman_SLAM kalm(full_filter, nL);
+
+	// Fast_SLAM filter
+	unsigned nParticles = 1000;
+	BF::SIR_kalman_scheme fast_location(nL, nParticles, goodRandom);
+	fast_location.init_kalman(x_init, X_init);
+	Fast_SLAM_Kstatistics fast(fast_location);
+
+	Kalman_statistics stat(nL+nM);
+
+	// Initial feature states
+	z = observe0.h(true0);		// Observe a relative position between location and map landmark
+	z[0] += 0.5;			
+	kalm.observe_new (0, observe_new0, z);
+	fast.observe_new (0, observe_new0, z);
+
+	z = observe1.h(true1);
+	z[0] += -1.0;		
+	kalm.observe_new (1, observe_new1, z);
+	fast.observe_new (1, observe_new1, z);
+
 	unsigned it = 0;
 	for (;;) {
 		++it;
-		std::cerr << it << std::endl;
-		for (unsigned t = 0; t<100; ++t)
+		std::cout << it << std::endl;
+		
+		// Groups of observations without resampling
 		{
 			// Predict the filter forward
-			kalm.predict (predict);
-			fast.predict (predict);
+			full_filter.predict (all_predict);
+			fast_location.predict (location_predict);
 
-			// Observation feature 0
+			// Observation feature 0 with bias
 			z = observe0.h(true0);		// Observe a relative position between location and map landmark
 			z[0] += 0.5;
 			kalm.observe( 0, observe0, z );
 			fast.observe( 0, observe0, z );
 
 			// Predict the filter forward
-			kalm.predict (predict);
-			fast.predict (predict);
+			full_filter.predict (all_predict);
+			fast_location.predict (location_predict);
 
-			// Observation feature 1
+			// Observation feature 1 with bias
 			z = observe1.h(true1);		// Observe a relative position between location and map landmark
 			z[0] += -1.0;		
 			kalm.observe( 1, observe1, z );
 			fast.observe( 1, observe1, z );
-
-			if (it>=27) {
-				kalm.update(); display("Kalm", full_filter);
-				fast.update(); fast.statistics(stat); display("Fast", stat); std::cout << fast_location.stochastic_samples <<','<< fast_location.unique_samples()
-					<<' '<< fast.feature_unique_samples(0) <<','<< fast.feature_unique_samples(1) <<std::endl;
-				std::cout.flush();
-			}
 		}
-	}
-#endif
 
+		// Update and resample
+		kalm.update();
+		try {
+			fast.update();
+		}
+		catch (BF::Filter_exception ne)
+		{
+			std::cout << ne.what() << std::endl;
+			std::cout.flush();
+			throw;	// re-throw
+		}
+		
+		display("Kalm", full_filter);
+		fast.statistics(stat); display("Fast", stat);
+		std::cout << fast_location.stochastic_samples <<','<< fast_location.unique_samples()
+			<<' '<< fast.feature_unique_samples(0) <<','<< fast.feature_unique_samples(1) <<std::endl;
+		std::cout.flush();
+	}
 }
 
 
 int main()
 {
-	SLAMDemo doit;	// run the test
+	// Global setup for test output
+	std::cout.flags(std::ios::fixed); std::cout.precision(4);
+
+	// Create test and run experiments
+	SLAMDemo test;
+	test.OneDExperiment();
+	test.InformationLooseExperiment();
 }

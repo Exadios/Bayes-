@@ -86,7 +86,8 @@ public:
 	virtual ~Bayes_base() = 0;
 	// Polymorphic
 
-	static void error (const Filter_exception& a);
+	static void error (const Numeric_exception& a);
+	static void error (const Logic_exception& a);
 	// Report a filter, throw a Filter_exception
 	//  No exception saftey rules are specified, assume the object is invalid
 	// May have side effects for debuging

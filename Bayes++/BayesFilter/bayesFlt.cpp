@@ -33,7 +33,15 @@ Bayes_base::~Bayes_base()
  */
 {}
 
-void Bayes_base::error (const Filter_exception& e )
+void Bayes_base::error (const Numeric_exception& e )
+/*
+ * Filter error
+ */
+{
+	throw e;
+}
+
+void Bayes_base::error (const Logic_exception& e )
 /*
  * Filter error
  */

@@ -128,7 +128,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 		const Float P = fom.Zv[0] /sqr(Ht) ;
 		const Float q = m1.x;
 		const Float Q = m1.X;
-											// Multiplicive fussion of observation weights
+											// Multiplicative fussion of observation weights
  		wir[pi] *= exp(Float(-0.5) *sqr(p-q) / (P+Q)) / sqrt(P+Q);		// Integrate(g(p,P)*g(q,Q)
 	}
 	wir_update = true;			// Weights have been updated requiring a resampling
