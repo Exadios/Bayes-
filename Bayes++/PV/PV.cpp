@@ -201,11 +201,9 @@ int main()
 	f1.update ();
 	f2.update ();
 
-	// Print everything
+	// Print everything: filter state and covariance
 	std::cout <<"True     " << x_true << std::endl;
-	std::cout <<"Direct   " << f1.x << std::endl;
-	std::cout <<"Indirect " << f2.x << std::endl;
-	std::cout <<"Direct   " << f1.X << std::endl;		// Filter covariance
-	std::cout <<"Indirect " << f2.X << std::endl;
+	std::cout <<"Direct   " << f1.x << ',' << f1.X <<std::endl;
+	std::cout <<"Indirect " << f2.x << ',' << f2.X << std::endl;;
 	return 0;
 }
