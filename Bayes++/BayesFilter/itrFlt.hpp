@@ -29,41 +29,54 @@
 namespace Bayesian_filter
 {
 
+class Iterated_covariance_filter;
+
+class Iterated_observe_model : virtual public Observe_model_base
+/* Linrz observation model which can be iterated
+    Hx can be relinearised
+ */
+{
+protected: // model is not sufficient, it is used to build observe model's
+	Iterated_observe_model ()
+	{}
+public:
+	virtual void relinearise (const FM::Vec& x) =0;
+	// Relinearised about state x
+};
+
+
 class Iterated_terminator : public Bayes_base
 /*
  * Termination condition for filter Iteration
  *  Used by iterated observe to parameterise termination condition
+ *  If iteration continues, the terminator must also relinearise the model about the filters new state
  *
- * Defaults to immidately terminating the iteration
+ * Defaults to immediately terminating the iteration
  *
  * A more useful terminator can built by derivation.
- * For example terminator constructed with a reference to the filter can
+ * For example terminator constructed with a reference to the filter and model can
  * detect convergence of x and/or X
  */
 {
 public:
-	virtual void relinearize (const FM::Vec& x)
-	{}	// linearize observation model about new x
-	virtual bool term_or_relinearize ()
+	virtual bool term_or_relinearize (const Iterated_covariance_filter& f)
 	{
 		return true;
 	}
 };
 
-class Counted_iterated_terminator : public Bayes_base
+class Counted_iterated_terminator : public Iterated_terminator
 /*
- * Termination condition for filter Iteration
- *  Used by iterated observe to parameterise termination condition
- *
+ * Termination condition with a simple fixed number of iterations 
  */
 {
 public:
-	virtual void relinearize (const FM::Vec& x)
-	{}	// linearize observation model about new x
-	virtual bool term_or_relinearize ()
-	{
-		return true;
-	}
+	Counted_iterated_terminator (Iterated_observe_model& model, unsigned iterations) :
+		m(model), i(iterations)
+	{}
+	bool term_or_relinearize (const Iterated_covariance_filter& f);
+	Iterated_observe_model& m;
+	unsigned i;
 };
 
 

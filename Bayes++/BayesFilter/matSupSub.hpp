@@ -1,3 +1,4 @@
+#define BAYES_FILTER_COMPRESSED
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -36,7 +37,7 @@
 // As of Boost 1.30.0 they do not allow mixed assignment of elements, and must be disabled
 #define BOOST_UBLAS_NO_ELEMENT_PROXIES
 
-// Required to allow all members of trinangular matrices to be accessed
+// Required to allow access to all elements of triangular matrices
 #define BOOST_UBLAS_REFERENCE_CONST_MEMBER
 
 // Singularity is a numerical issue. Thanks to Joerg we can enable runtime exceptions

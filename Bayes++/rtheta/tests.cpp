@@ -319,7 +319,7 @@ template boost::uniform_on_sphere<boost::mt19937, Float>;
 
 void test_random()
 {
-	Test_random<float> x;
-	Vec v(2);
+	Test_random<Float> x;
+	DenseVec v(2);
 	x.lognormal(v);
 }

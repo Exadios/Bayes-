@@ -1,7 +1,6 @@
 BayesFilter TODO List
 
 FOR RELEASE
-	Check if can use inplace_solve for UTinverse
 	Check what UBLAS macros are needed
 		For execeptions/errors
 		For storage
@@ -9,8 +8,6 @@ FOR RELEASE
 		Run Simple, PV, QuadCalib
 
 TODO
-	FIX Iterated filter: Require iterated model
-	
 	Replace General_ with a form that works with functional forms
 	Replace UdU function with UdU class
 
@@ -20,7 +17,7 @@ TODO
 	UD_filter
 		observeUD : return 0 for semi-definate (or zero)
 
-	By products: add observe paramterisation for by products and temps
+	By products: add observe parameterisation for by products and temps
 
 NEW FILTERS
 	Factorised UKF or DDF2
@@ -61,9 +58,10 @@ DOCUMENTATION
 
 
 
-// Look at using this implementation
+// Hmmm this seems to be not the best algorithm numerically
+// The good one from A+G uses element multiples
 template<class M>
-bool lower_cholesky (M &m)
+bool compact_cholesky (M &m)
 {
 	using namespace ublas;
 	bool negative = false;
@@ -71,10 +69,10 @@ bool lower_cholesky (M &m)
 	for (size_t i = 0; i < size; ++ i)
 	{
 		typename M::value_type t (m (i, i));
-		// why this doesn't compile ?
-		// matrix_vector_slice<M> mvs (m.column (i).project(range (i +1, size)));
-		m.column (i).project(range (i +1, size)) -=
-			prod(project (m, range (i + 1, size), range (0, i)),conj (project (row (m, i),range (0, i))));
+		vector_range<matrix_column<M> > v(project(column(m,i), range(i+1,size)));
+		v -=
+			prod(project (m, range (i + 1, size), range (0, i)),
+			conj (project (row (m, i),range (0, i))));
 		t -= inner_prod (conj (project (row(m, i), range (0,i))),project (row (m, i),range (0, i)));
 		if (t <= 0)  {
 			negative = true;
@@ -82,7 +80,7 @@ bool lower_cholesky (M &m)
 		};
 		t = std::sqrt (t);
 		m (i, i) = t;
-		m.column (i).project(range (i +1, size)) /= t;
+		v /= t;
 	}
 	return negative;
 }
@@ -91,11 +89,10 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 {
 	assert (M.size1() == n);
 	assert (M.size2() == n);
-	bool negative = cholesky(M);
+	bool negative = lower_cholesky(M);
 	// Estimate the reciprocal condition number
 	if (negative)
 		return -1;
 	return UCrcond (M,n);
-
 }
 

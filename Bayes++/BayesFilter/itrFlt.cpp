@@ -21,6 +21,15 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
+bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance_filter& f)
+{
+	--i;
+	if (i != 0)
+		m.relinearise (f.x);
+	return (--i) == 0;
+}
+
+
 Iterated_covariance_filter::Iterated_covariance_filter(size_t x_size, size_t z_initialsize) :
 		Linrz_filter(x_size),
 		S(Empty), SI(Empty),
@@ -132,7 +141,6 @@ Bayes_base::Float
 
 	do {
 							// Observation model, linearize about new x
-		term.relinearize (x);
 		const Vec& zp = h.h(x);
 		
 		HxT.assign (trans(h.Hx));
@@ -154,7 +162,7 @@ Bayes_base::Float
 		temp2.assign (prod(X,HxT));
 		temp1.assign (prod(X,XpredI));
 		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));
-	} while (!term.term_or_relinearize());
+	} while (!term.term_or_relinearize(*this));
 	return rcond;
 }
 
