@@ -6,7 +6,7 @@ subproject PV ;
 
 # The executable for the example
 
-exe PV :
+exe pv :
      PV.cpp
      <lib>../BayesFilter/BayesFilter
     :

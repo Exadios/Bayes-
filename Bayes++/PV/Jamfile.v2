@@ -6,7 +6,7 @@ project
      : default-build release
 ;
 
-exe PV :
+exe pv :
      PV.cpp
      ../BayesFilter//BayesFilter
 ;
