@@ -547,7 +547,7 @@ int main()
 	// Initialise and do the comparison
 	std::cout << "udfilter, irfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-// SPARSE	CCompare<Filter<UD_filter>, Filter<Information_root_filter> > test1(x_init, X_init, 4);
+	CCompare<Filter<UD_filter>, Filter<Information_root_filter> > test1(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;

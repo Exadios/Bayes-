@@ -28,8 +28,10 @@
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
+#ifdef BAYES_FILTER_SPARSE
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
+#endif
 
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
@@ -58,24 +60,28 @@ typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseDens
 typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseDenseLowerTriMatrix;
 typedef ublas::banded_matrix<Float> BaseDenseDiagMatrix;
 							// Sparse types
+#ifdef BAYES_FILTER_SPARSE
 typedef ublas::sparse_vector<Float> BaseSparseVector;
 typedef ublas::sparse_matrix<Float, ublas::row_major> BaseSparseRowMatrix;
 typedef ublas::sparse_matrix<Float, ublas::column_major> BaseSparseColMatrix;
+#endif
 
-							// Default types
-typedef BaseSparseVector BaseVector;
-typedef BaseSparseRowMatrix BaseRowMatrix;
-typedef BaseSparseColMatrix BaseColMatrix;
-typedef BaseSparseRowMatrix BaseUpperTriMatrix;
-typedef BaseSparseRowMatrix BaseLowerTriMatrix;
-typedef BaseSparseRowMatrix BaseDiagMatrix;
-/*
+							// Default types Dense or Sparse
+#ifndef BAYES_FILTER_SPARSE
 typedef BaseDenseVector BaseVector;
 typedef BaseDenseRowMatrix BaseRowMatrix;
 typedef BaseDenseColMatrix BaseColMatrix;
-typedef BaseDenseRowMatrix BaseUpperTriMatrix;
-typedef BaseDenseRowMatrix BaseLowerTriMatrix;
-typedef BaseDenseRowMatrix BaseDiagMatrix;*/
+typedef BaseDenseUpperTriMatrix BaseUpperTriMatrix;
+typedef BaseDenseLowerTriMatrix BaseLowerTriMatrix;
+typedef BaseDenseDiagMatrix BaseDiagMatrix;
+#else
+typedef BaseSparseVector BaseVector;
+typedef BaseSparseRowMatrix BaseRowMatrix;
+typedef BaseSparseColMatrix BaseColMatrix;
+typedef BaseDenseUpperTriMatrix BaseUpperTriMatrix;		// No sparse triangular or banded
+typedef BaseDenseLowerTriMatrix BaseLowerTriMatrix;
+typedef BaseDenseDiagMatrix BaseDiagMatrix;
+#endif
 
 }
 

@@ -108,8 +108,8 @@ namespace rawLAPACK {
 
 /* Support types */
 typedef boost::numeric::ublas::vector<int> pivot_t;
-typedef Bayesian_filter_matrix::Vec vector_t;
-typedef Bayesian_filter_matrix::ColMatrix matrix_t;
+typedef Bayesian_filter_matrix::DenseVec vector_t;
+typedef Bayesian_filter_matrix::DenseColMatrix matrix_t;
 
 /* LAPACK Interface*/
 

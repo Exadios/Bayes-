@@ -69,13 +69,7 @@ void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& 
 
 	Vec SigmaCol(x_size);
 	for (size_t c = 0; c < x_size; ++c) {
-		// ISSUE: Copy a column
-		// uBLAS	SigmaCol = UTriMatrix::Column(Sigma,c);
-		size_t r;
-		for (r = 0; r <= c; ++r)
-			SigmaCol[r] = Sigma(r,c);
-		for (; r < x_size; ++r)
-			SigmaCol[r] = 0.;
+		SigmaCol.assign (column(Sigma,c));
 		column(XX,c+1).assign (x  + SigmaCol);
 		column(XX,x_size+c+1).assign (x - SigmaCol);
 	}

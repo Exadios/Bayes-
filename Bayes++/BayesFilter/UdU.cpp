@@ -363,7 +363,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 	}
 
 	// Estimate the reciprocal condition number
-	return UdUrcond (asRowMatrix(M));
+	return UdUrcond (static_cast<const RowMatrix&>(M));
 
 Negative:
    return -1.;
@@ -457,24 +457,6 @@ RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
 }
 
 
-template <class BaseMatrix>
-class baseLTriMatrixAdaptor : public BaseMatrix
-{
-public:
-	baseLTriMatrixAdaptor(const BaseMatrix& m)
-		: BaseMatrix(m)
-	{}
-};
-
-template <class BaseMatrix>
-class baseUTriMatrixAdaptor : public BaseMatrix
-{
-public:
-	baseUTriMatrixAdaptor(const BaseMatrix& m)
-		: BaseMatrix(m)
-	{}
-};
-
 LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
 /*
  * Modified lower triangular Cholesky factor of a
@@ -486,9 +468,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  *		see in-place LdLfactor 
  */
 {
-//TODO	ublas::triangular_adaptor<const SymMatrix, ublas::lower> ltriM(M);
-	baseLTriMatrixAdaptor<const SymMatrix> ltriM(M);
-	LD.assign (ltriM);
+	LD.assign (M);
 	LTriMatrix::value_type rcond = LdLfactor (LD, M.size1());
 
 	return rcond;
@@ -506,9 +486,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M)
  *		see in-place UCfactor
  */
 {
-//TODO	ublas::triangular_adaptor<const SymMatrix, ublas::upper> utriM(M);
-	baseLTriMatrixAdaptor<const SymMatrix> utriM(M);
-	U.assign (utriM);
+	U.assign (M);
 	UTriMatrix::value_type rcond = UCfactor (U, M.size1());
 
 	return rcond;
@@ -798,7 +776,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
  */
 {
 					// Abuse as a RowMatrix
-	RowMatrix& M_Matrix = asRowMatrix(M);
+	RowMatrix& M_Matrix = static_cast<RowMatrix&>(M);
 	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
@@ -814,7 +792,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM)
  */
 {
 					// Abuse as a RowMatrix
-	RowMatrix& M_Matrix = asRowMatrix(M);
+	RowMatrix& M_Matrix = static_cast<RowMatrix&>(M);
 	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
@@ -839,7 +817,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	RowMatrix& MI_Matrix = asRowMatrix(MI);
+	RowMatrix& MI_Matrix = static_cast<RowMatrix&>(MI);
 	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
@@ -856,8 +834,8 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, SymMatrix::value_type& detM, 
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	const RowMatrix& M_Matrix = asRowMatrix(M);
-	RowMatrix& MI_Matrix = asRowMatrix(MI);
+	const RowMatrix& M_Matrix = static_cast<const RowMatrix&>(M);
+	RowMatrix& MI_Matrix = static_cast<RowMatrix&>(MI);
 	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {

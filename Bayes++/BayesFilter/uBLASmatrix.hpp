@@ -59,18 +59,6 @@ public:
 		assign(r);
 		return *this;
 	}
-	template <class Base>
-	FMVec& operator=(const ublas::matrix_row<Base>& r)
-	{	// Matrix row assignment; independant
-assert(false);
-		return *this;
-	}
-	template <class Base>
-	FMVec& operator=(const ublas::matrix_column<Base>& r)
-	{	// Matrix column assignment; independant
-assert(false);
-		return *this;
-	}
 	template <class E>
 	FMVec& operator=(const ublas::vector_expression<E>& r)
 	{	// Expression assignment, may be dependant on r
@@ -180,6 +168,7 @@ public:
 	}
 #else
 		// For this to work requires patched uBLAS for Bayes++
+		// Don't use project(column(*this,s2), range(s1,e1)) it will return a reference to the temporary column object
 	ublas::matrix_vector_slice<const MatrixBase>
 	sub_column(size_t s1, size_t e1, size_t s2) const 
 	// Column vector s2 with rows [s1,e1)
@@ -243,12 +232,12 @@ public:
 		return *this;
 	}
 
-	// Conversions straight to a FMMatrix, equivilent to a RowMatrix
-	const FMMatrix<MatrixBase>& asRowMatrix() const
+	// User defined conversions straight to a FMMatrix, equivilent to a RowMatrix
+	operator const FMMatrix<MatrixBase>& () const
 	{
 		return static_cast<const FMMatrix<MatrixBase>& >(rm);
 	}
-	FMMatrix<MatrixBase>& asRowMatrix()
+	operator FMMatrix<MatrixBase>& ()
 	{	
 		return static_cast<FMMatrix<MatrixBase>& >(rm);
 	}
@@ -293,23 +282,13 @@ typedef FMMatrix<detail::BaseDenseLowerTriMatrix> DenseLTriMatrix;
 typedef FMMatrix<detail::BaseDenseDiagMatrix> DenseDiagMatrix;
 
 							// Explicitly sparse types
+#ifdef BAYES_FILTER_SPARSE
 typedef FMVec<detail::BaseSparseVector> SparseVec;
 typedef FMMatrix<detail::BaseDenseRowMatrix> SparseRowMatrix;
 typedef SparseRowMatrix SparseMatrix;
 typedef FMMatrix<detail::BaseSparseColMatrix> SparseColMatrix;
-//typedef FMMatrix<detail::SymMatrixAdaptor<detail::BaseSparseRowMatrix> > SparseSymMatrix;
-
-/*
- * Type conversions helper functions
- */
-inline RowMatrix& asRowMatrix(SymMatrix& M)
-{
-	return M.asRowMatrix();
-}
-inline const RowMatrix& asRowMatrix(const SymMatrix& M)
-{
-	return M.asRowMatrix();
-}
+typedef FMMatrix<detail::SymMatrixAdaptor<detail::BaseSparseRowMatrix> > SparseSymMatrix;
+#endif
 
 
 /*
@@ -334,6 +313,68 @@ void identity(FMMatrix<Base>& I)
 	ublas::matrix_vector_range<Base>(I, ublas::range(0,common_size), ublas::range(0,common_size)) = 
 		ublas::scalar_vector<Base_value_type>(common_size, 1.);
 }
+
+// Sub matrix/vector helpers
+template <class Base>
+ublas::matrix_range<const FMMatrix<Base> >
+sub_matrix (const FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2, size_t e2)
+{
+	using namespace ublas;
+	return matrix_range<const FMMatrix<Base> > (m, range(s1,e1), range(s2,e2));
+}
+template <class Base>
+ublas::matrix_range<FMMatrix<Base> >
+sub_matrix (FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2, size_t e2)
+{
+	using namespace ublas;
+	return matrix_range<FMMatrix<Base> > (m, range(s1,e1), range(s2,e2));
+}
+
+		// ISSUE uBLAS currently has bugs when matrix_vector_slice is require to represent a sub column
+#ifndef BAYESFILTER_UBLAS_SLICE_OK
+		// Workaround using a vector_range of a matrix_column
+template <class MatrixBase>
+struct special_matrix_vector_slice : ublas::vector_range<ublas::matrix_column<MatrixBase> > 
+{
+	special_matrix_vector_slice(MatrixBase& mb, size_t s1, size_t e1, size_t s2) :
+			ublas::vector_range<ublas::matrix_column<MatrixBase> >(col,ublas::range(s1,e1)), col(mb, s2)
+	{}
+	ublas::matrix_column<MatrixBase> col;
+};
+
+template <class Base>
+const special_matrix_vector_slice<const FMMatrix<Base> >
+sub_column(const FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2)
+// Column vector s2 with rows [s1,e1)
+{
+	return special_matrix_vector_slice<const FMMatrix<Base> > (m, s1,e1, s2);
+}
+template <class Base>
+special_matrix_vector_slice<FMMatrix<Base> >
+sub_column(FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2)
+// Column vector s2 with rows [s1,e1)
+{
+	return special_matrix_vector_slice<FMMatrix<Base> > (m, s1,e1, s2);
+}
+
+#else
+	// For this to work requires patched uBLAS for Bayes++
+	// Don't use project(column(*this,s2), range(s1,e1)) it will return a reference to the temporary column object
+ublas::matrix_vector_slice<const MatrixBase>
+sub_column(size_t s1, size_t e1, size_t s2) const 
+// Column vector s2 with rows [s1,e1)
+{
+	using namespace ublas;
+	return matrix_vector_slice<const MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
+}
+ublas::matrix_vector_slice<MatrixBase>
+sub_column(size_t s1, size_t e1, size_t s2)
+// Column vector s2 with rows [s1,e1)
+{
+	using namespace ublas;
+	return matrix_vector_slice<MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
+}
+#endif
 
 
 /*
@@ -387,7 +428,7 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
 	typename MatrixX::const_iterator1 Xb;
 
 	// P(a,b) = X.row(a) * X.row(b)
-	for (; Xa != Xend; ++Xa,++Pa)			// Iterate vectors
+	for (; Xa != Xend; ++Xa)			// Iterate vectors
 	{		
 		MatrixX::const_Row Xav = MatrixX::rowi(Xa);
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required

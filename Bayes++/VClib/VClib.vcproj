@@ -111,7 +111,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)../ublas_2002_10_12"
-				PreprocessorDefinitions="_DEBUG,_LIB,WIN32"
+				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,BAYES_FILTER_SPARSE"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -395,8 +395,7 @@
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32"
-					ExcludedFromBuild="TRUE">
+					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm200"/>
