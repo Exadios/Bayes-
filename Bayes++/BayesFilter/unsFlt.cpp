@@ -174,7 +174,8 @@ namespace {
 			Unscented_predict_model(),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
-			noalias(QGqG) = prod_SPD(am.G, am.q);
+			RowMatrix temp (am.G.size1(), am.G.size1());
+			noalias(QGqG) = prod_SPD(am.G, am.q, temp);
 		}
 		const Vec& f(const Vec& x) const
 		{

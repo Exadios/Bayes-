@@ -57,7 +57,8 @@ Bayes_base::Float
 {
 	x = f.f(x);		// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
-	noalias(X) = prod_SPD(f.Fx,X, tempX) + prod_SPD(f.G, f.q);
+	noalias(X) = prod_SPD(f.Fx,X, tempX);
+	noalias(X) += prod_SPD(f.G, f.q, tempX);
 
 	return 1;
 }
@@ -68,7 +69,7 @@ Bayes_base::Float
  */
 {
 						// Predict state covariance, simply add in noise
-	noalias(X) += prod_SPD(f.G, f.q);
+	noalias(X) += prod_SPD(f.G, f.q, tempX);
   
 	return 1;
 }

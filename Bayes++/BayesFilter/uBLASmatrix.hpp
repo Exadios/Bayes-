@@ -232,7 +232,8 @@ public:
 
 	// Matrix storage members
 	void clear()
-	{	matrix_type::member.clear();
+	{
+		matrix_type::member.clear();
 	}
 	void resize(size_t nsize1, size_t nsize2)
 	{
@@ -352,79 +353,11 @@ void identity(FMMatrix<Base>& I)
 }
 
 
-
 /*
- * Symmetric Positive (Semi) Definate multiplication: X*S*X' and X'*S*X
+ * prod_SPD - uBLAS Expression templates for X*X' , X*S*X´ , X'*X and 'X*S*X
  *  The name is slightly misleading. The result is actually only PD if S is PD
- *  Algorithms are intended to exploit the symmerty of the result
- *  and also where possible the row by row multiplication inherent in X*X'
- */
-
-namespace detail {		// mult_SPD now an implementation detail
-	
-template <class MatrixX>
-void mult_SPD (const MatrixX& X, const Vec& s, SymMatrix& P)
-/*
- * Symmetric Positive (Semi) Definate multiply:	P += X*diag_matrix(s)*X'
- */
-{
-	Vec::const_iterator si, send = s.end();
-	typename MatrixX::const_iterator1 Xa = X.begin1();
-	const typename MatrixX::const_iterator1 Xend = X.end1();
-	typename MatrixX::const_iterator1 Xb;
-
-	// P(a,b) = X.row(a) * X.row(b)
-	for (; Xa != Xend; ++Xa)				// Iterate Rows
-	{
-		typename MatrixX::const_Row Xav = MatrixX::rowi(Xa);
-		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
-		for (; Xb != Xend; ++Xb)
-		{
-			SymMatrix::value_type p = 0;	// Tripple vector inner product
-			typename MatrixX::const_Row Xbv = MatrixX::rowi(Xb);
-			for (si = s.begin(); si != send; ++si) {
-				Vec::size_type i = si.index();
-				p += Xav[i] * (*si) * Xbv[i];
-			}
-			P(Xa.index1(),Xb.index1()) += p;
-		}
-	}
-}
-
-template <class MatrixX>
-void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
-/*
- * Symmetric Positive (Semi) Definate multiply:	P += X'*diag_matrix(s)*X
- */
-{
-	Vec::const_iterator si, send = s.end();
-	typename MatrixX::const_iterator2 Xa = X.begin2();
-	const typename MatrixX::const_iterator2 Xend = X.end2();
-	typename MatrixX::const_iterator2 Xb;
-
-	// P(a,b) = X.col(a) * X.col(b)
-	for (; Xa != Xend; ++Xa)				// Iterate vectors
-	{
-		typename MatrixX::const_Column Xav = MatrixX::columni(Xa);
-		Xb = Xa;							// Start at the row Xa only one triangle of symertric result required
-		for (; Xb != Xend; ++Xb)
-		{									// Tripple vector inner product
-			SymMatrix::value_type p = 0;
-			typename MatrixX::const_Column Xbv = MatrixX::columni(Xb);
-			for (si = s.begin(); si != send; ++si) {
-				Vec::size_type i = si.index();
-				p += Xav[i] * (*si) * Xbv[i];
-			}
-			P(Xa.index2(),Xb.index2()) += p;
-		}
-	}
-}
-
-}//namespace detail
-
-
-/*
- * prod_SPD - uBLAS Expression templates for X*X' and X*X'
+ * Algorithms are intended to exploit the symmerty of the result and S, therefore
+ * are often defined with a more efficient compuation order.
  * Functions are only defined for the type for which the operation is efficient
  * ISSUE Although numerically symmetric, uBlas has no expression type to represent this property
  *  The result must be assigned to a symmetric container to exploit the symmetry
@@ -456,27 +389,49 @@ typename prod_expression_result<E,E>::E1E2T_type
 	return prod( X, trans(const_cast<ublas::matrix_expression<E>&>(X) ));
 }
 
-template<class E1, class E2> inline
-typename prod_expression_result<E1,E2>::E1E2T_type
- prod_SPD (const ublas::matrix_expression<E1>& X, const SymMatrix& S, ublas::matrix_expression<E2>& XStemp)
+template<class EX, class ES, class ET> inline
+typename prod_expression_result<EX,ET>::E1E2T_type
+ prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::matrix_expression<ES>& S, ublas::matrix_expression<ET>& XStemp)
 /*
  * Symmetric Positive (Semi) Definate product: X*(X*S)', XStemp = X*S
+ * Assumes S symmetric
  */
 {
 	return prod( X, trans(prod(X,S,XStemp())) );
 }
 
-inline
-SymMatrix prod_SPD (const RowMatrix& X, const Vec& s)
+template<class EX, class ES, class ET> inline
+ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s, ublas::matrix_expression<ET>& Ptemp)
 /*
- * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X'
- * TODO: Define using ublas ET
+ * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X', Ptemp = return value
+ * Precond: Ptemp must be size conformant with the product
+ * TODO requires a prod_diag(X,s)
  */
 {
-	SymMatrix P(X.size1(),X.size1());
-	P.clear();
-	detail::mult_SPD(X,s, P);
-	return P;
+	Vec::const_iterator si, send = s().end();
+	typename EX::const_iterator1 Xa = X().begin1();
+	const typename EX::const_iterator1 Xend = X().end1();
+	typename EX::const_iterator1 Xb;
+
+	// P(a,b) = sum(X.row(a) * s * X.row(b))
+	for (; Xa != Xend; ++Xa)		// Iterate rows
+	{
+		typedef const ublas::matrix_row<EX> EX_row;
+		EX_row Xav = ublas::row(Xa(), Xa.index1());
+		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
+		for (; Xb != Xend; ++Xb)
+		{
+			typename EX::value_type p = 0;	// Tripple vector inner product
+			EX_row Xbv = ublas::row(Xb(), Xb.index1());
+			for (si = s().begin(); si != send; ++si) {
+				Vec::size_type i = si.index();
+				p += Xav[i] * (*si) * Xbv[i];
+			}
+			Ptemp()(Xa.index1(),Xb.index1()) = p;
+			Ptemp()(Xb.index1(),Xa.index1()) = p;
+		}
+	}
+	return Ptemp();
 }
 
 
@@ -491,27 +446,49 @@ typename prod_expression_result<E,E>::E1TE2_type
 	return prod( trans(const_cast<ublas::matrix_expression<E>&>(X) ), X);
 }
 
-template<class E1, class E2> inline
-typename prod_expression_result<E2,E1>::E1TE2_type
- prod_SPDT (const ublas::matrix_expression<E1>& X, const SymMatrix& S, ublas::matrix_expression<E2>& SXtemp)
+template<class EX, class ES, class ET> inline
+typename prod_expression_result<ET,EX>::E1TE2_type
+ prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::matrix_expression<ES>& S, ublas::matrix_expression<ET>& SXtemp)
 /*
  * Symmetric Positive (Semi) Definate product: (S*X)'*X, SXtemp = S*X
+ * Assumes S symmetric
  */
 {
 	return prod( trans(prod(S,X,SXtemp())), X);
 }
 
-inline
-SymMatrix prod_SPDT (const ColMatrix& X, const Vec& s)
+template<class EX, class ES, class ET> inline
+ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s, ublas::matrix_expression<ET>& Ptemp)
 /*
- * Symmetric Positive (Semi) Definate product: X'*diag_matrix(s)*X
- * TODO: Define using ublas ET
+ * Symmetric Positive (Semi) Definate product: X'*diag_matrix(s)*X, Ptemp = return value
+ * Precond: Ptemp must be size conformant with the product
+ * TODO requires a prod_diag(X,s)
  */
 {
-	SymMatrix P(X.size2(),X.size2());
-	P.clear();
-	detail::mult_SPDT(X,s, P);
-	return P;
+	Vec::const_iterator si, send = s().end();
+	typename EX::const_iterator2 Xa = X().begin2();
+	const typename EX::const_iterator2 Xend = X().end2();
+	typename EX::const_iterator2 Xb;
+
+	// P(a,b) = sum(X.col(a) * s * X.col(b))
+	for (; Xa != Xend; ++Xa)		// Iterate columns
+	{
+		typedef const ublas::matrix_column<EX> EX_column;
+		EX_column Xav = ublas::column(Xa(), Xa.index2());
+		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
+		for (; Xb != Xend; ++Xb)
+		{
+			typename EX::value_type p = 0;	// Tripple vector inner product
+			EX_column Xbv = ublas::column(Xb(), Xb.index2());
+			for (si = s().begin(); si != send; ++si) {
+				Vec::size_type i = si.index();
+				p += Xav[i] * (*si) * Xbv[i];
+			}
+			Ptemp()(Xa.index2(),Xb.index2()) = p;
+			Ptemp()(Xb.index2(),Xa.index2()) = p;
+		}
+	}
+	return Ptemp();
 }
 
 inline Vec::value_type prod_SPDT (const Vec& x, const Vec& s)

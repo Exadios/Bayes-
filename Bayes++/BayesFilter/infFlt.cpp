@@ -120,7 +120,8 @@ Bayes_base::Float
 	update ();			// x,X required
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict information matrix, and state covariance
-	noalias(X) = prod_SPD(f.Fx,X,tempX) + prod_SPD(f.G, f.q);
+	noalias(X) = prod_SPD(f.Fx, X, tempX);
+	noalias(X) += prod_SPD(f.G, f.q, tempX);
 
 						// Information
 	Float rcond = UdUinversePD (Y, X);
