@@ -36,9 +36,11 @@ TO REVIEW
 	Sharing state in filters, alternative to MI is constructors with state references (closures)
 	Check consistency of model to filter
 		Validate (z to h.Z) model sizes in predict and observe
-	UDpredict catching Negative matrices in observe
-	Check normalisation: Standard form should be to normalise(z,zp). This ensure z is consistent with zp and other model parts such as Hx
-	Check when numerics fail for both state and obs semidefinate
+	Check when numerics fail:
+		For both state and obs semidefinate
+		Negtive matrices
+		UDpredict catching Negative matrices in observe
+	Use normalisation dtandard form for Jacobian_obersve. Should be to normalise(z,zp).
 
 CODE RULES
 	filter
