@@ -9,12 +9,10 @@
 # Use make TOOLS='tt' to specify the toolset used by Boost.Build
 # Use make TOOLS='tt' ARGS='aa'  to pass additional arguments to bjam
 
-# Modify these settings to locate Boost and bjam
-BOOST_ROOT = ../boost_1_29_0
+# Modify these settings to locate bjam
 BJAM = bjam
-ALL_LOCATE_TARGET = bin
 
-GOBJAM = $(BJAM) $(ARGS) -sBOOST_ROOT=$(BOOST_ROOT) -sALL_LOCATE_TARGET=$(ALL_LOCATE_TARGET)
+GOBJAM = $(BJAM) $(ARGS)
 
 # Build everything
 buildAll:

@@ -3,7 +3,7 @@
 #
 
 # Modify these settings to locate Boost and bjam
-BOOST_ROOT = ../../boost_1_29_0
+BOOST_ROOT = ../../boost
 BJAM = bjam
 ALL_LOCATE_TARGET = bin
 

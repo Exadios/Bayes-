@@ -202,31 +202,31 @@ type=HEADER
 
 [Config for BinMakefileAm]
 addcxxflags=
-bin_program=PV
+bin_program=rtheta
 cflags=
 cppflags=
 cxxflags=\s-O0 -g3 -Wall
 ldadd=
-ldflags=\s         \s
+ldflags=\s                            \s
 libtool_dir=
-path_to_bin_program=bin/PV/bin/PV/gcc/debug/runtime-link-dynamic
+path_to_bin_program=bin/rtheta/bin/rtheta/gcc/debug/runtime-link-dynamic
 
 [General]
 AMChanged=false
 author=Michael Stevems
 configure_args=\s--build=i386-linux --host=i386-linux --target=i386-linux\s
-dir_where_make_will_be_called=./
+dir_where_make_will_be_called=/home/michael/Documents/MyProjects/Bayes++/rtheta/
 email=
 kdevprj_version=1.3
-lfv_open_groups=Others
+lfv_open_groups=Headers,Others,Sources
 make_options=\s-j1 ARGS='-sBUILD=debug'
-makefiles=Makefile.am,kmake/Makefile.am,kmake/docs/Makefile.am,kmake/docs/en/Makefile.am,Simple/Makefile.am,PV/Makefile.am,QuadCalib/Makefile.am,BayesFilter/Makefile.am,BayesFilter/filters/Makefile.am
+makefiles=Makefile.am,kmake/Makefile.am,kmake/docs/Makefile.am,kmake/docs/en/Makefile.am,Simple/Makefile.am,PV/Makefile.am,QuadCalib/Makefile.am,BayesFilter/Makefile.am,BayesFilter/filters/Makefile.am,rtheta/Makefile.am
 modifyMakefiles=false
 project_name=Bayes++
 project_type=normal_empty
 short_info=
 sub_dir=kmake/
-version=0.1
+version=1.0
 version_control=CVS
 workspace=1
 
@@ -236,9 +236,15 @@ Others=*
 Sources=*.cpp,*.c,*.cc,*.C,*.cxx,*.ec,*.ecpp,*.lxx,*.l++,*.ll,*.l
 groups=Headers,Sources,Others
 
+[Makefile]
+dist=true
+install=false
+install_location=
+type=DATA
+
 [Makefile.am]
-files=Bayes++.kdevprj,BayesFilter TODO.txt
-sub_dirs=kmake,Simple,PV,QuadCalib,BayesFilter
+files=Bayes++.kdevprj,BayesFilter TODO.txt,Makefile
+sub_dirs=kmake,Simple,PV,QuadCalib,BayesFilter,rtheta
 type=normal
 
 [PV/Makefile.am]
@@ -281,6 +287,7 @@ install_location=
 type=SOURCE
 
 [kmake/Makefile.am]
+files=
 sub_dirs=
 type=prog_main
 
@@ -291,3 +298,22 @@ type=normal
 [kmake/docs/en/Makefile.am]
 sub_dirs=
 type=normal
+
+[rtheta/Makefile]
+dist=true
+install=false
+install_location=
+type=DATA
+
+[rtheta/Makefile.am]
+files=rtheta/rtheta.cpp,rtheta/Makefile
+sharedlib_LDFLAGS=-version-info 0:0:0
+sharedlib_rootname=rtheta
+sub_dirs=
+type=static_library
+
+[rtheta/rtheta.cpp]
+dist=true
+install=false
+install_location=
+type=SOURCE

@@ -16,7 +16,6 @@
 // Common headers required for declerations
 #include <exception>
 #include "matSupSub.hpp"	// Expect to find the actual matrix support headers elsewhere
-#include <boost/numeric/ublas/io.hpp>
 
 /* Filter namespace */
 namespace Bayesian_filter
