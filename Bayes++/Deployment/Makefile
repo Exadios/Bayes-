@@ -2,7 +2,7 @@
 # Provides interface project development and sourceforge maintance
 # Use bjam to compile and build Bayes++
 
-RELEASE=2003.x1
+RELEASE=2003.x.1
 
 help:
 	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
@@ -13,7 +13,7 @@ uploaddoc:
 
 
 uploadstyle:
-	rsync --verbose --relative --compress --times --rsh=ssh paper.css paper.png  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs/style
+	rsync --verbose --relative --compress --times --rsh=ssh paper.css paper.png  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs/Deployment
 
 archivedoc:
 	cd ..; tar --create --file=bf-classdocumentation-$(RELEASE).tar.bz2 --use-compress-program=bzip2 ClassDocumentation/*
