@@ -395,7 +395,7 @@ void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
 		size_t fs = nL + (*fi).first;		// Feature subscript
 		if (fs < kstat.x.size())			// Space in kstat
 		{
-		statistics_feature(kstat, fs, fi, fi);	// build statistics of fi with other features up to fi
+			statistics_feature(kstat, fs, fi, fi);	// build statistics of fi with other features up to fi
 		}
 	}//all feature
 }//statistics_sparse

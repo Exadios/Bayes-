@@ -8,9 +8,9 @@
 
 /*
  * SLAM : Simultaneous Locatization and Mapping
- *  Kalman filter representing representation of SLAM
- *  A very simple and INEFFICIENT full filter implementation.
- *  The Feature number should be incremented by one to avoid sparseness in the full filter.
+ *  Kalman filter representation of SLAM
+ *  A very simplistic and INEFFICIENT full correlation implementation.
+ *  The feature numbers should be sequential to avoid sparseness in the full filter.
  *  The filter size grows with the feature number, but never shrinks
  *
  * Reference
@@ -52,11 +52,7 @@ public:
 		full->update();
 	}
 
-	void statistics_sparse( BF::Kalman_state_filter& kstats ) const
-	{
-		kstats = *full;
-	}
-	
+	void statistics_sparse( BF::Kalman_state_filter& kstats ) const;
 	void decorrelate( Bayesian_filter::Bayes_base::Float d);
 
 protected:

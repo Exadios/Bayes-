@@ -134,7 +134,7 @@ void SLAMDemo::OneDExperiment ()
 	// Stationary Prediction model (Identity)
 	location_predict.Fx(0,0) = 1;
 				// Constant Noise model
-	location_predict.q[0] = 0.;
+	location_predict.q[0] = 1000.;
 	location_predict.G.clear();
 	location_predict.G(0,0) = 1;
 
@@ -146,7 +146,7 @@ void SLAMDemo::OneDExperiment ()
 	// Location with no uncertainty
 	FM::Vec x_init(nL); FM::SymMatrix X_init(nL, nL);
 	x_init[0] = 20.;
-	X_init(0,0) = 1000.;
+	X_init(0,0) = 1.;
 
 	// Truth model : location plus one map feature
 	FM::Vec true0(nL+1), true1(nL+1);
@@ -167,19 +167,29 @@ void SLAMDemo::OneDExperiment ()
 	fast_location.init_kalman (x_init, X_init);
 	Fast_SLAM_Kstatistics fast (fast_location);
 
+	fast.update(); fast.statistics_sparse(stat); display("Initial Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Initial Kalm", stat);
+
 	// Initial feature states
 	z = observe0.h(true0);		// Observe a relative position between location and map landmark
 	z[0] += 0.5;			
-	kalm.observe_new (0, observe_new0, z);
 	fast.observe_new (0, observe_new0, z);
+	kalm.observe_new (0, observe_new0, z);
+	fast.update(); fast.statistics_sparse(stat); display("Featur0 Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Featur0 Kalm", stat);
 
 	z = observe1.h(true1);
 	z[0] += -1.0;		
-	kalm.observe_new (1, observe_new1, z);
 	fast.observe_new (1, observe_new1, z);
+	kalm.observe_new (1, observe_new1, z);
+	fast.update(); fast.statistics_sparse(stat); display("Featur1 Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Featur1 Kalm", stat);
 
-	fast.update(); fast.statistics_sparse(stat); display("Feature Fast", stat);
-	kalm.update(); kalm.statistics_sparse(stat); display("Feature Kalm", stat);
+	// Predict the filter forward
+	fast_location.predict (location_predict);
+	kalm.predict (location_predict);
+	fast.update(); fast.statistics_sparse(stat); display("Predict Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Predict Kalm", stat);
 
 	// Observation feature 0
 	z = observe0.h(true0);
@@ -188,12 +198,6 @@ void SLAMDemo::OneDExperiment ()
 	kalm.observe( 0, observe0, z );
 	fast.update(); fast.statistics_sparse(stat); display("ObserveA Fast", stat);
 	kalm.update(); kalm.statistics_sparse(stat); display("ObserveA Kalm", stat);
-
-	// Predict the filter forward
-	fast_location.predict (location_predict);
-	kalm.predict (location_predict);
-	fast.update(); fast.statistics_sparse(stat); display("Predict Fast", stat);
-	kalm.update(); kalm.statistics_sparse(stat); display("Predict Kalm", stat);
 
 	// Observation feature 1
 	z = observe1.h(true1);
