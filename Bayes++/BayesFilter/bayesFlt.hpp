@@ -107,14 +107,14 @@ private:
 
 /*
  * Abstract Prediction models
- *  Prediction model are used to parameterise predict functions of filters
+ *  Predict models are used to parameterise predict functions of filters
  */
 class Predict_model_base : public Bayes_base
 {
 	// Empty
 };
 
-class Predict_function
+class Predict_function : public Bayes_base
 // Function object for prediction of states
 {
 public:
@@ -230,10 +230,15 @@ public:
 
 
 /*
- * Observation of state model
+ * Abstract Observation models
+ *  Observe models are used to parameterise the observe functions of filters
  */
+class Observe_model_base : public Bayes_base
+{
+	// Empty
+};
 
-class Observe_function
+class Observe_function : public Bayes_base
 // Function object for prediction of observations
 {
 public:
@@ -241,7 +246,8 @@ public:
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
-class Likelihood_observe_model : public Bayes_base
+
+class Likelihood_observe_model : virtual public Observe_model_base
 /* Likelihood observe model L(z |x)
  *  The most fundamental Bayesian definition of an observation
  * Defines an Interface without data members
@@ -262,7 +268,7 @@ protected:
 	FM::Vec z;			// z set by Lz
 };
 
-class Functional_observe_model : public Bayes_base, public Observe_function
+class Functional_observe_model : virtual public Observe_model_base, public Observe_function
 /* Functional (non-stochastic) observe model h
  *  z(k) = hx(x(k|k-1))
  * This is a seperate fundamental model and not derived from likelihood because
@@ -279,7 +285,7 @@ public:
 
 };
 
-class Parametised_observe_model : public Bayes_base
+class Parametised_observe_model : virtual public Observe_model_base
 /* Observation model parametised with a fixed z size
  * Model is assume to have linear components
  */
@@ -326,7 +332,7 @@ public:
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
-class Jacobian_observe_model   // ISSUE could drive from Bayes_base but not polymorphic
+class Jacobian_observe_model : virtual public Observe_model_base
 /* Linrz observation model Hx, h about state x (fixed size)
     z(k) = h(x(k-1|k-1)
     Hx(x(k|k-1) = Jacobian of h with respect to state x
