@@ -93,6 +93,8 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 /*
  * SLAM Feature observation
  *  Uses Extended Fast_SLAM observation equations
+ * Note: Mathematically only weight ratios are important. Numerically however the range should be restricted.
+ * The weights are computed here using the simplist form with common factor Ht removed.
  */
 {
 	assert(z.size() == 1);		// Only single state observation supported
@@ -112,48 +114,36 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	if (Ht == 0.)
 		error (BF::Numeric_exception("observe Hx feature component zero"));
 
-								// Observation weight for each particle
+							// Loop in invariants and temporary storage
 	FM::Vec x2(nL+1);					// Augmented state (particle + feature mean)
 	FM::Vec znorm(z.size());
-	for (size_t pi = 0; pi < nparticles; ++pi)
+	const Float Z = fom.Zv[0];
+							// Iterate over particles
+	for (size_t pi = 0; pi != nparticles; ++pi)
 	{
 		Feature_1& m1 = afm[pi];		// Associated feature's map particle
 							
 		x2.sub_range(0,nL) = L.S.column(pi);		// Build Augmented state x2
 		x2[nL] = m1.x;
 		const FM::Vec& zp = fom.h(x2);	// Observation model
-		znorm = z;						// Normalised observation
+		znorm = z;									// Normalised observation
 		fom.normalise(znorm, zp);
+														// Observation innovation and innovation variance
+		const Float s = (znorm[0] - zp[0]);
+		const Float S = sqr(Ht) * m1.X + Z;
+		if (S <= 0.)
+			error (BF::Numeric_exception("Conditional feature estimate not PD"));
+		const Float sqrtS  = std::sqrt (S);		// Drop Ht which is a common factor for all weights
 
-		const Float zpp = zp[0] - Ht*m1.x;	// Extended State observation for non-linear h
-		const Float p = (znorm[0] - zpp) / Ht;
-		const Float P = fom.Zv[0] /sqr(Ht) ;
-		const Float q = m1.x;
-		const Float Q = m1.X;
-											// Multiplicative fussion of observation weights
- 		wir[pi] *= exp(Float(-0.5) *sqr(p-q) / (P+Q)) / sqrt(P+Q);		// Integral( g(p,P)*g(q,Q) )
+										// Multiplicative fusion of observation weights, integral of Gaussian product g(p,P)*g(q,Q)
+ 		wir[pi] *= exp(Float(-0.5)* sqr(s) / S) / sqrtS;
+
+										// Estimate associated features conditional map for resampled particles
+		Float W = m1.X*Ht / S;	// EKF for conditional feature observation - specialised for 1D and zero state uncertianty
+		m1.x += W * (znorm[0] - zp[0]);
+		m1.X -= sqr(W) * S;
 	}
 	wir_update = true;			// Weights have been updated requiring a resampling
-
-								// Estimate associated features conditional map for resampled particles
-	for (size_t pi = 0; pi < nparticles; ++pi)
-	{
-		Feature_1& m1 = afm[pi];		// Associated feature's map particle
-		x2.sub_range(0,nL) = L.S.column(pi);		// Build Augmented state x2
-		x2[nL] = m1.x;
-		FM::Vec zp = fom.h(x2);			// Observation model
-		znorm = z;						// Normalised observation
-		fom.normalise(znorm, zp);
-
-								// EKF for conditional feature observation - specialised for 1D and zero state uncertianty
-		Float Sf = m1.X*sqr(Ht) + fom.Zv[0];	// Innovation variance
-		if (Sf <= 0.)
-			error (BF::Numeric_exception("Conditional feature estimate not PD"));
-		Float Wf = m1.X*Ht / Sf;
-		
-		m1.x += Wf*(znorm[0] - zp[0]);
-		m1.X -= sqr(Wf) * Sf;
-	}
 }
 
 Fast_SLAM::Float
