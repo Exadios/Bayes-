@@ -11,9 +11,9 @@
 
 #include <mex.h>
 #include "matlabBfilter.h"
-#include "SLAM/SLAM.h"
-#include "SLAM/fastSLAM.h"
-#include "SLAM/kalmanSLAM.h"
+#include "SLAM/SLAM.hpp"
+#include "SLAM/fastSLAM.hpp"
+#include "SLAM/kalmanSLAM.hpp"
 
 using namespace::Matlab_convert;
 

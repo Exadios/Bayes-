@@ -12,8 +12,8 @@
  *  algorithm that require additional resources to implement
  */
 #include "bayesFlt.hpp"
-#include "matSup.hpp"
 #include "models.hpp"
+#include "matSup.hpp"
 #include <vector>		// Only for unique_samples
 
 

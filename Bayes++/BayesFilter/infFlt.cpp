@@ -10,6 +10,7 @@
 /*
  * Information Filter.
  */
+#include "bayesFlt.hpp"
 #include "infFlt.hpp"
 #include "matSup.hpp"
 

@@ -28,7 +28,7 @@
 #include <mex.h>				// Matlab MEX suport
 								// Need bounds check so we get exceptions
 #define BOOST_UBLAS_BOUNDS_CHECK
-#include "BayesFilter/allFlt.h" // Include all of Bayesian Filtering library
+#include "BayesFilter/allFilters.hpp" // Include all of Bayesian Filtering library
 #include <boost/random.hpp>		// Fast and good random numbers
 
 namespace FM = Bayesian_filter_matrix;

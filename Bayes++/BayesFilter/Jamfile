@@ -14,7 +14,6 @@ CPP_SOURCES =
 lib BayesFilter : $(CPP_SOURCES).cpp
     :
      <include>$(BOOST_ROOT)
-     <vc7>cxxflags=/Za
     : debug release
 ;
 

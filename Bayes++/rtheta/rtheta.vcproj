@@ -28,7 +28,6 @@
 				PreprocessorDefinitions="_CONSOLE,_DEBUG,WIN32"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -80,7 +79,6 @@
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DisableSpecificWarnings="4224"/>
@@ -124,7 +122,6 @@
 				PreprocessorDefinitions="_CONSOLE,_DEBUG,WIN32"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"

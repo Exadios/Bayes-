@@ -9,7 +9,9 @@
 
 /*
  * Covariance Intersection Filter.
+ * TODO: Implement useful Omega based on iterative optimization algorithm from the authors of reference [1]
  */
+#include "bayesFlt.hpp"
 #include "CIFlt.hpp"
 #include "matSup.hpp"
 #include "models.hpp"
@@ -102,8 +104,6 @@ Bayes_base::Float
 /* correlated innovation observe
  */
 {
-return -1.;
-#ifdef DOES_NOT_WORK_YET
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
 		filter_error("observation and model size inconsistent");
@@ -122,22 +122,16 @@ return -1.;
 	rcond = UdUinversePD (invX, X);
 	rclimit.check_PD(rcond, "X not PD in observe");
 
-std::cout << X <<std::endl;
-std::cout << invX <<std::endl;
-std::cout << HTinvRH <<std::endl;
 
 	double omega = Omega(invX, HTinvRH, X);
-std::cout << omega <<std::endl;
 
 	/* calculate predicted innovation */
 	Matrix PHTran = prod(X, HTran);
 	Matrix HPHTran = prod(h.Hx, PHTran);
-std::cout << HPHTran <<std::endl;
 	Matrix oHPHTran = HPHTran * (1.-omega);
 	SymMatrix oR = h.Z * omega;
 
 	S = oHPHTran + oR;
-std::cout << S <<std::endl;
 
 	/* test for fault ??*/
 	//    error = faultTest( S, obsErr, obsNum  );
@@ -148,7 +142,6 @@ std::cout << S <<std::endl;
 
 	Matrix oPHTran = PHTran*(1.0-omega);
 	Matrix K = prod(oPHTran, SI);
-std::cout << K <<std::endl;
 
 	// State update
 	x += prod(K, s);
@@ -160,168 +153,7 @@ std::cout << K <<std::endl;
 	rcond = UdUinversePD (X, invX);
 	rclimit.check_PD(rcond, "inverse covariance not PD in observe");
 	return rcond;
-#endif
 }
 
-
-CI_filter::Float CI_filter::Omega(const SymMatrix& Ai_ext, const SymMatrix& Bi_ext, const SymMatrix& A_ext)
-/*
- * Compute CI Omega value
- *  Iterative optimization algorithm from the authors of reference [1]
- */
-{
-return 0.;
-#ifdef DOES_NOT_WORK_YET
-// Also need work to avoid predefined types sizes and constants
-	using std::sqrt;
-	const int MAX_STATES=10;	// Nast fixed value for C implementation
-	const double MINDOUBLE=1E-38;
-	int n = A_ext.size1();
-	int i, j, k, m, count;
-	double a=0.0, b, c, f, g, p, q, r, s;
-	double d[MAX_STATES], e[MAX_STATES], t=0.0, dt=0.0, X[MAX_STATES][MAX_STATES];
-
-	Matrix Ai = Ai_ext;			// Copy extern matrices internal work matrices
-	Matrix Bi = Bi_ext;
-	Matrix A  = A_ext;
-
-	for (i=0; i<n; i++) {
-		for (j=0; j<n; j++) {
-			for (k=0,s=0; k<j; k++) s += X[i][k] * X[j][k];
-			if (j<i) X[i][j] = (A[i][j] - s)/X[j][j];
-			else X[i][j] = sqrt(fabs(A[i][i] - s));
-		}
-	}
-	for (i=0; i<n; i++) for (j=i; j<n; j++) A[i][j] = X[j][i];
-	for (i=0; i<n; i++) {
-		for (j=i; j<n; j++) e[j] = A[i][j];
-		for (j=0; j<n; j++) {
-			for (k=i,s=0.0; k<n; k++) s += e[k]*Bi[k][j];
-			A[i][j] = s;
-		}
-	}
-	for (i=0; i<n; i++) {
-		for (j=0; j<n; j++) e[j] = A[i][j];
-		for (j=0; j<n; j++) {
-			for (k=j,s=0.0; k<n; k++) s += e[k]*X[k][j];
-			A[i][j] = s;
-		}
-	}
-	for (i=(n-1); i>0; i--) {
-		m = i - 1;  r = s = 0.0;
-		if (m > 0) {
-			for (k=0; k<=m; k++) s += fabs(A[i][k]);
-			if (s == 0.0) e[i] = A[i][m];
-			else {
-				for (k=0; k<=m; k++) {
-					A[i][k] /= s;
-					r += A[i][k]*A[i][k];
-				}
-				g = ((f = A[i][m]) >= 0.0 ? -sqrt(r) : sqrt(r));
-				e[i] = s * g;  r -= f*g;
-				A[i][m] = f - g;  f = 0.0;
-				for (j=0; j<=m; j++) {
-					for (k=0,g=0.0; k<=j; k++) g += A[j][k]*A[i][k];
-					for (k=j+1; k<=m; k++) g += A[k][j]*A[i][k];
-					e[j] = g/r;
-					f += e[j]*A[i][j];
-				}
-				q = f/(r+r);
-				for (j=0; j<=m; j++) {
-					f = A[i][j];
-					g = (e[j] -= q*f);
-					for (k=0; k<=j; k++) A[j][k]-=(f*e[k]+g*A[i][k]);
-				}
-			}
-		}
-		else e[i] = A[i][m];
-		d[i] = r;
-	}
-	for (i=0; i<n; i++) d[i] = A[i][i];
-	for (i=1; i<n; i++) e[i-1] = e[i];
-	e[n-1] = 0.0;
-	for (j=0; j<n; j++) {
-		count = 0;
-		do {
-			for (m=j; m<n-1; m++) {
-				q = fabs(d[m]) + fabs(d[m+1]);
-				if ((double)(fabs(e[m])+q) == q) break;
-			}
-			if (m != j) {
-				if (count++ > sizeof(double)*4) goto Iloop;
-				g = (d[j+1]-d[j])/(2.0*e[j]);
-				r = sqrt(g*g+1.0);
-				g = d[m]-d[j]+e[j]/(g+((g<0)?-fabs(r):fabs(r)));
-				s = c = 1.0; p = 0.0;
-				for (i=m-1; i>=j; i--) {
-					f = s*e[i]; b = c*e[i];
-					e[i+1] = (r = sqrt(f*f+g*g));
-					if (r == 0.0) {
-						d[i+1] -= p; e[m] = 0.0;
-						break;
-					}
-					s = f/r; c = g/r;
-					g = d[i+1] - p;
-					r = (d[i]-g)*s + 2.0*c*b;
-					d[i+1] = g + (p=s*r);
-					g = c*r - b;
-				}
-				if (r == 0.0 && i >= 0) continue;
-				d[j] -= p; e[j] = g; e[m] = 0.0;
-			}
-		} while (m != j);
-	}
-Iloop:
-	for (i=0,b=c=0.0; i<n; i++) {
-		if (d[i]==0.0) j = 1;
-		else b += (1-d[i])/d[i];
-		c += (1-d[i]);
-	}
-	if (j) b = fabs(c)+2*(a=sqrt(MINDOUBLE));
-	if (fabs(b-c)<a)
-		return(1.0);
-	if (b*c>0.0) {
-		if (b<0.0)
-			return(0.0);
-		else
-			return(1.0);
-	}
-	if (b > 0.0) {c = 0.0; b = 1.0;}
-	else {b = 0.0; c = 1.0;}
-	for (i=0; i<n; i++) {
-		t += (q = 2*(1-d[i])/(1+d[i]));
-		dt -= q*q;
-	}
-	p = q = 1.0; g = 0.5;
-	for (j=0; j<(32*sizeof(double)); j++) {
-		if ((((g-c)*dt-t)*((g-b)*dt-t) >= 0.0)
-			|| (fabs(2.0*t) > fabs(q*dt))) {
-				q = p;
-				p = 0.5*(c-b);
-				g = b + p;
-				if (b == g)
-					goto Iwrap;
-			}
-		else {
-			q = p; p = t/dt; q = g; g -= p;
-			if (q == g)
-				goto Iwrap;
-		}
-		if (fabs(p) < a)
-			goto Iwrap;
-		t = dt = 0.0;
-		for (i=0; i<n; i++) {
-			t += (q = (1-d[i])/(g*(1-d[i])+d[i]));
-			dt -= q*q;
-		}
-		if (t < 0.0) b = g;
-		else c = g;
-	}
-Iwrap:
-	if (1.0-g<=2.*a) return(1.0);
-	if (g<=2.*a) return(0.0);
-	return(g);
-#endif
-}
 
 }//namespace

@@ -3,6 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.00"
 	Name="Quadradtic Calib"
+	ProjectGUID="{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}"
 	SccProjectName=""
 	SccAuxPath=""
 	SccLocalPath=""
@@ -28,7 +29,6 @@
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -76,7 +76,6 @@
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DisableSpecificWarnings="4224"/>
@@ -124,7 +123,6 @@
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -159,7 +157,7 @@
 	</Configurations>
 	<Files>
 		<File
-			RelativePath=".\quadc.cpp">
+			RelativePath="QuadCalib.cpp">
 		</File>
 	</Files>
 	<Globals>

@@ -10,6 +10,7 @@
 /*
  * Information Root Filter.
  */
+#include "bayesFlt.hpp"
 #include "infRtFlt.hpp"
 #include "matSup.hpp"
 #include "uLAPACK.hpp"	// Common LAPACK interface

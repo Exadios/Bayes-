@@ -30,6 +30,7 @@
  * 	predict, observe
  * cycle defined by the base class
  */
+#include "matSup.hpp"
 #include "bayesFlt.hpp"
 
 /* Filter namespace */

@@ -527,7 +527,6 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 
 int main()
 {
-try {
 	// Other things I might want to test
 	extern void other_tests();
 	other_tests();
@@ -546,14 +545,9 @@ try {
 	X_init(1,0) = X_init(0,1) = INIT_X_NOISE*INIT_Y_NOISE*INIT_XY_NOISE_CORRELATION;
 
 	// Initialise and do the comparison
-	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	std::cout << "udfilter, irfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<UD_filter>, Filter<Unscented_filter> > test1(x_init, X_init, 4);
-	std::cout << std::endl;
-
-	std::cout << "irfilter, ijfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
-	Random.reseed();
-	CCompare<Filter<Information_root_filter>, Filter<Information_joseph_filter> > test0(x_init, X_init, 4);
+	CCompare<Filter<UD_filter>, Filter<Information_root_filter> > test1(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
@@ -561,14 +555,15 @@ try {
 	CCompare<Filter<Covariance_filter>, Filter<Information_filter> > test2(x_init, X_init, 4);
 	std::cout << std::endl;
 
+	std::cout << "ufilter, ijfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	Random.reseed();
+	CCompare<Filter<Unscented_filter>, Filter<Information_joseph_filter> > test3(x_init, X_init, 4);
+	std::cout << std::endl;
+
 	std::cout << "cifilter, sfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<CI_filter>, Filter<SIR_kalman_filter> > test3(x_init, X_init, 4);
+	CCompare<Filter<CI_filter>, Filter<SIR_kalman_filter> > test4(x_init, X_init, 4);
 	std::cout << std::endl;
-}
-catch (std::exception e)
-{
-	std::cout << e.what() << std::endl;
-}
+
 	return 0;
 }

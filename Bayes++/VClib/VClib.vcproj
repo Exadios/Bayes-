@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.00"
-	Name="VClib"
+	Name="BayesFilter"
 	ProjectGUID="{F90E045F-A6E0-4933-9477-1C135987F920}"
 	SccProjectName=""
 	SccAuxPath=""
@@ -29,9 +29,8 @@
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="matSup.h"
+				PrecompiledHeaderThrough="bayesFlt.hpp"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -78,9 +77,8 @@
 				PreprocessorDefinitions="NDEBUG,_LIB"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="matSup.h"
+				PrecompiledHeaderThrough="bayesFlt.hpp"
 				WarningLevel="3"
 				CompileAs="0"
 				DisableSpecificWarnings="4224"/>
@@ -121,9 +119,8 @@
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="matSup.h"
+				PrecompiledHeaderThrough="bayesFlt.hpp"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 				CompileAs="0"
@@ -155,69 +152,65 @@
 			Name="BayesFilter Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
-				RelativePath="..\BayesFilter\CIFlt.h">
+				RelativePath="..\BayesFilter\CIFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\SIRFlt.h">
+				RelativePath="..\BayesFilter\SIRFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\UDFlt.h">
+				RelativePath="..\BayesFilter\UDFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\allFlt.h">
+				RelativePath="..\BayesFilter\allFilters.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\bayesFlt.h">
+				RelativePath="..\BayesFilter\bayesFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\compatibility.h">
+				RelativePath="..\BayesFilter\compatibility.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\covFlt.h">
+				RelativePath="..\BayesFilter\covFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\infFlt.h">
+				RelativePath="..\BayesFilter\infFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\infRtFlt.h">
+				RelativePath="..\BayesFilter\infRtFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\itrFlt.h">
+				RelativePath="..\BayesFilter\itrFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\matSup.h">
+				RelativePath="..\BayesFilter\matSup.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\models.h">
+				RelativePath="..\BayesFilter\matSupSub.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\schemeFlt.h">
+				RelativePath="..\BayesFilter\models.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\unsFlt.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="uBlas"
-			Filter="">
-			<File
-				RelativePath="..\BayesFilter\matSupSub.h">
+				RelativePath="..\BayesFilter\schemeFlt.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\uBLASmatrix.h">
+				RelativePath="..\BayesFilter\uBLASmatrix.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\uLAPACK.h">
+				RelativePath="..\BayesFilter\uLAPACK.hpp">
+			</File>
+			<File
+				RelativePath="..\BayesFilter\unsFlt.hpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Filters"
 			Filter="">
 			<File
-				RelativePath="..\BayesFilter\filters\average1.h">
+				RelativePath="..\BayesFilter\filters\average1.hpp">
 			</File>
 			<File
-				RelativePath="..\BayesFilter\filters\indirect.h">
+				RelativePath="..\BayesFilter\filters\indirect.hpp">
 			</File>
 		</Filter>
 		<Filter
@@ -434,21 +427,24 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+						PrecompiledHeaderThrough="bayesFlt.hpp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+						PrecompiledHeaderThrough="bayesFlt.hpp"/>
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"
-						UsePrecompiledHeader="1"/>
+						UsePrecompiledHeader="1"
+						PrecompiledHeaderThrough="bayesFlt.hpp"/>
 				</FileConfiguration>
 			</File>
 			<File

@@ -18,7 +18,6 @@
  *   then those in Bayesian_filter.
  */
 
-
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {

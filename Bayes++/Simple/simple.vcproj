@@ -29,7 +29,6 @@
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\UBLAS_Debug/simple.pch"
 				WarningLevel="3"
@@ -81,7 +80,6 @@
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="TRUE"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\UBLAS_Debug/simple.pch"
 				WarningLevel="3"
@@ -126,7 +124,6 @@
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\UBLAS_Debug/simple.pch"
 				WarningLevel="3"
@@ -163,24 +160,6 @@
 	<Files>
 		<File
 			RelativePath=".\simpleExample.cpp">
-			<FileConfiguration
-				Name="uBLAS Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					DisableLanguageExtensions="TRUE"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="uBLAS Release|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					DisableLanguageExtensions="TRUE"/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="uBLAS(Development) Debug|Win32">
-				<Tool
-					Name="VCCLCompilerTool"
-					DisableLanguageExtensions="TRUE"/>
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

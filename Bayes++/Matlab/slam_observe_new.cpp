@@ -6,11 +6,13 @@
 
 /*
  * MATLAB MEX interface for Bayes++
- *  bf_observe:  Observe new SLAM feature
+ *  bf_observe_new:  Observe new SLAM feature
  */
 
 #include <mex.h>
 #include "matlabBfilter.h"
+#include "SLAM/SLAM.hpp"
+
 
 using namespace::Matlab_convert;
 

@@ -13,8 +13,8 @@
  * TODO
  *	Update can be done directly in factorised form
  */
+#include "bayesFlt.hpp"
 #include "unsFlt.hpp"
-#include "matSup.hpp"
 #include "models.hpp"
 #include <cmath>
 

@@ -12,6 +12,7 @@
  *
  * Bootstap filter (Sequential Importance Resampleing).
  */
+#include "bayesFlt.hpp"
 #include "SIRFlt.hpp"
 #include "matSup.hpp"
 #include <algorithm>
