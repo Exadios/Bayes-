@@ -113,94 +113,9 @@ public:
 
 
 /*
- * Generalise addative observe model to likelihood observe model
+ * Model Adaptors: Constructed with a reference to another model
  */
 
-// General Linearised Uncorrelated Addative
-class General_LzUnAd_observe_model: public Linrz_uncorrelated_observe_model, public Likelihood_observe_model
-{
-public:
-	General_LzUnAd_observe_model (size_t x_size, size_t z_size) :
-		Linrz_uncorrelated_observe_model(x_size, z_size),
-		Likelihood_observe_model(z_size),
-		Zv_inv(z_size)
-	{
-		zset = false;
-	}
-	virtual Float L(const FM::Vec& x) const;
-	// Definition of likelihood for addative noise model given zz
-	virtual void Lz (const FM::Vec& zz);
-	// Fix the observation zz about which to evaluate the Likelihood function
-	// Zv is also fixed
-
-private:
-	FM::Vec Zv_inv;			// Inverse Noise Covariance given zz
-	Float logdetZ;			// log(det(Z))
-	mutable bool zset;	
-};
-
-// General Linear Uncorrelated Addative
-class General_LiUnAd_observe_model: public General_LzUnAd_observe_model
-{
-public:
-	General_LiUnAd_observe_model (size_t x_size, size_t z_size) :
-		General_LzUnAd_observe_model(x_size, z_size),
-		hx(z_size)
-	{}
-	const FM::Vec& h(const FM::Vec& x) const
-	{	// Provide a linear implementation of functional h assumes model is already Linrz for Hx
-		hx.assign (FM::prod(Hx,x));
-		return hx;
-	}
-private:
-	mutable FM::Vec hx;
-};
-
-// General Linearised Correlated Addative
-class General_LzCoAd_observe_model: public Linrz_correlated_observe_model, public Likelihood_observe_model
-{
-public:
-	General_LzCoAd_observe_model (size_t x_size, size_t z_size) :
-		Linrz_correlated_observe_model(x_size, z_size),
-		Likelihood_observe_model(z_size),
-		Z_inv(z_size,z_size)
-	{
-		zset = false;
-	}
-	virtual Float L(const FM::Vec& x) const;
-	// Definition of likelihood for addative noise model given zz
-	virtual void Lz (const FM::Vec& zz);
-	// Fix the observation zz about which to evaluate the Likelihood function
-	// Z is also fixed
-
-private:
-	FM::SymMatrix Z_inv;	// Inverse Noise Covariance
-	Float logdetZ;			// log(det(Z)
-	static Float scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& V);
-	mutable bool zset;	
-};
-
-// General Linear Correlated Addative
-class General_LiCoAd_observe_model: public General_LzCoAd_observe_model
-{
-public:
-	General_LiCoAd_observe_model (size_t x_size, size_t z_size) :
-		General_LzCoAd_observe_model(x_size, z_size),
-		hx(z_size)
-	{}
-	const FM::Vec& h(const FM::Vec& x) const
-	{	// Provide a linear implementation of functional h assumes model is already Linrz for Hx
-		hx.assign (FM::prod(Hx,x));
-		return hx;
-	}
-private:
-	mutable FM::Vec hx;
-};
-
-
-/*
- * Model Adaptors:
- */
 
 class Adapted_Correlated_addative_observe_model : public Correlated_addative_observe_model
 /*
@@ -241,6 +156,138 @@ public:
 protected:
 	Linrz_uncorrelated_observe_model& unc;
 };
+
+
+/*
+ * Genereal Models: Include properties of more then on observe model.
+ */
+
+// General Linearised Uncorrelated Addative and Likelihood observe model
+class General_LzUnAd_observe_model : public Linrz_uncorrelated_observe_model, public Likelihood_observe_model
+{
+public:
+	General_LzUnAd_observe_model (size_t x_size, size_t z_size) :
+		Linrz_uncorrelated_observe_model(x_size, z_size),
+		Likelihood_observe_model(z_size),
+		li(z_size)
+	{}
+	virtual Float L(const FM::Vec& x) const
+	// Definition of likelihood for addative noise model given zz
+	{	return li.L(*this, z, h(x));
+	}
+	virtual void Lz (const FM::Vec& zz)
+	// Fix the observation zz about which to evaluate the Likelihood function
+	// Zv is also fixed
+	{	Likelihood_observe_model::z = zz;
+		li.Lz(*this);
+	}
+private:
+	friend class General_LiUnAd_observe_model;
+	struct Likelihood_uncorrelated
+	{
+		Likelihood_uncorrelated(size_t z_size) :
+			zInnov(z_size), Zv_inv(z_size)
+		{	zset = false;
+		}
+		mutable FM::Vec zInnov;	// Normailised innovation, temporary for L(x)
+		FM::Vec Zv_inv;			// Inverse Noise Covariance given zz
+		Float logdetZ;			// log(det(Z))
+		bool zset;
+		Float L(const Uncorrelated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const;
+		// Definition of likelihood for addative noise model given zz
+		void Lz(const Uncorrelated_addative_observe_model& model);
+	};
+	Likelihood_uncorrelated li;
+};
+
+// General Linear Uncorrelated Addative and Likelihood observe model
+class General_LiUnAd_observe_model : public Linear_uncorrelated_observe_model, public Likelihood_observe_model
+{
+public:
+	General_LiUnAd_observe_model (size_t x_size, size_t z_size) :
+		Linear_uncorrelated_observe_model(x_size, z_size),
+		Likelihood_observe_model(z_size),
+		li(z_size)
+	{}
+	virtual Float L(const FM::Vec& x) const
+	// Definition of likelihood for addative noise model given zz
+	{	return li.L(*this, z, h(x));
+	}
+	virtual void Lz (const FM::Vec& zz)
+	// Fix the observation zz about which to evaluate the Likelihood function
+	// Zv is also fixed
+	{	Likelihood_observe_model::z = zz;
+		li.Lz(*this);
+	}
+
+private:
+	General_LzUnAd_observe_model::Likelihood_uncorrelated li;
+};
+
+// General Linearised Correlated Addative and Likelihood observe model
+class General_LzCoAd_observe_model : public Linrz_correlated_observe_model, public Likelihood_observe_model
+{
+public:
+	General_LzCoAd_observe_model (size_t x_size, size_t z_size) :
+		Linrz_correlated_observe_model(x_size, z_size),
+		Likelihood_observe_model(z_size),
+		li(z_size)
+	{}
+	virtual Float L(const FM::Vec& x) const
+	// Definition of likelihood for addative noise model given zz
+	{	return li.L(*this, z, h(x));
+	}
+	virtual void Lz (const FM::Vec& zz)
+	// Fix the observation zz about which to evaluate the Likelihood function
+	// Zv is also fixed
+	{	Likelihood_observe_model::z = zz;
+		li.Lz(*this);
+	}
+
+private:
+	friend class General_LiCoAd_observe_model;
+	struct Likelihood_correlated
+	{
+		Likelihood_correlated(size_t z_size) :
+			zInnov(z_size), Z_inv(z_size,z_size)
+		{	zset = false;
+		}
+		mutable FM::Vec zInnov;	// Normailised innovation, temporary for L(x)
+		FM::SymMatrix Z_inv;	// Inverse Noise Covariance
+		Float logdetZ;			// log(det(Z)
+		bool zset;	
+		static Float scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& V);
+		Float L(const Correlated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const;
+		// Definition of likelihood for addative noise model given zz
+		void Lz(const Correlated_addative_observe_model& model);
+	};
+	Likelihood_correlated li;
+};
+
+// General Linear Correlated Addative and Likelihood observe model
+class General_LiCoAd_observe_model : public Linear_correlated_observe_model, public Likelihood_observe_model
+{
+public:
+	General_LiCoAd_observe_model (size_t x_size, size_t z_size) :
+		Linear_correlated_observe_model(x_size, z_size),
+		Likelihood_observe_model(z_size),
+		li(z_size)
+	{}
+	virtual Float L(const FM::Vec& x) const
+	// Definition of likelihood for addative noise model given zz
+	{	return li.L(*this, z, h(x));
+	}
+	virtual void Lz (const FM::Vec& zz)
+	// Fix the observation zz about which to evaluate the Likelihood function
+	// Zv is also fixed
+	{	Likelihood_observe_model::z = zz;
+		li.Lz(*this);
+	}
+
+private:
+	General_LzCoAd_observe_model::Likelihood_correlated li;
+};
+
 
 }// namespace
 
