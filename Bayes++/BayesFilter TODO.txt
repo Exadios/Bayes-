@@ -2,13 +2,12 @@ Bayes++ TODO List
 
 FOR RELEASE
 		Doxygen!
-		Build GCC2.95.3 and VC7
+		Build gcc-3.2 gcc-2.95 msvcms intelinux-70
 		Check VC7 solution
 	Check what UBLAS macros are needed
 		For exceptions/errors
 		For storage
-		Run with sparse
-		Run Simple, PV, QuadCalib
+	Run Simple, PV, QuadCalib, SLAM
 
 DOCUMENTATION
 	Describe generic schemes
@@ -38,7 +37,7 @@ TO REVIEW
 	Check consistency of model to filter
 		Validate (z to h.Z) model sizes in predict and observe
 	UDpredict catching Negative matrices in observe
-	Check normalisation: Standard form should be to normalise z. It is nice to have zp consistent with itself i.e. Hx
+	Check normalisation: Standard form should be to normalise(z,zp). This ensure z is consistent with zp and other model parts such as Hx
 	Check when numerics fail for both state and obs semidefinate
 
 CODE RULES

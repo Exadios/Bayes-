@@ -10,6 +10,3 @@ project deployment
 build-project .. ;
 build-project ../rtheta ;
 build-project ../SLAM ;
-
-#alias all
-#    :   ../PV//PV  :  ;
