@@ -122,14 +122,18 @@ void test_SPD()
 	Vec Stemp(1);
 	SymMatrix P(2,2);
 
-	// Try mult_SPD
 	RowMatrix R(2,1);
 	R(0,0) = 1.;
 	R(1,0) = 2.;
-	std::cout << R << std::endl;
 
+	// Try mult_SPD
 	P.clear();
 	mult_SPD(R,S,P,Stemp);
+	std::cout << P << std::endl;
+
+	// Try prod_SPD
+	RowMatrix RStemp(R.size1(), S.size2());
+	P.assign( prod_SPD(R,S, RStemp) );
 	std::cout << P << std::endl;
 
 	// Try mult_SPDT
@@ -145,17 +149,6 @@ void test_SPD()
 
 void test_SPD_all()
 {
-	{
-	SymMatrix S(1,1);
-	SymMatrix::iterator1 Si = S.begin1();
-	SymMatrix::rowi(Si);
-	}
-	{
-	const SymMatrix S(1,1);
-	SymMatrix::const_iterator1 Si = S.begin1();
-	SymMatrix::rowi(Si);
-	}
-
 	SymMatrix S(1,1);
 	Vec x(1);
 	S(0,0) = 5.;
@@ -163,7 +156,7 @@ void test_SPD_all()
 
 	double v1 = ublas::inner_prod (x, ublas::prod(S,x) );
 
-	double v2 = mult_SPDT(x,S);
+	double v2 = prod_SPDT(x,S);
 
 	test_SPD();
 }
@@ -273,7 +266,7 @@ void test_addative()
 	Vec q(1);
 	class ff : public Function_model
 	{
-	virtual const FM::Vec& fx(const FM::Vec& x) const {return x;}
+	virtual const FM::Vec& fx(const FM::Vec& x) const {return x;7}
 	} f;
 	Simple_addative_predict_model s(f,G,q);
 }

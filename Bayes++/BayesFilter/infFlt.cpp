@@ -107,7 +107,8 @@ Bayes_base::Float
 	update ();			// x,X required
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict information matrix, and state covariance
-	X = mult_SPD(f.Fx, X) + mult_SPD(f.G, f.q);
+	RowMatrix temp(f.Fx.size1(), X.size2());
+	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
 
 						// Information
 	Float rcond = UdUinversePD (Y, X);
@@ -147,12 +148,13 @@ Bayes_base::Float
 												// Calculate EIF i
 	i = prod(trans(h.Hx), prod(ZI,zz));
 												// Calculate EIF I
-	I = mult_SPDT(h.Hx, ZI);
+	RowMatrix temp = prod(ZI, h.Hx);
+	I = prod(trans(h.Hx), temp );
 
 	y += i;
 	Y += I;
 	update_required = true;
-	// TODO: Remove check once proved
+
 	assert_isPSD (Y);
 	return rcond;
 }
@@ -178,12 +180,13 @@ Bayes_base::Float
 												// Calculate EIF i
 	i = prod(trans(h.Hx), prod(ZI,zz));						// ISSUE: Efficiency ZI is diagonal
 												// Calculate EIF I
-	I = mult_SPDT(h.Hx, ZI);
+	RowMatrix temp = prod(ZI, h.Hx);
+	I = prod(trans(h.Hx), temp );
 
 	y += i;
 	Y += I;
 	update_required = true;
-	// TODO: Remove check once proved
+
 	assert_isPSD (Y);
 	return rcond;
 }
@@ -234,7 +237,8 @@ void Information_joseph_filter::predict (Linear_invertable_predict_model& f)
 	t.Chi.assign (prod(t.A,t.inv_AQ));
 	FM::identity(t.IChi); t.IChi -= t.Chi;
 
-	Y = mult_SPD(t.IChi, t.A) + mult_SPD(t.Chi, t.inv_Q);
+	RowMatrix temp1(t.IChi.size1(), t.A.size2()), temp2(t.Chi.size1(), t.inv_Q.size2());
+	Y = prod_SPD(t.IChi,t.A, temp1) + prod_SPD(t.Chi, t.inv_Q, temp2);
 						// Information state
 	y = prod(prod(t.IChi,trans(f.inv.Fx)), y);
 

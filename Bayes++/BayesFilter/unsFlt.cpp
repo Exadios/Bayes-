@@ -113,7 +113,6 @@ void Unscented_filter::update ()
  *		Post: x,X
  */
 {
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 }
 
@@ -233,7 +232,6 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 						// Addative Noise Prediction, computed about center point
 	X.plus_assign (f.Q(column(fXX,0)));
 
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 }
 
@@ -356,9 +354,9 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 						// Filter update
 	s = z; s.minus_assign (zp);
 	x.plus_assign (prod(W,s));
-	X.minus_assign (mult_SPD(W, S));
+	RowMatrix WStemp(W.size1(), S.size2());
+	X.minus_assign (prod_SPD(W,S, WStemp) );
 
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 
 	return rcond;

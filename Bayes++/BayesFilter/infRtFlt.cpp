@@ -117,7 +117,6 @@ void Information_root_filter::update ()
 	mult_SPDi(RI, X);		// X = RI*RI'
 	x.assign (prod(RI,r));
 
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 }
 

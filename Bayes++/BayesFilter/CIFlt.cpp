@@ -58,9 +58,9 @@ Bayes_base::Float
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
-	X = mult_SPD(f.Fx, X) + mult_SPD(f.G, f.q);
+	RowMatrix temp(f.Fx.size1(), X.size2());
+	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
 
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 	return 1.;
 }

@@ -56,7 +56,7 @@ void Kalman_SLAM::observe (unsigned feature, const Feature_observe& fom, const F
 		filter_error ("Observe non existing feature");
 		return;
 	}
-	// TODO Implement nonlinear fom
+	// TODO Implement nonlinear form
 	// Create a augmented sparse observe model for full states
 	BF::Linear_uncorrelated_observe_model fullm(nL+nM, 1);
 	fullm.Hx.clear();

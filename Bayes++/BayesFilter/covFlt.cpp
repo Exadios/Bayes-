@@ -57,9 +57,9 @@ Bayes_base::Float
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
-	X = mult_SPD(f.Fx, X) + mult_SPD(f.G, f.q);
+	RowMatrix temp(f.Fx.size1(), X.size2());
+	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
 
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 	return 1.;
 }
@@ -88,7 +88,8 @@ Bayes_base::Float
 	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
-	S = mult_SPD(h.Hx, X) + h.Z;
+	Matrix temp(h.Hx.size1(), X.size2());
+	S = prod_SPD(h.Hx,X, temp) + h.Z;
 
 						// Inverse innovation covariance
 	Float rcond = UdUinversePD (SI, S);
@@ -99,8 +100,9 @@ Bayes_base::Float
 
 						// State update
 	x += prod(W, s);
-	X -= mult_SPD(W, S);
-	// TODO: Remove check once proved
+	Matrix WStemp(W.size1(), S.size2());
+	X -= prod_SPD(W, S, WStemp);
+
 	assert_isPSD (X);
 	return rcond;
 }
@@ -117,7 +119,8 @@ Bayes_base::Float
 	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
-	S = mult_SPD(h.Hx, X);
+	Matrix temp(h.Hx.size1(), X.size2());
+	S = prod_SPD(h.Hx,X, temp);
 	for (size_t i = 0; i < h.Zv.size(); ++i)
 		S(i,i) += h.Zv[i];
 
@@ -130,8 +133,9 @@ Bayes_base::Float
 
 						// State update
 	x += prod(W, s);
-	X -= mult_SPD(W, S);
-	// TODO: Remove check once proved
+	Matrix WStemp(W.size1(), S.size2());
+	X -= prod_SPD(W,S, WStemp);
+
 	assert_isPSD (X);
 	return rcond;
 }

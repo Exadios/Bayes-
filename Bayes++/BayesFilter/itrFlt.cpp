@@ -59,9 +59,9 @@ Bayes_base::Float
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
-	X = mult_SPD(f.Fx, X) + mult_SPD(f.G, f.q);
+	RowMatrix FxXtemp(f.Fx.size1(),X.size2());
+	X = prod_SPD(f.Fx,X, FxXtemp) + prod_SPD(f.G,f.q);
 
-	// TODO: Remove check once proved
 	assert_isPSD (X);
 	return 1.;
 }
@@ -134,14 +134,16 @@ Bayes_base::Float
 		h.normalise(zp, z);
 		HxT.assign (trans(h.Hx));
 		s = z - zp;			// Innovation and covariance
-		S = mult_SPD(h.Hx, Xpred) + h.Z;
+		RowMatrix HxXtemp(h.Hx.size1(),X.size2());
+		S = prod_SPD(h.Hx, Xpred, HxXtemp) + h.Z;
 
 							// Inverse innovation covariance
 		rcond = UdUinversePD (SI, S);
 		rclimit.check_PD(rcond, "S not PD in observe");
 
 							// Iterative observe
-		X = Xpred - mult_SPD (Xpred, mult_SPD(HxT,SI));
+		RowMatrix temp1(Xpred.size1(), HxT.size1()), temp2(HxT.size1(), SI.size2());
+		X = Xpred - prod_SPD (Xpred, prod_SPD(HxT,SI, temp2), temp1);
 		// TODO: Remove check once proved
 		assert_isPSD (X);
 		x += prod(prod(X,HxT),prod(ZI,s)) - prod(prod(X,XpredI), (x - xpred));

@@ -23,7 +23,6 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zm150"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)"
 				PreprocessorDefinitions="_CONSOLE,_DEBUG,WIN32"
@@ -167,9 +166,22 @@
 		</File>
 		<File
 			RelativePath=".\rtheta.cpp">
+			<FileConfiguration
+				Name="uBLAS Debug|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalOptions="/Zm200"/>
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\tests.cpp">
+			<FileConfiguration
+				Name="uBLAS Debug|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					AdditionalOptions="/Zm200"
+					DisableLanguageExtensions="FALSE"/>
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>
