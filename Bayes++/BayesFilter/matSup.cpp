@@ -27,7 +27,7 @@ inline scalar sqr(scalar x)
 {
 	return x*x;
 }
-};//namespace
+}//namespace
 
 
 /* Filter Matrix Namespace */
