@@ -3,7 +3,7 @@
 
 # Propagated usage requirements
 project BayesFilter
-     : usage-requirements <include>".."
+     : usage-requirements <include>".."		# Library headers are refered to as "BayesFilter/xxx.hpp"
 ;
 
 # Base names of the source files for BayesFilter

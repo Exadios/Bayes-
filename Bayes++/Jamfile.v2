@@ -20,8 +20,8 @@ project
 
 # Build variant to allow testing with a local uBLAS version seperated from Boost. It named @uBLAS so it sorted name is included first
 # Tested with compressed matrices
-variant uBLAS_seperate_debug : debug : <include>"../@uBLAS" ;
-variant uBLAS_seperate_release : release : <include>"../@uBLAS" ;
+variant uBLAS_seperate_debug : debug : <include>"../boost/@uBLAS" ;
+variant uBLAS_seperate_release : release : <include>"../boost/@uBLAS" ;
 
 # Tested with compressed matrices
 variant compress_debug : debug : <define>BAYES_FILTER_COMPRESSED ;
