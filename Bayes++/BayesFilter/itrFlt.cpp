@@ -83,7 +83,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Iterated_covariance_scheme::eobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+ Iterated_covariance_scheme::eobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /*
  * Iterated Extended Kalman Filter
@@ -99,7 +99,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Iterated_covariance_scheme::eobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+ Iterated_covariance_scheme::eobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /*
  * Iterated Extended Kalman Filter

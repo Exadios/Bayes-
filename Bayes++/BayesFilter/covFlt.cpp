@@ -75,7 +75,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Covariance_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
+ Covariance_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
 /* Extended_kalman_filter observe, unused byproduct
  */
 {
@@ -86,7 +86,7 @@ Bayes_base::Float
 }	
 
 Bayes_base::Float
- Covariance_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
+ Covariance_scheme::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
 /* Extended_kalman_filter observe, unused byproduct
  */
 {
@@ -97,7 +97,7 @@ Bayes_base::Float
 }	
 
 Bayes_base::Float
- Covariance_scheme::eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+ Covariance_scheme::eobserve_innovation (Linrz_correlated_observe_model& h, const Vec& s,
  				Covariance_byproduct& S, Kalman_gain_byproduct& b)
  /* Correlated innovation observe with explict byproduct
  */
@@ -126,7 +126,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Covariance_scheme::eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+ Covariance_scheme::eobserve_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s,
  				Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /* Uncorrelated innovation observe with explict byproduct
  */

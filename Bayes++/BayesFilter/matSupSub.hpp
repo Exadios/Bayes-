@@ -25,12 +25,6 @@
  * Gappy matrix support: The macros BAYES_FILTER_(SPARSE/COMPRESSED/COORDINATE) control experimental gappy matrix support
  * When enabled the default storage types are replaced with their sparse equivilents
  *
- * ISSUE: Element proxies.
- *  Element proxies have a colourful history!
- *  As of Boost 1.30.0 they do not allow assignment of elements between mixed types.
- *  They do not work with gcc-3.3. The order of expression temporary distruction overrights previous changes. They must be disabled.
- *  The sparse support in Bayes++ does not require element proxies.
- *  Define BOOST_UBLAS_NO_ELEMENT_PROXIES to disable them.
  */
 
 #include <boost/version.hpp>

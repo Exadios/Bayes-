@@ -38,7 +38,7 @@ namespace Bayesian_filter
 
 
 Standard_resampler::Float
- Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const
+ Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
 /*
  * Standard resampler from [1]
  * Algorithm:
@@ -118,7 +118,7 @@ Standard_resampler::Float
 
 
 Systematic_resampler::Float
- Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const
+ Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
 /*
  * Systematic resample algorithm from [2]
  * Algorithm:
@@ -286,7 +286,7 @@ void
 						// Predict particles S using supplied predict model
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Si(S,i);
+		ColMatrix::Column Si(S,i);
 		noalias(Si) = f.fw(Si);
 	}
 	stochastic_samples = S.size2();
@@ -294,7 +294,7 @@ void
 
 
 void
- SIR_scheme::observe (Likelihood_observe_model& h, const FM::Vec& z)
+ SIR_scheme::observe (Likelihood_observe_model& h, const Vec& z)
 /*
  * Observation fusion using Likelihood at z
  * Pre : wir previous particle likelihood weights
@@ -306,13 +306,13 @@ void
 						// Weight Particles. Fused with previous weight
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		wir[i] *= h.L( FM::column(S,i) );
+		wir[i] *= h.L(FM::column(S,i) );
 	}
 	wir_update = true;
 }
 
 void
- SIR_scheme::observe_likelihood (const FM::Vec& lw)
+ SIR_scheme::observe_likelihood (const Vec& lw)
 /*
  * Observation fusion directly from likelihood weights
  * lw may be smaller then the number of particles. Weights for additional particles are assumed to be 1
@@ -329,7 +329,7 @@ void
 }
 
 
-void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::Resamples_t& presamples)
+void SIR_scheme::copy_resamples (ColMatrix& P, const Importance_resampler::Resamples_t& presamples)
 /*
  * Update P by selectively copying presamples
  * Uses a in-place copying alogorithm
@@ -366,7 +366,7 @@ void SIR_scheme::copy_resamples (FM::ColMatrix& P, const Importance_resampler::R
 }
 
 
-void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
+void SIR_scheme::roughen_minmax (ColMatrix& P, Float K) const
 /*
  * Roughening
  *  Uses algorithm from Ref[1] using max-min in each state of P
@@ -414,10 +414,10 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 	for (pi = P.begin2(); pi != P.end2(); ++pi) {
 		random.normal (n);			// independant zero mean normal
 									// multiply elements by std dev
-		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
+		for (DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
 		}
-		FM::ColMatrix::Column Pi(P,pi.index2());
+		ColMatrix::Column Pi(P,pi.index2());
 		noalias(n) += Pi;			// add to P
 		Pi = n;
 	}
@@ -444,7 +444,7 @@ void SIR_kalman_scheme::init ()
 						// Samples at mean
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Si(S,i);
+		ColMatrix::Column Si(S,i);
 		noalias(Si) = x;
 	}
 						// Decorrelate init state noise
@@ -474,7 +474,7 @@ void SIR_kalman_scheme::mean ()
 	x.clear();
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Si(S,i);
+		ColMatrix::Column Si(S,i);
 		x.plus_assign (Si);
 	}
 	x /= Float(S.size2());
@@ -520,7 +520,7 @@ void SIR_kalman_scheme::update_statistics ()
 
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Si(S,i);
+		ColMatrix::Column Si(S,i);
 		X.plus_assign (FM::outer_prod(Si, Si));
 	}
 	X.minus_assign (FM::outer_prod(x, x) * Float(nSamples));
@@ -528,7 +528,7 @@ void SIR_kalman_scheme::update_statistics ()
 }
 
 
-void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
+void SIR_kalman_scheme::roughen_correlated (ColMatrix& P, Float K)
 /*
  * Roughening
  *  Uses a roughening noise based on covariance of P

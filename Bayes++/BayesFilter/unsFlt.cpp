@@ -48,7 +48,7 @@ Unscented_scheme& Unscented_scheme::operator= (const Unscented_scheme& a)
  * Generate the unscented point representing a distribution.
  * Fails if scale is negative
  */
-void Unscented_scheme::unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale)
+void Unscented_scheme::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& X, Float scale)
 {
 	UTriMatrix Sigma(x_size,x_size);
 
@@ -158,7 +158,7 @@ namespace {
 		{
 			return fmodel.fx(x);
 		}
-		const SymMatrix& Q(const FM::Vec& /*x*/) const
+		const SymMatrix& Q(const Vec& /*x*/) const
 		{
 			return zeroQ;
 		}
@@ -180,7 +180,7 @@ namespace {
 		{
 			return amodel.f(x);
 		}
-		const SymMatrix& Q(const FM::Vec& /*x*/) const
+		const SymMatrix& Q(const Vec& /*x*/) const
 		{
 			return QGqG;
 		}
@@ -244,7 +244,7 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
  *
  * ISSUE: Simplified implemenation using uncorrelated noise equations
  */
-Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_model& h, const FM::Vec& z,
+Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_model& h, const Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	Adapted_Correlated_additive_observe_model hh(h);
@@ -256,7 +256,7 @@ Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_mode
  * @pre x,X
  * @post x,X is PSD
  */
-Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model& h, const FM::Vec& z,
+Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model& h, const Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	size_t z_size = z.size();

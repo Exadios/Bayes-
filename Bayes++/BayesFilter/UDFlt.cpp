@@ -278,7 +278,7 @@ Negative:
 
 
 Bayes_base::Float
- UD_scheme::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+ UD_scheme::observe (Linrz_uncorrelated_observe_model& h, const Vec& z)
 /* Linrz_kalman_filter observe
  */
 {

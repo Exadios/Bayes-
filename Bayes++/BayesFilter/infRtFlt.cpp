@@ -132,7 +132,7 @@ void Information_root_info_scheme::update_yY ()
 }
 
 
-void Information_root_scheme::inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx)
+void Information_root_scheme::inverse_Fx (DenseColMatrix& invFx, const Matrix& Fx)
 /*
  * Numerical Inversion of Fx using LU factorisation
  * Required LAPACK getrf (with PIVOTING) and getrs
@@ -156,7 +156,7 @@ void Information_root_scheme::inverse_Fx (FM::DenseColMatrix& invFx, const FM::M
 
 
 Bayes_base::Float
- Information_root_scheme::epredict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
+ Information_root_scheme::epredict (Linrz_predict_model& f, const ColMatrix& invFx, bool linear_r)
 /* Linrz Prediction: using precomputed inverse of f.Fx
  * Precondition:
  *   r(k|k),R(k|k)
@@ -236,7 +236,7 @@ Bayes_base::Float
 }
 
 
-Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
+Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
 /* Extended linrz correlated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)
@@ -279,7 +279,7 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 }
 
 
-Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
+Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
 /* Extended linrz uncorrelated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)
