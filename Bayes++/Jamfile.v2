@@ -10,7 +10,7 @@ build-project PV ;
 build-project QuadCalib ;
 
 # Boost requirements: ISSUE should come from environment
-BOOST_ROOT ?= "../boost/boost_1_30_0" ;
+BOOST_ROOT ?= "../boost/boost_CVS" ;
 echo BOOST_ROOT $(BOOST_ROOT) ;
 
 # Project requirements

@@ -6,19 +6,15 @@ project
      : default-build debug
 ;
 
-# System libraries
-lib g2c : : <name>g2c ;
-lib lapack : : <toolset>gcc <name>lapack : <library>g2c ;
-
-# TODO: Adding compiler specific target fails in Boost.build v2 M3 and M4.
-# lib g2c : : <name>g2c <toolset>gcc ;
-# lib lapack : : <toolset>gcc <name>lapack ;
-#lib lapack : : <toolset>msvcms <file>"../../CLAPACK3/clapack7.a" ;
+# System libraries - ISSUE Second compiler specific target still not functioning in Boost.build v2 M5
+lib g2c : : <toolset>gcc <name>g2c ;
+lib lapack : : <toolset>gcc <name>lapack : : <library>g2c ;
+#lib lapack : : <toolset>msvc <file>"../../CLAPACK3/clapack7.a" ;
 
 # The executable for testing
 
 exe rtheta :
      rtheta.cpp  tests.cpp
      ../BayesFilter//BayesFilterLib
-     lapack g2c
+	lapack
 ;
