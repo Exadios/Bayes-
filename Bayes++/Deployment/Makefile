@@ -20,11 +20,13 @@ archivedoc:
 	cd ..; zip -r bf-classdocumentation-$(RELEASE).zip ClassDocumentation
 
 archivesrc:
-	cd ../..; zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.htm "Bayes++/Bayesian Filtering Classes.htm"
+	cd ../..; zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html "Bayes++/Bayesian Filtering Classes.html"
 
 buildall :
-	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release compress_debug compress_release gcc-3.3.1 gcc-3.4 intellinux-71 msvc-7 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release compress_debug compress_release gcc-3.3 gcc-3.4 intellinux-71 msvc-71 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release msvc-7 . SLAM rtheta
 
 buildallCVS :
-	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release compress_debug compress_release gcc-3.3.1 gcc-3.4 intellinux-71 msvc-7 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gcc-3.4 intellinux-71 msvc-71 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release msvc-7 . SLAM rtheta
 	

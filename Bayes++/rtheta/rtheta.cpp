@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.htm for terms and conditions of use.
+ * See accompanying Bayes++.html for terms and conditions of use.
  *
  * $Header$
  * $NoKeywords: $
@@ -22,6 +22,7 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/format.hpp>
 #include <boost/limits.hpp>
+#include <boost/test/floating_point_comparison.hpp>
 
 
 using namespace Bayesian_filter;
@@ -388,39 +389,43 @@ void Filter<Unscented_scheme>::dump_state()
  * Compare Two filters
  */
 
-template<class Tf1, class Tf2>
 class CCompare
 {
 public:
-	CCompare (const Vec x_init, const SymMatrix X_init, unsigned nIterations);
+	CCompare (const Vec x, const SymMatrix X, unsigned compare_iterations);
+	template<class Tf1, class Tf2>
+	void compare ();
 private:
-	void doIt (unsigned nIterations);
-	// Attributes
-	Tf1 f1;
-	Tf2 f2;
+	// Test configuration
+	const Vec x_init; const SymMatrix X_init;
+	unsigned nIterations;
 	walk truth;
 	pred_model f;
 	uobs_model uh;
 	cobs_model ch;
 
-	// Implementation
-	void dumpCompare ();
+	void dump_state ();
+	bool tolerably_equal ();
 
+	// Test state
 	Vec ztrue, z;
-
+	DenseVec f1_x, f2_x;
+	DenseSymMatrix f1_X, f2_X;
 	DenseVec f1_xpred, f2_xpred;
-	DenseSymMatrix f1_Xpred;
-	DenseSymMatrix f2_Xpred;
+	DenseSymMatrix f1_Xpred, f2_Xpred;
 };
 
-template<class Tf1, class Tf2>
-CCompare<Tf1,Tf2>::CCompare (const Vec x_init, const SymMatrix X_init, unsigned nIterations) :
-	f1(x_init, X_init),
-	f2(x_init, X_init),
+CCompare::CCompare (const Vec x, const SymMatrix X, unsigned compare_iterations) :
+	x_init(x), X_init(X),
+	nIterations (compare_iterations),
 	truth (x_init, TRUTH_STATIONARY),
 	uh(),
 	ch(uh),
 	ztrue(NZ), z(NZ),
+	f1_x (NX),
+	f2_x (NX),
+	f1_X (NX, NX),
+	f2_X (NX, NX),
 	f1_xpred (NX),
 	f2_xpred (NX),
 	f1_Xpred (NX, NX),
@@ -433,12 +438,9 @@ CCompare<Tf1,Tf2>::CCompare (const Vec x_init, const SymMatrix X_init, unsigned 
 	f2_xpred.clear();
 	f1_Xpred.clear();
 	f2_Xpred.clear();
-
-	doIt (nIterations);
 }
 
-template<class Tf1, class Tf2>
-void CCompare<Tf1, Tf2>::dumpCompare ()
+void CCompare::dump_state ()
 {
 	// Additional Scheme state
 	//f1.dump_state(); f2.dump_state();
@@ -457,40 +459,77 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 	{
 		using std::cout; using std::endl;
 		using boost::format;
-		const Vec& f1x = f1.x(); const SymMatrix& f1X = f1.X();
-		const Vec& f2x = f2.x(); const SymMatrix& f2X = f2.X();
 
-		// Compomparision and truth line
+		// Comparision and truth line
 		//	x(0)diff, x(1)diff, truth.x(0), truth.x(1), zx, zy)
 		cout << format("*%11.4g %11.4g * %10.3f %10.3f  %10.3f %10.3f")
-			 	% (f1x[0]-f2x[0]) % (f1x[1]-f2x[1])
+			 	% (f1_x[0]-f2_x[0]) % (f1_x[1]-f2_x[1])
 			 	% Float(truth.x[0]) % Float(truth.x[1]) % zx % zy << endl;	// ISSUE mixed type proxy assignment
 
 		format state(" %11.4g %11.4g * %10.3f %10.3f");
 		format covariance(" %12.4e %12.4e %12.4e");
 
-		// Filter f1 performace
+		// Filter f1 performance
 		//		x[0]err, x[1]err, x[0], x[1],  Xpred*3, X*3
-		cout << state % (f1x[0]-truth.x[0]) % (f1x[1]-truth.x[1])
-				% f1x[0] % f1x[1] << endl;
+		cout << state % (f1_x[0]-truth.x[0]) % (f1_x[1]-truth.x[1])
+				% f1_x[0] % f1_x[1] << endl;
 		cout << covariance % f1_Xpred(0,0) % f1_Xpred(1,1) % f1_Xpred(1,0);
-		cout << covariance % f1X(0,0) % f1X(1,1) % f1X(1,0) << endl;
+		cout << covariance % f1_X(0,0) % f1_X(1,1) % f1_X(1,0) << endl;
 		// Filter f2 performace
 		//		x[0]err, x[1]err, x[0], x[1], x[01]dist,  Xpred*3, X*3
-		cout << state % (f2x[0]-truth.x[0]) % (f2x[1]-truth.x[1])
-				% f2x[0] % f2x[1] << endl;
+		cout << state % (f2_x[0]-truth.x[0]) % (f2_x[1]-truth.x[1])
+				% f2_x[0] % f2_x[1] << endl;
 		cout << covariance % f2_Xpred(0,0) % f2_Xpred(1,1) % f2_Xpred(1,0);
-		cout << covariance % f2X(0,0) % f2X(1,1) % f2X(1,0) << endl;
+		cout << covariance % f2_X(0,0) % f2_X(1,1) % f2_X(1,0) << endl;
 	}
 }
 
-template<class Tf1, class Tf2>
-void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
+bool CCompare::tolerably_equal ()
 {
+	bool tolerable = true;
+	Float epsilon = std::numeric_limits<Float>::epsilon();
+
+	// Filter estimate is close to truth
+	boost::test_toolbox::close_at_tolerance<Float> truth_close(epsilon * 1000, boost::test_toolbox::FPC_WEAK);
+	tolerable &= truth_close (f1_x[0], truth.x[0]);
+	tolerable &= truth_close (f1_x[1], truth.x[1]);
+	tolerable &= truth_close (f2_x[0], truth.x[0]);
+	tolerable &= truth_close (f2_x[1], truth.x[1]);
+
+	// Filter states equal
+	boost::test_toolbox::close_at_tolerance<Float> state_close(epsilon * 10);
+	tolerable &= state_close (f1_x[0]-f2_x[0],  f1_x[1]-f2_x[1]);
+
+	// Covraiance toleration
+	boost::test_toolbox::close_at_tolerance<Float> var_close(epsilon * 10);
+	boost::test_toolbox::close_at_tolerance<Float> cov_close(epsilon * 100);
+	// Predict covariance equal
+	tolerable &= var_close (f1_Xpred(0,0), f2_Xpred(0,0));
+	tolerable &= var_close (f1_Xpred(1,1), f2_Xpred(1,1));
+	tolerable &= cov_close (f1_Xpred(1,0), f2_Xpred(1,0));
+	// Observe covariance equal
+	tolerable &= var_close (f1_X(0,0), f2_X(0,0));
+	tolerable &= var_close (f1_X(1,1), f2_X(1,1));
+	tolerable &= cov_close (f1_X(1,0), f2_X(1,0));
+
+	return tolerable;
+}
+
+template<class Tf1, class Tf2>
+void CCompare::compare ()
+{
+	// Construct filter to compare
+	Tf1 f1(x_init, X_init);
+	Tf2 f2(x_init, X_init);
+
 	// Update the filter x,X representation
 	f1.update (); f2.update ();
+	f1_xpred = f1.x(); f2_xpred = f2.x();
+	f1_Xpred = f1.X(); f2_Xpred = f2.X();
+	f1_x = f1.x(); f2_x = f2.x();
+	f1_X = f1.X(); f2_X = f2.X();
 	z = ztrue = uh.h(truth.x);
-	dumpCompare();
+	dump_state ();
 
 	for (unsigned i = 0; i < nIterations; i++ ) {
 		truth.predict ();		// Predict truth model
@@ -526,8 +565,11 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 
 		// Update the filter
 		f1.update (); f2.update ();
+		f1_x = f1.x(); f2_x = f2.x();
+		f1_X = f1.X(); f2_X = f2.X();
 		
-		dumpCompare();
+		dump_state ();
+		tolerably_equal ();
 		// DEBUG char c;std::cin>>c;
 	}
 }
@@ -560,25 +602,28 @@ int main()
 	X_init(2,0) = X_init(0,2) = INIT_X_NOISE*INIT_2_NOISE*INIT_2_NOISE_CORRELATION;
 	X_init(2,1) = X_init(1,2) = INIT_Y_NOISE*INIT_2_NOISE*INIT_2_NOISE_CORRELATION;
 
+	// Test iterations
+	CCompare test (x_init, X_init, 4);
+
 	// Initialise and do the comparison
 	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.seed();
-	CCompare<Filter<UD_scheme>, Filter<Unscented_scheme> > test1(x_init, X_init, 4);
+	test.compare<Filter<UD_scheme>, Filter<Unscented_scheme> >();
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.seed();
-	CCompare<Filter<Covariance_scheme>, Filter<Information_linrz_scheme> > test2(x_init, X_init, 4);
+	test.compare<Filter<Covariance_scheme>, Filter<Information_linrz_scheme> >();
 	std::cout << std::endl;
 
 	std::cout << "irfilter, ilfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.seed();
-	CCompare<Filter<Information_root_scheme>, Filter<Information_scheme> > test3(x_init, X_init, 4);
+	test.compare<Filter<Information_root_scheme>, Filter<Information_scheme> >();
 	std::cout << std::endl;
 
 	std::cout << "sfilter, itfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.seed();
-	CCompare<Filter<SIR_kalman_scheme>, Filter<Iterated_covariance_scheme> > test4(x_init, X_init, 4);
+	test.compare<Filter<SIR_kalman_scheme>, Filter<Iterated_covariance_scheme> >();
 	std::cout << std::endl;
 
 	return 0;

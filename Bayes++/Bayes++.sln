@@ -43,8 +43,8 @@ Global
 		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Release.Build.0 = uBLAS Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
-		Item:1 = Bayes++.htm
-		Item:2 = Bayesian Filtering Classes.htm
+		Item:1 = Bayes++.html
+		Item:2 = Bayesian Filtering Classes.html
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

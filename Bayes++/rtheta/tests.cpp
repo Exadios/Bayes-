@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.htm for terms and conditions of use.
+ * See accompanying Bayes++.html for terms and conditions of use.
  */
 #define NO_TESTS
 
