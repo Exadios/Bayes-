@@ -20,7 +20,7 @@ archivedoc:
 	cd ..; zip -r bf-classdocumentation-$(RELEASE).zip ClassDocumentation
 
 archivesrc:
-	cd ..; zip -r bf-C++source-$(RELEASE).zip BayesFilter Simple PV QuadCalib SLAM Test VClib  Jamfile Jamrules Jamfile.v2 projec-root.jam Makefile Bayes++.doxygen  Bayes++.sln .project Bayes++.htm "Bayesian Filtering Classes.htm"
+	cd ../..; zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.htm "Bayes++/Bayesian Filtering Classes.htm"
 
 buildallCVS :
-	bjam -sBOOST=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3.1 gcc-3.2 gcc-2.95 intellinux-70 msvcms . rtheta SLAM
+	cd ..; bjam -sBOOST=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3.1 gcc-3.2 gcc-2.95 intellinux-70 msvcms . SLAM rtheta
