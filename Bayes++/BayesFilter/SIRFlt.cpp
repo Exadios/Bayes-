@@ -55,15 +55,21 @@ Standard_resampler::Float
  */
 {
 	assert (presamples.size() == w.size());
-						// Normalised cumulative sum of likelihood weights, find smallest weight
-	Float wcum = 0;
-	Float wmin = std::numeric_limits<Float>::max();
 	DenseVec::iterator wi, wi_end = w.end();
-	for (wi = w.begin(); wi != wi_end; ++wi) {
-		if (*wi < wmin) {
-			wmin = *wi;
+						// Normalised cumulative sum of likelihood weights (Kahan algorithm), and find smallest weight
+	Float wmin = std::numeric_limits<Float>::max();
+	Float wcum = 0;
+	{
+		Float c = 0, y, t;
+		for (wi = w.begin(); wi != wi_end; ++wi) {
+			if (*wi < wmin) {
+				wmin = *wi;
+			}
+			y = *wi - c;
+			t = wcum + y;
+			c = t - wcum - y;
+			wcum = *wi = t;
 		}
-		wcum = *wi = wcum + *wi;
 	}
 	if (wmin < 0)		// bad weights
 		error (Numeric_exception("negative weight"));
@@ -129,15 +135,21 @@ Systematic_resampler::Float
 {
 	size_t nParticles = presamples.size();
 	assert (nParticles == w.size());
-						// Normalised cumulative sum of likelihood weights, find smallest weight
-	Float wcum = 0;
-	Float wmin = std::numeric_limits<Float>::max();
 	DenseVec::iterator wi, wi_end = w.end();
-	for (wi = w.begin(); wi != wi_end; ++wi) {
-		if (*wi < wmin) {
-			wmin = *wi;
+						// Normalised cumulative sum of likelihood weights (Kahan algorithm), and find smallest weight
+	Float wmin = std::numeric_limits<Float>::max();
+	Float wcum = 0;
+	{
+		Float c = 0, y, t;
+		for (wi = w.begin(); wi != wi_end; ++wi) {
+			if (*wi < wmin) {
+				wmin = *wi;
+			}
+			y = *wi - c;
+			t = wcum + y;
+			c = t - wcum - y;
+			wcum = *wi = t;
 		}
-		wcum = *wi = wcum + *wi;
 	}
 	if (wmin < 0)		// bad weights
 		error (Numeric_exception("negative weight"));
