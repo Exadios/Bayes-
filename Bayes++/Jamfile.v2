@@ -21,10 +21,10 @@ variant uBLAS_seperate_debug : debug : <include>"../boost/@uBLAS" ;
 variant uBLAS_seperate_release : release : <include>"../boost/@uBLAS" ;
 
 # Tested with compressed matrices
-variant compress_debug : debug : <define>BAYES_FILTER_COMPRESSED <define>BOOST_UBLAS_NO_ELEMENT_PROXIES ;
-variant compress_release : release : <define>BAYES_FILTER_COMPRESSED <define>BOOST_UBLAS_NO_ELEMENT_PROXIES ;
-variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED <define>BOOST_UBLAS_NO_ELEMENT_PROXIES ;
-variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED <define>BOOST_UBLAS_NO_ELEMENT_PROXIES ;
+variant compress_debug : debug : <define>BAYES_FILTER_COMPRESSED ;
+variant compress_release : release : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
 
 # Build variant for full compiler optimization
 variant hardoptimize_release : release : 
