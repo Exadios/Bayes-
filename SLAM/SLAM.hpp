@@ -42,31 +42,31 @@ public:
 	//  Feature state t = h(lz)	where lz is the vector of location state augmented with observation z
 
 									// Single feature observe (single element vectors)
-	virtual void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z) = 0;
+	virtual void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z ) = 0;
 	// Feature observation (fuse with existing feature)
-	virtual void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z) = 0;
+	virtual void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z ) = 0;
 	// New Feature observation (new or overwrite existing feature)
-	virtual void observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T) = 0;
+	virtual void observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T ) = 0;
 	// New Feature directly from Feature statistics: mean t and variance T (overwrite existing feature)
 
-	virtual void forget( unsigned feature, bool must_exist = true) = 0;
+	virtual void forget( unsigned feature, bool must_exist = true ) = 0;
 	// Forget information associated with a feature: feature number can be reused for a new feature
 
 										// Multi feature observe: Defaults using multiple single feature observes
 	typedef std::vector<unsigned> afeatures_t;	// Use a vector to store feature assocations
-	virtual void observe( afeatures_t& features, const Feature_observe& fom, const FM::Vec& z)
+	virtual void observe( afeatures_t& features, const Feature_observe& fom, const FM::Vec& z )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}
-	virtual void observe_new( afeatures_t& features, const Feature_observe_inverse& fom, const FM::Vec& z)
+	virtual void observe_new( afeatures_t& features, const Feature_observe_inverse& fom, const FM::Vec& z )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}
-	virtual void observe_new( afeatures_t& features, const FM::Vec& t, const FM::Vec& T)
+	virtual void observe_new( afeatures_t& features, const FM::Vec& t, const FM::Vec& T )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}
-	virtual void forget( afeatures_t& features, bool must_exist = true)
+	virtual void forget( afeatures_t& features, bool must_exist = true )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}

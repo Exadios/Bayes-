@@ -154,7 +154,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 }
 
 Fast_SLAM::Float
- Fast_SLAM::update_resample (const Bayesian_filter::Importance_resampler& resampler)
+ Fast_SLAM::update_resample( const Bayesian_filter::Importance_resampler& resampler )
 /* Resampling Update
  *  Resample particles using weights
  *  Propogate resampling to All features
@@ -205,7 +205,7 @@ void Fast_SLAM::forget( unsigned feature, bool must_exist )
 {
 	AllFeature::size_type n = M.erase(feature);
 	if (n==0 && must_exist)
-		error (BF::Logic_exception("Forget non existing feature" ));
+		error (BF::Logic_exception("Forget non existing feature"));
 }
 
 unsigned Fast_SLAM::feature_unique_samples( unsigned feature )

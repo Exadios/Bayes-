@@ -33,13 +33,13 @@ public:
 	// Construct Fast_SLAM filter using referenced filter for resampling
 
 									// Single Feature observations (single element vectors)
-	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z);
-	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z);
-	void observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T);
+	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );
+	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z );
+	void observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T );
 
-	void forget( unsigned feature, bool must_exist = true);
+	void forget( unsigned feature, bool must_exist = true );
 
-	virtual Float update_resample( const Bayesian_filter::Importance_resampler& resampler);
+	virtual Float update_resample( const Bayesian_filter::Importance_resampler& resampler );
 	/* Resampling Update: resample particles using weights and then roughen
 	 *	Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
 	 *          lcond == 1. if no resampling performed
@@ -83,10 +83,10 @@ class Fast_SLAM_Kstatistics : public Fast_SLAM
  */
 {
 public:
-	Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter);
+	Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter );
 	// Construct Fast_SLAM filter using referenced filter for resampling
 	
-	unsigned statistics( BF::Kalman_state_filter& kstats);
+	unsigned statistics( BF::Kalman_state_filter& kstats );
 	// Compute statistics of particles. Return: Number of features in map
 	//  Sample mean and covariance of particle.
 

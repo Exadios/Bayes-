@@ -34,7 +34,7 @@ Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter, uns
 	nM = 0;
 }
 
-void Kalman_SLAM::predict (BF::Linear_predict_model& lpred)
+void Kalman_SLAM::predict( BF::Linear_predict_model& lpred )
 {
 	// lpred is only prediction model for Location. Create a augmented sparse model for full states
 	BF::Linear_predict_model all(full.x.size(),full.x.size());
@@ -48,7 +48,7 @@ void Kalman_SLAM::predict (BF::Linear_predict_model& lpred)
 	full.predict(all);
 }
 
-void Kalman_SLAM::observe (unsigned feature, const Feature_observe& fom, const FM::Vec& z)
+void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z )
 {
 	// Assume features added sequenatialy
 	if (feature >= nM) {
@@ -65,7 +65,7 @@ void Kalman_SLAM::observe (unsigned feature, const Feature_observe& fom, const F
 	full.observe(fullm, z);
 }
 
-void Kalman_SLAM::observe_new (unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z)
+void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
 // fom: must have a the special from required for SLAM::obeserve_new
 {
 	if (nL+feature >= full.x.size()) {
@@ -81,12 +81,14 @@ void Kalman_SLAM::observe_new (unsigned feature, const Feature_observe_inverse& 
 
 	full.x[nL+feature] = t[0];
 
-	clear( full.X.sub_matrix(0,full.X.size1(), nL+feature,nL+feature+1) );
-	clear( full.X.sub_matrix(nL+feature,nL+feature+1, 0,full.X.size1()) );
+			// ISSUE uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, there two two parts seperately
+	clear( full.X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
+	clear( full.X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full.X.size1()) );
 	full.X(nL+feature,nL+feature) = fom.Zv[0];
+	full.init();
 }
 
-void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T)
+void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T )
 {
 	if (nL+feature >= full.x.size()) {
 		error (BF::Logic_exception("Observe_new no feature space"));
@@ -96,18 +98,20 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec
 
 	full.x[nL+feature] = t[0];
 	full.X(nL+feature,nL+feature) = T[0];
+	full.init();
 }
 
-void Kalman_SLAM::forget( unsigned feature, bool must_exist)
+void Kalman_SLAM::forget( unsigned feature, bool must_exist )
 {
-	full.x[feature] = 0.;
-	clear( full.X.sub_matrix(0,full.X.size1(), nL+feature,nL+feature+1) );
-	clear( full.X.sub_matrix(nL+feature,nL+feature+1, 0,full.X.size1()) );
+	full.x[nL+feature] = 0.;
+			// ISSUE uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, there two two parts seperately
+	clear( full.X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
+	clear( full.X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full.X.size1()) );
 	full.init();
 	--nM;
 }
 
-void Kalman_SLAM::decorrelate( Bayesian_filter::Bayes_base::Float d)
+void Kalman_SLAM::decorrelate( Bayesian_filter::Bayes_base::Float d )
 // Reduce correlation by scaling cross-correlation terms
 {
 	size_t i,j;
@@ -124,6 +128,7 @@ void Kalman_SLAM::decorrelate( Bayesian_filter::Bayes_base::Float d)
 			Xi[j] *= d;
 		}
 	}
+	full.init();
 }
 
 }//namespace SLAM

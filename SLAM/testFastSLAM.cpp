@@ -21,9 +21,9 @@
 #include "fastSLAM.hpp"
 #include "kalmanSLAM.hpp"
 
-#include <boost/random.hpp>
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
+#include <boost/random.hpp>
 
 
 
@@ -38,20 +38,23 @@ class Boost_random : public BF::SIR_random, public BF::General_LiInAd_predict_mo
  */
 {
 public:
-	Boost_random() : gen_normal(rng), gen_uniform(rng)
+	Boost_random() : dist_normal(), dist_uniform()
 	{}
-	double normal(const double mean, const double sigma)
+	FM::Float normal(const FM::Float mean, const FM::Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937> gen(rng, mean, sigma);
+		boost::normal_distribution<FM::Float> dist(mean, sigma);
+		boost::variate_generator<boost::mt19937& ,boost::normal_distribution<FM::Float> > gen(rng, dist);
 		return gen();
 	}
 	void normal(FM::DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), gen_normal);
+		boost::variate_generator<boost::mt19937& ,boost::normal_distribution<FM::Float> > gen(rng, dist_normal);
+		std::generate (v.begin(), v.end(), gen);
 	}
 	void uniform_01(FM::DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), gen_uniform);
+		boost::variate_generator<boost::mt19937& ,boost::uniform_real<FM::Float> > gen(rng, dist_uniform);
+		std::generate (v.begin(), v.end(), gen);
 	}
 	void reseed()
 	{
@@ -59,8 +62,8 @@ public:
 	}
 private:
 	boost::mt19937 rng;
-	boost::normal_distribution<boost::mt19937> gen_normal;
-	boost::uniform_01<boost::mt19937> gen_uniform;
+	boost::normal_distribution<FM::Float> dist_normal;
+	boost::uniform_real<FM::Float> dist_uniform;
 };
 
 
