@@ -23,9 +23,9 @@ class SLAM : public BF::Bayes_filter_base
  *  Observe parameters are defined:
  *   feature: A arbitary unique number to label each feature in the map.
  *   fom: feature observe model.
- * A complete SLAM solution must also represent prediction; of location only or location
+ * A complete SLAM solution must also represent predict; of location only or location
  * and map. This is not include in the abstraction as no single implementation can deal with
- * a general stochastic prediction model.
+ * a general stochastic predict model.
  */
 {
 public:

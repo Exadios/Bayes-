@@ -247,7 +247,7 @@ const FM::Vec& MuPAD_function_model::fx(const FM::Vec& x) const
 	MTcell fxarray = MFcall( MFcopy(Mu_fn), 1, xarray );
 
 	if (MFisExpr(fxarray))
-		MFerror ("prediction function not found");	// ISSUE: MFerror may leak arrays
+		MFerror ("predict function not found");	// ISSUE: MFerror may leak arrays
 
 	rfx = MuC::Vector(fxarray);
 	MFfree(xarray);
