@@ -12,6 +12,8 @@ variant uBLAS_seperate_debug : debug : <include>"../boost/@uBLAS" ;
 variant uBLAS_seperate_release : release : <include>"../boost/@uBLAS" ;
 variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
 variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_coordinate_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COORDINATE ;
+variant uBLAS_seperate_coordinate_release : uBLAS_seperate_release : <define>BAYES_FILTER_COORDINATE ;
 
  # Build variant for fast syntax checking
 variant syntax :  : 
