@@ -217,7 +217,7 @@ UD_filter::Float
 				// Positive definate
 				UDj[j] = e;
 
-				Float diaginv = Float(1.) / e;
+				Float diaginv = 1 / e;
 				for (k = 0; k < j; ++k)	// 0..j-1
 				{
 					FM::Matrix::Row UDk(UD,k);
@@ -565,7 +565,7 @@ UD_filter::Float
 		alpha += b[j] * a[j];
 		lamda = -a[j] * gamma;
 		if (alpha <= 0.) goto NotPD;
-		gamma = Float(1.) / alpha;
+		gamma = 1 / alpha;
 		UD(j,j) *= alpha_jm1 * gamma;
 					// U modification
 		for (i = 0; i < j; ++i)		// 0..j-1

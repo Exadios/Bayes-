@@ -193,7 +193,7 @@ void General_LzUnAd_observe_model::Lz (const FM::Vec& zz)
 	FM::Vec::iterator ZIi = Zv_inv.begin();
 	for (FM::Vec::const_iterator zi = Zv.begin(); zi != Zv.end(); ++zi) {
 		detZ *= *zi;
-		*ZIi = Float(1.)/ (*zi);		// Protected from /0 by rcond check
+		*ZIi = 1 / (*zi);		// Protected from /0 by rcond check
 		++ZIi;
 	}
 	using namespace std;

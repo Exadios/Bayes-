@@ -226,6 +226,12 @@
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\SIRFlt.cpp">

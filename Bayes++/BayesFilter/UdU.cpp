@@ -54,9 +54,9 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 	// Special case an empty matrix
 	const size_t n = UD.size1();
 	if (n == 0)
-		return 0.;
+		return 0;
 
-	RowMatrix::value_type rcond, mind = UD(0,0), maxd = 0.;
+	RowMatrix::value_type rcond, mind = UD(0,0), maxd = 0;
 
 	for (size_t i = 0; i < n; ++i)	{
 		RowMatrix::value_type d = UD(i,i);
@@ -65,7 +65,7 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 	}
 	assert (mind <= maxd);
 
-	if (maxd == 0.)	{
+	if (maxd == 0)	{
 		// avoid division by zero, for zero or negative matrix
 		rcond = mind;	// mind may not be zero depending on D (but mind<=maxd)
 	}
@@ -73,7 +73,7 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 		// Rcond from min/max norm
 		rcond = mind / maxd;
 	}
-	assert (rcond <= 1.);
+	assert (rcond <= 1);
 	return rcond;
 }
 
@@ -87,9 +87,9 @@ Vec::value_type UdUrcond_vec (const Vec& D)
 	// Special case an empty vector
 	const size_t n = D.size();
 	if (n == 0)
-		return 0.;
+		return 0;
 
-	Vec::value_type rcond, mind = D[0], maxd = 0.;
+	Vec::value_type rcond, mind = D[0], maxd = 0;
 
 	for (size_t i = 0; i < n; ++i)	{
 		Vec::value_type d = D[i];
@@ -98,7 +98,7 @@ Vec::value_type UdUrcond_vec (const Vec& D)
 	}
 	assert (mind <= maxd);
 
-	if (maxd == 0.)	{
+	if (maxd == 0)	{
 		// avoid division by zero, for zero or negative matrix
 		rcond = mind;	// mind may not be zero depending on D (but mind<=maxd)
 	}
@@ -132,9 +132,9 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U)
 	// Special case an empty matrix
 	const size_t n = U.size1();
 	if (n == 0)
-		return 0.;
+		return 0;
 
-	UTriMatrix::value_type rcond, mind = U(0,0), maxd = 0.;
+	UTriMatrix::value_type rcond, mind = U(0,0), maxd = 0;
 
 	for (size_t i = 0; i < n; ++i)	{
 		UTriMatrix::value_type d = U(i,i);
@@ -143,7 +143,7 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U)
 	}
 	assert (mind <= maxd);
 
-	if (maxd == 0.)	{
+	if (maxd == 0)	{
 		// avoid division by zero, for zero or negative matrix
 		rcond = mind;	// mind may not be zero depending on D (but mind<=maxd)
 	}
@@ -187,7 +187,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
  *    diagonal(M) = d
  *    strict_lower_triangle(M) is unmodifed
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -200,9 +200,9 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
 			d = M(j,j);
 
 			// Diagonal element
-			if (d > 0.0)
+			if (d > 0)
 			{	// Positive definate
-				d = Float(1.) / d;
+				d = 1 / d;
 
 				for (i = 0; i < j; ++i)
 				{
@@ -215,11 +215,11 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
 					}
 				}
 			}
-			else if (d == 0.0)
+			else if (d == 0)
 			{	// Possibly Semidefinate, check not negative
 				for (i = 0; i < j; ++i)
 				{
-					if (M(i,j) != 0.0)
+					if (M(i,j) != 0)
 						goto Negative;
 				}
 			}
@@ -251,7 +251,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
  *    diagonal(M) = d
  *    strict_lower_triangle(M) is unmodifed
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -265,7 +265,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
 			d = Mj[j];
 
 			// Diagonal element
-			if (d > 0.0)
+			if (d > 0)
 			{	// Positive definate
 				i = j;
 				do
@@ -284,7 +284,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
 					}
 				} while (i-- > 0);
 			}
-			else if (d == 0.0)
+			else if (d == 0)
 			{	// Possibly Semidefinate, check not negative, whole row must be identically zero
 				for (k = j+1; k < n; ++k)
 				{
@@ -318,7 +318,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
  *    strict_lower_triangle(M) = strict_lower_triangle(L)
  *    diagonal(M) = d
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  * ISSUE: This could change to equivilient of UdUfactor_varient2
  */
 {
@@ -330,10 +330,10 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 		d = M(j,j);
 
 		// Diagonal element
-		if (d > 0.0)
+		if (d > 0)
 		{
 			// Positive definate
-			d = Float(1.) / d;
+			d = 1 / d;
 
 			for (i = j+1; i < n; ++i)
 			{
@@ -346,12 +346,12 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 				}
 			}
 		}
-		else if (d == 0.0)
+		else if (d == 0)
 		{
 			// Possibly Semidefinate, check not negative
 			for (i = j+1; i < n; ++i)
 			{
-				if (M(i,j) != 0.0)
+				if (M(i,j) != 0)
 					goto Negative;
 			}
 		}
@@ -381,7 +381,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
  * Output: M as UC factor
  *    upper_triangle(M) = upper_triangle(UC)
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	using namespace std;		// for sqrt
@@ -395,12 +395,12 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 			d = M(j,j);
 
 			// Diagonal element
-			if (d > 0.0)
+			if (d > 0)
 			{
 				// Positive definate
 				d = sqrt(d);
 				M(j,j) = d;
-				d = Float(1.) / d;
+				d = 1 / d;
 
 				for (i = 0; i < j; ++i)
 				{
@@ -413,12 +413,12 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 					}
 				}
 			}
-			else if (d == 0.0)
+			else if (d == 0)
 			{
 				// Possibly Semidefinate, check not negative
 				for (i = 0; i < j; ++i)
 				{
-					if (M(i,j) != 0.0)
+					if (M(i,j) != 0)
 						goto Negative;
 				}
 			}
@@ -434,7 +434,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 	return UCrcond (M);
 
 Negative:
-   return -1.;
+   return -1;
 }
 
 
@@ -527,7 +527,7 @@ bool UdUinverse (RowMatrix& UD)
 					UDij -= UDi[k] * UD(k,j);
 				UDi[j] = UDij;
 			}
-		} while (i-- > 0.);
+		} while (i-- > 0);
 	}
 
 	// Invert d in place
@@ -535,8 +535,8 @@ bool UdUinverse (RowMatrix& UD)
 	for (i = 0; i < n; ++i)
 	{
 		// Detect singular element
-		if (UD(i,i) != 0.)
-			UD(i,i) = Float(1.)/UD(i,i);
+		if (UD(i,i) != 0)
+			UD(i,i) = 1 / UD(i,i);
 		else
 			singular = true;
 	}
@@ -566,22 +566,22 @@ bool UTinverse (UTriMatrix& U)
 		do {
 			UTriMatrix::Row Ui(U,i);
 			UTriMatrix::value_type d = Ui[i];
-			if (d == 0.)
+			if (d == 0)
 			{
 				singular = true;
 				break;
 			}
-			d = Float(1.)/d;
+			d = 1 / d;
 			Ui[i] = d;
 
 			for (j = n-1; j > i; --j)
 			{
-				UTriMatrix::value_type e = 0.;
+				UTriMatrix::value_type e = 0;
 				for (k = i; k < j; ++k)
 					e -= Ui[k] * U(k,j);
 				Ui[j] = e*U(j,j);
 			}
-		} while (i-- > 0.);
+		} while (i-- > 0);
 	}
 
 	return singular;
@@ -682,7 +682,7 @@ void Lzero (RowMatrix& M)
 		RowMatrix::Row Ui(M,i);
 		for (j = 0; j < i; ++j)
 		{
-			Ui[j] = 0.;
+			Ui[j] = 0;
 		}
 	}
 }
@@ -699,7 +699,7 @@ void Uzero (RowMatrix& M)
 		RowMatrix::Row Li(M,i);
 		for (j = i+1; j < n; ++j)
 		{
-			Li[j] = 0.;
+			Li[j] = 0;
 		}
 	}
 }
@@ -727,7 +727,7 @@ void UdUfromUCholesky (RowMatrix& U)
 		RowMatrix::value_type sd = U(j,j);
 		U(j,j) = sd*sd;
 					// Devide columns by square of non zero diagonal
-		if (sd != 0.)
+		if (sd != 0)
 		{
 			for (i = 0; i < j; ++i)
 			{
@@ -757,7 +757,7 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
 		{
 			U(i,j) = UD(i,j);
 			// Zero lower triangle of U
-			Uj[i] = 0.;
+			Uj[i] = 0;
 		}
 	}
 }
@@ -774,14 +774,14 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
  * Output:
  *		M inverse of M, only updated if return value >0
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 					// Abuse as a RowMatrix
 	RowMatrix& M_Matrix = asRowMatrix(M);
 	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
 	// Only invert and recompose if PD
-	if (rcond > 0.) {
+	if (rcond > 0) {
 		(void)UdUinverse (M_Matrix);
 		UdUrecompose_transpose (M_Matrix);
 	}
@@ -797,7 +797,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM)
 	RowMatrix& M_Matrix = asRowMatrix(M);
 	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
 	// Only invert and recompose if PD
-	if (rcond > 0.) {
+	if (rcond > 0) {
 		detM = UdUdet(M_Matrix);
 		(void)UdUinverse (M_Matrix);
 		UdUrecompose_transpose (M_Matrix);
@@ -814,7 +814,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
  * Output:
  *		MI inverse of M, only valid if return value >0
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	MI = M;
@@ -822,7 +822,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 	RowMatrix& MI_Matrix = asRowMatrix(MI);
 	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
 	// Only invert and recompose if PD
-	if (rcond > 0.) {
+	if (rcond > 0) {
 		(void)UdUinverse (MI_Matrix);
 		UdUrecompose_transpose (MI_Matrix);
 	}
@@ -840,7 +840,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, SymMatrix::value_type& detM, 
 	RowMatrix& MI_Matrix = asRowMatrix(MI);
 	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
 	// Only invert and recompose if PD
-	if (rcond > 0.) {
+	if (rcond > 0) {
 		detM = UdUdet(M_Matrix);
 		(void)UdUinverse (MI_Matrix);
 		UdUrecompose_transpose (MI_Matrix);

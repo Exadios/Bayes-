@@ -92,7 +92,7 @@ PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 	Fx(1,0) = 0.;
 	Fx(1,1) = exp(-dt*V_GAMMA);
 	// Setup constant noise model: G is identity
-	q[0] = dt*sqr((Float(1.)-Fvv)*V_NOISE);
+	q[0] = dt*sqr((1-Fvv)*V_NOISE);
 	G(0,0) = 0.;
 	G(1,0) = 1.;
 }
@@ -182,7 +182,7 @@ int main()
 		// This is a Guassian
 		x_true = linearPredict.f(x_true);
 		randNormal (u);		// normally distributed mean 0., stdDev for stationary IOU
-		x_true[1] += u[0]* sqr(V_NOISE)/(Float(2.)*V_GAMMA);
+		x_true[1] += u[0]* sqr(V_NOISE) / (2*V_GAMMA);
 
 		// Predict filter with known pertubation
 		f1.predict (linearPredict);

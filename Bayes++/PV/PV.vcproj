@@ -116,7 +116,7 @@
 				AdditionalOptions="/w44224 /Zm150"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)../boost;$(SolutionDir)"
-				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
+				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE,BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"

@@ -212,7 +212,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 						// Mean of predicted distribution: x
 	x.assign (column(fXX,0) * Kappa);
 	for (i = 1; i < XX_size; ++i) {
-		x.plus_assign (column(fXX,i) / Float(2.));
+		x.plus_assign (column(fXX,i) / 2);
 	}
 	x /= x_Kappa;
 						// Covariance of distribution: X
@@ -223,12 +223,12 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 							// Center point, premult here by 2 for efficency
 	X.clear();
 	X.plus_assign (FM::outer_prod(column(fXX,0), column(fXX,0)));
-	X *= Float(2.)*Kappa;
+	X *= 2*Kappa;
 							// Remaining unscented points
 	for (i = 1; i < XX_size; ++i) {
 		X.plus_assign (FM::outer_prod(column(fXX,i), column(fXX,i)));
 	}
-	X /= Float(2.)*x_Kappa;
+	X /= 2*x_Kappa;
 						// Addative Noise Prediction, computed about center point
 	X.plus_assign (f.Q(column(fXX,0)));
 
@@ -308,7 +308,7 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 						// Mean of predicted distribution: zp
 	zp.assign (column(zXX,0) * Kappa);
 	for (i = 1; i < zXX.size2(); ++i) {
-		zp.plus_assign (column(zXX,i) / Float(2.));
+		zp.plus_assign (column(zXX,i) / 2);
 	}
 	zp /= x_Kappa;
 
@@ -322,25 +322,25 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 		Vec tzXX0 = column(zXX,0);		// TODO Make this a reference
 		Xzz.clear();
 		Xzz.plus_assign (FM::outer_prod(tzXX0, tzXX0));
-		Xzz *= Float(2.)*Kappa;
+		Xzz *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (i = 1; i < zXX.size2(); ++i) {
 		Vec tzXXi = column(zXX,i);		// TODO Make this a reference
 		Xzz.plus_assign (FM::outer_prod(tzXXi, tzXXi));
 	}
-	Xzz /= (Float)2.*x_Kappa;
+	Xzz /= 2*x_Kappa;
 
 						// Correlation of state with observation: Xxz
 							// Center point, premult here by 2 for efficency
 	Xxz.clear();
 	Xxz.plus_assign (FM::outer_prod(column(XX,0) - x, column(zXX,0)));
-	Xxz *= Float(2.)*Kappa;
+	Xxz *= 2*Kappa;
 							// Remaining unscented points
 	for (i = 1; i < zXX.size2(); ++i) {
 		Xxz.plus_assign (FM::outer_prod(column(XX,i) -x, column(zXX,i)));
 	}
-	Xxz /= Float(2.)* (Float(x_size) + Kappa);
+	Xxz /= 2* (Float(x_size) + Kappa);
 
 						// Innovation covariance
 	S = Xzz;

@@ -8,9 +8,8 @@
  */
 
 /*
- * Matrix types for filter classes
- * Implemented using boost::numeric::ublas uBLAS Basic Linear Algebra library
- *  Provides predefined types Vec and a variety of Matrix types
+ * Common type independant uBlas interface
+ *  Should be include after base types have been defined
  *
  * Everything in namespace Bayes_filter_matrix is intended to support the matrix storage
  * and algebra requirements of the library. Therefore the interfaces and implementation is
@@ -22,17 +21,10 @@
  *  is to use row_major matrices
  */
 
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/numeric/ublas/symmetric.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
-#include <boost/numeric/ublas/banded.hpp>
-#include <boost/numeric/ublas/io.hpp>
-
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {
-						// Allow use of ublas and a few functions in own namespace
+						// Allow use a few functions in own namespace
 namespace ublas = boost::numeric::ublas;
 using ublas::row;
 using ublas::column;
@@ -42,10 +34,6 @@ using ublas::inner_prod;
 using ublas::outer_prod;
 
 enum EmptyTag {Empty};	// Tag type used for empty matrix constructor
-
-// Declare the value used for ALL linear algebra operations
-// Also required as the matrix/vector container value_type
-typedef float Float;
 
 
 /*
@@ -140,7 +128,7 @@ public:
 	typedef const ublas::matrix_column<const FMMatrix> const_Column;
 
 	// Vector proxies from iterators - static members dependant on MatrixBase type
-	// ri() returns container associated with iterator. static_cast required as typeof(ri()) may not be MM
+	// ri() returns container associated with iterator. static_cast required as typeof(ri()) may not be typeof(MM)
 	static ublas::matrix_row<MatrixBase> rowi(const typename MatrixBase::iterator1& ri)
 	{
 		typedef MatrixBase MM;
@@ -213,18 +201,6 @@ public:
 #endif
 };
 
-
-/*
- * uBLAS Base Types
- *  We require static type conversion between RowMatrix and SymMatrix
- *  This requires they both use the same dense represenation. Therefore
- *  we use a symmetric_adaptor to provide the base for symmetric matrices.
- */
-typedef ublas::matrix<Float, ublas::row_major> BaseRowMatrix;
-typedef ublas::matrix<Float, ublas::column_major> BaseColMatrix;
-typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseUpperTriMatrix;
-typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseLowerTriMatrix;
-typedef ublas::banded_matrix<Float> BaseDiagMatrix;
 
 // Helper class for _BaseSymMatrix allow construction of BaseRowMatrix (rm) before symmertic_adaptor
 class BaseSymMatrix;

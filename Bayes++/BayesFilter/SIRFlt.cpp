@@ -205,7 +205,7 @@ SIR_filter& SIR_filter::operator= (const SIR_filter& a)
 {
 	*static_cast<Sample_filter*>(this) = a;
 	stochastic_samples = S.size2();
-	std::fill (wir.begin(), wir.end(), Float(1.));		// Initial uniform weights
+	std::fill (wir.begin(), wir.end(), Float(1));		// Initial uniform weights
 	wir_update = false;
 	return *this;
 }
@@ -220,7 +220,7 @@ void
  */
 {
 	stochastic_samples = S.size2();
-	std::fill (wir.begin(), wir.end(), Float(1.));		// Initial uniform weights
+	std::fill (wir.begin(), wir.end(), Float(1));		// Initial uniform weights
 	wir_update = false;
 }
 
@@ -253,7 +253,7 @@ SIR_filter::Float
 
 		roughen ();			// Roughen samples
 
-		std::fill (wir.begin(), wir.end(), Float(1.));		// Initial uniform weights
+		std::fill (wir.begin(), wir.end(), Float(1));		// Resampling results in uniform weights
 		wir_update = false;
 	}
 	return lcond;
@@ -370,7 +370,7 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 {
 	using namespace std;
 						// Scale Sigma by constant and state dimensions
-	Float SigmaScale = K * pow (Float(P.size2()), Float(-1.)/Float(x_size));
+	Float SigmaScale = K * pow (Float(P.size2()), -1/Float(x_size));
 
 						// Find min and max states in all P, precond P not empty
 	Vec xmin(x_size); xmin.assign (column(P,0));
