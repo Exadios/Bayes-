@@ -163,8 +163,23 @@ private:
 };
 
 
+namespace {
+class Kalman_filter_init : public Kalman_filter
+/* Rename init to init_from_kalman
+ * Required for GCC which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
+ */
+{
+protected:
+	Kalman_filter_init (size_t x_size) : Kalman_filter(x_size)
+	{}
+	void init() {
+		init_from_kalman();
+	}
+	virtual void init_from_kalman() = 0;
+};
+}//namespace
 
-class SIR_kalman_filter : public SIR_filter, public Kalman_filter
+class SIR_kalman_filter : public SIR_filter, public Kalman_filter_init
 /*
  * SIR implementation of a Kalman filter
  *  Updates Kalman statistics of SIR_filter
@@ -176,10 +191,12 @@ public:
 	SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper);
 
 	/* Specialisations for filter algorithm */
-	void Kalman_filter::init();
-	// Initialisation from kalman statistics
 
-	// Init from S is already defined by SIR_filter
+	// SIR_filter::Init and Kalman_filter::Init are both inherited from bases
+private:
+	void init_from_kalman();
+	// Initialisation from kalman statistics
+public:
 
 	virtual void update ()
 	// Implement Default Kalman_filter update

@@ -416,14 +416,14 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
  * SIR implementation of a Kalman filter
  */
 SIR_kalman_filter::SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
-	SIR_filter(x_size, s_size, random_helper), Kalman_filter(x_size),
+	SIR_filter(x_size, s_size, random_helper), Kalman_filter_init(x_size),
 	rough_random(random_helper),
 	rough(x_size,x_size, rough_random)
 {
 	FM::identity (rough.Fx);
 }
 
-void SIR_kalman_filter::init ()
+void SIR_kalman_filter::init_from_kalman ()
 /*
  * Initialise sampling from kalman statistics
  *	Pre: x,X
