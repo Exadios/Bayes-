@@ -122,7 +122,9 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	FM::Matrix tempHa (1,nL);
 	FM::Matrix tempHb (1,sz.size());
 
-		// feature covariance with existing location and features - zero exisiting feature covariance
+		// feature covariance with existing location and features
+        // X+ = [0 Ha] X [0 Ha]' + Hb Z Hb'
+        // - zero exisiting feature covariance
 			// ISSUE old uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, zero via upper symmetry
 	// zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
 	zero( full->X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
