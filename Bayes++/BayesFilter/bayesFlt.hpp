@@ -510,8 +510,16 @@ public:
 	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	/* Initialise from a state and state covariance
 	    Parameters that reference the instance's x and X members are valid
+	    Resizeing is valid (x,X must be conformant)
 	*/
 	{
+		size_t x_size = x.size();
+		if (Kalman_state_filter::x.size() != x_size)
+		{
+			Kalman_state_filter::x.resize(x_size);
+			Kalman_state_filter::X.resize(x_size,x_size);
+		}
+		
 		Kalman_state_filter::x = x;
 		Kalman_state_filter::X = X;
 		init();
