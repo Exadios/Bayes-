@@ -31,11 +31,8 @@ namespace Bayesian_filter
 class Unscented_predict_model : public Predict_model_base
 {
 public:
-	Unscented_predict_model (size_t q_size)
-	/// Construct with fixed noise size
-	{
-		q_unscented = q_size;
-	}
+	Unscented_predict_model ()
+	{}
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
 	/// Functional part of additive model
@@ -44,9 +41,6 @@ public:
 	virtual const FM::SymMatrix& Q(const FM::Vec& x) const = 0;
 	/// Covariance of additive noise
 	//  Note: Reference return value as a speed optimisation, MUST be copied by caller.
-private:
-	friend class Unscented_filter;	// Filter implementation need to know noise size
-	size_t q_unscented;
 };
 
 

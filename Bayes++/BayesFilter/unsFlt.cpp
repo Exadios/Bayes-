@@ -151,7 +151,7 @@ namespace {
 	{
 	public:
 		Adapted_zero_model(Functional_predict_model& fm) :
-			Unscented_predict_model(0),
+			Unscented_predict_model(),
 			fmodel(fm), zeroQ(0,0)
 		{}
 		const Vec& f(const Vec& x) const
@@ -171,7 +171,7 @@ namespace {
 	{
 	public:
 		Adapted_model(Additive_predict_model& am) :
-			Unscented_predict_model(am.G.size1()),
+			Unscented_predict_model(),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
 			noalias(QGqG) = prod_SPD(am.G, am.q);
