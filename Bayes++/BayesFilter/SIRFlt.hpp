@@ -186,7 +186,7 @@ class SIR_kalman_filter : public SIR_filter, public Kalman_filter_init
  */
 {
 public:
-	using Kalman_filter::x;
+	using Kalman_filter_init::x;
 	SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper);
 
 	/* Specialisations for filter algorithm */
