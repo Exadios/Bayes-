@@ -7,6 +7,12 @@ path-constant BOOST : [ modules.peek : BOOST_ROOT ] ;
 variant hardoptimize_release : release : 
  	<toolset>gcc <cflags>"-march=pentium3 -msse" <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
 
+# Build variant to allow testing with a local uBLAS version seperated from Boost. It named @uBLAS so it sorted name is included first
+variant uBLAS_seperate_debug : debug : <include>"../boost/@uBLAS" ;
+variant uBLAS_seperate_release : release : <include>"../boost/@uBLAS" ;
+variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
+
  # Build variant for fast syntax checking
 variant syntax :  : 
  	<toolset>gcc <cflags>"-fsyntax-only" ;
