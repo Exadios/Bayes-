@@ -46,14 +46,14 @@ public:
 	{
 				// Observe error (explict temporary)
 		FM::Vec z_error (h.h(x) - z);
-		direct.observe_error (h, z_error);
+		observe_error (h, z_error);
 	}
 
 	void observe (Linear_correlated_observe_model& h, const FM::Vec& z)
 	{
 				// Observe error (explict temporary)
 		FM::Vec z_error (h.h(x) - z);
-		direct.observe_error (h, z_error);
+		observe_error (h, z_error);
 	}
 
 	template <typename O_model>
@@ -116,14 +116,14 @@ public:
 	{
 				// Observe error (explict temporary)
 		FM::Vec z_error (h.h(x) - z);
-		direct.observe_error (h, z_error);
+		observe_error (h, z_error);
 	}
 
 	void observe (Linear_correlated_observe_model& h, const FM::Vec& z)
 	{
 				// Observe error (explict temporary)
 		FM::Vec z_error (h.h(x) - z);
-		direct.observe_error (h, z_error);
+		observe_error (h, z_error);
 	}
 
 	template <typename O_model>
