@@ -43,14 +43,14 @@ Fast_SLAM::Fast_SLAM( BF::SIR_scheme& L_filter ) :
 	wir_update = false;
 }
 
-void Fast_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
+void Fast_SLAM::observe_new( unsigned feature, const BF::Uncorrelated_additive_observe_model& fom, const FM::Vec& z )
 /*
  * SLAM New Feature observation (overwrite)
  * Assumes there is no prior information about the feature (strictly a uniform un-informative prior)
  *
  * This implies
  *  a) There has no information about location so no resampling is requires
- *  b) Feature Posterior estimated directly from observation using inormation form
+ *  b) Feature Posterior estimated directly from observation using information form
  *
  * fom: must have a the special from required for SLAM::obeserve_new
  */

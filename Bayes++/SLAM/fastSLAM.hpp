@@ -34,7 +34,11 @@ public:
 
 									// Single Feature observations (single element vectors)
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );
-	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z );
+	void observe_new( unsigned feature, const BF::Uncorrelated_additive_observe_model& fom, const FM::Vec& z );
+	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
+	{
+		observe_new (feature, static_cast<const BF::Uncorrelated_additive_observe_model&>(fom), z);
+	}
 	void observe_new( unsigned feature, const FM::Float& t, const FM::Float& T );
 
 	void forget( unsigned feature, bool must_exist = true );

@@ -9,7 +9,7 @@
 /*
  * SLAM : Simultaneous Locatization and Mapping
  *  Kalman filter representing representation of SLAM
- *  A very simple full filter implementation.
+ *  A very simple and INEFFICIENT full filter implementation.
  *  The Feature number should be incremented by one to avoid sparseness in the full filter.
  *  The filter size grows with the feature number, but never shrinks
  *
@@ -39,7 +39,7 @@ public:
 	Kalman_SLAM( Kalman_filter_generator& filter_generator );
 	~Kalman_SLAM();
 	void init_kalman( const FM::Vec& x, const FM::SymMatrix& X );
-	void predict( Bayesian_filter::Linrz_predict_model& m );
+	void predict( Bayesian_filter::Linear_predict_model& m );
 
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );
 	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z );
@@ -61,8 +61,6 @@ public:
 
 protected:
 	Kalman_filter_generator& fgenerator;
-	// Location filter for prediction
-	Kalman_filter_generator::Filter_type* loc;
 	// Full Kalman representation of state
 	Kalman_filter_generator::Filter_type* full;
 

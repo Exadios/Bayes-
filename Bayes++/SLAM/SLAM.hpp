@@ -42,9 +42,9 @@ public:
 	// Linearised observation model
 	//  Observation z = h(lt) where lt is the vector of location state augmented with the associated feature state
 
-	typedef BF::Uncorrelated_additive_observe_model Feature_observe_inverse;
+	typedef BF::Linrz_uncorrelated_observe_model Feature_observe_inverse;
 	// Inverse model required for observe_new
-	//  Feature state t = h(lz)	where lz is the vector of location state augmented with observation z
+	//  Feature state t = h(lz) where lz is the vector of location state augmented with observation z
 
 									// Observation associated with a single feature
 	virtual void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z ) = 0;
