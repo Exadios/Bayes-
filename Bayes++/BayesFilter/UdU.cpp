@@ -26,7 +26,6 @@
 #include <cassert>
 #include <cmath>
 
-
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {
@@ -45,6 +44,7 @@ inline typename V::value_type rcond_internal (const V& D)
  *
  * Note:
  *  Defined to be 0 for semi-definate and 0 for an empty matrix
+ *  Defined to be 0 for max and min infinite
  *  Defined to be <0 for negative matrix (D element a value  < 0)
  *  Defined to be <0 with any NaN element
  *
@@ -287,7 +287,6 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
 {
 	size_t i,j,k;
 	RowMatrix::value_type e, d;
-
 	if (n > 0)
 	{
 		j = n-1;
