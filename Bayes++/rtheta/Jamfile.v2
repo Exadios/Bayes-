@@ -7,9 +7,10 @@ project
 
 # System libraries - specifiy local link requirements for lapack
 lib g2c : : <name>g2c ;
+lib blas : : <name>blas ;
 lib lapack : : <name>lapack ;
-lib lapack : : <toolset>gcc <name>lapack : : <library>g2c  ;
-lib lapack : : <toolset>intel-linux  <name>lapack : : <library>g2c  ;
+lib lapack : : <toolset>gcc <name>lapack : : <library>blas <library>g2c  ;
+lib lapack : : <toolset>intel-linux  <name>lapack : : <library>blas <library>g2c  ;
 alias lapack : "../../CLAPACK3/clapack-7.a" : <toolset>msvc ;
 
 # The executable for testing
