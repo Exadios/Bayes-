@@ -11,16 +11,15 @@
  *  A linear filter with one state and constant noises
  */
 
-// Types Required for SLAM classes
-#include <vector>
-#include <map>
-
-// Bayes++ Bayesian filtering schemes
+		// Bayes++ Bayesian filtering schemes
 #include "BayesFilter/SIRFlt.hpp"
 #include "BayesFilter/covFlt.hpp"
 #include "BayesFilter/unsFlt.hpp"
 #include "BayesFilter/models.hpp"
-// Bayes++ SLAM
+		// Types required for SLAM classes
+#include <vector>
+#include <map>
+		// Bayes++ SLAM
 #include "SLAM.hpp"
 #include "fastSLAM.hpp"
 #include "kalmanSLAM.hpp"

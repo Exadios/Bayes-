@@ -134,7 +134,7 @@ Bayes_base::Float
 	Matrix temp_XZ (prod(X, trans(h.Hx)));
 	noalias(S) = prod(h.Hx, temp_XZ);
 	for (size_t i = 0; i < h.Zv.size(); ++i)
-		S(i,i) += h.Zv[i];
+		S(i,i) += Float(h.Zv[i]);	// ISSUE mixed type proxy assignment
 
 						// Inverse innovation covariance
 	Float rcond = UdUinversePD (SI, S);

@@ -11,8 +11,9 @@
  *  Kalman filter representing representation of SLAM
  */
 
-// Include Bayesian filtering library
+		// Bayes++ Bayesian filtering schemes
 #include "BayesFilter/bayesFlt.hpp"
+		// Bayes++ SLAM
 #include "SLAM.hpp"
 #include "kalmanSLAM.hpp"
 
@@ -21,7 +22,7 @@ namespace SLAM_filter
 
 template <class Base>
 inline void zero(FM::ublas::matrix_range<Base> A)
-// Zero a matrix_rangec
+// Zero a matrix_range
 {	// Note A cannot be a reference
 	typedef typename Base::value_type Base_value_type;
 	noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type());

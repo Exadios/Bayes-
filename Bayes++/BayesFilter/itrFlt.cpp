@@ -33,7 +33,7 @@ Iterated_covariance_scheme::Iterated_covariance_scheme(size_t x_size, size_t z_i
 		Kalman_state_filter(x_size),
 		S(Empty), SI(Empty),
 		s(Empty), HxT(Empty)
-/*`
+/*
  * Initialise filter and set the size of things we know about
  */
 {

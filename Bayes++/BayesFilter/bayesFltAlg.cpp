@@ -240,7 +240,7 @@ Adapted_Correlated_addative_observe_model::Adapted_Correlated_addative_observe_m
 {
 	Z.clear();
 	for (size_t i = 0; i < unc.Zv.size(); ++i)
-		Z(i,i) = unc.Zv[i];
+		Z(i,i) = Float(unc.Zv[i]);	// ISSUE mixed type proxy assignment
 }
 
 Adapted_Linrz_correlated_observe_model::Adapted_Linrz_correlated_observe_model (Linrz_uncorrelated_observe_model& adapt) :
@@ -250,7 +250,7 @@ Adapted_Linrz_correlated_observe_model::Adapted_Linrz_correlated_observe_model (
 	Hx = unc.Hx;
 	Z.clear();
 	for (size_t i = 0; i < unc.Zv.size(); ++i)
-		Z(i,i) = unc.Zv[i];
+		Z(i,i) = Float(unc.Zv[i]);	// ISSUE mixed type proxy assignment
 }
 
 

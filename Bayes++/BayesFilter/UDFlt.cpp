@@ -154,7 +154,7 @@ UD_scheme::Float
 		{
 						// Prepare d(0)..d(j) as temporary
 			for (i = 0; i <= j; ++i)	// 0..j
-				d[i] = UD(i,j);
+				d[i] = Float(UD(i,j));	// ISSUE mixed type proxy assignment
 
 						// Lower triangle of UD is implicity empty
 			for (i = 0; i < n; ++i) 	// 0..n-1
@@ -166,7 +166,7 @@ UD_scheme::Float
 					UDi[j] += Fxi[k] * d[k];
 			}
 		}
-		d[0] = UD(0,0);
+		d[0] = Float(UD(0,0));	// ISSUE mixed type proxy assignment
 
 						//  Complete U = Fx*U
 		for (j = 0; j < n; ++j)			// 0..n-1
@@ -181,7 +181,7 @@ UD_scheme::Float
 			e = 0.;
 			for (k = 0; k < N; ++k)		// 0..N-1
 			{
-				v[k] = UDj[k];
+				v[k] = Float(UDj[k]);	// ISSUE mixed type proxy assignment
 				dv[k] = d[k] * v[k];
 				e += v[k] * dv[k];
 			}

@@ -377,8 +377,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 	ColMatrix::iterator2 pi = P.begin2();
 	while (pi != P.end2())		// Loop includes 0 to simplify code
 	{
-		Vec::iterator ni = xmin.begin();
-		Vec::iterator xi = xmax.begin();
+		Vec::iterator mini = xmin.begin();
+		Vec::iterator maxi = xmax.begin();
 
 #ifdef BOOST_UBLAS_NO_NESTED_CLASS_RELATION
 		for (ColMatrix::iterator1 xpi = begin(pi, ublas::iterator2_tag()); xpi != pi.end(); ++xpi)
@@ -386,10 +386,9 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 		for (ColMatrix::iterator1 xpi = pi.begin(); xpi != pi.end(); ++xpi)
 #endif
 		{
-			if (*xpi < *ni) *ni = *xpi;
-			if (*xpi > *xi) *xi = *xpi;
-			++ni; ++xi;
-
+			if (*xpi < *mini) *mini = Float(*xpi);	// ISSUE mixed type proxy assignment
+			if (*xpi > *maxi) *maxi = Float(*xpi);
+			++mini; ++maxi;
 		}
 		++pi;
 	}

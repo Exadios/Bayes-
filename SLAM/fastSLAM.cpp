@@ -12,13 +12,14 @@
  *  Direct implementation without log(n) tree pruneing for associated observations
  */
 
-#include <cmath>
-#include <vector>
-#include <map>
-// Include Bayesian filtering library
+		// Bayes++ Bayesian filtering schemes
 #include "BayesFilter/SIRFlt.hpp"
+		// Types required for SLAM classes
+#include <map>
+		// Bayes++ SLAM
 #include "SLAM.hpp"
 #include "fastSLAM.hpp"
+#include <cmath>
 
 
 namespace {

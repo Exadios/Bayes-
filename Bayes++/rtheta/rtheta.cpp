@@ -183,8 +183,8 @@ cobs_model::cobs_model(uobs_model& u) :
 {
 	FM::identity (Z);
 	// Create the correlation in Z
-	Z(0,0) = uobs.Zv[0]; Z(1,1) = uobs.Zv[1];
-	Z(1,0) = Z(0,1) = sqrt(Z(0,0))*sqrt(Z(1,1))*Z_CORRELATION;
+	Z(0,0) = Float(uobs.Zv[0]); Z(1,1) = Float(uobs.Zv[1]);	// ISSUE mixed type proxy assignment
+	Z(1,0) = Float(Z(0,1) = sqrt(Z(0,0))*sqrt(Z(1,1))*Z_CORRELATION);
 }
 
 void uobs_model::state (const Vec& x)
@@ -458,7 +458,7 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 		//	x(0)diff, x(1)diff, truth.x(0), truth.x(1), zx, zy)
 		cout << format("*%11.4g %11.4g * %10.3f %10.3f  %10.3f %10.3f")
 			 	% (f1x[0]-f2x[0]) % (f1x[1]-f2x[1])
-			 	% truth.x[0] % truth.x[1] % zx % zy << endl;
+			 	% Float(truth.x[0]) % Float(truth.x[1]) % zx % zy << endl;	// ISSUE mixed type proxy assignment
 
 		format state(" %11.4g %11.4g * %10.3f %10.3f");
 		format covariance(" %12.4e %12.4e %12.4e");
