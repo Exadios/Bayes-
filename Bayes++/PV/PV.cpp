@@ -24,10 +24,10 @@
 
 #include "BayesFilter/UDFlt.hpp"
 #include "BayesFilter/filters/indirect.hpp"
+#include "Test/random.hpp"
 #include <cmath>
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/random.hpp>
 
 namespace
 {
@@ -45,19 +45,7 @@ namespace
 	}
 
 	// Random numbers from Boost
-	boost::mt19937 localRng;
-	inline void randNormal(Vec& v)
-	{
-		boost::normal_distribution<Float> dist;
-		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
-		std::generate (v.begin(), v.end(), gen);
-	}
-	inline void randNormal(Vec& v, const Float mean, const Float sigma)
-	{
-		boost::normal_distribution<Float> dist(mean, sigma);
-		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
-		std::generate (v.begin(), v.end(), gen);
-	}
+	Bayesian_filter_test::Boost_random localRng;
 
 	// Constant Dimensions
 	const unsigned NX = 2;			// Filter State dimension 	(Position, Velocity)
@@ -184,7 +172,7 @@ int main()
 		// Predict true state using Normally distributed acceleration
 		// This is a Guassian
 		x_true = linearPredict.f(x_true);
-		randNormal (u);		// normally distributed mean 0., stdDev for stationary IOU
+		localRng.normal (u);		// normally distributed mean 0., stdDev for stationary IOU
 		x_true[1] += u[0]* sqr(V_NOISE) / (2*V_GAMMA);
 
 		// Predict filter with known pertubation
@@ -199,7 +187,7 @@ int main()
 			z_true[0] = x_true[0];
 
 			// Observation with addative noise
-			randNormal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
+			localRng.normal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
 
 			// Filter observation
 			f1.observe (linearObserve, z);

@@ -4,13 +4,13 @@
  * See Bayes++.htm for copyright license details
  */
 #include "BayesFilter/allFilters.hpp"
+#include "Test/random.hpp"
 #include <cmath>
 #include <iostream>
 #include <exception>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/limits.hpp>
 #include <boost/bind.hpp>
-#include <boost/random.hpp>
 
 
 using namespace Bayesian_filter;
@@ -35,48 +35,30 @@ inline scalar sqr(scalar x)
 }
 
 
-template <typename Float>
-class Test_random : public SIR_random
+class Test_random : public Bayesian_filter_test::Boost_random, public SIR_random
 /*
- * Random number distributions
+ * Random numbers for filters from Boost
  */
 {
 public:
-	Test_random() : gen_normal(), gen_lognormal(), gen_exponential(1.), gen_uniform(rng)
-	{}
-	Float normal(const Float mean, const Float sigma)
+	Float normal (const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<Float> gen(mean, sigma);
-		return gen(rng);
+		return Boost_random::normal (mean, sigma);
 	}
-	void normal(DenseVec& v)
+	void normal (DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), boost::bind(gen_normal,rng));
+		Boost_random::normal (v);
 	}
-	void lognormal(DenseVec& v)
+	void uniform_01 (DenseVec& v)
 	{
-		std::generate (v.begin(), v.end(), boost::bind(gen_lognormal, rng));
+		Boost_random::uniform_01 (v);
 	}
-	void exponential_1(DenseVec& v)
+	void seed ()
 	{
-		std::generate (v.begin(), v.end(), boost::bind(gen_exponential, rng));
+		Boost_random::seed();
 	}
-	void uniform_01(DenseVec& v)
-	{
-		std::generate (v.begin(), v.end(), gen_uniform);
-	}
-	void reseed()
-	{
-		rng.seed();
-	}
-private:
-	typedef boost::mt19937 good_random;
-	good_random rng;
-	boost::normal_distribution<Float> gen_normal;
-	boost::lognormal_distribution<Float> gen_lognormal;
-	boost::exponential_distribution<Float> gen_exponential;
-	boost::uniform_01<good_random,Float> gen_uniform;
-};
+} Random;
+
 
 void test_inverse()
 {

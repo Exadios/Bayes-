@@ -19,6 +19,7 @@
  */
 
 #include "BayesFilter/infFlt.hpp"
+#include "Test/random.hpp"
 #include <cmath>
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
@@ -40,20 +41,7 @@ namespace
 	}
 
 	// Random numbers from Boost
-	boost::mt19937 localRng;
-	inline void randNormal(Vec& v)
-	{
-		boost::normal_distribution<Float> dist;
-		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
-		std::generate (v.begin(), v.end(), gen);
-	}
-	inline void randNormal(Vec& v, const Float mean, const Float sigma)
-	{
-		boost::normal_distribution<Float> dist(mean, sigma);
-		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(localRng, dist);
-		std::generate (v.begin(), v.end(), gen);
-	}
-
+	Bayesian_filter_test::Boost_random localRng;
 
 	// Constant Dimensions
 	const unsigned NX = 3;			// Filter State dimension 	(SystemState, Scale, Bias)
@@ -177,7 +165,7 @@ int main()
 	for (unsigned i = 0; i < 100; i++ )
 	{
 		// Predict true state using control input brownian
-		randNormal (u);				// normally distributed
+		localRng.normal (u);				// normally distributed
 		x_true[0] += u[0];
 		linearPredict.predict (u);
 
@@ -188,7 +176,7 @@ int main()
 		z_true[0] = x_true[0] * x_true[1] + x_true[2];
 
 		// Observation with addative noise
-		randNormal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
+		localRng.normal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
 
 		// Filter observation using model linearised at state estimate x
 		nonlinObserve.state (obsAndCalib.x);

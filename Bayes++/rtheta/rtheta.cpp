@@ -15,12 +15,12 @@
 
 #include "BayesFilter/allFilters.hpp"
 #include "BayesFilter/schemeFlt.hpp"
+#include "Test/random.hpp"
 #include <angle.hpp>			// Angle arithmatic header from Ms
 #include <cmath>
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/bind.hpp>
-#include <boost/random.hpp>
 #include <boost/format.hpp>
 #include <boost/limits.hpp>
 
@@ -65,39 +65,28 @@ inline scalar sqr(scalar x)
 	return x*x;
 }
 
-// Random numbers for filters from Boost
-class Boost_random : public SIR_random
+class Rtheta_random : public Bayesian_filter_test::Boost_random, public SIR_random
 /*
- * Random number distributions
+ * Random numbers for filters from Boost
  */
 {
 public:
-	Boost_random() : dist_normal(), dist_uniform()
-	{}
-	Float normal(const Float mean, const Float sigma)
+	Float normal (const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<Float> dist(mean, sigma);
-		boost::variate_generator<boost::mt19937&,boost::normal_distribution<Float> > gen(rng, dist);
-		return gen();
+		return Boost_random::normal (mean, sigma);
 	}
-	void normal(DenseVec& v)
+	void normal (DenseVec& v)
 	{
-		boost::variate_generator<boost::mt19937&, boost::normal_distribution<Float> > gen(rng, dist_normal);
-		std::generate (v.begin(), v.end(), gen);
+		Boost_random::normal (v);
 	}
-	void uniform_01(DenseVec& v)
+	void uniform_01 (DenseVec& v)
 	{
-		boost::variate_generator<boost::mt19937&, boost::uniform_real<Float> > gen(rng, dist_uniform);
-		std::generate (v.begin(), v.end(), gen);
+		Boost_random::uniform_01 (v);
 	}
-	void reseed()
+	void seed ()
 	{
-		rng.seed();
+		Boost_random::seed();
 	}
-private:
-	boost::mt19937 rng;
-	boost::normal_distribution<Float> dist_normal;
-	boost::uniform_real<Float> dist_uniform;
 } Random, Random2;
 
 
@@ -555,22 +544,22 @@ int main()
 
 	// Initialise and do the comparison
 	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
-	Random.reseed();
+	Random.seed();
 	CCompare<Filter<UD_scheme>, Filter<Unscented_scheme> > test1(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
-	Random.reseed();
+	Random.seed();
 	CCompare<Filter<Covariance_scheme>, Filter<Information_linrz_scheme> > test2(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "irfilter, ilfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
-	Random.reseed();
+	Random.seed();
 	CCompare<Filter<Information_root_scheme>, Filter<Information_scheme> > test3(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "sfilter, itfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
-	Random.reseed();
+	Random.seed();
 	CCompare<Filter<SIR_kalman_scheme>, Filter<Iterated_covariance_scheme> > test4(x_init, X_init, 4);
 	std::cout << std::endl;
 
