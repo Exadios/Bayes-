@@ -36,7 +36,7 @@ template <class V>
 inline typename V::value_type rcond_internal (const V& D)
 /*
  * Estimate the reciprocal condition number of a Diagonal Matrix for inversion.
- * D is a diagonal matrix, the parameter is actually a vector
+ * D represents a diagonal matrix, the parameter is actually passed as a vector
  *
  * The Condition Number is defined from a matrix norm.
  *  Choose max element of D as the norm of the original matrix.
@@ -44,16 +44,16 @@ inline typename V::value_type rcond_internal (const V& D)
  *  Therefore rcond = min/max
  *
  * Note:
- *  Defined to be 0 for semi-definate or zero or empty matrix
+ *  Defined to be 0 for semi-definate and 0 for an empty matrix
  *  Defined to be <0 for negative matrix (D element a value  < 0)
- *  Defined to be <0 for any NaN conditioning
+ *  Defined to be <0 with any NaN element
  *
- *  A negative matrix may also be due to errors in the original matrix resulting in
+ *  A negative matrix may be due to errors in the original matrix resulting in
  *   a factorisation producing special values in D (e.g. -infinity,NaN etc)
  *  By definition rcond <= 1 as min<=max
  */
 {
-	// Special case an empty vector
+	// Special case an empty matrix
 	const size_t n = D.size();
 	if (n == 0)
 		return 0;
@@ -70,12 +70,12 @@ inline typename V::value_type rcond_internal (const V& D)
 
 	if (mind < 0)				// matrix is negative
 		return -1;
-	assert (mind <= maxd);		// check sanity
 								// ISSUE mind may still be -0, this is progated into rcond
+	assert (mind <= maxd);		// check sanity
 	
 	rcond = mind / maxd; 		// rcond from min/max norm
 	if (rcond != rcond)			// NaN, singular due to (mind == maxd) == (zero or infinity)
-		return 0;
+		rcond = 0;
 	assert (rcond <= 1);
 	return rcond;
 }
@@ -84,27 +84,14 @@ template <class V>
 inline typename V::value_type rcond_ignore_infinity_internal (const V& D)
 /*
  * Estimate the reciprocal condition number of a Diagonal Matrix for inversion.
- * D is a diagonal matrix, the parameter is actually a vector
- *
- * The Condition Number is defined from a matrix norm.
- *  Choose max element of D as the norm of the original matrix.
- *  Assume this norm for inverse matrix is min element D.
- *  Therefore rcond = min/max
- *
- * Note:
- *  Defined to be 0 for semi-definate or zero or empty matrix
- *  Defined to be <0 for negative matrix (D element a value  < 0)
- *  Defined to be <0 for any NaN conditioning
- *
- *  A negative matrix may also be due to errors in the original matrix resulting in
- *   a factorisation producing special values in D (e.g. -infinity,NaN etc)
- *  By definition rcond <= 1 as min<=max
+ * Same as rcond_internal except that elements are infinity are ignored
+ * when determining the maximum element.
  */
 {
-	// Special case an empty vector
+	// Special case an empty matrix
 	const size_t n = D.size();
 	if (n == 0)
-		return 1;
+		return 0;
 
 	Vec::value_type rcond, mind = D[0], maxd = 0;
 
@@ -119,14 +106,14 @@ inline typename V::value_type rcond_ignore_infinity_internal (const V& D)
 
 	if (mind < 0)				// matrix is negative
 		return -1;
-	assert (mind <= maxd);		// check sanity
 								// ISSUE mind may still be -0, this is progated into rcond
-
-    if (maxd == 0)				// singular due to (mind == maxd) == zero
+    if (maxd == 0)				// singular due to maxd == zero (elements all zero or infinity)
 		return 0;
+	assert (mind <= maxd);		// check sanity
+
 	rcond = mind / maxd; 		// rcond from min/max norm
 	if (rcond != rcond)			// NaN, singular due to (mind == maxd) == infinity
-		return 1;
+		rcond = 0;
 	assert (rcond <= 1);
 	return rcond;
 }
