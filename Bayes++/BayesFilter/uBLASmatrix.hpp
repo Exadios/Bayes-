@@ -372,7 +372,7 @@ struct prod_expression_result
 
 	// Provide ET result E1TE2_type of prod(trans(matrix_expression<E1>),matrix_expression<E2>)
 	typedef typename ublas::matrix_unary2_traits<E1, ublas::scalar_identity<typename E1::value_type> >::result_type  E1T_type;
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<typename E1T_type::value_type, E1T_type,
+	typedef typename ublas::matrix_matrix_binary_traits<typename E1T_type::value_type, E1T_type,
                                         typename E2::value_type, E2>::result_type  E1TE2_type;
 };
 
