@@ -343,17 +343,19 @@ public:
 	Filter (const Vec& x_init, const SymMatrix& X_init);
 	Filter_scheme<TestScheme> ts;
 	template <class P>
-	void predict (P pmodel)
+	void predict (P& pmodel)
 	{
 		ts.predict (pmodel);
 	}
 	template <class O>
-	void observe (O omodel, const Vec& z)
+	void observe (O& omodel, const Vec& z)
 	{
 		ts.observe (omodel, z);
 	}
 	void update ()
-	{}
+	{
+		ts.update ();
+	}
 	const Vec& x()
 	{	return ts.x;
 	}
@@ -505,13 +507,13 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 		// Observe using model linearised about filter state estimate
 		if (Z_CORRELATION == 0.)
 		{
-			uh.state(f1.x());	f1.observe (uh, z);
+			uh.state(f1.x()); f1.observe (uh, z);
 			uh.state(f2.x()); f2.observe (uh, z);
 		}
 		else
 		{
-			ch.state(f1.x());	f1.observe (ch, z);
-			ch.state(f2.x());	f2.observe (ch, z);
+			ch.state(f1.x()); f1.observe (ch, z);
+			ch.state(f2.x()); f2.observe (ch, z);
 		}
 
 		// Update the filter
