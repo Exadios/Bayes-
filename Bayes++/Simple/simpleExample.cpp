@@ -54,13 +54,6 @@ public:
 	}
 };
 
-template <class BaseR>
-inline void mstest(BaseR R)
-{
-	R.size();
-}
-
-
 
 /*
  * Filter a simple example

@@ -7,7 +7,7 @@
 #
 # This Makefile just wraps up the bjam command for those used to make.
 # Use make TOOLS='tt' to specify the toolset used by Boost.Build
-# Use make TOOLS='tt' ARGS='aa'  to pass arguments to bjam
+# Use make TOOLS='tt' ARGS='aa'  to pass additional arguments to bjam
 
 # Modify these settings to locate Boost and bjam
 BOOST_ROOT = ../boost_1_29_0

@@ -13,6 +13,7 @@ CPP_SOURCES =
 
 lib BayesFilter : $(CPP_SOURCES).cpp
     :
+     <include>$(BAYES_ROOT)/uBLAS	# Local uBLAS overides Boost
      <include>$(BOOST_ROOT)
     : debug release
 ;

@@ -10,6 +10,7 @@ exe simple :
      simpleExample.cpp 
      <lib>../BayesFilter/BayesFilter
     :
+     <include>$(BAYES_ROOT)/uBLAS	# Local uBLAS overides Boost
      <include>$(BOOST_ROOT)
      <include>$(BAYES_ROOT)
     : release
