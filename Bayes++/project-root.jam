@@ -5,17 +5,17 @@ path-constant BOOST : [ modules.peek : BOOST_ROOT ] ;
 
 # Build variant for full compiler optimization
 variant hardoptimize_release : release : 
- 	<toolset>gcc <cflags>"-march=pentium3 -msse" <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
+ 	<toolset>gcc <cflags>"-march=pentium4 -msse2" <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
 
 # Build variant to allow testing with a local uBLAS version seperated from Boost. It named @uBLAS so it sorted name is included first
 variant uBLAS_seperate_debug : debug : <include>"../Boost/@uBLAS" ;
 variant uBLAS_seperate_release : release : <include>"../Boost/@uBLAS" ;
-variant uBLAS_seperate_sparse_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_SPARSE ;
-variant uBLAS_seperate_sparse_release : uBLAS_seperate_release : <define>BAYES_FILTER_SPARSE ;
-variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
-variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
-variant uBLAS_seperate_coordinate_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COORDINATE ;
-variant uBLAS_seperate_coordinate_release : uBLAS_seperate_release : <define>BAYES_FILTER_COORDINATE ;
+variant uBLAS_sparse_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_SPARSE ;
+variant uBLAS_sparse_release : uBLAS_seperate_release : <define>BAYES_FILTER_SPARSE ;
+variant uBLAS_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_coordinate_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COORDINATE ;
+variant uBLAS_coordinate_release : uBLAS_seperate_release : <define>BAYES_FILTER_COORDINATE ;
 
  # Build variant for fast syntax checking
 variant syntax :  : 
