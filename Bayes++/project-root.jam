@@ -1,1 +1,5 @@
 # Bayes++ project root - See Boost.build v2
+
+# Get Boost location from build system
+path-constant BOOST : [ modules.peek : BOOST_ROOT ] ;
+
