@@ -11,8 +11,8 @@
  * Information Root Filter.
  */
 #include "bayesFlt.hpp"
-#include "infRtFlt.hpp"
 #include "matSup.hpp"
+#include "infRtFlt.hpp"
 #include "uLAPACK.hpp"	// Common LAPACK interface
 #include <algorithm>
 
@@ -80,10 +80,10 @@ void Information_root_info_filter::init_yY ()
 			LTriMatrix::value_type sd = LC(i,i);
 			sd = sqrt(sd);
 			LC(i,i) = sd;
-						// Multiply columns by square of non zero diagonal
+						// Multiply columns by square of non zero diagonal. TODO use column operation
 			for (j = i+1; j < n; ++j)
 			{
-				LC(j,i) *= sd;		// TODO Use Row operation
+				LC(j,i) *= sd;		
 			}
 		}
 	}

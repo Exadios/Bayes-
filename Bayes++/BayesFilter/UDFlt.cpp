@@ -16,8 +16,8 @@
  * observe functions: returned rcond is the minimum of each sequential update, an overall conditioning would be better
  */
 #include "bayesFlt.hpp"
-#include "UDFlt.hpp"
 #include "matSup.hpp"
+#include "UDFlt.hpp"
 #include <boost/limits.hpp>
 
 /* Filter namespace */

@@ -1,4 +1,3 @@
-#define BAYES_FILTER_COMPRESSED
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -20,7 +19,7 @@
 /*
  * Use the Boost uBLAS Basic Linear Algebra library
  * That is boost::numeric::ublas
- *  Thanks to  Joerg Walter, Mathias Koch for an excellent C++ library
+ *  Thanks to Joerg Walter and Mathias Koch for an excellent library!
  *
  * Provides predefined types Vec and a variety of Matrix types
  *

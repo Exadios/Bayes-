@@ -11,6 +11,7 @@
  * Unscented Filter.
  */
 #include "bayesFlt.hpp"
+#include "matSup.hpp"
 #include "unsFlt.hpp"
 #include "models.hpp"
 #include <cmath>

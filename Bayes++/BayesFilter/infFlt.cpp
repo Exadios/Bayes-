@@ -11,8 +11,8 @@
  * Information Filter.
  */
 #include "bayesFlt.hpp"
-#include "infFlt.hpp"
 #include "matSup.hpp"
+#include "infFlt.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter
@@ -162,7 +162,7 @@ Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_pr
 			filter_error ("Predict q Not PSD");
 		b.invq[i] = Float(1) / f.q[i];
 	}
-	diag(b.B) += b.invq;
+	diag(b.B).plus_assign (b.invq);
 	
 						// invert B ,Addative noise
 	Float rcond = UdUinversePDignoreInfinity (b.B);
@@ -177,8 +177,8 @@ Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_pr
 						// Information
 	Y.assign (prod(b.tempY,b.A));
 						// Information state
-	y.assign (prod(prod(b.tempY,trans(f.inv.Fx)), y));
-
+	y = prod(prod(b.tempY,trans(f.inv.Fx)), y);
+	
 	update_required = true;
 	assert_isPSD (Y);
 	return rcond;
@@ -220,8 +220,8 @@ Bayes_base::Float
 												// Calculate EIF I = Hx'*ZI*Hx
 	I.assign (prod(HxTZI, trans(HxT)));				// use column matrix trans(HxT)
 
-	y += i;
-	Y += I;
+	y.plus_assign (i);
+	Y.plus_assign (I);
 	update_required = true;
 
 	assert_isPSD (Y);
@@ -252,10 +252,10 @@ Bayes_base::Float
 												// Calculate EIF I = Hx'*ZI*Hx
 	I.assign (prod(HxT, h.Hx));
 
-	y += i;
-	Y += I;
-
+	y.plus_assign (i);
+	Y.plus_assign (I);
 	update_required = true;
+
 	assert_isPSD (Y);
 	return rcond;
 }

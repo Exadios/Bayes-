@@ -1,4 +1,3 @@
-
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -12,8 +11,8 @@
  * Covariance Filter.
  */
 #include "bayesFlt.hpp"
-#include "covFlt.hpp"
 #include "matSup.hpp"
+#include "covFlt.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter
@@ -102,8 +101,8 @@ Bayes_base::Float
 	W.assign (prod(temp_XZ, SI));
 
 						// State update
-	x += prod(W, s);
-	X -= prod_SPD(W, S, temp_XZ);
+	x.plus_assign (prod(W, s));
+	X.minus_assign (prod_SPD(W, S, temp_XZ));
 
 	assert_isPSD (X);
 	return rcond;
@@ -134,8 +133,8 @@ Bayes_base::Float
 	W.assign (prod(temp_XZ, SI));
 
 						// State update
-	x += prod(W, s);
-	X -= prod_SPD(W,S, temp_XZ);
+	x.plus_assign (prod(W, s));
+	X.minus_assign (prod_SPD(W, S, temp_XZ));
 
 	assert_isPSD (X);
 	return rcond;

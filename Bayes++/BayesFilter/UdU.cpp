@@ -23,7 +23,6 @@
  */
 #include "bayesFlt.hpp"
 #include "matSup.hpp"
-
 #include <cassert>
 #include <cmath>
 

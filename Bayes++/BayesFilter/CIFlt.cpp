@@ -12,8 +12,8 @@
  * TODO: Implement useful Omega based on iterative optimization algorithm from the authors of reference [1]
  */
 #include "bayesFlt.hpp"
-#include "CIFlt.hpp"
 #include "matSup.hpp"
+#include "CIFlt.hpp"
 #include "models.hpp"
 
 /* Filter namespace */
@@ -138,7 +138,7 @@ Bayes_base::Float
 	Matrix K (prod(XHT*(one-omega), SI));
 
 						// state update
-	x += prod(K, s);
+	x.plus_assign (prod(K, s));
 						// inverse covariance
 	invX = invX * omega + HTinvZH*(one-omega);
 						// covariance

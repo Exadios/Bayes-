@@ -12,8 +12,8 @@
  *  algorithm that require additional resources to implement
  */
 #include "bayesFlt.hpp"
-#include "models.hpp"
 #include "matSup.hpp"
+#include "models.hpp"
 #include <vector>		// Only for unique_samples
 
 
@@ -164,7 +164,7 @@ Bayes_base::Float
 	Vec zInnov(z.size());
 	zInnov = zp;;
 	normalise (zInnov, z);
-	zInnov -= z;
+	zInnov.minus_assign (z);
 
 	// Likelihood w of observation z given particlar state xi is true state
 	// The state, xi, defines a predicted observation with a gaussian 
@@ -218,7 +218,7 @@ Bayes_base::Float
 	FM::Vec zInnov(z.size());
 	zInnov = zp;
 	normalise (zInnov, z);
-	zInnov -= z;
+	zInnov.minus_assign (z);
 
 	Float logL = scaled_vector_square(zInnov, Z_inv);
 	using namespace std;
