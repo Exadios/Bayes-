@@ -35,13 +35,14 @@ class Filter_exception : public std::exception
  *	Base class for all exception produced by filter heirachy
  */
 {
+public:
+	const char *what() const throw()
+	{	return error_description;
+	}
 protected:
 	Filter_exception (const char* description)
 	{	error_description = description;
 	};
-	const char *what() const throw()
-	{	return error_description;
-	}
 private:
 	const char* error_description;
 };
