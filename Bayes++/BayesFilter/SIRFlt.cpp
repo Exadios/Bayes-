@@ -450,7 +450,7 @@ void SIR_kalman_scheme::init ()
 						// Decorrelate init state noise
 	Matrix UD(x_size,x_size);
 	Float rcond = UdUfactor (UD, X);
-	rclimit.check_PSD(rcond, "Roughening X not PSD");
+	rclimit.check_PSD(rcond, "Init X not PSD");
 
 						// Sampled predict model for initial noise variance
 	FM::identity (roughen_model.Fx);
