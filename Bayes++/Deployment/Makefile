@@ -1,7 +1,8 @@
 # Bayes++ Project Managment Makefile
 #   Provides interface for project development and sourceforge maintainance
 
-RELEASE=2004.8-1
+RELEASE=2004.8
+RELEASE_SUB=-1
 BOOST_VERSION=boost_1_32_0
 
 help:
@@ -20,8 +21,8 @@ archivedoc:
 	cd ..; zip -r Deployment/bf-classdocumentation-$(RELEASE).zip ClassDocumentation
 
 archivesrc:
-	ln -s ../../Bayes++ Bayes++
-	zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html "Bayes++/Bayesian Filtering Classes.html"  -x '*/CVS/*'
+	ln -s "../../Bayes++$(RELEASE)" Bayes++
+	zip -r "Bayes++/bf-C++source-$(RELEASE)$(RELEASE_SUB).zip" Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html "Bayes++/Bayesian Filtering Classes.html"  -x '*/CVS/*'
 	rm Bayes++
 
 buildall :
