@@ -51,8 +51,8 @@ void Kalman_SLAM::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 		// generate full filter
 	full = fgenerator.generate(nL);
 		// initialise location states
-	noalias (full->x.sub_range(0,nL)) = x;
-	noalias (full->X.sub_matrix(0,nL,0,nL)) = X;
+	FM::noalias (full->x.sub_range(0,nL)) = x;
+	FM::noalias (full->X.sub_matrix(0,nL,0,nL)) = X;
 	full->init();
 }
 
@@ -129,7 +129,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 		// feature covariance with existing location and features
 	//	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
 	{	// ISSUE old uBLAS has problems assigning to symmetric proxy as above, go element by element
-		const FM::Matrix cross (prod(Ha, full->X.sub_matrix(0,nL, 0,nL+nM)) );
+		const FM::Matrix cross (FM::prod(Ha, full->X.sub_matrix(0,nL, 0,nL+nM)) );
 		for (std::size_t i = 0; i != nL+nM-1; ++i)
 			full->X(nL+feature, i) = cross(0,i);
 	}

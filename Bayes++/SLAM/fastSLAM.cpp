@@ -351,8 +351,8 @@ void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& ksta
 	if (nL > kstat.x.size())
 		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
 	L.update_statistics();
-	noalias (kstat.x.sub_range(0,nL)) = L.x;
-	noalias (kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
+	FM::noalias (kstat.x.sub_range(0,nL)) = L.x;
+	FM::noalias (kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
 
 								// Iterated over feature statistics (that there is space for in kstat)
 	std::size_t fs = nL;						// Feature subscript
@@ -386,8 +386,8 @@ void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
 	if (nL > kstat.x.size())
 		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
 	L.update_statistics();
-	noalias (kstat.x.sub_range(0,nL)) = L.x;
-	noalias (kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
+	FM::noalias (kstat.x.sub_range(0,nL)) = L.x;
+	FM::noalias (kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
 
 								// Iterated over feature statistics (that there is space for in kstat)
 	for (AllFeature::const_iterator fi = M.begin(); fi != M.end(); ++fi)
