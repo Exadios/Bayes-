@@ -606,19 +606,18 @@ int main()
 	Random2.seed();
 	
 	// Setup the test filters
+		// Cartessian start position (in meters)
 	Vec x_init (NX);
-	SymMatrix X_init (NX, NX);
-
-	// Cartessian start position (in meters)
     x_init.clear();
 	x_init[0] = INIT_XY[0];
 	x_init[1] = INIT_XY[1];
-	// Initial state covariance, correlated
+		// Initial state covariance, correlated
+	SymMatrix X_init (NX, NX);
 	FM::identity (X_init);
 	X_init(0,0) = sqr(INIT_X_NOISE);
 	X_init(1,1) = sqr(INIT_Y_NOISE);
 	X_init(1,0) = X_init(0,1) = INIT_X_NOISE*INIT_Y_NOISE*INIT_XY_NOISE_CORRELATION;
-	// Additional state correlation is useful for testing
+		// Additional state correlation is useful for testing
 	X_init(2,2) = sqr(INIT_2_NOISE);
 	X_init(2,0) = X_init(0,2) = INIT_X_NOISE*INIT_2_NOISE*INIT_2_NOISE_CORRELATION;
 	X_init(2,1) = X_init(1,2) = INIT_Y_NOISE*INIT_2_NOISE*INIT_2_NOISE_CORRELATION;
