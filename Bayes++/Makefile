@@ -1,16 +1,16 @@
 # Bayes++ Project Makefile
 #
-# Bayes++ uses several Boost template libraries.
-# The Boost.build system (and bjam) is also used to create the Bayes++ examples.
-# It provides a flexible and toolset independant system to build the examples and
-# create a static library for BayesFilter
+# The BayesFilter library and examples as built using the Boost Build system.
+# The Boost build system provides a flexible and toolset independant replacment for make.
+# Bayes++ also uses several Boost template libraries. Therefore it is simple
+# to combine the build process for Bayes++, with the libraries it requires.
 #
+# The Boost Build system uses the 'bjam' tool.
 # This Makefile just wraps up the bjam command for those used to make.
-# Use make TOOLS='tt' to specify the toolset used by Boost.Build
-# Use make TOOLS='tt' ARGS='aa'  to pass additional arguments to bjam
+# Use make ARGS='aa'  to pass additional arguments to bjam
 
-# Modify these settings to locate bjam
-BJAM = bjam
+# Modify this variable to locate bjam
+BJAM ?= bjam
 
 GOBJAM = $(BJAM) $(ARGS)
 

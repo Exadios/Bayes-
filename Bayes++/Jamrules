@@ -15,3 +15,7 @@ path-global BAYES_ROOT ;
 
 # Default Traget Output in Project Root
 ALL_LOCATE_TARGET ?= target ;
+
+# Build variant to allow testing with a local uBLAS version seperated from Boost
+variant uBLAS-seperate-debug : <include>"../../uBLAS" debug ;
+variant uBLAS-seperate-release : <include>"../../uBLAS" release ;

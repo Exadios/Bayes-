@@ -1,16 +1,14 @@
 # Bayes++ Jamfile - See Boost.build
-# Bayesian filtering library
+# BayesFilter - The Bayesian filtering library
 
 # Declare the location of this subproject relative to the project root.
 subproject BayesFilter ;
 
-#######################
-# Declare the BayesFilter static link library
-
-# Base names of the source files for libboost_thread.
+# Base names of the source files for BayesFilter
 CPP_SOURCES =
     bayesFlt bayesFltAlg matSup UdU covFlt infFlt infRtFlt itrFlt SIRFlt UDFlt unsFlt CIFlt ;
 
+# Declare the BayesFilter static link library
 lib BayesFilter : $(CPP_SOURCES).cpp
     :
      <include>$(BOOST_ROOT)

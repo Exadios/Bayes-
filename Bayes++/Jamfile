@@ -1,9 +1,11 @@
 # Bayes++ Jamfile - See Boost.build
-#  Project root
+# Project root.
+#  The project root simply includes all the subprojects. The BayesFilter library
+#  and examples.
 
 project-root ;
 
 subinclude BayesFilter ;
 subinclude Simple ;
 subinclude PV ;
-subinclude "QuadCalib" ;
+subinclude QuadCalib ;

@@ -1,8 +1,8 @@
 # Bayes++ rtheta Makefile
-# Range Angle test for all filter schemse
+# Range Angle test for all filter schemes
 #
 
-# Modify these settings to locate Boost and bjam
+# Modify these settings to locate bjam
 BJAM = bjam
 
 GOBJAM = $(BJAM) $(ARGS)
