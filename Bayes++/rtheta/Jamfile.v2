@@ -9,9 +9,8 @@ project
 lib g2c : : <name>g2c ;
 lib lapack : : <name>lapack ;
 lib lapack : : <toolset>gcc <name>lapack : : <library>g2c  ;
-lib lapack : : <toolset>gccms <name>lapack : : <library>g2c  ;
 lib lapack : : <toolset>intellinux  <name>lapack : : <library>g2c  ;
-lib lapack : : <toolset>msvcms <file>"../../CLAPACK3/clapack7.a" ;
+lib lapack : : <toolset>msvc <file>"../../CLAPACK3/clapack7.a" ;
 
 # The executable for testing
 
