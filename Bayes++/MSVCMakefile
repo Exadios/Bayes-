@@ -12,10 +12,10 @@
 # Modify these settings to locate Boost and bjam
 BOOST_ROOT = ../boost_1_29_0
 BJAM = bjam
-TOOLS = msvc
+#//TOOLS = msvc -sTOOLS=$(TOOLS) 
 ALL_LOCATE_TARGET = bin
 
-GOBJAM = $(BJAM) $(ARGS) "-sBOOST_ROOT=$(BOOST_ROOT)" -sTOOLS=$(TOOLS) -sALL_LOCATE_TARGET=$(ALL_LOCATE_TARGET)
+GOBJAM = $(BJAM) $(ARGS) -sBOOST_ROOT=$(BOOST_ROOT) -sALL_LOCATE_TARGET=$(ALL_LOCATE_TARGET)
 
 # Build everything
 buildAll:
