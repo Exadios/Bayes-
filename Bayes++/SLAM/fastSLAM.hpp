@@ -62,7 +62,8 @@ protected:
 
 	struct FeatureCondMap : public std::vector<Feature_1>
 	// Particle Conditional map for a feature
-	{	explicit FeatureCondMap(unsigned nParticles) : std::vector<Feature_1>(nParticles)
+	{
+		explicit FeatureCondMap(unsigned nParticles) : std::vector<Feature_1>(nParticles)
 		{}
 	};
 	typedef std::map<unsigned, FeatureCondMap> AllFeature;	// Particle Maps for all features: associative container keys by feature number
