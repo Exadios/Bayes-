@@ -105,7 +105,7 @@ struct SLAMDemo
 	};
 
 	template <class Filter>
-	struct Full_manager : public Full_filter
+	struct Full_generator : public Full_filter
 	// Generate and dispose of predefined filter types
 	{
 		Filter_type* generate( unsigned full_size )
@@ -165,8 +165,8 @@ void SLAMDemo::OneDExperiment ()
 	BF::Covariance_scheme location_filter(nL);
 	location_filter.init_kalman (x_init, X_init);
 
-	Full_manager<BF::Covariance_scheme> full_filter;
-	Kalman_SLAM kalm (location_filter, full_filter);
+	Full_generator<BF::Covariance_scheme> full_gen;
+	Kalman_SLAM kalm (location_filter, full_gen);
 
 	// Fast_SLAM filter
 	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
@@ -264,8 +264,8 @@ void SLAMDemo::InformationLossExperiment ()
 	BF::Covariance_scheme location_filter(nL);
 	location_filter.init_kalman (x_init, X_init);
 
-	Full_manager<BF::Unscented_scheme> full_filter;
-	Kalman_SLAM kalm (location_filter, full_filter);
+	Full_generator<BF::Unscented_scheme> full_gen;
+	Kalman_SLAM kalm (location_filter, full_gen);
 
 	// Fast_SLAM filter
 	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);

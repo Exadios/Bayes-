@@ -37,6 +37,7 @@ class Kalman_SLAM : public SLAM
 {
 public:
 	Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& loc_filter, Full_filter& filter_generator );
+	~Kalman_SLAM();
 	void predict( Bayesian_filter::Linrz_predict_model& m );
 
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );

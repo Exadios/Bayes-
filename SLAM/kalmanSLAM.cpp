@@ -34,10 +34,15 @@ Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& location_filter,
 	fgenerator(filter_generator), nL(location_filter.x.size())
 {
 		// generate full with only location states
-	full = filter_generator.generate(nL);
+	full = fgenerator.generate(nL);
 		// place location in full
 	full->init_kalman (loc.x, loc.X);
 	nM = 0;
+}
+
+Kalman_SLAM::~Kalman_SLAM()
+{
+	fgenerator.dispose (full);
 }
 
 void Kalman_SLAM::predict( BF::Linrz_predict_model& lpred )
