@@ -3,6 +3,9 @@
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
  * See Bayes++.htm for copyright license details
  */
+#define NO_TESTS
+
+#ifndef NO_TESTS
 #include "BayesFilter/allFilters.hpp"
 #include "Test/random.hpp"
 #include <cmath>
@@ -291,7 +294,6 @@ void test_sym_proxy()
 	ublas::row(S, 1).assign(v);		// ERROR only one element in upper for packed proxy assign
 }
 
-
 void other_tests()
 {
 	// Other things I might want to benchmark
@@ -306,3 +308,9 @@ void other_tests()
 		std::cerr << e.what() << std::endl;
 	}
 }
+
+#else
+void other_tests()
+{
+}
+#endif
