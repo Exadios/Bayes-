@@ -11,17 +11,14 @@
  *  Provides a common class  for all random number requirements to test Bayes++
  */
 
-#include <boost/version.hpp>
 #include <boost/random.hpp>
 
 
 namespace Bayesian_filter_test
 {
 
-#if (BOOST_VERSION >= 103100)
-
 /*
- * Random numbers from Boost 1_31_0
+ * Random numbers from Boost Random
  */
 
 namespace
@@ -46,9 +43,13 @@ namespace
 class Boost_random
 {
 public:
+	// ISSUE mt19937 is failing on x86_64
+	//	typedef boost::mt19937 Boost_gen;
+	typedef boost::ranlux3 Boost_gen;	
+
 	typedef Bayesian_filter_matrix::Float Float;
-	typedef boost::uniform_01<boost::mt19937, Float> UGen;
-	Boost_random() : gen01(boost::mt19937()), dist_normal()
+	typedef boost::uniform_01<Boost_gen, Float> UGen;
+	Boost_random() : gen01(Boost_gen()), dist_normal()
 	{}
 	Bayesian_filter_matrix::Float normal(const Float mean, const Float sigma)
 	{
@@ -100,64 +101,5 @@ private:
 	boost::normal_distribution<Float> dist_normal;
 };
 
-
-#else
-
-/*
- * Random numbers from Boost 1_30_0 or earlier
- */
-class Boost_random
-{
-public:
-	typedef Bayesian_filter_matrix::Float Float;
-	Boost_random() : gen_normal(rng), gen_uniform(rng)
-	{}
-	double normal(const double mean, const double sigma)
-	{
-		boost::normal_distribution<boost::mt19937,Float> gen(rng, mean, sigma);
-		return gen();
-	}
-	void normal(Bayesian_filter_matrix::DenseVec& v, const Float mean, const Float sigma)
-	{
-		boost::normal_distribution<boost::mt19937,Float> gen(rng, mean, sigma);
-		std::generate (v.begin(), v.end(), gen);
-	}
-	void normal(Bayesian_filter_matrix::DenseVec& v)
-	{
-		std::generate (v.begin(), v.end(), gen_normal);
-	}
-	void uniform_01(Bayesian_filter_matrix::DenseVec& v)
-	{
-		std::generate (v.begin(), v.end(), gen_uniform);
-	}
-#ifdef BAYES_FILTER_GAPPY
-	void normal(Bayesian_filter_matrix::Vec& v, const Float mean, const Float sigma)
-	{
-		boost::normal_distribution<boost::mt19937,Float> gen(rng, mean, sigma);
-		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
-			v[i] = gen();
-	}
-	void normal(Bayesian_filter_matrix::Vec& v)
-	{
-		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
-			v[i] = gen_normal();
-	}
-	void uniform_01(Bayesian_filter_matrix::Vec& v)
-	{
-		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
-			v[i] = gen_uniform();
-	}
-#endif
-	void seed()
-	{
-		rng.seed();
-	}
-private:
-	boost::mt19937 rng;
-	boost::normal_distribution<boost::mt19937,Float> gen_normal;
-	boost::uniform_01<boost::mt19937,Float> gen_uniform;
-};
-
-#endif
 
 }//namespace
