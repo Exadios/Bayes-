@@ -1,0 +1,20 @@
+# Bayes++ Jamfile - See Boost.build
+# FastSLAM Test. Compare Kalman and FastSLAM results
+
+
+# Declare the location of this subproject relative to the project root.
+subproject "SLAM" ;
+
+
+# The executable for testing
+
+exe testfastslam :
+     testFastSlam.cpp
+     fastSLAM.cpp
+     kalmanSLAM.cpp
+     <lib>../BayesFilter/BayesFilter
+    :
+     <include>$(BOOST_ROOT)
+     <include>$(BAYES_ROOT)
+    : debug release
+;
