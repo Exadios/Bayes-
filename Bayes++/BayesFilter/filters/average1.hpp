@@ -27,7 +27,7 @@ class Average1_filter
 	
 	typedef typename Filter_base::Float Float;
 	class Cpredict : public Linear_predict_model
-	// Constant prediction model
+	// Constant predict model
 	{
 	public:
 		Cpredict(Float qq) : Linear_predict_model(1, 1)
