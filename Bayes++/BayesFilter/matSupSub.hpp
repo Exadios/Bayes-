@@ -22,16 +22,21 @@
  * That is boost::numeric::ublas
  *  Thanks to Joerg Walter and Mathias Koch for an excellent library!
  *
+ * Gappy matrix support: The macros BAYES_FILTER_(SPARSE/COMPRESSED/COORDINATE) control experimental gappy matrix support
+ * When enabled the default storage types are replaced with their sparse equivilents
  *
- * Sparse support: The macros BAYES_FILTER_(SPARSE/COMPRESSED/COORDINATE) control experimental sparse matrix support
- * These simply replace the default storage types with their sparse equivilents
+ * ISSUE: Element proxies.
+ *  Element proxies have a colourful history!
+ *  As of Boost 1.30.0 they do not allow assignment of elements between mixed types.
+ *  They do not work with gcc-3.3. The order of expression temporary distruction overrights previous changes. They must be disabled.
+ *  The sparse support in Bayes++ does not require element proxies.
+ *  Define BOOST_UBLAS_NO_ELEMENT_PROXIES to disable them.
  */
 
 #include <boost/version.hpp>
 #if !(BOOST_VERSION >= 103000)
 #error Requires Boost 1.30.0 or later
 #endif
-
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -44,6 +49,7 @@
 #include <boost/numeric/ublas/matrix_sparse.hpp>
 #define BAYES_FILTER_GAPPY
 #endif
+
 
 
 /* Filter Matrix Namespace */
