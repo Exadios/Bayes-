@@ -1,8 +1,8 @@
 # Bayes++ Project Managment Makefile
-#   Provides interface for project development and sourceforge maintance
+#   Provides interface for project development and sourceforge maintainance
 
-RELEASE=2004.2-1
-BOOST_VERSION=boost_1_31_0
+RELEASE=2004.8-1
+BOOST_VERSION=boost_1_32_0
 
 help:
 	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
@@ -26,9 +26,9 @@ archivesrc:
 
 buildall :
 	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release compress_debug compress_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1/runtime-link=static  . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release msvc-7 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release msvc-7.0 . SLAM rtheta
 
 buildallCVS :
 	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1 . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release msvc-7 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release msvc-7.0 . SLAM rtheta
 	

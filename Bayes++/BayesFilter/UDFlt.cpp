@@ -25,7 +25,7 @@ namespace Bayesian_filter
 
 
 UD_scheme::
-UD_scheme (size_t x_size, size_t q_maxsize) :
+UD_scheme (std::size_t x_size, std::size_t q_maxsize) :
 		Kalman_state_filter(x_size),
 		q_max(q_maxsize),
 		UD(x_size,x_size+q_max)
@@ -35,26 +35,26 @@ UD_scheme (size_t x_size, size_t q_maxsize) :
 {}
 
 UD_scheme::
-Predict_byproduct::Predict_byproduct (size_t x_size, size_t q_size) :
+Predict_byproduct::Predict_byproduct (std::size_t x_size, std::size_t q_size) :
 	d(x_size+q_size), dv(x_size+q_size), v(x_size+q_size)
 {}
 
 UD_scheme::
-Observe_innovation_byproduct::Observe_innovation_byproduct (size_t x_size, size_t z_size) :
+Observe_innovation_byproduct::Observe_innovation_byproduct (std::size_t x_size, std::size_t z_size) :
 		s(z_size),
 		Sv(z_size),
 		W(x_size, z_size)
 {}
 
 UD_scheme::
-Observe_byproduct::Observe_byproduct (size_t x_size, size_t z_size) :
+Observe_byproduct::Observe_byproduct (std::size_t x_size, std::size_t z_size) :
 		a(x_size),
 		w(x_size),
 		znorm(z_size)
 {}
 
 UD_scheme::
-Observe_linear_byproduct::Observe_linear_byproduct (size_t x_size, size_t z_size) :
+Observe_linear_byproduct::Observe_linear_byproduct (std::size_t x_size, std::size_t z_size) :
 		Observe_byproduct(x_size, z_size),
 		zpdecol(z_size),
 		Gz(z_size, z_size),
@@ -87,7 +87,7 @@ void
  */
 {
 					// Factorise X into left partition of UD
-	size_t x_size = UD.size1();
+	std::size_t x_size = UD.size1();
 	noalias(UD.sub_matrix(0,x_size, 0,x_size)) = X;
 	Float rcond = UdUfactor (UD, x_size);
 	rclimit.check_PSD(rcond, "Initial X not PSD");
@@ -151,10 +151,10 @@ UD_scheme::Float
  *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
-	size_t i,j,k;
-	const size_t n = x.size();
-	const size_t Nq = q.size();
-	const size_t N = n+Nq;
+	std::size_t i,j,k;
+	const std::size_t n = x.size();
+	const std::size_t Nq = q.size();
+	const std::size_t N = n+Nq;
 	Float e;
 					// Check preallocated space for q size
 	if (Nq > q_max)
@@ -303,12 +303,12 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	const size_t z_size = z.size();
+	const std::size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
 								// Apply observations sequentialy as they are decorrelated
 	Float rcondmin = std::numeric_limits<Float>::max();
-	for (size_t o = 0; o < z_size; ++o)
+	for (std::size_t o = 0; o < z_size; ++o)
 	{
 								// Observation model, extracted for a single z element
 		const Vec& zp = h.h(x);
@@ -355,9 +355,9 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	size_t i, j, k;
-	const size_t x_size = x.size();
-	const size_t z_size = z.size();
+	std::size_t i, j, k;
+	const std::size_t x_size = x.size();
+	const std::size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
 					// Factorise process noise as GzG'
@@ -396,7 +396,7 @@ Bayes_base::Float
 
 								// Apply observations sequentialy as they are decorrelated
 	Float rcondmin = std::numeric_limits<Float>::max();
-	for (size_t o = 0; o < z_size; ++o)
+	for (std::size_t o = 0; o < z_size; ++o)
 	{
 		noalias(b.a) = row(b.GIHx,o);
 								// Update UD and extract gain
@@ -429,8 +429,8 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	size_t o;
-	const size_t z_size = z.size();
+	std::size_t o;
+	const std::size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
 								// Apply observations sequentialy as they are decorrelated
@@ -481,8 +481,8 @@ UD_scheme::Float
  *  reciprocal condition number of UD, -1 if alpha singular (negative or zero)
  */
 {
-	size_t i,j,k;
-	const size_t n = UD.size1();
+	std::size_t i,j,k;
+	const std::size_t n = UD.size1();
 	Float gamma;	// becomes inverse covariance of innovation
 	Float alpha_jm1, lamda;
 

@@ -72,9 +72,9 @@ typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseDens
 typedef ublas::banded_matrix<Float> BaseDenseDiagMatrix;
 							// Sparse types
 #if defined(BAYES_FILTER_SPARSE)
-typedef ublas::sparse_vector<Float, std::map<size_t,Float> > BaseSparseVector;
-typedef ublas::sparse_matrix<Float, ublas::row_major, std::map<size_t,Float> > BaseSparseRowMatrix;
-typedef ublas::sparse_matrix<Float, ublas::column_major, std::map<size_t,Float> > BaseSparseColMatrix;
+typedef ublas::sparse_vector<Float, std::map<std::size_t,Float> > BaseSparseVector;
+typedef ublas::sparse_matrix<Float, ublas::row_major, std::map<std::size_t,Float> > BaseSparseRowMatrix;
+typedef ublas::sparse_matrix<Float, ublas::column_major, std::map<std::size_t,Float> > BaseSparseColMatrix;
 							// OR Compressed types
 #elif defined(BAYES_FILTER_COMPRESSED)
 typedef ublas::compressed_vector<Float> BaseSparseVector;

@@ -89,9 +89,9 @@ bool isSymmetric (const Matrix &M)
 
 	// Check equality of upper and lower
 	bool bSym = true;
-	size_t size = M.size1();
-	for (size_t r = 0; r < size; ++r) {
-		for (size_t c = 0; c <= r; ++c) {
+	std::size_t size = M.size1();
+	for (std::size_t r = 0; r < size; ++r) {
+		for (std::size_t c = 0; c <= r; ++c) {
 			if( M(r,c) != M(c,r) ) {
 				bSym = false;
 			}
@@ -114,13 +114,13 @@ void forceSymmetric (Matrix &M, bool bUpperToLower)
 		Bayes_base::error (Logic_exception ("Matrix is not square"));
 	}
 
-	size_t size = M.size1();
+	std::size_t size = M.size1();
 
 	if (bUpperToLower)
 	{
 		// Copy Lower to Upper
-		for (size_t r = 1; r < size; ++r) {
-			for (size_t c = 0; c < r; ++c) {
+		for (std::size_t r = 1; r < size; ++r) {
+			for (std::size_t c = 0; c < r; ++c) {
 				M(c,r) = M(r,c);
 			}
 		}
@@ -128,8 +128,8 @@ void forceSymmetric (Matrix &M, bool bUpperToLower)
 	else
 	{
 		// Copy Upper to Lower
-		for (size_t r = 1; r < size; ++r) {
-			for (size_t c = 0; c < r; ++c) {
+		for (std::size_t r = 1; r < size; ++r) {
+			for (std::size_t c = 0; c < r; ++c) {
 				M(r,c) = M(c,r);
 			}
 		}

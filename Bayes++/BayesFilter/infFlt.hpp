@@ -42,13 +42,13 @@ namespace Bayesian_filter
 class Information_scheme : public Extended_kalman_filter, virtual public Information_state_filter
 {
 public:
-	Information_scheme (size_t x_size);
+	Information_scheme (std::size_t x_size);
 	Information_scheme& operator= (const Information_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	struct Predict_linear_byproduct
 	{
-		 Predict_linear_byproduct (size_t x_size, size_t q_size);
+		 Predict_linear_byproduct (std::size_t x_size, std::size_t q_size);
 		 FM::SymMatrix A;
 		 FM::Matrix tempG;
 		 FM::SymMatrix B;

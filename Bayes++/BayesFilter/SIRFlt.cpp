@@ -38,7 +38,7 @@ namespace Bayesian_filter
 
 
 Standard_resampler::Float
- Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
+ Standard_resampler::resample (Resamples_t& presamples, std::size_t& uresamples, DenseVec& w, SIR_random& r) const
 /*
  * Standard resampler from [1]
  * Algorithm:
@@ -90,11 +90,11 @@ Standard_resampler::Float
 	Resamples_t::iterator pri = presamples.begin();
 	wi = w.begin();
 	DenseVec::iterator ui = ur.begin(), ui_end = ur.end();
-	size_t unique = 0;
+	std::size_t unique = 0;
 
 	while (wi != wi_end)
 	{
-		size_t Pres = 0;		// assume P not resampled until find out otherwise
+		std::size_t Pres = 0;		// assume P not resampled until find out otherwise
 		if (ui != ui_end && *ui < *wi)
 		{
 			++unique;
@@ -118,7 +118,7 @@ Standard_resampler::Float
 
 
 Systematic_resampler::Float
- Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
+ Systematic_resampler::resample (Resamples_t& presamples, std::size_t& uresamples, DenseVec& w, SIR_random& r) const
 /*
  * Systematic resample algorithm from [2]
  * Algorithm:
@@ -133,7 +133,7 @@ Systematic_resampler::Float
  *  A single draw is made from 'r'
  */
 {
-	size_t nParticles = presamples.size();
+	std::size_t nParticles = presamples.size();
 	assert (nParticles == w.size());
 	DenseVec::iterator wi, wi_end = w.end();
 						// Normalised cumulative sum of likelihood weights (Kahan algorithm), and find smallest weight
@@ -169,12 +169,12 @@ Systematic_resampler::Float
 						// Resamples based on cumulative weights
 	Importance_resampler::Resamples_t::iterator pri = presamples.begin();
 	wi = w.begin();
-	size_t unique = 0;
+	std::size_t unique = 0;
 	Float s = ur[0] * wstep;		// random initialisation
 
 	while (wi != wi_end)
 	{
-		size_t Pres = 0;			// assume P not resampled until find out otherwise
+		std::size_t Pres = 0;			// assume P not resampled until find out otherwise
 		if (s < *wi)
 		{
 			++unique;
@@ -200,7 +200,7 @@ Systematic_resampler::Float
 const SIR_scheme::Float SIR_scheme::rougheningKinit = 1;
 		// use 1 std.dev. per sample as default roughening
 
-SIR_scheme::SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
+SIR_scheme::SIR_scheme (std::size_t x_size, std::size_t s_size, SIR_random& random_helper) :
 		Sample_state_filter (x_size, s_size),
 		Sample_filter (x_size, s_size),
 		random (random_helper),
@@ -259,7 +259,7 @@ SIR_scheme::Float
 	if (wir_update)		// Resampleing only required if weights have been updated
 	{
 		// Resample based on likelihood weights
-		size_t R_unique;
+		std::size_t R_unique;
 		lcond = resampler.resample (resamples, R_unique, wir, random);
 
 							// No resampling exceptions: update S
@@ -284,8 +284,8 @@ void
  */
 {
 						// Predict particles S using supplied predict model
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
 		ColMatrix::Column Si(S,i);
 		noalias(Si) = f.fw(Si);
 	}
@@ -304,8 +304,8 @@ void
 	h.Lz (z);			// Observe likelihood at z
 
 						// Weight Particles. Fused with previous weight
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
 		wir[i] *= h.L(FM::column(S,i) );
 	}
 	wir_update = true;
@@ -339,7 +339,7 @@ void SIR_scheme::copy_resamples (ColMatrix& P, const Importance_resampler::Resam
  */
 {
 							// reverse_copy_if live
-	size_t si = P.size2(), livei = si;
+	std::size_t si = P.size2(), livei = si;
 	Importance_resampler::Resamples_t::const_reverse_iterator pri, pri_end = presamples.rend();
 	for (pri = presamples.rbegin(); pri != pri_end; ++pri) {
 		--si;
@@ -353,7 +353,7 @@ void SIR_scheme::copy_resamples (ColMatrix& P, const Importance_resampler::Resam
 	si = 0;
 	Importance_resampler::Resamples_t::const_iterator pi, pi_end = presamples.end();
 	for (pi = presamples.begin(); pi != pi_end; ++pi) {
-		size_t res = *pi;
+		std::size_t res = *pi;
 		if (res > 0) {
 			do  {
 				noalias(FM::column(P,si)) = FM::column(P,livei);
@@ -427,7 +427,7 @@ void SIR_scheme::roughen_minmax (ColMatrix& P, Float K) const
 /*
  * SIR implementation of a Kalman filter
  */
-SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
+SIR_kalman_scheme::SIR_kalman_scheme (std::size_t x_size, std::size_t s_size, SIR_random& random_helper) :
 	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size),
 	SIR_scheme (x_size, s_size, random_helper),
 	roughen_model (x_size,x_size, random_helper)
@@ -442,8 +442,8 @@ void SIR_kalman_scheme::init ()
  */
 {
 						// Samples at mean
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
 		ColMatrix::Column Si(S,i);
 		noalias(Si) = x;
 	}
@@ -472,8 +472,8 @@ void SIR_kalman_scheme::mean ()
 {
 						// Mean of distribution: mean of particles
 	x.clear();
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
 		ColMatrix::Column Si(S,i);
 		x.plus_assign (Si);
 	}
@@ -518,8 +518,8 @@ void SIR_kalman_scheme::update_statistics ()
 	mean ();
 	X.clear();				// Covariance
 
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
 		ColMatrix::Column Si(S,i);
 		X.plus_assign (FM::outer_prod(Si, Si));
 	}

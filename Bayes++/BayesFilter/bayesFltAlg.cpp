@@ -206,7 +206,7 @@ Adapted_Correlated_additive_observe_model::Adapted_Correlated_additive_observe_m
 		unc(adapt)
 {
 	Z.clear();
-	for (size_t i = 0; i < unc.Zv.size(); ++i)
+	for (std::size_t i = 0; i < unc.Zv.size(); ++i)
 		Z(i,i) = Float(unc.Zv[i]);	// ISSUE mixed type proxy assignment
 }
 
@@ -216,7 +216,7 @@ Adapted_Linrz_correlated_observe_model::Adapted_Linrz_correlated_observe_model (
 {
 	Hx = unc.Hx;
 	Z.clear();
-	for (size_t i = 0; i < unc.Zv.size(); ++i)
+	for (std::size_t i = 0; i < unc.Zv.size(); ++i)
 		Z(i,i) = Float(unc.Zv[i]);	// ISSUE mixed type proxy assignment
 }
 

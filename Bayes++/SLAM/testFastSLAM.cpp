@@ -94,7 +94,7 @@ struct SLAMDemo
 	struct Kalman_statistics : public BF::Kalman_state_filter
 	// Kalman_statistics without any filtering
 	{
-		Kalman_statistics (size_t x_size) : Kalman_state_filter(x_size) {}
+		Kalman_statistics (std::size_t x_size) : Kalman_state_filter(x_size) {}
 		void init() {}
 		void update() {}
 	};

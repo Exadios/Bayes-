@@ -49,7 +49,7 @@ public:
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMVec(EmptyTag) : VecBase()
 	{}	// Empty constructor
-	explicit FMVec(size_t size) : VecBase(size)
+	explicit FMVec(VecBase::size_type size) : VecBase(size)
 	{}	// Normal sized constructor
 	FMVec(const FMVec& c) : VecBase(static_cast<const VecBase&>(c))
 	{}	// Copy constructor
@@ -73,11 +73,11 @@ public:
 	}
 
 	// Sub-range selection operators
-	const ublas::vector_range<const VecBase> sub_range(size_t b, size_t e) const
+	const ublas::vector_range<const VecBase> sub_range(VecBase::size_type b, VecBase::size_type e) const
 	{
 		return ublas::vector_range<const VecBase>(*this, ublas::range(b,e));
 	}
-	ublas::vector_range<VecBase> sub_range(size_t b, size_t e)
+	ublas::vector_range<VecBase> sub_range(VecBase::size_type b, VecBase::size_type e)
 	{
 		return ublas::vector_range<VecBase>(*this, ublas::range(b,e));
 	}
@@ -96,7 +96,7 @@ public:
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMMatrix(EmptyTag) : MatrixBase()
 	{}	// Empty constructor
-	FMMatrix(size_t size1, size_t size2) : MatrixBase(size1,size2)
+	FMMatrix(MatrixBase::size_type size1, MatrixBase::size_type size2) : MatrixBase(size1,size2)
 	{}	// Normal sized constructor
 	FMMatrix(const FMMatrix& c) : MatrixBase(static_cast<const MatrixBase&>(c))
 	{}	// Copy constructor
@@ -143,25 +143,25 @@ public:
 
 	// Sub-range selection operators
 	ublas::matrix_range<const MatrixBase>
-	sub_matrix(size_t s1, size_t e1, size_t s2, size_t e2) const
+	sub_matrix(MatrixBase::size_type s1, MatrixBase::size_type e1, MatrixBase::size_type s2, MatrixBase::size_type e2) const
 	{
 		return ublas::matrix_range<const MatrixBase> (*this, ublas::range(s1,e1), ublas::range(s2,e2));
 	}
 	ublas::matrix_range<MatrixBase>
-	sub_matrix(size_t s1, size_t e1, size_t s2, size_t e2)
+	sub_matrix(MatrixBase::size_type s1, MatrixBase::size_type e1, MatrixBase::size_type s2, MatrixBase::size_type e2)
 	{
 		return ublas::matrix_range<MatrixBase> (*this, ublas::range(s1,e1), ublas::range(s2,e2));
 	}
 
 	// Requires boost_1.30.0 which has a generalised matrix_vector_slice
 	ublas::matrix_vector_slice<const MatrixBase>
-	sub_column(size_t s1, size_t e1, size_t s2) const 
+	sub_column(MatrixBase::size_type s1, MatrixBase::size_type e1, MatrixBase::size_type s2) const 
 	// Column vector s2 with rows [s1,e1)
 	{
 		return ublas::matrix_vector_slice<const MatrixBase> (*this, ublas::slice(s1,1,e1-s1), ublas::slice(s2,0,e1-s1));
 	}
 	ublas::matrix_vector_slice<MatrixBase>
-	sub_column(size_t s1, size_t e1, size_t s2)
+	sub_column(MatrixBase::size_type s1, MatrixBase::size_type e1, MatrixBase::size_type s2)
 	// Column vector s2 with rows [s1,e1)
 	{
 		return ublas::matrix_vector_slice<MatrixBase> (*this, ublas::slice(s1,1,e1-s1), ublas::slice(s2,0,e1-s1));
@@ -205,7 +205,7 @@ class SymMatrixWrapper :
 public:
 	SymMatrixWrapper () : matrix_type(), symadaptor_type(matrix_type::member)
 	{}
-	SymMatrixWrapper (size_t size1, size_t size2) : matrix_type(size1,size2), symadaptor_type(matrix_type::member)
+	SymMatrixWrapper (MatrixBase::size_type size1, MatrixBase::size_type size2) : matrix_type(size1,size2), symadaptor_type(matrix_type::member)
 	{}	// Normal sized constructor
 	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), symadaptor_type(matrix_type::member)
 	{}	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
@@ -235,7 +235,7 @@ public:
 	{
 		matrix_type::member.clear();
 	}
-	void resize(size_t nsize1, size_t nsize2)
+	void resize(MatrixBase::size_type nsize1, MatrixBase::size_type nsize2)
 	{
 		matrix_type::member.resize(nsize1, nsize2);
 	}
@@ -314,14 +314,14 @@ const ublas::triangular_adaptor<const M, ublas::lower>
  */
 template <class Base>
 ublas::matrix_vector_range<FMMatrix<Base> >
- diag(FMMatrix<Base>& M, size_t n)
+ diag(FMMatrix<Base>& M, Base::size_type n)
 {	// Return a vector proxy to the first n diagonal elements of M
 	return ublas::matrix_vector_range<FMMatrix<Base> >(M, ublas::range(0,n), ublas::range(0,n));
 }
 
 template <class Base>
 const ublas::matrix_vector_range<const FMMatrix<Base> >
- diag(const FMMatrix<Base>& M, size_t n)
+ diag(const FMMatrix<Base>& M, Base::size_type n)
 {	// Return a vector proxy to the first n diagonal elements of M
 	return ublas::matrix_vector_range<const FMMatrix<Base> >(M, ublas::range(0,n), ublas::range(0,n));
 }
@@ -330,7 +330,7 @@ template <class Base>
 ublas::matrix_vector_range<FMMatrix<Base> >
  diag(FMMatrix<Base>& M)
 {	// Return a vector proxy to the diagonal elements of M
-	const size_t common_size = std::min(M.size1(),M.size2());
+	const Base::size_type common_size = std::min(M.size1(),M.size2());
 	return ublas::matrix_vector_range<FMMatrix<Base> >(M, ublas::range(0,common_size), ublas::range(0,common_size));
 }
 
@@ -338,7 +338,7 @@ template <class Base>
 const ublas::matrix_vector_range<const FMMatrix<Base> >
  diag(const FMMatrix<Base>& M)
 {	// Return a vector proxy to the diagonal elements of M
-	const size_t common_size = std::min(M.size1(),M.size2());
+	const Base::size_type common_size = std::min(M.size1(),M.size2());
 	return ublas::matrix_vector_range<const FMMatrix<Base> >(M, ublas::range(0,common_size), ublas::range(0,common_size));
 }
 
@@ -347,7 +347,7 @@ void identity(FMMatrix<Base>& I)
 {	// Set I to generalised Identity matrix. Clear I and set diag(I) to one
 	I.clear();
 							// Set common diagonal elements
-	size_t common_size = std::min(I.size1(),I.size2());
+	Base::size_type common_size = std::min(I.size1(),I.size2());
 	typedef typename Base::value_type Base_value_type;
 	diag(I) = ublas::scalar_vector<Base_value_type>(common_size, Base_value_type(1));
 }
@@ -408,21 +408,22 @@ ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expressi
  * TODO requires a prod_diag(X,s)
  */
 {
+	const EX& XX = X();
 	Vec::const_iterator si, send = s().end();
-	typename EX::const_iterator1 Xa = X().begin1();
-	const typename EX::const_iterator1 Xend = X().end1();
+	typename EX::const_iterator1 Xa = XX.begin1();
+	const typename EX::const_iterator1 Xend = XX.end1();
 	typename EX::const_iterator1 Xb;
 
 	// P(a,b) = sum(X.row(a) * s * X.row(b))
 	for (; Xa != Xend; ++Xa)		// Iterate rows
 	{
 		typedef const ublas::matrix_row<EX> EX_row;
-		EX_row Xav = ublas::row(Xa(), Xa.index1());
+		EX_row Xav (ublas::row(XX, Xa.index1()));
 		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{
 			typename EX::value_type p = 0;	// Tripple vector inner product
-			EX_row Xbv = ublas::row(Xb(), Xb.index1());
+			EX_row Xbv (ublas::row(XX, Xb.index1()));
 			for (si = s().begin(); si != send; ++si) {
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
@@ -465,21 +466,22 @@ ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_express
  * TODO requires a prod_diag(X,s)
  */
 {
+	const EX& XX = X();
 	Vec::const_iterator si, send = s().end();
-	typename EX::const_iterator2 Xa = X().begin2();
-	const typename EX::const_iterator2 Xend = X().end2();
+	typename EX::const_iterator2 Xa = X.begin2();
+	const typename EX::const_iterator2 Xend = X.end2();
 	typename EX::const_iterator2 Xb;
 
 	// P(a,b) = sum(X.col(a) * s * X.col(b))
 	for (; Xa != Xend; ++Xa)		// Iterate columns
 	{
-		typedef const ublas::matrix_column<EX> EX_column;
-		EX_column Xav = ublas::column(Xa(), Xa.index2());
+		typedef const ublas::matrix_column<EX> EX_column;	// ISSUE VC7.0 require const EX!
+		EX_column Xav = ublas::column(XX, Xa.index2());
 		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{
 			typename EX::value_type p = 0;	// Tripple vector inner product
-			EX_column Xbv = ublas::column(Xb(), Xb.index2());
+			EX_column Xbv = ublas::column(XX, Xb.index2());
 			for (si = s().begin(); si != send; ++si) {
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];

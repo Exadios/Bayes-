@@ -56,7 +56,7 @@ public:
 		(void)update_resample (Bayesian_filter::Standard_resampler());
 	}
 
-	size_t feature_unique_samples( unsigned feature );
+	std::size_t feature_unique_samples( unsigned feature );
 
 protected:
 	struct Feature_1
@@ -99,7 +99,7 @@ public:
 	// Statistics are returned in a sparse form indexed by feature number
 
 protected:
-	void statistics_feature( BF::Kalman_state_filter& kstat, size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
+	void statistics_feature( BF::Kalman_state_filter& kstat, std::size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
 	// Compute statistics of particles for a map feature: Sample mean and covariance of particle.
 
 	BF::SIR_kalman_scheme& L;			// Reference to filter parameter in constructor

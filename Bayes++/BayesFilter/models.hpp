@@ -166,7 +166,7 @@ protected:
 class General_LzUnAd_observe_model : public Linrz_uncorrelated_observe_model, public Likelihood_observe_model
 {
 public:
-	General_LzUnAd_observe_model (size_t x_size, size_t z_size) :
+	General_LzUnAd_observe_model (std::size_t x_size, std::size_t z_size) :
 		Linrz_uncorrelated_observe_model(x_size, z_size),
 		Likelihood_observe_model(z_size),
 		li(z_size)
@@ -185,7 +185,7 @@ private:
 	friend class General_LiUnAd_observe_model;
 	struct Likelihood_uncorrelated
 	{
-		Likelihood_uncorrelated(size_t z_size) :
+		Likelihood_uncorrelated(std::size_t z_size) :
 			zInnov(z_size), Zv_inv(z_size)
 		{	zset = false;
 		}
@@ -204,7 +204,7 @@ private:
 class General_LiUnAd_observe_model : public Linear_uncorrelated_observe_model, public Likelihood_observe_model
 {
 public:
-	General_LiUnAd_observe_model (size_t x_size, size_t z_size) :
+	General_LiUnAd_observe_model (std::size_t x_size, std::size_t z_size) :
 		Linear_uncorrelated_observe_model(x_size, z_size),
 		Likelihood_observe_model(z_size),
 		li(z_size)
@@ -228,7 +228,7 @@ private:
 class General_LzCoAd_observe_model : public Linrz_correlated_observe_model, public Likelihood_observe_model
 {
 public:
-	General_LzCoAd_observe_model (size_t x_size, size_t z_size) :
+	General_LzCoAd_observe_model (std::size_t x_size, std::size_t z_size) :
 		Linrz_correlated_observe_model(x_size, z_size),
 		Likelihood_observe_model(z_size),
 		li(z_size)
@@ -248,7 +248,7 @@ private:
 	friend class General_LiCoAd_observe_model;
 	struct Likelihood_correlated
 	{
-		Likelihood_correlated(size_t z_size) :
+		Likelihood_correlated(std::size_t z_size) :
 			zInnov(z_size), Z_inv(z_size,z_size)
 		{	zset = false;
 		}
@@ -268,7 +268,7 @@ private:
 class General_LiCoAd_observe_model : public Linear_correlated_observe_model, public Likelihood_observe_model
 {
 public:
-	General_LiCoAd_observe_model (size_t x_size, size_t z_size) :
+	General_LiCoAd_observe_model (std::size_t x_size, std::size_t z_size) :
 		Linear_correlated_observe_model(x_size, z_size),
 		Likelihood_observe_model(z_size),
 		li(z_size)

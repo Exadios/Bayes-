@@ -29,7 +29,7 @@ bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance
 }
 
 
-Iterated_covariance_scheme::Iterated_covariance_scheme (size_t x_size) :
+Iterated_covariance_scheme::Iterated_covariance_scheme (std::size_t x_size) :
 		Kalman_state_filter(x_size),
 		tempX(x_size,x_size)
 /*
@@ -110,8 +110,8 @@ Bayes_base::Float
  * returned rcond is of S (or 1 if no iterations are performed)
  */
 {
-	size_t x_size = x.size();
-	size_t z_size = z.size();
+	std::size_t x_size = x.size();
+	std::size_t z_size = z.size();
 	SymMatrix ZI(z_size,z_size);
 	Matrix HxT(x_size,z_size);
 

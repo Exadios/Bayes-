@@ -30,10 +30,10 @@ using namespace Bayesian_filter_matrix;
 using namespace angleArith;
 
 
-const size_t NX = 2+1;			// State dimension (x,y) and some more to show noise coupling or singular X
-const size_t NQ = 2;			// State dimension of noise
-const size_t NZ = 2+2;			// Observation dimension (r,a) and some empty dummies
-const size_t NS = 1000;			// Number of samples for a sampled representation
+const std::size_t NX = 2+1;			// State dimension (x,y) and some more to show noise coupling or singular X
+const std::size_t NQ = 2;			// State dimension of noise
+const std::size_t NZ = 2+2;			// Observation dimension (r,a) and some empty dummies
+const std::size_t NS = 1000;			// Number of samples for a sampled representation
 
 const bool RA_MODEL = true;		// Use Range angle NON-linear model (requires normalising angle)
 const bool NOISE_MODEL = true;		// Add noise to truth model
@@ -303,7 +303,7 @@ void walk::predict ()
 class Information_linrz_scheme : public Information_scheme
 {
 public:
-	Information_linrz_scheme (size_t x_size) :
+	Information_linrz_scheme (std::size_t x_size) :
 		Kalman_state_filter (x_size),
 		Information_state_filter (x_size),
 		Information_scheme (x_size)
@@ -317,7 +317,7 @@ public:
 
 // Filter_scheme Information_linrz_scheme specialisation
 template <>
-Filter_scheme<Information_linrz_scheme>::Filter_scheme(size_t x_size, size_t q_maxsize) :
+Filter_scheme<Information_linrz_scheme>::Filter_scheme(std::size_t x_size, std::size_t q_maxsize) :
 	Kalman_state_filter (x_size),
 	Information_state_filter (x_size),
 	Information_linrz_scheme (x_size)

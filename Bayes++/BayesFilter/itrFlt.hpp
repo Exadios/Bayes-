@@ -84,7 +84,7 @@ public:
 class Iterated_covariance_scheme : public Linrz_kalman_filter
 {
 public:
-	Iterated_covariance_scheme (size_t x_size);
+	Iterated_covariance_scheme (std::size_t x_size);
 	/* Initialised filter requries an addition iteration limit for the
 	   observe algorithm */
 	Iterated_covariance_scheme& operator= (const Iterated_covariance_scheme&);
@@ -101,7 +101,7 @@ public:
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 	{	// Linrz_kalman_filter observe with default termination
 		Iterated_terminator term;
-		const size_t z_size = h.Hx.size1();
+		const std::size_t z_size = h.Hx.size1();
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
@@ -110,7 +110,7 @@ public:
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	// Linrz_kalman_filter observe with default termination
 		Iterated_terminator term;
-		const size_t z_size = h.Hx.size1();
+		const std::size_t z_size = h.Hx.size1();
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);

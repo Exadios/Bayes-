@@ -33,23 +33,23 @@ namespace Bayesian_filter
 class UD_scheme : public Linrz_kalman_filter
 {
 private:
-	size_t q_max;	// Maxiumum size allocated for noise model, constructed before UD
+	std::size_t q_max;	// Maxiumum size allocated for noise model, constructed before UD
 public:
 	FM::Matrix UD;	// UDU factorisation of X with D on diagonal. Lower triangle used as workspace
 
 	struct Predict_byproduct
 	{
-		Predict_byproduct (size_t x_size, size_t q_size);
+		Predict_byproduct (std::size_t x_size, std::size_t q_size);
 		FM::Vec d, dv, v;
 	};
 
 	class Sequential_observe_model : public Parametised_observe_model
 	{
 	public:
-		Sequential_observe_model (size_t x_size, size_t z_size) :
+		Sequential_observe_model (std::size_t x_size, std::size_t z_size) :
 			Parametised_observe_model(z_size)
 		{}
-		virtual const FM::Vec& ho (const FM::Vec& x, const size_t o, Float& Zv_o, FM::Vec& Hx_o) = 0;
+		virtual const FM::Vec& ho (const FM::Vec& x, const std::size_t o, Float& Zv_o, FM::Vec& Hx_o) = 0;
 		/* Supplied model (h) for observation using state x, z allows normalisation and model variation
 		   Fast model of a single element (o) in observation model
 		   Precondition: Hx_o is conformantly dimensioned
@@ -63,7 +63,7 @@ public:
 	struct Observe_innovation_byproduct
 	// Kalman gain and associated innovation and variance from sequential observe
 	{
-		Observe_innovation_byproduct (size_t x_size, size_t z_size);
+		Observe_innovation_byproduct (std::size_t x_size, std::size_t z_size);
 		State_byproduct s;
 		FM::Vec Sv;
 		FM::Matrix W;
@@ -71,7 +71,7 @@ public:
 
 	struct Observe_byproduct
 	{	// Numerical byproducts of observe using observeUD
-		Observe_byproduct (size_t x_size, size_t z_size);
+		Observe_byproduct (std::size_t x_size, std::size_t z_size);
 		FM::Vec a;				// observe UD temporary
 		FM::Vec w;
 		FM::Vec znorm;		// normalised innovation
@@ -79,13 +79,13 @@ public:
 
 	struct Observe_linear_byproduct : public Observe_byproduct
 	{	// Numerical byproducts of observe with Linear_correlated_observe_model
-		Observe_linear_byproduct (size_t x_size, size_t z_size);
+		Observe_linear_byproduct (std::size_t x_size, std::size_t z_size);
 		FM::Vec zpdecol;	// decorrelated zp
 		FM::Matrix Gz;			// Z coupling
 		FM::Matrix GIHx;		// modified model for linear decorrelation
 	};
 
-	UD_scheme (size_t x_size, size_t q_maxsize);
+	UD_scheme (std::size_t x_size, std::size_t q_maxsize);
 	UD_scheme& operator= (const UD_scheme&);
 	// Optimise copy assignment to only copy filter state
 

@@ -85,8 +85,8 @@ void test_inverse()
 	rand.exponential_1(rv);
 
 	Vec::iterator rv_i = rv.begin();
-	for (size_t r = 0; r < U.size1(); ++r)
-		for (size_t c = 0; c < U.size2(); ++c)
+	for (std::size_t r = 0; r < U.size1(); ++r)
+		for (std::size_t c = 0; c < U.size2(); ++c)
 		{
 			U(r,c) = *rv_i; ++rv_i;
 		}

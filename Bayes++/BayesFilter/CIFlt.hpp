@@ -39,7 +39,7 @@ namespace Bayesian_filter
 class CI_scheme : public Extended_kalman_filter
 {
 public:
-	CI_scheme (size_t x_size);
+	CI_scheme (std::size_t x_size);
 	CI_scheme& operator= (const CI_scheme&);
 	// Optimise copy assignment to only copy filter state
 
@@ -49,14 +49,14 @@ public:
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
 	{	// Extended_kalman_filter observe
-		const size_t z_size = h.Hx.size1();
+		const std::size_t z_size = h.Hx.size1();
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
 		return eobserve_innovation (h, s, S,b);
 	}
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
 	{	// Extended_kalman_filter observe
-		const size_t z_size = h.Hx.size1();
+		const std::size_t z_size = h.Hx.size1();
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
 		return eobserve_innovation (h, s, S,b);

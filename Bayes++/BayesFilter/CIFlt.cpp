@@ -21,7 +21,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-CI_scheme::CI_scheme (size_t x_size) :
+CI_scheme::CI_scheme (std::size_t x_size) :
 	Kalman_state_filter(x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -76,7 +76,7 @@ Bayes_base::Float
  */
 {
 						// ISSUE: Implement simplified uncorrelated noise equations
-	size_t z_size = s.size();
+	std::size_t z_size = s.size();
 	SymMatrix Z(z_size,z_size);
 
 	Adapted_Linrz_correlated_observe_model hh(h);

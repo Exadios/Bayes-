@@ -25,7 +25,7 @@ namespace Bayesian_filter
 /**
  * Initialise filter and set the size of things we know about
  */
-Unscented_scheme::Unscented_scheme (size_t x_size) :
+Unscented_scheme::Unscented_scheme (std::size_t x_size) :
 		Kalman_state_filter(x_size), Functional_filter(),
 		XX(x_size, 2*x_size+1),
 		fXX(x_size, 2*x_size+1)
@@ -60,21 +60,21 @@ void Unscented_scheme::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& 
 						// Generate XX with the same sample Mean and Covar as before
 	column(XX,0) = x;
 
-	for (size_t c = 0; c < x_size; ++c) {
+	for (std::size_t c = 0; c < x_size; ++c) {
 		UTriMatrix::Column SigmaCol = column(Sigma,c);
 		noalias(column(XX,c+1)) = x  + SigmaCol;
 		noalias(column(XX,x_size+c+1)) = x - SigmaCol;
 	}
 }
 
-Unscented_scheme::Float Unscented_scheme::predict_Kappa (size_t size) const
+Unscented_scheme::Float Unscented_scheme::predict_Kappa (std::size_t size) const
 // Default Kappa for predict: state augmented with predict noise
 {
 	// Use the rule to minimise mean squared error of 4 order term
 	return Float(3-signed(size));
 }
 
-Unscented_scheme::Float Unscented_scheme::observe_Kappa (size_t size) const
+Unscented_scheme::Float Unscented_scheme::observe_Kappa (std::size_t size) const
 // Default Kappa for observation: state on its own
 {
 	// Use the rule to minimise mean squared error of 4 order term
@@ -101,13 +101,13 @@ void Unscented_scheme::init_XX ()
 	Float x_kappa = Float(x_size) + kappa;
 						// Mean of predicted distribution: x
 	noalias(x) = column(fXX,0) * kappa;
-	for (size_t i = 1; i < XX_size; ++i) {
+	for (std::size_t i = 1; i < XX_size; ++i) {
 		noalias(x) += column(fXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
 	}
 	x /= x_kappa;
 						// Covariance of distribution: X
 							// Subtract mean from each point in fXX
-	for (size_t i = 0; i < XX_size; ++i) {
+	for (std::size_t i = 0; i < XX_size; ++i) {
 		noalias(column(fXX,i)) -= x;
 	}
 							// Center point, premult here by 2 for efficency
@@ -117,7 +117,7 @@ void Unscented_scheme::init_XX ()
 		X *= 2*kappa;
 	}
 							// Remaining unscented points
-	for (size_t i = 1; i < XX_size; ++i) {
+	for (std::size_t i = 1; i < XX_size; ++i) {
 		ColMatrix::Column fXXi = column(fXX,i);
 		noalias(X) += FM::outer_prod(fXXi, fXXi);
 	}
@@ -220,7 +220,7 @@ void Unscented_scheme::predict (Additive_predict_model& f)
  */
 void Unscented_scheme::predict (Unscented_predict_model& f)
 {
-	const size_t XX_size = XX.size2();
+	const std::size_t XX_size = XX.size2();
 
 						// Create unscented distribution
 	kappa = predict_Kappa(x_size);
@@ -229,7 +229,7 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 
 						// Predict points of XX using supplied predict model
 							// State covariance
-	for (size_t i = 0; i < XX_size; ++i) {
+	for (std::size_t i = 0; i < XX_size; ++i) {
 		noalias(column(fXX,i)) = f.f( column(XX,i) );
 	}
 
@@ -260,7 +260,7 @@ Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_mode
 Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model& h, const Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
-	size_t z_size = z.size();
+	std::size_t z_size = z.size();
 	ColMatrix zXX (z_size, 2*x_size+1);
 	Vec zp(z_size);
 	SymMatrix Xzz(z_size,z_size);
@@ -276,7 +276,7 @@ Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model&
 		Vec zXXi(z_size), zXX0(z_size);
 		zXX0 = h.h( column(XX,0) );
 		column(zXX,0) = zXX0;
-		for (size_t i = 1; i < XX.size2(); ++i) {
+		for (std::size_t i = 1; i < XX.size2(); ++i) {
 			zXXi = h.h( column(XX,i) );
 						// Normalise relative to zXX0
 			h.normalise (zXXi, zXX0);
@@ -286,14 +286,14 @@ Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model&
 
 						// Mean of predicted distribution: zp
 	noalias(zp) = column(zXX,0) * kappa;
-	for (size_t i = 1; i < zXX.size2(); ++i) {
+	for (std::size_t i = 1; i < zXX.size2(); ++i) {
 		noalias(zp) += column(zXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
 	}
 	zp /= x_kappa;
 
 						// Covariance of observation predict: Xzz
 							// Subtract mean from each point in zXX
-	for (size_t i = 0; i < XX_size; ++i) {
+	for (std::size_t i = 0; i < XX_size; ++i) {
 		column(zXX,i).minus_assign (zp);
 	}
 							// Center point, premult here by 2 for efficency
@@ -303,7 +303,7 @@ Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model&
 		Xzz *= 2*kappa;
 	}
 							// Remaining unscented points
-	for (size_t i = 1; i < zXX.size2(); ++i) {
+	for (std::size_t i = 1; i < zXX.size2(); ++i) {
 		ColMatrix::Column zXXi = column(zXX,i);
 		noalias(Xzz) += FM::outer_prod(zXXi, zXXi);
 	}
@@ -316,7 +316,7 @@ Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model&
 		Xxz *= 2*kappa;
 	}
 							// Remaining unscented points
-	for (size_t i = 1; i < zXX.size2(); ++i) {
+	for (std::size_t i = 1; i < zXX.size2(); ++i) {
 		noalias(Xxz) += FM::outer_prod(column(XX,i) - x, column(zXX,i));
 	}
 	Xxz /= 2* (Float(x_size) + kappa);

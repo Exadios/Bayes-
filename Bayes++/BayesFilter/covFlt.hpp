@@ -35,7 +35,7 @@ namespace Bayesian_filter
 class Covariance_scheme : public Extended_kalman_filter
 {
 public:
-	Covariance_scheme (size_t x_size);
+	Covariance_scheme (std::size_t x_size);
 	Covariance_scheme& operator= (const Covariance_scheme&);
 	// Optimise copy assignment to only copy filter state
 

@@ -50,18 +50,18 @@ void forceSymmetric (Matrix &M, bool bUpperToLower = false);
  */
 Vec::value_type UdUrcond (const Vec& d);
 RowMatrix::value_type UdUrcond (const RowMatrix& UD);
-RowMatrix::value_type UdUrcond (const RowMatrix& UD, size_t n);
+RowMatrix::value_type UdUrcond (const RowMatrix& UD, std::size_t n);
 UTriMatrix::value_type UCrcond (const UTriMatrix& UC);
 SymMatrix::value_type UdUdet (const SymMatrix& UD);
 
 // In-place factorisations
-RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n);
-RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n);
-inline RowMatrix::value_type UdUfactor (RowMatrix& M, size_t n)
+RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, std::size_t n);
+RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, std::size_t n);
+inline RowMatrix::value_type UdUfactor (RowMatrix& M, std::size_t n)
 {	return UdUfactor_variant2(M,n);
 }
-LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n);
-UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n);
+LTriMatrix::value_type LdLfactor (LTriMatrix& M, std::size_t n);
+UTriMatrix::value_type UCfactor (UTriMatrix& M, std::size_t n);
 
 // Copy factorisations
 RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M);

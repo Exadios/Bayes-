@@ -40,7 +40,7 @@ public:
 	FM::Vec r;			// Information Root state
 	FM::UTriMatrix R;	// Information Root
 
-	Information_root_scheme (size_t x_size);
+	Information_root_scheme (std::size_t x_size);
 
 	void init ();
 	void update ();
@@ -75,7 +75,7 @@ public:
 class Information_root_info_scheme : public Information_root_scheme, virtual public Information_state_filter
 {
 public:
-	Information_root_info_scheme (size_t x_size);
+	Information_root_info_scheme (std::size_t x_size);
 
 	void init_yY ();
 	void update_yY ();

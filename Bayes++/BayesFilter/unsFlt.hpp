@@ -65,12 +65,12 @@ public:
 class Unscented_scheme : public Linrz_kalman_filter, public Functional_filter
 {
 private:
-	size_t q_max;			// Maxiumum size allocated for noise model, constructed before XX
+	std::size_t q_max;			// Maxiumum size allocated for noise model, constructed before XX
 public:
 	FM::ColMatrix XX;		///< Unscented form of state, with associated kappa
 	Float kappa;
 
-	Unscented_scheme (size_t x_size);
+	Unscented_scheme (std::size_t x_size);
 	Unscented_scheme& operator= (const Unscented_scheme&);
 
  	void init ();
@@ -90,7 +90,7 @@ public:
 	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 	{	///< Linrz_kalman_filter observe
-		const size_t z_size = h.Hx.size1();
+		const std::size_t z_size = h.Hx.size1();
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
@@ -98,7 +98,7 @@ public:
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	///< Linrz_kalman_filter observe
-		const size_t z_size = h.Hx.size1();
+		const std::size_t z_size = h.Hx.size1();
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
@@ -117,15 +117,15 @@ protected:
 	/** Unscented transform Kappa values.
 	    Defaults use the rule which minimise mean squared error of 4th order term
 	*/
-	virtual Float predict_Kappa (size_t size) const;
-	virtual Float observe_Kappa (size_t size) const;
+	virtual Float predict_Kappa (std::size_t size) const;
+	virtual Float observe_Kappa (std::size_t size) const;
 	//@}
 
 private:
 	void unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale);
 	// Determine Unscented points for a distribution
-	size_t x_size;
-	size_t XX_size;	// 2*x_size+1
+	std::size_t x_size;
+	std::size_t XX_size;	// 2*x_size+1
 
 protected:			   		// Permenantly allocated temps
 	FM::ColMatrix fXX;

@@ -71,7 +71,7 @@ void Kalman_SLAM::predict( BF::Linear_predict_model& lpred )
 
 void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z )
 {
-	const size_t z_size = z.size();
+	const std::size_t z_size = z.size();
 		// size consistency, single state feature
 	if (fom.Hx.size1() != z_size)
 		error (BF::Logic_exception("observation and model size inconsistent"));
@@ -130,7 +130,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	//	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
 	{	// ISSUE old uBLAS has problems assigning to symmetric proxy as above, go element by element
 		const FM::Matrix cross (prod(Ha, full->X.sub_matrix(0,nL, 0,nL+nM)) );
-		for (size_t i = 0; i != nL+nM-1; ++i)
+		for (std::size_t i = 0; i != nL+nM-1; ++i)
 			full->X(nL+feature, i) = cross(0,i);
 	}
 		
@@ -171,7 +171,7 @@ void Kalman_SLAM::forget( unsigned feature, bool must_exist )
 
 void Kalman_SLAM::statistics_sparse( BF::Kalman_state_filter& kstats ) const
 {
-	const size_t k = std::min(kstats.x.size(), full->x.size());
+	const std::size_t k = std::min(kstats.x.size(), full->x.size());
 	kstats.x.clear(); kstats.X.clear();
 	kstats.x.sub_range(0,k) = full->x.sub_range(0,k);
 	kstats.X.sub_matrix(0,k, 0,k) = full->X.sub_matrix(0,k, 0,k);
@@ -180,8 +180,8 @@ void Kalman_SLAM::statistics_sparse( BF::Kalman_state_filter& kstats ) const
 void Kalman_SLAM::decorrelate( Bayesian_filter::Bayes_base::Float d )
 // Reduce correlation by scaling cross-correlation terms
 {
-	size_t i,j;
-	const size_t n = full->X.size1();
+	std::size_t i,j;
+	const std::size_t n = full->X.size1();
 	for (i = 1; i < n; ++i)
 	{
 		FM::SymMatrix::Row Xi(full->X,i);

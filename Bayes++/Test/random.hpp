@@ -76,18 +76,18 @@ public:
 	{
 		boost::normal_distribution<Float> dist(mean, sigma);
 		simple_generator<UGen, boost::normal_distribution<Float> > gen(gen01, dist);
-		for (size_t i = 0, iend=v.size(); i < iend; ++i)
+		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen();
 	}
 	void normal(Bayesian_filter_matrix::Vec& v)
 	{
 		simple_generator<UGen, boost::normal_distribution<Float> > gen(gen01, dist_normal);
-		for (size_t i = 0, iend=v.size(); i < iend; ++i)
+		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen();
 	}
 	void uniform_01(Bayesian_filter_matrix::Vec& v)
 	{
-		for (size_t i = 0, iend=v.size(); i < iend; ++i)
+		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen01();
 	}
 #endif
@@ -134,17 +134,17 @@ public:
 	void normal(Bayesian_filter_matrix::Vec& v, const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<boost::mt19937,Float> gen(rng, mean, sigma);
-		for (size_t i = 0, iend=v.size(); i < iend; ++i)
+		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen();
 	}
 	void normal(Bayesian_filter_matrix::Vec& v)
 	{
-		for (size_t i = 0, iend=v.size(); i < iend; ++i)
+		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen_normal();
 	}
 	void uniform_01(Bayesian_filter_matrix::Vec& v)
 	{
-		for (size_t i = 0, iend=v.size(); i < iend; ++i)
+		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen_uniform();
 	}
 #endif

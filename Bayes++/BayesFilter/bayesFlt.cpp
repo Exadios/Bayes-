@@ -50,21 +50,21 @@ void Bayes_base::error (const Logic_exception& e )
 	throw e;
 }
 
-Gaussian_predict_model::Gaussian_predict_model (size_t x_size, size_t q_size) :
+Gaussian_predict_model::Gaussian_predict_model (std::size_t x_size, std::size_t q_size) :
 		q(q_size), G(x_size, q_size)
 /*
  * Set the size of things we know about
  */
 {}
 
-Additive_predict_model::Additive_predict_model (size_t x_size, size_t q_size) :
+Additive_predict_model::Additive_predict_model (std::size_t x_size, std::size_t q_size) :
 		q(q_size), G(x_size, q_size)
 /*
  * Set the size of things we know about
  */
 {}
 
-Linrz_predict_model::Linrz_predict_model (size_t x_size, size_t q_size) :
+Linrz_predict_model::Linrz_predict_model (std::size_t x_size, std::size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -72,7 +72,7 @@ Linrz_predict_model::Linrz_predict_model (size_t x_size, size_t q_size) :
 		Fx(x_size,x_size)
 {}
 
-Linear_predict_model::Linear_predict_model (size_t x_size, size_t q_size) :
+Linear_predict_model::Linear_predict_model (std::size_t x_size, std::size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -80,7 +80,7 @@ Linear_predict_model::Linear_predict_model (size_t x_size, size_t q_size) :
 		xp(x_size)
 {}
 
-Linear_invertable_predict_model::Linear_invertable_predict_model (size_t x_size, size_t q_size) :
+Linear_invertable_predict_model::Linear_invertable_predict_model (std::size_t x_size, std::size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -88,12 +88,12 @@ Linear_invertable_predict_model::Linear_invertable_predict_model (size_t x_size,
 		inv(x_size)
 {}
 
-Linear_invertable_predict_model::inverse_model::inverse_model (size_t x_size) :
+Linear_invertable_predict_model::inverse_model::inverse_model (std::size_t x_size) :
 		Fx(x_size,x_size)
 {}
 
 
-State_filter::State_filter (size_t x_size) :
+State_filter::State_filter (std::size_t x_size) :
 	x(x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -104,7 +104,7 @@ State_filter::State_filter (size_t x_size) :
 }
 
 
-Kalman_state_filter::Kalman_state_filter (size_t x_size) :
+Kalman_state_filter::Kalman_state_filter (std::size_t x_size) :
 /*
  * Initialise state size
  */
@@ -154,7 +154,7 @@ Bayes_base::Float
 }
 
 
-Information_state_filter::Information_state_filter (size_t x_size) :
+Information_state_filter::Information_state_filter (std::size_t x_size) :
 /*
  * Initialise state size
  */
@@ -173,7 +173,7 @@ void Information_state_filter::init_information (const FM::Vec& y, const FM::Sym
 }
 
 
-Sample_state_filter::Sample_state_filter (size_t x_size, size_t s_size) :
+Sample_state_filter::Sample_state_filter (std::size_t x_size, std::size_t s_size) :
 		S(x_size,s_size)
 
 /*
@@ -207,7 +207,7 @@ namespace {
 	struct ColProxy
 	{
 		const FM::ColMatrix* cm;
-		size_t col;
+		std::size_t col;
 		const ColProxy& operator=(const ColProxy& a)
 		{
 			col = a.col;
@@ -233,7 +233,7 @@ namespace {
 	};
 }//namespace
 
-size_t Sample_state_filter::unique_samples () const
+std::size_t Sample_state_filter::unique_samples () const
 /*
  * Count number of unique (unequal value) samples in S
  * Implementation requires std::sort on sample column references
@@ -242,7 +242,7 @@ size_t Sample_state_filter::unique_samples () const
 						// Temporary container to Reference each element in S
 	typedef std::vector<ColProxy> SRContainer;
 	SRContainer sortR(S.size2());
-	size_t col_index = 0;
+	std::size_t col_index = 0;
 	for (SRContainer::iterator si = sortR.begin(); si != sortR.end(); ++si) {
 		(*si).cm = &S; (*si).col = col_index++;
 	}
@@ -250,7 +250,7 @@ size_t Sample_state_filter::unique_samples () const
 	std::sort (sortR.begin(), sortR.end(), ColProxy::less);
 
 						// Count element changes, precond: sortS not empty
-	size_t u = 1;
+	std::size_t u = 1;
 	SRContainer::const_iterator ssi = sortR.begin();
 	SRContainer::const_iterator ssp = ssi;
 	++ssi;
@@ -265,7 +265,7 @@ size_t Sample_state_filter::unique_samples () const
 }
 
 
-Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
+Sample_filter::Sample_filter (std::size_t x_size, std::size_t s_size) :
 		Sample_state_filter(x_size,s_size)
 
 /*
@@ -283,8 +283,8 @@ void Sample_filter::predict (Functional_predict_model& f)
  */
 {
 						// Predict particles S using supplied predict model
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
 		FM::ColMatrix::Column Si(S,i);
 		FM::noalias(Si) = f.fx(Si);
 	}

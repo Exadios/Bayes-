@@ -19,7 +19,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Covariance_scheme::Covariance_scheme (size_t x_size) :
+Covariance_scheme::Covariance_scheme (std::size_t x_size) :
 	Kalman_state_filter(x_size),
 	tempX(x_size,x_size)
 /*
@@ -80,7 +80,7 @@ Bayes_base::Float
 /* Extended_kalman_filter observe, unused byproduct
  */
 {
-	const size_t z_size = h.Hx.size1();
+	const std::size_t z_size = h.Hx.size1();
 	Covariance_byproduct S(z_size, z_size);
 	Kalman_gain_byproduct b(h.Hx.size2(), z_size);
 	return eobserve_innovation (h, s, S, b);
@@ -91,7 +91,7 @@ Bayes_base::Float
 /* Extended_kalman_filter observe, unused byproduct
  */
 {
-	const size_t z_size = h.Hx.size1();
+	const std::size_t z_size = h.Hx.size1();
 	Covariance_byproduct S(z_size, z_size);
 	Kalman_gain_byproduct b(h.Hx.size2(), z_size);
 	return eobserve_innovation (h, s, S, b);
@@ -139,7 +139,7 @@ Bayes_base::Float
 						// Innovation covariance
 	Matrix temp_XZ (prod(X, trans(h.Hx)));
 	noalias(S) = prod(h.Hx, temp_XZ);
-	for (size_t i = 0; i < h.Zv.size(); ++i)
+	for (std::size_t i = 0; i < h.Zv.size(); ++i)
 		S(i,i) += Float(h.Zv[i]);	// ISSUE mixed type proxy assignment
 
 						// Inverse innovation covariance

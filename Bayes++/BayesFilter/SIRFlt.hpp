@@ -65,9 +65,9 @@ class Importance_resampler : public Bayes_base
  */
 {
 public:
-	typedef std::vector<size_t> Resamples_t;	// resampling counts
+	typedef std::vector<std::size_t> Resamples_t;	// resampling counts
 
-	virtual Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const = 0;
+	virtual Float resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const = 0;
 	/*
 	 * The resampling function
 	 *  Weights w are proportional to the posterior Likelihood of a state
@@ -90,13 +90,13 @@ public:
 class Standard_resampler : public Importance_resampler
 // Standard resample algorithm from [1]
 {
-	Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
+	Float resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
 
 class Systematic_resampler : public Importance_resampler
 // Systematic resample algorithm from [2]
 {
-	Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
+	Float resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
 
 
@@ -108,7 +108,7 @@ class Sampled_general_predict_model: public Predict_model, public Sampled_predic
  */
 {
 public:
-	Sampled_general_predict_model (size_t x_size, size_t q_size, SIR_random& random_helper) :
+	Sampled_general_predict_model (std::size_t x_size, std::size_t q_size, SIR_random& random_helper) :
 		Predict_model(x_size, q_size),
 		Sampled_predict_model(),
 		genn(random_helper),
@@ -177,9 +177,9 @@ class SIR_scheme : public Sample_filter
 {
 	friend class SIR_kalman_scheme;
 public:
-	size_t stochastic_samples;	// Number of stochastic samples in S
+	std::size_t stochastic_samples;	// Number of stochastic samples in S
 
-	SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper);
+	SIR_scheme (std::size_t x_size, std::size_t s_size, SIR_random& random_helper);
 	SIR_scheme& operator= (const SIR_scheme&);
 	// Optimise copy assignment to only copy filter state
 
@@ -229,7 +229,7 @@ protected:
 	bool wir_update;			// weights have been updated requring a resampling on update
 private:
 	static const Float rougheningKinit;
-	size_t x_size;
+	std::size_t x_size;
 };
 
 
@@ -241,7 +241,7 @@ class SIR_kalman_scheme : public SIR_scheme, virtual public Kalman_state_filter
  */
 {
 public:
-	SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper);
+	SIR_kalman_scheme (std::size_t x_size, std::size_t s_size, SIR_random& random_helper);
 
 	/* Specialisations for filter algorithm */
 

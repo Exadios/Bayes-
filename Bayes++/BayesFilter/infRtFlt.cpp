@@ -21,7 +21,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_root_scheme::Information_root_scheme (size_t x_size) :
+Information_root_scheme::Information_root_scheme (std::size_t x_size) :
 		Kalman_state_filter(x_size),
 		r(x_size), R(x_size,x_size)
 /*
@@ -29,7 +29,7 @@ Information_root_scheme::Information_root_scheme (size_t x_size) :
  */
 {}
 
-Information_root_info_scheme::Information_root_info_scheme (size_t x_size) :
+Information_root_info_scheme::Information_root_info_scheme (std::size_t x_size) :
 		Kalman_state_filter(x_size), Information_state_filter (x_size), 
 		Information_root_scheme (x_size)
 {}
@@ -65,14 +65,14 @@ void Information_root_info_scheme::init_yY ()
  */
 {
 					// Temporary R Matrix for factorisation
-	const size_t n = x.size();
+	const std::size_t n = x.size();
 	LTriMatrix LC(n,n);
 					// Information Root
 	Float rcond = LdLfactor (LC, Y);
 	rclimit.check_PD(rcond, "Initial Y not PD");
 
 	{				// Lower triangular Choleksy factor of LdL'
-		size_t i,j;
+		std::size_t i,j;
 		for (i = 0; i < n; ++i)
 		{
 			using namespace std;		// for sqrt
@@ -182,8 +182,8 @@ Bayes_base::Float
 		column(Gqr, qi.index()) *= std::sqrt(*qi);
 	}
 						// Form Augmented matrix for factorisation
-	const size_t x_size = x.size();
-	const size_t q_size = f.q.size();
+	const std::size_t x_size = x.size();
+	const std::size_t q_size = f.q.size();
 						// Column major required for LAPACK, also this property is using in indexing
 	DenseColMatrix A(q_size+x_size, q_size+x_size+unsigned(linear_r));
 	FM::identity (A);	// Prefill with identity for topleft and zero's in off diagonals
@@ -247,8 +247,8 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
  * ISSUE correctness of linrz form needs validation
  */
 {
-	const size_t x_size = x.size();
-	const size_t z_size = s.size();
+	const std::size_t x_size = x.size();
+	const std::size_t z_size = s.size();
 						// Size consistency, z to model
 	if (z_size != h.Z.size1())
 		error (Logic_exception("observation and model size inconsistent"));
@@ -291,8 +291,8 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
  * ISSUE Efficiency. Product of Zir can be simplified
  */
 {
-	const size_t x_size = x.size();
-	const size_t z_size = s.size();
+	const std::size_t x_size = x.size();
+	const std::size_t z_size = s.size();
 						// Size consistency, z to model
 	if (z_size != h.Zv.size())
 		error (Logic_exception("observation and model size inconsistent"));
@@ -300,7 +300,7 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 						// Require Inverse of Root of uncorrelated observe noise
 	DiagMatrix Zir(z_size,z_size);
 	Zir.clear();
-	for (size_t i = 0; i < z_size; ++i)
+	for (std::size_t i = 0; i < z_size; ++i)
 	{
 		Zir(i,i) = 1 / std::sqrt(h.Zv[i]);
 	}

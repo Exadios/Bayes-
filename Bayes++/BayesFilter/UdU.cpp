@@ -54,13 +54,13 @@ inline typename V::value_type rcond_internal (const V& D)
  */
 {
 	// Special case an empty matrix
-	const size_t n = D.size();
+	const std::size_t n = D.size();
 	if (n == 0)
 		return 0;
 
 	Vec::value_type rcond, mind = D[0], maxd = 0;
 
-	for (size_t i = 0; i < n; ++i)	{
+	for (std::size_t i = 0; i < n; ++i)	{
 		Vec::value_type d = D[i];
 		if (d != d)				// NaN
 			return -1;
@@ -89,13 +89,13 @@ inline typename V::value_type rcond_ignore_infinity_internal (const V& D)
  */
 {
 	// Special case an empty matrix
-	const size_t n = D.size();
+	const std::size_t n = D.size();
 	if (n == 0)
 		return 0;
 
 	Vec::value_type rcond, mind = D[0], maxd = 0;
 
-	for (size_t i = 0; i < n; ++i)	{
+	for (std::size_t i = 0; i < n; ++i)	{
 		Vec::value_type d = D[i];
 		if (d != d)				// NaN
 			return -1;
@@ -141,7 +141,7 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 	return rcond_internal (diag(UD));
 }
 
-RowMatrix::value_type UdUrcond (const RowMatrix& UD, size_t n)
+RowMatrix::value_type UdUrcond (const RowMatrix& UD, std::size_t n)
 /*
  * As above but only first n elements are used
  */
@@ -166,7 +166,7 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& UC)
 		return rcond*rcond;
 }
 
-inline UTriMatrix::value_type UCrcond (const UTriMatrix& UC, size_t n)
+inline UTriMatrix::value_type UCrcond (const UTriMatrix& UC, std::size_t n)
 /*
  * As above but for use by UCfactor functions where only first n elements are used
  */
@@ -188,17 +188,17 @@ RowMatrix::value_type UdUdet (const RowMatrix& UD)
  *  Defined to be 1 for 0 size UD
  */
 {
-	const size_t n = UD.size1();
+	const std::size_t n = UD.size1();
 	assert (n == UD.size2());
 	RowMatrix::value_type det = 1;
-	for (size_t i = 0; i < n; ++i)	{
+	for (std::size_t i = 0; i < n; ++i)	{
 		det *= UD(i,i);
 	}
 	return det;
 }
 
 
-RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
+RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, std::size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
@@ -209,7 +209,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
  *
  * Strict lower triangle of M is ignored in computation
  *
- * Input: M, n=last size_t to be included in factorisation
+ * Input: M, n=last std::size_t to be included in factorisation
  * Output: M as UdU' factor
  *    strict_upper_triangle(M) = strict_upper_triangle(U)
  *    diagonal(M) = d
@@ -218,7 +218,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
  *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
-	size_t i,j,k;
+	std::size_t i,j,k;
 	RowMatrix::value_type e, d;
 
 	if (n > 0)
@@ -266,7 +266,7 @@ Negative:
 }
 
 
-RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
+RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, std::size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
@@ -276,7 +276,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
  *
  * Strict lower triangle of M is ignored in computation
  *
- * Input: M, n=last size_t to be included in factorisation
+ * Input: M, n=last std::size_t to be included in factorisation
  * Output: M as UdU' factor
  *    strict_upper_triangle(M) = strict_upper_triangle(U)
  *    diagonal(M) = d
@@ -285,7 +285,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
  *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
-	size_t i,j,k;
+	std::size_t i,j,k;
 	RowMatrix::value_type e, d;
 	if (n > 0)
 	{
@@ -337,13 +337,13 @@ Negative:
 }
 
 
-LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
+LTriMatrix::value_type LdLfactor (LTriMatrix& M, std::size_t n)
 /*
  * In place Modified lower triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.218 Lower cholesky algorithm modified for LdL'
  *
- * Input: M, n=last size_t to be included in factorisation
+ * Input: M, n=last std::size_t to be included in factorisation
  * Output: M as LdL' factor
  *    strict_lower_triangle(M) = strict_lower_triangle(L)
  *    diagonal(M) = d
@@ -352,7 +352,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
  * ISSUE: This could change to equivilient of UdUfactor_varient2
  */
 {
-	size_t i,j,k;
+	std::size_t i,j,k;
 	LTriMatrix::value_type e, d;
 
 	for (j = 0; j < n; ++j)
@@ -400,21 +400,21 @@ Negative:
 }
 
 
-UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
+UTriMatrix::value_type UCfactor (UTriMatrix& M, std::size_t n)
 /*
  * In place Upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.218
  * Strict lower triangle of M is ignored in computation
  *
- * Input: M, n=last size_t to be included in factorisation
+ * Input: M, n=last std::size_t to be included in factorisation
  * Output: M as UC*UC' factor
  *    upper_triangle(M) = UC
  * Return:
  *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
-	size_t i,j,k;
+	std::size_t i,j,k;
 	UTriMatrix::value_type e, d;
 
 	if (n > 0)
@@ -538,8 +538,8 @@ bool UdUinverse (RowMatrix& UD)
  *    singularity (of d), true iff d has a zero element
  */
 {
-	size_t i,j,k;
-	const size_t n = UD.size1();
+	std::size_t i,j,k;
+	const std::size_t n = UD.size1();
 	assert (n == UD.size2());
 
 	// Invert U in place
@@ -583,14 +583,14 @@ bool UTinverse (UTriMatrix& U)
  *    singularity (of U), true iff diagonal of U has a zero element
  */
 {
-	const size_t n = U.size1();
+	const std::size_t n = U.size1();
 	assert (n == U.size2());
 
 	bool singular = false;
 	// Invert U in place
 	if (n > 0)
 	{
-		size_t i = n-1;
+		std::size_t i = n-1;
 		do {
 			UTriMatrix::Row Ui(U,i);
 			UTriMatrix::value_type d = Ui[i];
@@ -602,10 +602,10 @@ bool UTinverse (UTriMatrix& U)
 			d = 1/d;
 			Ui[i] = d;
 
-			for (size_t j = n-1; j > i; --j)
+			for (std::size_t j = n-1; j > i; --j)
 			{
 				UTriMatrix::value_type e = 0.;
-				for (size_t k = i+1; k <= j; ++k)
+				for (std::size_t k = i+1; k <= j; ++k)
 					e -= Ui[k] * U(k,j);
 				Ui[j] = e*d;
 			}
@@ -633,8 +633,8 @@ void UdUrecompose_transpose (RowMatrix& M)
  *    M - U'dU recomposition (symmetric)
  */
 {
-	size_t i,j,k;
-	const size_t n = M.size1();
+	std::size_t i,j,k;
+	const std::size_t n = M.size1();
 	assert (n == M.size2());
 
 	// Recompose M = (U'dU) in place
@@ -672,8 +672,8 @@ void UdUrecompose (RowMatrix& M)
  *    M - UdU' recomposition (symmetric)
  */
 {
-	size_t i,j,k;
-	const size_t n = M.size1();
+	std::size_t i,j,k;
+	const std::size_t n = M.size1();
 	assert (n == M.size2());
 
 	// Recompose M = (UdU') in place
@@ -705,8 +705,8 @@ void Lzero (RowMatrix& M)
  * Zero strict lower triangle of Matrix
  */
 {
-	size_t i,j;
-	const size_t n = M.size1();
+	std::size_t i,j;
+	const std::size_t n = M.size1();
 	assert (n == M.size2());
 	for (i = 1; i < n; ++i)
 	{
@@ -723,8 +723,8 @@ void Uzero (RowMatrix& M)
  * Zero strict upper triangle of Matrix
  */
 {
-	size_t i,j;
-	const size_t n = M.size1();
+	std::size_t i,j;
+	const std::size_t n = M.size1();
 	assert (n == M.size2());
 	for (i = 0; i < n; ++i)
 	{
@@ -752,8 +752,8 @@ void UdUfromUCholesky (RowMatrix& U)
  *    U Modified Cholesky factor (UD format)
  */
 {
-	size_t i,j;
-	const size_t n = U.size1();
+	std::size_t i,j;
+	const std::size_t n = U.size1();
 	assert (n == U.size2());
 	for (j = 0; j < n; ++j)
 	{
@@ -777,8 +777,8 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
  *    U and d parts of UD
  */
 {
-	size_t i,j;
-	const size_t n = UD.size1();
+	std::size_t i,j;
+	const std::size_t n = UD.size1();
 	assert (n == UD.size2());
 
 	for (j = 0; j < n; ++j)
@@ -806,8 +806,8 @@ void UdUrecompose (SymMatrix& X, const RowMatrix& M)
 					// Abuse X as a RowMatrix
 	RowMatrix& X_matrix = X.asRowMatrix();
 					// Assign elements of common top left block of R into L
-	size_t top = std::min(X_matrix.size1(), M.size1());
-	size_t left = std::min(X_matrix.size2(), M.size2());
+	std::size_t top = std::min(X_matrix.size1(), M.size1());
+	std::size_t left = std::min(X_matrix.size2(), M.size2());
 	noalias(X_matrix.sub_matrix(0,top, 0,left)) = M.sub_matrix(0,top, 0,left);
 
 	UdUrecompose (X_matrix);

@@ -19,7 +19,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_scheme::Information_scheme (size_t x_size) :
+Information_scheme::Information_scheme (std::size_t x_size) :
 		Kalman_state_filter(x_size), Information_state_filter(x_size),
 		tempX(x_size,x_size)
 /*
@@ -29,7 +29,7 @@ Information_scheme::Information_scheme (size_t x_size) :
 	update_required = true;	// Not a valid state, init is required before update can be used
 }
 
-Information_scheme::Predict_linear_byproduct::Predict_linear_byproduct (size_t x_size, size_t q_size) :
+Information_scheme::Predict_linear_byproduct::Predict_linear_byproduct (std::size_t x_size, std::size_t q_size) :
 /* Set size of by-products for linear predict
  */
 		 A(x_size,x_size), tempG(x_size,q_size),
@@ -158,7 +158,7 @@ Bayes_base::Float
 	noalias(b.A) = prod_SPDT(f.inv.Fx, Y, tempX);
 						// B = G'*A*G+invQ , A in coupled additive noise space
 	noalias(b.B) = prod_SPDT(f.G, b.A, b.tempG);
-	for (size_t i = 0; i < f.q.size(); ++i)
+	for (std::size_t i = 0; i < f.q.size(); ++i)
 	{
 		if (f.q[i] < 0)	// allow PSD q, let infinity propogate into B
 			error (Numeric_exception("Predict q Not PSD"));
@@ -190,7 +190,7 @@ Bayes_base::Float
 /* Extended_kalman_filter observe, unused byproduct
  */
 {
-	const size_t x_size = h.Hx.size2();
+	const std::size_t x_size = h.Hx.size2();
 	State_byproduct i(x_size);
 	Covariance_byproduct I(x_size,x_size);
 	return eobserve_innovation (h, s, i,I);
@@ -201,7 +201,7 @@ Bayes_base::Float
 /* Extended_kalman_filter observe, unused byproduct
  */
 {
-	const size_t x_size = h.Hx.size2();
+	const std::size_t x_size = h.Hx.size2();
 	State_byproduct i(x_size);
 	Covariance_byproduct I(x_size,x_size);
 	return eobserve_innovation (h, s, i,I);
@@ -253,7 +253,7 @@ Bayes_base::Float
 	rclimit.check_PD(rcond, "Zv not PD in observe");
 
 	RowMatrix HxT (trans(h.Hx));      			// HxT = Hx'*inverse(Z)
-	for (size_t w = 0; w < h.Zv.size(); ++w)
+	for (std::size_t w = 0; w < h.Zv.size(); ++w)
 		column(HxT, w) *= 1 / h.Zv[w];
 												// Calculate EIF i = Hx'*ZI*zz
 	noalias(i) = prod(HxT, zz);

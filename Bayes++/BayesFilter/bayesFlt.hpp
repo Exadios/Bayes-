@@ -143,7 +143,7 @@ class Gaussian_predict_model : virtual public Predict_model_base
 */
 {
 public:
-	Gaussian_predict_model (size_t x_size, size_t q_size);
+	Gaussian_predict_model (std::size_t x_size, std::size_t q_size);
 
 	FM::Vec q;		// Noise variance (always dense, use coupling to represent sparseness)
 	FM::Matrix G;		// Noise Coupling
@@ -162,7 +162,7 @@ class Additive_predict_model : virtual public Predict_model_base
 */
 {
 public:
-	Additive_predict_model (size_t x_size, size_t q_size);
+	Additive_predict_model (std::size_t x_size, std::size_t q_size);
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
 	// Functional part of additive model
@@ -183,7 +183,7 @@ class Linrz_predict_model : public Additive_predict_model
  */
 {
 public:
-	Linrz_predict_model (size_t x_size, size_t q_size);
+	Linrz_predict_model (std::size_t x_size, std::size_t q_size);
 	FM::Matrix Fx;		// Model
 };
 
@@ -194,7 +194,7 @@ class Linear_predict_model : public Linrz_predict_model
  */
 {
 public:
-	Linear_predict_model (size_t x_size, size_t q_size);
+	Linear_predict_model (std::size_t x_size, std::size_t q_size);
 	const FM::Vec& f(const FM::Vec& x) const
 	{	// Provide the linear implementation of functional f
 		xp.assign (FM::prod(Fx,x));
@@ -211,9 +211,9 @@ class Linear_invertable_predict_model : public Linear_predict_model
  */
 {
 public:
-	Linear_invertable_predict_model (size_t x_size, size_t q_size);
+	Linear_invertable_predict_model (std::size_t x_size, std::size_t q_size);
 	struct inverse_model {
-		inverse_model (size_t x_size);
+		inverse_model (std::size_t x_size);
 		FM::ColMatrix Fx;	// Model inverse (ColMatrix as usually transposed)
 	} inv;
 };
@@ -245,7 +245,7 @@ class Likelihood_observe_model : virtual public Observe_model_base
  */
 {
 public:
-	Likelihood_observe_model(size_t z_size) : z(z_size)
+	Likelihood_observe_model(std::size_t z_size) : z(z_size)
 	{}
 	virtual Float L(const FM::Vec& x) const = 0;
 	// Likelihood L(z | x)
@@ -268,7 +268,7 @@ class Functional_observe_model : virtual public Observe_model_base, public Obser
  */
 {
 public:
-	Functional_observe_model(size_t /*z_size*/)
+	Functional_observe_model(std::size_t /*z_size*/)
 	{}
 	const FM::Vec& operator()(const FM::Vec& x) const
 	{	return h(x);
@@ -285,7 +285,7 @@ class Parametised_observe_model : virtual public Observe_model_base, public Obse
  */
 {
 public:
-	Parametised_observe_model(size_t /*z_size*/)
+	Parametised_observe_model(std::size_t /*z_size*/)
 	{}
 	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
 	// Functional part of additive model
@@ -303,7 +303,7 @@ class Uncorrelated_additive_observe_model : public Parametised_observe_model
  */
 {
 public:
-	Uncorrelated_additive_observe_model (size_t z_size) :
+	Uncorrelated_additive_observe_model (std::size_t z_size) :
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
 	FM::Vec Zv;			// Noise Variance
@@ -315,7 +315,7 @@ class Correlated_additive_observe_model : public Parametised_observe_model
  */
 {
 public:
-	Correlated_additive_observe_model (size_t z_size) :
+	Correlated_additive_observe_model (std::size_t z_size) :
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
 	FM::SymMatrix Z;	// Noise Covariance (not necessarly dense)
@@ -330,7 +330,7 @@ class Jacobian_observe_model : virtual public Observe_model_base
 public:
 	FM::Matrix Hx;		// Model
 protected: // Jacobian model is not sufficient, it is used to build Linrz observe model's
-	Jacobian_observe_model (size_t x_size, size_t z_size) :
+	Jacobian_observe_model (std::size_t x_size, std::size_t z_size) :
 		Hx(z_size, x_size)
 	{}
 };
@@ -344,7 +344,7 @@ class Linrz_correlated_observe_model : public Correlated_additive_observe_model,
  */
 {
 public:
-	Linrz_correlated_observe_model (size_t x_size, size_t z_size) :
+	Linrz_correlated_observe_model (std::size_t x_size, std::size_t z_size) :
 		Correlated_additive_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 };
@@ -358,7 +358,7 @@ class Linrz_uncorrelated_observe_model : public Uncorrelated_additive_observe_mo
  */
 {
 public:
-	Linrz_uncorrelated_observe_model (size_t x_size, size_t z_size) :
+	Linrz_uncorrelated_observe_model (std::size_t x_size, std::size_t z_size) :
 		Uncorrelated_additive_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 };
@@ -370,7 +370,7 @@ class Linear_correlated_observe_model : public Linrz_correlated_observe_model
  */
 {
 public:
-	Linear_correlated_observe_model (size_t x_size, size_t z_size) :
+	Linear_correlated_observe_model (std::size_t x_size, std::size_t z_size) :
 		Linrz_correlated_observe_model(x_size, z_size), hx(z_size)
 	{}
 	const FM::Vec& h(const FM::Vec& x) const
@@ -389,7 +389,7 @@ class Linear_uncorrelated_observe_model : public Linrz_uncorrelated_observe_mode
  */
 {
 public:
-	Linear_uncorrelated_observe_model (size_t x_size, size_t z_size) :
+	Linear_uncorrelated_observe_model (std::size_t x_size, std::size_t z_size) :
 		Linrz_uncorrelated_observe_model(x_size, z_size), hx(z_size)
 	{}
 	const FM::Vec& h(const FM::Vec& x) const
@@ -416,7 +416,7 @@ typedef FM::SymMatrix Covariance_byproduct;
 struct Kalman_gain_byproduct
 // Kalman gain and associated innovation covariance and inverse
 {
-	Kalman_gain_byproduct (size_t x_size, size_t z_size) :
+	Kalman_gain_byproduct (std::size_t x_size, std::size_t z_size) :
 		SI(z_size,z_size), W(x_size, z_size)
 	{}
 	Covariance_byproduct SI;
@@ -475,7 +475,7 @@ public:
 class State_filter : virtual public Bayes_filter_base
 {
 public:
-	State_filter (size_t x_size);
+	State_filter (std::size_t x_size);
 	/* Set constant sizes, state must not be empty (must be >=1)
 	    Exceptions:
 	     bayes_filter_exception is x_size < 1
@@ -513,7 +513,7 @@ class Kalman_state_filter : public State_filter
 public:
 	FM::SymMatrix X;	// state covariance
 
-	Kalman_state_filter (size_t x_size);
+	Kalman_state_filter (std::size_t x_size);
 	/* Initialise filter and set constant sizes
 	 */
 
@@ -547,7 +547,7 @@ public:
 class Information_state_filter : virtual public Bayes_filter_base
 {
 public:
-	Information_state_filter (size_t x_size);
+	Information_state_filter (std::size_t x_size);
 	FM::Vec y;				// Information state
 	FM::SymMatrix Y;		// Information
 
@@ -673,7 +673,7 @@ class Sample_state_filter : virtual public Bayes_filter_base
 public:
 	FM::ColMatrix S;		// state sampleing (x_size,s_size)
 
-	Sample_state_filter (size_t x_size, size_t s_size);
+	Sample_state_filter (std::size_t x_size, std::size_t s_size);
 	/* Initialise filter and set constant sizes for
 	    x_size of the state vector
 	    s_size sample size
@@ -699,7 +699,7 @@ public:
 	            This should by multipled by the number of samples to get the Likelihood function conditioning
 	 */
 
-	size_t unique_samples () const;
+	std::size_t unique_samples () const;
 	/* Count number of unique (unequal value) samples in S
 	    Implementation requires std::sort on sample column references
 	*/
@@ -723,7 +723,7 @@ public:
 class Sample_filter : public Likelihood_filter, public Functional_filter, virtual public Sample_state_filter
 {
 public:
-	Sample_filter (size_t x_size, size_t s_size);
+	Sample_filter (std::size_t x_size, std::size_t s_size);
 	/* Initialise filter and set constant sizes for
 	    x_size of the state vector
 	    s_size sample size
