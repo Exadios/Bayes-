@@ -201,8 +201,7 @@ RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, size_t n)
 
 			// Diagonal element
 			if (d > 0.0)
-			{
-				// Positive definate
+			{	// Positive definate
 				d = 1. / d;
 
 				for (i = 0; i < j; ++i)
@@ -217,8 +216,7 @@ RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, size_t n)
 				}
 			}
 			else if (d == 0.0)
-			{
-				// Possibly Semidefinate, check not negative
+			{	// Possibly Semidefinate, check not negative
 				for (i = 0; i < j; ++i)
 				{
 					if (M(i,j) != 0.0)
@@ -226,8 +224,7 @@ RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, size_t n)
 				}
 			}
 			else
-			{
-				// Negative
+			{	// Negative
 				goto Negative;
 			}
 		} while (j-- > 0);
@@ -269,8 +266,7 @@ RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n)
 
 			// Diagonal element
 			if (d > 0.0)
-			{
-				// Positive definate
+			{	// Positive definate
 				i = j;
 				do
 				{
@@ -280,16 +276,17 @@ RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n)
 					{
 						e -= Mi[k]*M(k,k)*Mj[k];
 					}
-					if (i == j)
+					if (i == j) {
 						Mi[j] = e;		// Diagonal element
+						d = e;
+					}
 					else {
 						Mi[j] = e / d;
 					}
 				} while (i-- > 0);
 			}
 			else if (d == 0.0)
-			{
-				// Possibly Semidefinate, check not negative, whole row must be identically zero
+			{	// Possibly Semidefinate, check not negative, whole row must be identically zero
 				for (k = j+1; k < n; ++k)
 				{
 					if (Mj[k] != 0)
@@ -297,8 +294,7 @@ RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n)
 				}
 			}
 			else
-			{
-				// Negative
+			{	// Negative
 				goto Negative;
 			}
 		} while (j-- > 0);

@@ -1,4 +1,3 @@
-% Test Bayes++ Matlab filter interface
 hc = bf_scheme('UD', [1,2], [1,0;0,1]);
 hs = bf_scheme('SIR_Kalman', [1,2], [1,0;0,1], 1000, 1);
 

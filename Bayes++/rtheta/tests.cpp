@@ -32,28 +32,85 @@ inline scalar sqr(scalar x)
 }
 
 
+class Test_random
+/*
+ * Random number distributions
+ */
+{
+public:
+	Test_random() : gen_normal(rng), gen_uniform(rng), gen_exponential(rng, 1.)
+	{}
+	double normal(const double mean, const double sigma)
+	{
+		boost::normal_distribution<boost::mt19937> gen(rng, mean, sigma);
+		return gen();
+	}
+	void normal(Vec& v)
+	{
+		std::generate (v.begin(), v.end(), gen_normal);
+	}
+	void uniform_01(Vec& v)
+	{
+		std::generate (v.begin(), v.end(), gen_uniform);
+	}
+	void exponential_1(Vec& v)
+	{
+		std::generate (v.begin(), v.end(), gen_exponential);
+	}
+	void reseed()
+	{
+		rng.seed();
+	}
+private:
+	typedef boost::mt19937 good_random;
+	good_random rng;
+	boost::normal_distribution<good_random> gen_normal;
+	boost::uniform_01<good_random> gen_uniform;
+	boost::exponential_distribution<good_random> gen_exponential;
+};
+
 void test_inverse()
 {	// DEBUG Just for Debugging!
 
-	Matrix X (3,3);
-	SymMatrix XI(X.size1(), X.size2());
-	SymMatrix XII(X.size1(), X.size2());
+	Matrix U (3,3);
+	U.clear();
+	U(0,0) = sqr(1.);
+	U(1,1) = sqr(1.);
+	U(2,2) = sqr(1.);
+	U(0,1) = 2.;
+	U(0,2) = 3.;
+	U(1,2) = 5.;
+/*	
+	Vec rv(U.size1()*U.size2());
+	Test_random rand;
+	rand.exponential_1(rv);
 
-	X(0,0) = sqr(1.);
-	X(1,1) = sqr(10.);
-	X(1,0) = X(0,1) = 10.*0.99;
-	X(2,2) = 1.;
+	Vec::iterator rv_i = rv.begin();
+	for (size_t r = 0; r < U.size1(); ++r)
+		for (size_t c = 0; c < U.size2(); ++c)
+		{
+			U(r,c) = *rv_i; ++rv_i;
+		}
+	*/
+	std::cout << U << std::endl;
+
+	Matrix X(U.size1(),U.size2());
+	X = prod(U, trans(U));
 	std::cout << X << std::endl;
 	
-	XI = X;
+	SymMatrix XI(X.size1(), X.size2());
+	SymMatrix XII(X.size1(), X.size2());
+//	XI = X;
 //	UdUfactor(XI, 2);
-	std::cout << XI << std::endl;
-	XI = X;
+//	std::cout << XI << std::endl;
+//	XI = X;
 //	LdLfactor(XI, 2);
-	std::cout << XI << std::endl;
+//	std::cout << XI << std::endl;
 
 	UdUinversePD (XI, X);
 	std::cout << XI << std::endl;
+	std::cout << prod(X,XI) << std::endl;
+
 	UdUinversePD (XII, XI);
 	std::cout << XII << std::endl;
 };
@@ -190,4 +247,5 @@ void test_addative()
 void other_tests()
 {
 	//	test_();
+	test_inverse();
 }
