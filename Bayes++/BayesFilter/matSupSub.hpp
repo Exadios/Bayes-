@@ -28,8 +28,8 @@
  */
 
 #include <boost/version.hpp>
-#if !(BOOST_VERSION >= 103200)
-#error Requires Boost 1.32.0 or later
+#if !(BOOST_VERSION >= 103100)
+#error Requires Boost 1.31.0 or later
 #endif
 
 #include <boost/numeric/ublas/vector.hpp>
