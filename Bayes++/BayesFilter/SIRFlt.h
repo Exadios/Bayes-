@@ -201,7 +201,7 @@ public:
 	virtual void update ()
 	// Implement Default Kalman_filter update
 	{
-		Float ignore_lcond = SIR_filter::update_resample();
+		(void)SIR_filter::update_resample();
 	}
 
 	Float update_resample (const Importance_resampler& resampler);
