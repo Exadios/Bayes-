@@ -6,21 +6,18 @@
 # a BayesFilter static library.
 #
 # This Makefile just wraps up the bjam command for those used to make.
-# Use TOOLS='tt' to specify the toolset used by Boost.Build
 # Use ARGS='aa' to pass arguments to bjam
 
 # Modify these settings to locate Boost and bjam
 BOOST_ROOT ?= ../boost_1_29_0
 BJAM ?= bjam
-TOOLS ?=
 ALL_LOCATE_TARGET ?= bin
 
-GOBJAM = ${BJAM} $(ARGS) -sTOOLS=$(TOOLS) -sBOOST_ROOT=$(BOOST_ROOT) -sALL_LOCATE_TARGET=$(ALL_LOCATE_TARGET)
+GOBJAM = ${BJAM} $(ARGS) -sBOOST_ROOT=$(BOOST_ROOT) -sALL_LOCATE_TARGET=$(ALL_LOCATE_TARGET)
 
 # Build everything
 buildAll:
 	${GOBJAM}
-
 
 # Build individual examples
 buildSimple:
