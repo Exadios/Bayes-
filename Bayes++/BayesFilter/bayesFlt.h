@@ -652,7 +652,7 @@ public:
 	virtual void update ()
 	// Default update, simple resample
 	{
-		Float lcond_ignore = update_resample ();
+		(void)update_resample ();
 	}
 
 	virtual void predict (Functional_predict_model& f);

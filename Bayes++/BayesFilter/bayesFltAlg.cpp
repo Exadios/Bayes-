@@ -356,7 +356,7 @@ size_t Sample_filter::unique_samples () const
 	++ssi;
 	while (ssi < sortR.end())
 	{
-		if ((*ssp).col, (*ssi).col)
+		if ((*ssp).col == (*ssi).col)
 			++u;
 		ssp = ssi;
 		++ssi;
