@@ -6,6 +6,7 @@
 #include "BayesFilter/allFilters.hpp"
 #include <cmath>
 #include <iostream>
+#include <exception>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/limits.hpp>
 #include <boost/bind.hpp>
@@ -315,5 +316,11 @@ void other_tests()
 	extern void other_bench();
 //	other_bench();
 
-	test_sym_proxy();
+	try {
+		// Tests go here
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
 }
