@@ -433,25 +433,24 @@ void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
 template <class E1, class E2>
 struct prod_expression_result
 {	// Provide ET result E1E2T_type of prod(matrix_expression<E1>,trans(matrix_expression<E2>)
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<E2, ublas::scalar_identity<BOOST_UBLAS_TYPENAME E2::value_type> >::result_type  E2T_type;
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME E1::value_type, E1,
-                                        BOOST_UBLAS_TYPENAME E2T_type::value_type, E2T_type>::result_type  E1E2T_type;
+	typedef typename ublas::matrix_unary2_traits<E2, ublas::scalar_identity<typename E2::value_type> >::result_type  E2T_type;
+	typedef typename ublas::matrix_matrix_binary_traits<typename E1::value_type, E1,
+                                        typename E2T_type::value_type, E2T_type>::result_type  E1E2T_type;
 
 	// Provide ET result E1TE2_type of prod(trans(matrix_expression<E1>),matrix_expression<E2>)
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<E1, ublas::scalar_identity<BOOST_UBLAS_TYPENAME E1::value_type> >::result_type  E1T_type;
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME E1T_type::value_type, E1T_type,
-                                        BOOST_UBLAS_TYPENAME E2::value_type, E2>::result_type  E1TE2_type;
+	typedef typename ublas::matrix_unary2_traits<E1, ublas::scalar_identity<typename E1::value_type> >::result_type  E1T_type;
+	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<typename E1T_type::value_type, E1T_type,
+                                        typename E2::value_type, E2>::result_type  E1TE2_type;
 };
 
  
 template<class E> inline
-typename prod_expression_result<E,E>::E1E2T_type
+typename prod_expression_result<E,const E>::E1E2T_type
  prod_SPD (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X*X'
  */
 {
-	typedef typename E::value_type t1;
 	return prod( X, trans(X) );
 }
 
@@ -480,7 +479,7 @@ SymMatrix prod_SPD (const RowMatrix& X, const Vec& s)
 
 
 template<class E> inline
-typename prod_expression_result<E,E>::E1TE2_type
+typename prod_expression_result<const E,E>::E1TE2_type
  prod_SPDT (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X'*X
