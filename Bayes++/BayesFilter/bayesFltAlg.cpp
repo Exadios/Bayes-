@@ -39,7 +39,7 @@ Bayes_base::Float
  */
 {
 	update ();
-	FM::Vec zp = h.h(x);		// Observation model, zp is predicted observation
+	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
 
 	FM::Vec s = z;
 	h.normalise(s, zp);
@@ -54,7 +54,7 @@ Bayes_base::Float
  */
 {
 	update ();
-	FM::Vec zp = h.h(x);		// Observation model, zp is predicted observation
+	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
 
 	FM::Vec s = z;
 	h.normalise(s, zp);
