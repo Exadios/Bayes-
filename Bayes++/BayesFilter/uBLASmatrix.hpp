@@ -507,17 +507,18 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 
 template <class X>
 struct prod_SPD_matrix_traits
-{	// Provide ET result type XXT for prod(X,trans(X))
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<X, ublas::scalar_identity<BOOST_UBLAS_TYPENAME X::value_type> >::result_type  XT_type;
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME X::value_type, X,
+{	// Provide ET result type XXT for prod(X,trans(X)
+	typedef typename X::expression_type EX;
+	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<EX, ublas::scalar_identity<BOOST_UBLAS_TYPENAME X::value_type> >::result_type  XT_type;
+	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME X::value_type, EX,
                                         BOOST_UBLAS_TYPENAME XT_type::value_type, XT_type>::result_type  XXT_type;
 
 	// Provide ET result type XTX for prod(trans(X),X)
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME XT_type::value_type, XT_type,
-                                        BOOST_UBLAS_TYPENAME X::value_type, X>::result_type  XTX_type;
-
+                                        BOOST_UBLAS_TYPENAME X::value_type, EX>::result_type  XTX_type;
 };
 
+ 
 inline
 prod_SPD_matrix_traits<RowMatrix>::XXT_type
  prod_SPD (const RowMatrix& X, const SymMatrix& S, RowMatrix& XStemp)

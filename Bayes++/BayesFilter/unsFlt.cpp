@@ -203,7 +203,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 						// Mean of predicted distribution: x
 	x.assign (column(fXX,0) * Kappa);
 	for (i = 1; i < XX_size; ++i) {
-		x.plus_assign (column(fXX,i) / 2);
+		x.plus_assign (column(fXX,i) / 2.); // ISSUE uBlas may not be able to promote integer 2
 	}
 	x /= x_Kappa;
 						// Covariance of distribution: X
@@ -298,7 +298,7 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 						// Mean of predicted distribution: zp
 	zp.assign (column(zXX,0) * Kappa);
 	for (i = 1; i < zXX.size2(); ++i) {
-		zp.plus_assign (column(zXX,i) / 2);
+		zp.plus_assign (column(zXX,i) / 2.); // ISSUE uBlas may not be able to promote integer 2
 	}
 	zp /= x_Kappa;
 
