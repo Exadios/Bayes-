@@ -9,6 +9,7 @@ FOR RELEASE
 		Run Simple, PV, QuadCalib
 
 TODO
+	Complete resize support
 	Document state virtual bases. Inportant that init and update protocols are used
 	Provide scheme protected default contructors are virtual base define state size
 	unit test rcond_ignore_infinity_internal . rcond!=rcond was changed. Still OK?
