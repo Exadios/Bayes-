@@ -100,7 +100,7 @@ class Systematic_resampler : public Importance_resampler
 };
 
 
-class SIR_scheme : virtual public Sample_filter
+class SIR_scheme : public Sample_filter
 /*
  * Sampling Importance Resampleing Filter Scheme.
  *  Implement a general form of SIR filter
@@ -122,8 +122,7 @@ public:
 
 	Float update_resample ()
 	// Default resampling update
-	{
-		return update_resample (Standard_resampler());
+	{	return update_resample (Standard_resampler());
 	}
 
 	virtual Float update_resample (const Importance_resampler& resampler);
@@ -131,8 +130,12 @@ public:
 	 *  Return: lcond
 	 */
 
+	void predict (Functional_predict_model& f)
+	// Predict samples without noise
+	{	Sample_filter::predict (f);
+	}
 	void predict (Sampled_predict_model& f);
-	// Predict particles with sampled noise model
+	// Predict samples with noise model
 
 	void observe (Likelihood_observe_model& h, const FM::Vec& z);
 	// Weight particles using likelihood model h and z
@@ -142,7 +145,8 @@ public:
 
 	Float rougheningK;			// Current roughening value (0 implies no roughening)
 	virtual void roughen()
-	{	// Generalised roughening:  Default to roughen_minmax
+	// Generalised roughening:  Default to roughen_minmax
+	{
 		if (rougheningK != 0.)
 			roughen_minmax (S, rougheningK);
 	}
@@ -169,7 +173,7 @@ class Kalman_filter_init : virtual public Kalman_state_filter
  */
 {
 protected:
-	Kalman_filter_init() : Kalman_state_filter(0)
+	Kalman_filter_init () : Kalman_state_filter(0)
 	{}	// Dummy virtual base constructor
 	void init() {
 		init_from_kalman();
@@ -198,9 +202,13 @@ private:
 
 public:
 	virtual void update ()
-	// Implement Kalman_filter::update identically to SIR_filter
-	{
-		(void)SIR_scheme::update_resample();
+	// Implement Kalman_filter::update identically to SIR_scheme
+	{	(void)SIR_scheme::update_resample();
+	}
+
+	Float update_resample ()
+	// Implement identically to SIR_scheme
+	{	return SIR_scheme::update_resample();
 	}
 
 	Float update_resample (const Importance_resampler& resampler);

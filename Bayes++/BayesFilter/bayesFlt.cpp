@@ -105,7 +105,7 @@ State_filter::State_filter (size_t x_size) :
 
 Kalman_state_filter::Kalman_state_filter (size_t x_size) :
 /*
- * Initialise filter and set the size of things we know about
+ * Initialise state size
  */
 		State_filter(x_size), X(x_size,x_size)
 {}
@@ -113,15 +113,26 @@ Kalman_state_filter::Kalman_state_filter (size_t x_size) :
 
 Information_state_filter::Information_state_filter (size_t x_size) :
 /*
- * Initialise filter and set the size of things we know about
+ * Initialise state size
  */
 		y(x_size), Y(x_size,x_size)
 {}
 
 
-Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
-		Likelihood_filter(),
+Sample_state_filter::Sample_state_filter (size_t x_size, size_t s_size) :
 		S(x_size,s_size)
+
+/*
+ * Initialise state size
+ * Postcond: s_size >= 1
+ */
+{
+	if (s_size < 1)
+		error (Logic_exception("Zero sample filter constructed"));
+}
+
+Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
+		Sample_state_filter(x_size,s_size)
 
 /*
  * Initialise filter and set the size of things we know about

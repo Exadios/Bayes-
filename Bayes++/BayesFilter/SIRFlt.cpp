@@ -189,6 +189,7 @@ const SIR_scheme::Float SIR_scheme::rougheningKinit = 1;
 
 SIR_scheme::SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
 		Sample_filter (x_size, s_size),
+		Sample_state_filter (x_size, s_size),
 		random (random_helper),
 		resamples (s_size), wir (s_size)
 /*
@@ -416,7 +417,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
  * SIR implementation of a Kalman filter
  */
 SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
-	Kalman_state_filter(x_size), Sample_filter (x_size, s_size), SIR_scheme (x_size, s_size, random_helper),
+	SIR_scheme (x_size, s_size, random_helper),
+	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size), 
 	rough_random (random_helper),
 	rough (x_size,x_size, rough_random)
 {

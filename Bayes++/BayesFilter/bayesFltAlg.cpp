@@ -235,7 +235,7 @@ Adapted_Linrz_correlated_observe_model::Adapted_Linrz_correlated_observe_model (
 }
 
 
-Sample_filter::~Sample_filter()
+Sample_state_filter::~Sample_state_filter()
 /*
  * Default definition required for a pure virtual distructor
  * Should be in BayesFlt but cannot be defined if Matrix has
@@ -291,7 +291,7 @@ namespace {
 	};
 }//namespace
 
-size_t Sample_filter::unique_samples () const
+size_t Sample_state_filter::unique_samples () const
 /*
  * Count number of unique (unequal value) samples in S
  * Implementation requires std::sort on sample column references
