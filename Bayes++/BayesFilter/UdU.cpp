@@ -806,7 +806,10 @@ void UdUrecompose (SymMatrix& X, const RowMatrix& M)
 {
 						// Abuse X as a RowMatrix
 	RowMatrix& X_matrix = X.asRowMatrix();
-	subassign (X_matrix, M);
+		// assign elements of common top left block of R into L
+	size_t top = std::min(X_matrix.size1(), M.size1());
+	size_t left = std::min(X_matrix.size2(), M.size2());
+	X_matrix.sub_matrix(0,top, 0,left).assign( M.sub_matrix(0,top, 0,left) );
 
 	UdUrecompose (X_matrix);
 }

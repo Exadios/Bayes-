@@ -71,8 +71,9 @@ void
  */
 {
 					// Factorise X into left partition of UD
-	FM::subassign (UD, X);
-	Float rcond = FM::UdUfactor (UD, UD.size1());
+	size_t x_size = UD.size1();
+	UD.sub_matrix(0,x_size, 0,x_size).assign( X );
+	Float rcond = FM::UdUfactor (UD, x_size);
 	rclimit.check_PSD(rcond, "Initial X not PSD");
 }
 

@@ -354,17 +354,6 @@ const ublas::triangular_adaptor<const M, ublas::lower>
 /*
  * Matrix Support Operations
  */
-template <class BaseL, class BaseR>
-void subassign (FMMatrix<BaseL>& L, const FMMatrix<BaseR>& R)
-{	// Assign elements of common top left block of R into L
-	using namespace ublas;
-	size_t top = std::min(L.size1(), R.size1());
-	size_t left = std::min(L.size2(), R.size2());
-	matrix_range<BaseL> Ltopleft(L, range(0,top), range(0,left));
-	matrix_range<const BaseR> Rtopleft(R, range(0,top), range(0,left));
-	Ltopleft.assign (Rtopleft);
-}
-
 template <class Base>
 ublas::matrix_vector_range<FMMatrix<Base> >
  diag(FMMatrix<Base>& M, size_t n)
