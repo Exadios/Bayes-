@@ -11,7 +11,7 @@ CPP_SOURCES =
     bayesFlt bayesFltAlg matSup UdU covFlt infFlt infRtFlt itrFlt SIRFlt UDFlt unsFlt CIFlt ;
 
 # Declare the BayesFilter static link library
-lib BayesFilterLib : $(CPP_SOURCES).cpp
+lib BayesFilter : $(CPP_SOURCES).cpp
     : <link>static
 #    <toolset>gcc <cxxflags>"-pedantic"	# Pedantic make a lot of noise with GCC2.95.3 in Boost headers because of long long
 ;

@@ -20,7 +20,6 @@ DOCUMENTATION
 	Use BoostBook to consistenently document pre/postconditions
 
 TODO
-	Use variate_generator with non reference Engine should be ok in VC7
 	By products: add observe parameterisation for by products and temps
 		observe innovation, surely it is something that is always computable by all schemes
 			This should be the first "by_product"

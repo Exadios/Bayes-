@@ -15,7 +15,7 @@ lib lapack : : <toolset>msvcms <file>"../../CLAPACK3/clapack7.a" ;
 
 exe rtheta :
      rtheta.cpp  tests.cpp
-     ../BayesFilter//BayesFilterLib
+     ../BayesFilter//BayesFilter
 	lapack
      : 
      : debug
