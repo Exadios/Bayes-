@@ -1,4 +1,3 @@
-#include <iostream>
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -218,8 +217,6 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 	X *= 2*Kappa;
 							// Remaining unscented points
 	for (i = 1; i < XX_size; ++i) {
-std::cerr << X << column(fXX,i) << std::endl;
-std::cerr << FM::outer_prod(column(fXX,i), column(fXX,i)) << std::endl;
 		X.plus_assign (FM::outer_prod(column(fXX,i), column(fXX,i)));
 	}
 	X /= 2*x_Kappa;
