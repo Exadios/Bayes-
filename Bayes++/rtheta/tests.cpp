@@ -36,8 +36,6 @@ void nested_prod ()
 	R = prod(A, B);
 }
 
-#ifdef REMOVED
-
 // Square
 template <class scalar>
 inline scalar sqr(scalar x)
@@ -68,7 +66,7 @@ public:
 	{
 		Boost_random::seed();
 	}
-} Random;
+};
 
 
 void test_inverse()
@@ -150,25 +148,10 @@ void test_SPD()
 	noalias(P) = prod_SPD(R,S, RStemp);
 	std::cout << P << std::endl;
 
-	// Try prod_SPD
+	// Try prod_SPDT
 	ColMatrix RT(1,2);
-	noalias(P) = prod_SPDT (RT, Stemp);
-}
-
-void test_SPD_all()
-{
-	SymMatrix S(1,1);
-	Vec x(1);
-	S(0,0) = 5.;
-	x[0] = 1.;
-
-	Float v1 = ublas::inner_prod (x, ublas::prod(S,x) );
-	Float v2 = prod_SPDT(x,S);
-	(void)v1,(void)v2;
-
-	v2 = prod_SPD(x,x);
-
-	test_SPD();
+	RowMatrix SRtemp(S.size1(), RT.size2());
+	noalias(P) = prod_SPDT (RT, S, SRtemp);
 }
 
 void test_temp_prod()
@@ -245,7 +228,7 @@ void test_unique()
 	x[0] = 5.;
 	x[1] = 7.;
 
-	Test_random<Float> r;
+	Test_random r;
 	SIR_kalman_scheme sf(2, 100, r);
 	sf.init_kalman (x,X);
 
@@ -285,8 +268,6 @@ void numeric_tested()
 	std::cout << (d>=0) <<','<< (d<=0) << std::endl;
 }
 
-#endif
-
 void test_sym_proxy()
 /*
  * Problems accessing the symmetric half via a proxy
@@ -317,13 +298,9 @@ void utinverse_test()
 
 void other_tests()
 {
-	// Other things I might want to benchmark
-	extern void other_bench();
-//	other_bench();
-
 	try {
-		utinverse_test ();
 		// Tests go here
+		test_SPD ();
 	}
 	catch (std::exception& e)
 	{
