@@ -10,6 +10,8 @@ variant hardoptimize_release : release :
 # Build variant to allow testing with a local uBLAS version seperated from Boost. It named @uBLAS so it sorted name is included first
 variant uBLAS_seperate_debug : debug : <include>"../boost/@uBLAS" ;
 variant uBLAS_seperate_release : release : <include>"../boost/@uBLAS" ;
+variant uBLAS_seperate_sparse_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_SPARSE ;
+variant uBLAS_seperate_sparse_release : uBLAS_seperate_release : <define>BAYES_FILTER_SPARSE ;
 variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
 variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
 variant uBLAS_seperate_coordinate_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COORDINATE ;
