@@ -16,5 +16,6 @@ exe rtheta :
      <include>$(BAYES_ROOT)
      <sysinclude>../../include
      <gcc><*><find-library>"lapack -lg2c"	# LAPACK required, usualy built with g77 for gcc tools
+     <intel-linux><*><find-library>"lapack -lg2c"	# LAPACK required, usualy built with g77 for gcc tools
     : debug release
 ;

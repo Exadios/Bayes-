@@ -15,8 +15,10 @@
 #include <vector>
 #include <map>
 
-// Include all the Bayes++ Bayesian filtering library
-#include "BayesFilter/allFilters.hpp"
+// Bayes++ Bayesian filtering schemes
+#include "BayesFilter/SIRFlt.hpp"
+#include "BayesFilter/unsFlt.hpp"
+// Bayes++ SLAM
 #include "SLAM.hpp"
 #include "fastSLAM.hpp"
 #include "kalmanSLAM.hpp"
@@ -24,8 +26,6 @@
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 #include <boost/random.hpp>
-
-
 
 
 using namespace SLAM_filter;

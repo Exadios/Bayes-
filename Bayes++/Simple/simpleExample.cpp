@@ -11,8 +11,8 @@
  *  A linear filter with one state and constant noises
  */
 
-// Include all the Bayes++ Bayesian filtering classes
-#include "BayesFilter/allFilters.hpp"
+// Use the Unscented filter scheme from Bayes++
+#include "BayesFilter/unsFlt.hpp"
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 

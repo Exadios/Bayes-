@@ -22,7 +22,7 @@
  * [1] "Bayesian Multiple Target Tracking" Lawrence D Stone, Carl A Barlow, Thomas L Corwin
  */
 
-#include "BayesFilter/allFilters.hpp"
+#include "BayesFilter/UDFlt.hpp"
 #include "BayesFilter/filters/indirect.hpp"
 #include <cmath>
 #include <iostream>

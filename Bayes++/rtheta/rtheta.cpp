@@ -14,6 +14,7 @@
  */
 
 #include "BayesFilter/allFilters.hpp"
+#include "BayesFilter/schemeFlt.hpp"
 #include <angle.hpp>			// Angle arithmatic header from Ms
 #include <cmath>
 #include <iostream>
