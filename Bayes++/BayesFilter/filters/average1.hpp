@@ -87,7 +87,7 @@ average1_filter<filter>::average1_filter (Float iQ, Float iZ)
 }
 
 template <typename filter>
-average1_filter<filter>::Float average1_filter<filter>::observe(Float zz)
+typename average1_filter<filter>::Float average1_filter<filter>::observe(Float zz)
 /* Observe z, first call set initial state to z
  * Returns filtered estimate
  */

@@ -66,9 +66,9 @@ public:
 		return *this;
 	}
 
-	const ublas::vector_range<VecBase> operator()(size_t b, size_t e) const
+	const ublas::vector_range<const VecBase> operator()(size_t b, size_t e) const
 	{	// Range selection operator
-		return ublas::vector_range<VecBase>(*const_cast<Vec*>(this), ublas::range(b,e));
+		return ublas::vector_range<const VecBase>(*this, ublas::range(b,e));
 	}
 	ublas::vector_range<VecBase> operator()(size_t b, size_t e)
 	{	// Range selection operator
@@ -192,13 +192,13 @@ template <class MatrixBase>
 class SymMatrixAdaptor;
 
 template <class MatrixBase>
-class RMConstruct
+struct RMConstruct
 {
 	MatrixBase rm;
-	friend class SymMatrixAdaptor;
+
 	RMConstruct () : rm()
 	{}
-	RMConstruct (MatrixBase::size_type size1, MatrixBase::size_type size2) : rm(size1,size2)
+	RMConstruct (size_t size1, size_t size2) : rm(size1,size2)
 	{}
 	RMConstruct (const MatrixBase& r) : rm(r)
 	{}
@@ -215,7 +215,7 @@ class SymMatrixAdaptor : private RMConstruct<MatrixBase>, public ublas::symmetri
 public:
 	SymMatrixAdaptor () : RMConstruct<MatrixBase>(), SymAdap(rm)
 	{}
-	SymMatrixAdaptor (size_type nsize1, size_type nsize2) : RMConstruct<MatrixBase>(nsize1,nsize2), SymAdap(rm)
+	SymMatrixAdaptor (size_t nsize1, size_t nsize2) : RMConstruct<MatrixBase>(nsize1,nsize2), SymAdap(rm)
 	{}
 	explicit SymMatrixAdaptor (const SymMatrixAdaptor& r) : RMConstruct<MatrixBase>(reinterpret_cast<const MatrixBase&>(r)), SymAdap(rm)
 	{}
@@ -246,7 +246,7 @@ public:
 	void clear()
 	{	rm.clear();
 	}
-	void resize(size_type nsize1, size_type nsize2)
+	void resize(size_t nsize1, size_t nsize2)
 	{
 		rm.resize(nsize1, nsize2);
 	}
@@ -361,7 +361,7 @@ sub_column(FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2)
 	// For this to work requires patched uBLAS for Bayes++
 	// Don't use project(column(*this,s2), range(s1,e1)) it will return a reference to the temporary column object
 ublas::matrix_vector_slice<const MatrixBase>
-sub_column(size_t s1, size_t e1, size_t s2) const 
+sub_column(size_t s1, size_t e1, size_t s2) const
 // Column vector s2 with rows [s1,e1)
 {
 	using namespace ublas;
@@ -400,13 +400,13 @@ void mult_SPD (const MatrixX& X, const Vec& s, SymMatrix& P)
 
 	// P(a,b) = X.row(a) * X.row(b)
 	for (; Xa != Xend; ++Xa)				// Iterate Rows
-	{		
-		MatrixX::const_Row Xav = MatrixX::rowi(Xa);
+	{
+		typename MatrixX::const_Row Xav = MatrixX::rowi(Xa);
 		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{
 			SymMatrix::value_type p = 0;	// Tripple vector inner product
-			MatrixX::const_Row Xbv = MatrixX::rowi(Xb);
+			typename MatrixX::const_Row Xbv = MatrixX::rowi(Xb);
 			for (si = s.begin(); si != send; ++si) {	// TODO: use iterator on Xav and Xbv
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
@@ -429,8 +429,8 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
 
 	// P(a,b) = X.row(a) * X.row(b)
 	for (; Xa != Xend; ++Xa)			// Iterate vectors
-	{		
-		MatrixX::const_Row Xav = MatrixX::rowi(Xa);
+	{
+		typename MatrixX::const_Row Xav = MatrixX::rowi(Xa);
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{									// Simply multiple row Xa by row Xb
@@ -506,13 +506,13 @@ void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
 
 	// P(a,b) = X.col(a) * X.col(b)
 	for (; Xa != Xend; ++Xa)				// Iterate vectors
-	{		
-		MatrixX::const_Column Xav = MatrixX::columni(Xa);
+	{
+		typename MatrixX::const_Column Xav = MatrixX::columni(Xa);
 		Xb = Xa;							// Start at the row Xa only one triangle of symertric result required
 		for (; Xb != Xend; ++Xb)
 		{									// Tripple vector inner product
 			SymMatrix::value_type p = 0;
-			MatrixX::const_Column Xbv = MatrixX::columni(Xb);
+			typename MatrixX::const_Column Xbv = MatrixX::columni(Xb);
 			for (si = s.begin(); si != send; ++si) {	// TODO: use iterator on Xav and Xbv
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
@@ -535,7 +535,7 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 
 	// P(a,b) = X.row(a) * X.row(b)
 	for (; Xa != Xend; ++Xa)				// Iterate vectors
-	{		
+	{
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{									// Simply multiple col Xa by col Xb
