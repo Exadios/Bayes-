@@ -417,13 +417,13 @@ ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expressi
 	// P(a,b) = sum(X.row(a) * s * X.row(b))
 	for (; Xa != Xend; ++Xa)		// Iterate rows
 	{
-		typedef const ublas::matrix_row<EX> EX_row;
-		EX_row Xav (ublas::row(XX, Xa.index1()));
+		typedef const ublas::matrix_row<const EX> EX_row;
+		EX_row Xav (ublas::row_const(XX, Xa.index1()));
 		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{
-			typename EX::value_type p = 0;	// Tripple vector inner product
-			EX_row Xbv (ublas::row(XX, Xb.index1()));
+			typename EX::value_type p = 0;	// Triple vector inner product
+			EX_row Xbv (ublas::row_const(XX, Xb.index1()));
 			for (si = s().begin(); si != send; ++si) {
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
@@ -475,13 +475,13 @@ ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_express
 	// P(a,b) = sum(X.col(a) * s * X.col(b))
 	for (; Xa != Xend; ++Xa)		// Iterate columns
 	{
-		typedef const ublas::matrix_column<EX> EX_column;	// ISSUE VC7.0 require const EX!
-		EX_column Xav = ublas::column(XX, Xa.index2());
-		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
+		typedef const ublas::matrix_column<const EX> EX_column;
+		EX_column Xav = ublas::column_const(XX, Xa.index2());
+		Xb = Xa;							// Start at the column Xa only one triangle of symetric result required
 		for (; Xb != Xend; ++Xb)
 		{
-			typename EX::value_type p = 0;	// Tripple vector inner product
-			EX_column Xbv = ublas::column(XX, Xb.index2());
+			typename EX::value_type p = 0;	// Triple vector inner product
+			EX_column Xbv = ublas::column_const(XX, Xb.index2());
 			for (si = s().begin(); si != send; ++si) {
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
