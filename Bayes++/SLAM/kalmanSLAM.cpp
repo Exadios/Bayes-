@@ -28,35 +28,50 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 	FM::noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type());
 }
 
-Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& location_filter, Full_filter& filter_generator ) :
+Kalman_SLAM::Kalman_SLAM( Kalman_filter_generator& filter_generator ) :
 	SLAM(),
-	loc(location_filter),
-	fgenerator(filter_generator), nL(location_filter.x.size())
+	fgenerator(filter_generator),
+	loc(NULL), full(NULL)
 {
-		// generate full with only location states
-	full = fgenerator.generate(nL);
-		// place location in full
-	full->init_kalman (loc.x, loc.X);
+	nL = 0;
 	nM = 0;
 }
 
 Kalman_SLAM::~Kalman_SLAM()
 {
+	fgenerator.dispose (loc);
 	fgenerator.dispose (full);
+}
+
+void Kalman_SLAM::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
+{
+	// TODO maintain map states
+	nL = x.size();
+	nM = 0;
+	if (loc) fgenerator.dispose (loc);
+	if (full) fgenerator.dispose (full);
+		// generate a location filter for prediction
+	loc = fgenerator.generate(nL);
+		// generate full filter
+	full = fgenerator.generate(nL);
+		// initialise location states
+	full->x.sub_range(0,nL) = x;
+	full->X.sub_matrix(0,nL,0,nL) = X;
+	full->init();
 }
 
 void Kalman_SLAM::predict( BF::Linrz_predict_model& lpred )
 {
 		// extract location part of full
-	loc.x = full->x.sub_range(0,nL);
-	loc.X = full->X.sub_matrix(0,nL,0,nL);
+	loc->x = full->x.sub_range(0,nL);
+	loc->X = full->X.sub_matrix(0,nL,0,nL);
 		// predict location, independant of map
-	loc.init();
-	loc.predict (lpred);
-	loc.update();
+	loc->init();
+	loc->predict (lpred);
+	loc->update();
 		// return location to full
-	full->x.sub_range(0,nL) = loc.x;
-	full->X.sub_matrix(0,nL,0,nL) = loc.X;
+	full->x.sub_range(0,nL) = loc->x;
+	full->X.sub_matrix(0,nL,0,nL) = loc->X;
 	full->init();
 }
 
@@ -89,7 +104,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	if (feature >= nM)
 	{
 		nM = feature+1;	
-		Full_filter::Filter_type* nf = fgenerator.generate(nL+nM);
+		Kalman_filter_generator::Filter_type* nf = fgenerator.generate(nL+nM);
 		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
 		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
@@ -118,7 +133,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::F
 	if (feature >= nM)
 	{
 		nM = feature+1;
-		Full_filter::Filter_type* nf = fgenerator.generate(nL+nM);
+		Kalman_filter_generator::Filter_type* nf = fgenerator.generate(nL+nM);
 		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
 		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 

@@ -79,7 +79,6 @@ void Fast_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::Flo
  * SLAM New observation directly of state statistics (overwrite)
  */
 {
-	assert(t.size() == 1);		// Only single state observation supported
 	const size_t nparticles = L.S.size2();
 	Feature_1 m1;  				// single map feature
 	FeatureCondMap fmap(nparticles);

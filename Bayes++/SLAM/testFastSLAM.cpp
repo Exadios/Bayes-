@@ -105,8 +105,8 @@ struct SLAMDemo
 	};
 
 	template <class Filter>
-	struct Full_generator : public Full_filter
-	// Generate and dispose of predefined filter types
+	struct Generic_kalman_generator : public Kalman_filter_generator
+	// Generate and dispose of generic kalman filter type
 	{
 		Filter_type* generate( unsigned full_size )
 		{
@@ -136,13 +136,12 @@ void SLAMDemo::OneDExperiment ()
 
 	// Construct simple Prediction models
 	BF::Sampled_LiAd_predict_model location_predict(nL,1, goodRandom);
-	BF::Sampled_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
 	// Stationary Prediction model (Identity)
-	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
+	FM::identity(location_predict.Fx);
 				// Constant Noise model
-	location_predict.q[0] = 1000.;	all_predict.q[0] = 1000.;
-	location_predict.G.clear(); all_predict.G.clear();
-	location_predict.G(0,0) = 1.; all_predict.G(0,0) = 1.;
+	location_predict.q[0] = 1000.;
+	location_predict.G.clear();
+	location_predict.G(0,0) = 1.;
 
 	// Relative Observation with  Noise model
 	Simple_observe observe0(5.), observe1(3.);
@@ -160,20 +159,18 @@ void SLAMDemo::OneDExperiment ()
 	true1.sub_range(0,nL) = x_init; true1[nL] = 70.;
 	FM::Vec z(1);
 
+	// Filter statistics for display
+	Kalman_statistics stat(nL+nM);
 
 	// Kalman_SLAM filter:
-	BF::Covariance_scheme location_filter(nL);
-	location_filter.init_kalman (x_init, X_init);
-
-	Full_generator<BF::Covariance_scheme> full_gen;
-	Kalman_SLAM kalm (location_filter, full_gen);
+	Generic_kalman_generator<BF::Covariance_scheme> full_gen;
+	Kalman_SLAM kalm (full_gen);
+	kalm.init_kalman (x_init, X_init);
 
 	// Fast_SLAM filter
 	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
 	fast_location.init_kalman (x_init, X_init);
 	Fast_SLAM_Kstatistics fast (fast_location);
-
-	Kalman_statistics stat(nL+nM);
 
 	// Initial feature states
 	z = observe0.h(true0);		// Observe a relative position between location and map landmark
@@ -191,7 +188,7 @@ void SLAMDemo::OneDExperiment ()
 
 	// Predict the filter forward
 	fast_location.predict (location_predict);
-	kalm.full->predict (all_predict);
+	kalm.predict (location_predict);
 	fast.update(); fast.statistics_sparse(stat); display("Predict Fast", stat);
 	kalm.update(); kalm.statistics_sparse(stat); display("Predict Kalm", stat);
 
@@ -236,13 +233,12 @@ void SLAMDemo::InformationLossExperiment ()
 
 	// Construct simple Prediction models
 	BF::Sampled_LiAd_predict_model location_predict(nL,1, goodRandom);
-	BF::Sampled_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
 	// Stationary Prediction model (Identity)
-	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
+	FM::identity(location_predict.Fx);
 				// Constant Noise model
-	location_predict.q[0] = 1000.;	all_predict.q[0] = 1000.;
-	location_predict.G.clear(); all_predict.G.clear();
-	location_predict.G(0,0) = 1.; all_predict.G(0,0) = 1.;
+	location_predict.q[0] = 1000.;
+	location_predict.G.clear();
+	location_predict.G(0,0) = 1.;
 
 	// Relative Observation with  Noise model
 	Simple_observe observe0(5.), observe1(3.);
@@ -260,19 +256,18 @@ void SLAMDemo::InformationLossExperiment ()
 	true1.sub_range(0,nL) = x_init; true1[nL] = 70.;
 	FM::Vec z(1);
 
-	// Kalman_SLAM filter
-	BF::Covariance_scheme location_filter(nL);
-	location_filter.init_kalman (x_init, X_init);
+	// Filter statistics for display
+	Kalman_statistics stat(nL+nM);
 
-	Full_generator<BF::Unscented_scheme> full_gen;
-	Kalman_SLAM kalm (location_filter, full_gen);
+	// Kalman_SLAM filter
+	Generic_kalman_generator<BF::Unscented_scheme> full_gen;
+	Kalman_SLAM kalm (full_gen);
+	kalm.init_kalman (x_init, X_init);
 
 	// Fast_SLAM filter
 	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
 	fast_location.init_kalman (x_init, X_init);
 	Fast_SLAM_Kstatistics fast (fast_location);
-
-	Kalman_statistics stat (nL+nM);
 
 	// Initial feature states
 	z = observe0.h(true0);		// Observe a relative position between location and map landmark
@@ -293,7 +288,7 @@ void SLAMDemo::InformationLossExperiment ()
 		// Groups of observations without resampling
 		{
 			// Predict the filter forward
-			kalm.full->predict (all_predict);
+			kalm.predict (location_predict);
 			fast_location.predict (location_predict);
 
 			// Observation feature 0 with bias
@@ -303,7 +298,7 @@ void SLAMDemo::InformationLossExperiment ()
 			fast.observe( 0, observe0, z );
 
 			// Predict the filter forward
-			kalm.full->predict (all_predict);
+			kalm.predict (location_predict);
 			fast_location.predict (location_predict);
 
 			// Observation feature 1 with bias
