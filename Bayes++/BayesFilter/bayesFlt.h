@@ -630,19 +630,30 @@ public:
 
 	/* Virtual functions for filter algorithm */
 
-	virtual void init (const FM::ColMatrix& S) = 0;
+	virtual void init () = 0;
+	/* Initialise from current sampleing
+	*/
 
-	virtual void update ()
-	// Default update
+	virtual void init_sample (const FM::ColMatrix& initS)
+	/* Initialise from a sampling
+	 */
 	{
-		Float lcond_ignore;
-		update (lcond_ignore);
+		S.assign (initS);
+		init();
 	}
 
-	virtual void update (Float& lcond) = 0;
+	virtual Float update_resample () = 0;
 	/* Resampling update
-	 *	Returns lcond: Smallest normalised weight, represents conditioning of resampling solution
+	 *	Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
+	 *          lcond == 1. if no resampling performed
+	 *			This should by multipled by the number of samples to get the Likelihood function conditioning
 	 */
+
+	virtual void update ()
+	// Default update, simple resample
+	{
+		Float lcond_ignore = update_resample ();
+	}
 
 	virtual void predict (Functional_predict_model& f);
 	/* Predict state posterior with functional no noise model
@@ -654,6 +665,11 @@ public:
 
 	virtual void observe (Likelihood_observe_model& h, const FM::Vec& z) = 0;
 	/* Observation state posterior using likelihood model h at z
+	*/
+
+	virtual void observe_likelihood (const FM::Vec& lw) = 0;
+	/* Observation fusion directly from likelihood weights
+	 * lw may be smaller then the state sampling. Weights for additional particles are assumed to be 1
 	*/
 
 	size_t unique_samples () const;

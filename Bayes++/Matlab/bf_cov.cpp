@@ -11,7 +11,7 @@
 
 #include <mex.h>
 #include <exception>
-#include "bfilter.h"
+#include "matlabBfilter.h"
 
 using namespace::Matlab_convert;
 

@@ -247,5 +247,4 @@ void test_addative()
 void other_tests()
 {
 	//	test_();
-	test_inverse();
 }

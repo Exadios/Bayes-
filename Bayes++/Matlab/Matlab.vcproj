@@ -54,140 +54,74 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
 				RelativePath="bf_cov.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_mean.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_observe_likelihood.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_observe_linear_correlated.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_observe_linear_uncorrelated.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_observe_linrz_correlated.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_observe_linrz_uncorrelated.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_predict_addative.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_predict_functional.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_predict_linear.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_predict_linrz.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_sample.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_scheme.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_stochastic_samples.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="bf_unique_samples.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="slam_observe.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="slam_observe_new.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="slam_scheme.cpp">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
-				RelativePath="bfilter.h">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
+				RelativePath="matlabBfilter.h">
 			</File>
 			<File
 				RelativePath="matlabConvert.h">
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<File
 			RelativePath="Makefile">
-			<FileConfiguration
-				Name="uBLAS(Development) Debug|Win32">
-			</FileConfiguration>
 		</File>
 		<File
 			RelativePath="bf_test.m">
-			<FileConfiguration
-				Name="uBLAS(Development) Debug|Win32">
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

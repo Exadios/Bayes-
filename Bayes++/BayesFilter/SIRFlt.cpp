@@ -39,10 +39,155 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-// use 1 std.dev. per sample as default roughening
-const SIR_filter::Float SIR_filter::rougheningKinit = 1.;
 
-SIR_filter::SIR_filter (size_t x_size, size_t s_size, Random& random_helper) :
+Standard_resampler::Float
+ Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, Vec& w, SIR_random& r) const
+/*
+ * Standard resampler from [1]
+ * Algorithm:
+ *	Complexity O(n*log(n)) complexity required to sort the random draws made.
+ *	This allows comparing of the two ordered lists w and ur.
+ * Output:
+ *  Presamples number of times this particle should be resampled
+ *  uresamples number of unqiue particles (number of non zeros in Presamples)
+ *  w becomes a normalised cumulative sum
+ * Sideeffects:
+ *  A draw is made from this instances 'random' for each particle
+ */
+{
+	assert (presamples.size() == w.size());
+						// Normalised cumulative sum of likelihood weights, find smallest weight
+	Float wcum = 0.;
+	Float wmin = std::numeric_limits<Float>::max();
+	Vec::iterator wi, wi_end = w.end();
+	for (wi = w.begin(); wi != wi_end; ++wi) {
+		if (*wi < wmin) {
+			wmin = *wi;
+		}
+		wcum = *wi = wcum + *wi;
+	}
+	if (wmin < 0.)		// Bad weights
+		filter_error("negative weight");
+	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
+		filter_error("total likelihood zero");
+						// Any numerical failure should cascade into cummulative sum
+	if (wcum != wcum)
+		filter_error("total likelihood numerical error");
+
+						// Sorted uniform random distribution [0..1) for each resample
+	Vec ur(w.size());
+	r.uniform_01(ur);
+	std::sort (ur.begin(), ur.end());
+	assert(ur[0] >= 0. && ur[ur.size()-1] < 1.);		// Very bad if random is incorrect
+						// Scale ur to cummulative sum
+	ur *= wcum;
+
+						// Resamples based on cumulative weights from sorted resample random values
+	Resamples_t::iterator pri = presamples.begin();
+	wi = w.begin();
+	Vec::iterator ui = ur.begin(), ui_end = ur.end();
+	size_t unique = 0;
+
+	while (wi != wi_end)
+	{
+		size_t Pres = 0;			// assume P not resampled until find out otherwise
+		if (ui != ui_end && *ui < *wi)
+		{
+			++unique;
+			do						// count resamples
+			{
+				++Pres;
+				++ui;
+			} while (ui != ui_end && *ui < *wi);
+		}
+		++wi;
+		*pri++ = Pres;
+	}
+	assert(ui==ui_end); assert(pri==presamples.end());
+
+	uresamples = unique;
+	return wmin / wcum;
+}
+
+
+Systematic_resampler::Float
+ Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, Vec& w, SIR_random& r) const
+/*
+ * Systematic resample algorithm from [2]
+ * Algorithm:
+ *	Particles are chosesn from those whose cumulative weight intersect with an equidistant grid
+ *	A uniform random draw is chosen to position the grid with the cumulative weights
+ *	Complexity O(n)
+ * Output:
+ *  Presamples number of times this particle should be resampled
+ *  uresamples number of unqiue particles (number of non zeros in Presamples)
+ *  w becomes a normalised cumulative sum
+ * Sideeffects:
+ *  A single draw is made from this instances 'random'
+ */
+{
+	size_t nParticles = presamples.size();
+	assert (nParticles == w.size());
+						// Normalised cumulative sum of likelihood weights, find smallest weight
+	Float wcum = 0.;
+	Float wmin = std::numeric_limits<Float>::max();
+	Vec::iterator wi, wi_end = w.end();
+	for (wi = w.begin(); wi != wi_end; ++wi) {
+		if (*wi < wmin) {
+			wmin = *wi;
+		}
+		wcum = *wi = wcum + *wi;
+	}
+	if (wmin < 0.)		// Bad weights
+		filter_error("negative weight");
+	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
+		filter_error("total likelihood zero");
+						// Any numerical failure should cascade into cummulative sum
+	if (wcum != wcum)
+		filter_error("total likelihood numerical error");
+
+						// Stratified step
+	Float wstep = wcum / Float(nParticles);
+						
+	Vec ur(1);			// Single uniform for initialisation
+	r.uniform_01(ur);
+	assert(ur[0] >= 0. && ur[0] < 1.);		// Very bad if random is incorrect
+
+						// Resamples based on cumulative weights
+	Importance_resampler::Resamples_t::iterator pri = presamples.begin();
+	wi = w.begin();
+	size_t unique = 0;
+	Float s = ur[0] * wstep;	// Random initialisation
+
+	while (wi != wi_end)
+	{
+		size_t Pres = 0;			// assume P not resampled until find out otherwise
+		if (s < *wi)
+		{
+			++unique;
+			do						// count resamples
+			{
+				++Pres;
+				s += wstep;
+			} while (s < *wi);
+		}
+		++wi;
+		*pri++ = Pres;
+	}
+	assert(pri==presamples.end());
+
+	uresamples = unique;
+	return wmin / wcum;
+}
+
+
+/*
+ * SIR filter implementation
+ */
+const SIR_filter::Float SIR_filter::rougheningKinit = 1.;
+		// use 1 std.dev. per sample as default roughening
+
+SIR_filter::SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
 		Sample_filter(x_size, s_size),
 		resamples(s_size), wir(s_size),
 		random(random_helper)
@@ -69,21 +214,21 @@ SIR_filter& SIR_filter::operator= (const SIR_filter& a)
 
 
 void
- SIR_filter::init (const ColMatrix& SI)
+ SIR_filter::init ()
 /*
  * Initialise sampling
- *		Post: S, stochastic_samples := samples in S
+ *		Pre: S
+ *		Post: stochastic_samples := samples in S
  */
 {
-	S = SI;			// Simple initialisation
 	stochastic_samples = S.size2();
 	std::fill (wir.begin(), wir.end(), 1.);		// Initial uniform weights
 	wir_update = false;
 }
 
 
-void
- SIR_filter::update (Float& lcond)
+SIR_filter::Float
+ SIR_filter::update_resample (const Importance_resampler& resampler)
 /*
  * Resample particles using weights and roughen
  * Pre : S represent the predicted distribution
@@ -92,17 +237,17 @@ void
  *  Bayes_filter_exception from resampler
  *		unchanged: S, stochastic_samples
  * Return
- *		lcond: Smallest normalised weight, represents conditioning of resampling solution
+ *		lcond, Smallest normalised weight, represents conditioning of resampling solution
  *		lcond == 1. if no resampling preformed
  *		This should by multipled by the number of samples to get the Likelihood function conditioning
  */
 {
-	lcond = 1.;
+	Float lcond = 1.;
 	if (wir_update)		// Resampleing only required if weights have been updated
 	{
 		// Resample based on likelihood weights
 		size_t R_unique; 
-		lcond = weighted_resample (resamples, R_unique, wir);
+		lcond = resampler.resample (resamples, R_unique, wir, random);
 
 							// No resampling exceptions: update S
 		copy_resamples (S, resamples);
@@ -113,6 +258,7 @@ void
 		std::fill (wir.begin(), wir.end(), 1.);		// Initial uniform weights
 		wir_update = false;
 	}
+	return lcond;
 }
 
 
@@ -144,162 +290,39 @@ void
 {
 	h.Lz (z);			// Observe likelihood at z
 
-	{					// Weight Particles. Fused with previous weight
-		Vec::iterator wi = wir.begin();
-		const size_t nSamples = S.size2();
-		for (size_t i = 0; i != nSamples; ++i) {
-			*wi *= h.L(FM::column(S,i));
-			++wi;
-		}
+						// Weight Particles. Fused with previous weight
+	Vec::iterator wi = wir.begin();
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		*wi *= h.L(FM::column(S,i));
+		++wi;
 	}
 	wir_update = true;
 }
 
-  
-SIR_filter::Float
-SIR_filter::standard_resample (resamples_t& Presamples, size_t& uresamples, Vec& w) const
+void
+ SIR_filter::observe_likelihood (const Vec& lw)
 /*
- * Standard resampler from [1]
- * Algorithm:
- *	Complexity O(n*log(n)) complexity required to sort the random draws made.
- *	This allows comparing of the two ordered lists w and ur.
- * Output:
- *  Presamples number of times this particle should be resampled
- *  uresamples number of unqiue particles (number of non zeros in Presamples)
- *  w becomes a normalised cumulative sum
- * Sideeffects:
- *  A draw is made from this instances 'random' for each particle
+ * Observation fusion directly from likelihood weights
+ * lw may be smaller then the number of particles. Weights for additional particles are assumed to be 1
+ * Pre : wir previous particle likelihood weights
+ * Post: wir fused (multiplicative) particle likehood weights 
  */
 {
-	assert (Presamples.size() == w.size());
-						// Normalised cumulative sum of likelihood weights, find smallest weight
-	Float wcum = 0.;
-	Float wmin = std::numeric_limits<Float>::max();
-	Vec::iterator wi, wi_end = w.end();
-	for (wi = w.begin(); wi != wi_end; ++wi) {
-		if (*wi < wmin) {
-			wmin = *wi;
-		}
-		wcum = *wi = wcum + *wi;
-	}
-	if (wmin < 0.)		// Bad weights
-		filter_error("negative weight");
-	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
-		filter_error("total likelihood zero");
-						// Any numerical failure should cascade into cummulative sum
-	if (wcum != wcum)
-		filter_error("total likelihood numerical error");
-
-						// Sorted uniform random distribution [0..1) for each resample
-	Vec ur(w.size());
-	random.uniform_01(ur);
-	std::sort (ur.begin(), ur.end());
-	assert(ur[0] >= 0. && ur[ur.size()-1] < 1.);		// Very bad if random is incorrect
-						// Scale ur to cummulative sum
-	ur *= wcum;
-
-						// Resamples based on cumulative weights from sorted resample random values
-	resamples_t::iterator pri = Presamples.begin();
-	wi = w.begin();
-	Vec::iterator ui = ur.begin(), ui_end = ur.end();
-	size_t unique = 0;
-
-	while (wi != wi_end)
-	{
-		size_t Pres = 0;			// assume P not resampled until find out otherwise
-		if (ui != ui_end && *ui < *wi)
-		{
-			++unique;
-			do						// count resamples
-			{
-				++Pres;
-				++ui;
-			} while (ui != ui_end && *ui < *wi);
-		}
+					// Weight Particles. Fused with previous weight
+	Vec::iterator wi = wir.begin();
+	Vec::const_iterator lw_end = lw.end();
+	for (Vec::const_iterator lw_i = lw.begin(); lw_i != lw_end; ++lw_i) {
+		*wi *= *lw_i;
 		++wi;
-		*pri++ = Pres;
 	}
-	assert(ui==ui_end); assert(pri==Presamples.end());
-
-	uresamples = unique;
-	return wmin / wcum;
+	wir_update = true;
 }
 
 
-SIR_filter::Float
-SIR_filter::systematic_resample (resamples_t& Presamples, size_t& uresamples, Vec& w) const
+void SIR_filter::copy_resamples (ColMatrix& P, const Importance_resampler::Resamples_t& presamples)
 /*
- * Systematic resample algorithm from [2]
- * Algorithm:
- *	Particles are chosesn from those whose cumulative weight intersect with an equidistant grid
- *	A uniform random draw is chosen to position the grid with the cumulative weights
- *	Complexity O(n)
- * Output:
- *  Presamples number of times this particle should be resampled
- *  uresamples number of unqiue particles (number of non zeros in Presamples)
- *  w becomes a normalised cumulative sum
- * Sideeffects:
- *  A single draw is made from this instances 'random'
- */
-{
-	size_t nParticles = Presamples.size();
-	assert (nParticles == w.size());
-						// Normalised cumulative sum of likelihood weights, find smallest weight
-	Float wcum = 0.;
-	Float wmin = std::numeric_limits<Float>::max();
-	Vec::iterator wi, wi_end = w.end();
-	for (wi = w.begin(); wi != wi_end; ++wi) {
-		if (*wi < wmin) {
-			wmin = *wi;
-		}
-		wcum = *wi = wcum + *wi;
-	}
-	if (wmin < 0.)		// Bad weights
-		filter_error("negative weight");
-	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
-		filter_error("total likelihood zero");
-						// Any numerical failure should cascade into cummulative sum
-	if (wcum != wcum)
-		filter_error("total likelihood numerical error");
-
-						// Stratified step
-	Float wstep = wcum / Float(nParticles);
-						
-	Vec ur(1);			// Single uniform for initialisation
-	random.uniform_01(ur);
-	assert(ur[0] >= 0. && ur[0] < 1.);		// Very bad if random is incorrect
-
-						// Resamples based on cumulative weights
-	resamples_t::iterator pri = Presamples.begin();
-	wi = w.begin();
-	size_t unique = 0;
-	Float s = ur[0] * wstep;	// Random initialisation
-
-	while (wi != wi_end)
-	{
-		size_t Pres = 0;			// assume P not resampled until find out otherwise
-		if (s < *wi)
-		{
-			++unique;
-			do						// count resamples
-			{
-				++Pres;
-				s += wstep;
-			} while (s < *wi);
-		}
-		++wi;
-		*pri++ = Pres;
-	}
-	assert(pri==Presamples.end());
-
-	uresamples = unique;
-	return wmin / wcum;
-}
-
-
-void SIR_filter::copy_resamples (ColMatrix& P, const resamples_t& Presamples)
-/*
- * Update P by selectively copying Presamples 
+ * Update P by selectively copying presamples 
  * Uses a in-place copying alogorithm
  * Algorithm: In-place copying
  *  First copy the live samples (those resampled) to end of P
@@ -308,8 +331,8 @@ void SIR_filter::copy_resamples (ColMatrix& P, const resamples_t& Presamples)
 {
 							// reverse_copy_if live
 	size_t si = P.size2(), livei = si;
-	resamples_t::const_reverse_iterator pri, pri_end = Presamples.rend();
-	for (pri = Presamples.rbegin(); pri != pri_end; ++pri) {
+	Importance_resampler::Resamples_t::const_reverse_iterator pri, pri_end = presamples.rend();
+	for (pri = presamples.rbegin(); pri != pri_end; ++pri) {
 		--si;
 		if (*pri > 0) {
 			--livei;
@@ -319,8 +342,8 @@ void SIR_filter::copy_resamples (ColMatrix& P, const resamples_t& Presamples)
 	assert(si == 0);
 							// Replicate live samples
 	si = 0;
-	resamples_t::const_iterator pi, pi_end = Presamples.end();
-	for (pi = Presamples.begin(); pi != pi_end; ++pi) {
+	Importance_resampler::Resamples_t::const_iterator pi, pi_end = presamples.end();
+	for (pi = presamples.begin(); pi != pi_end; ++pi) {
 		size_t res = *pi;
 		if (res > 0) {
 			do  {
@@ -392,7 +415,7 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 /*
  * SIR implementation of a Kalman filter
  */
-SIR_kalman_filter::SIR_kalman_filter (size_t x_size, size_t s_size, Random& random_helper) :
+SIR_kalman_filter::SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
 	SIR_filter(x_size, s_size, random_helper), Kalman_filter(x_size),
 	rough_random(random_helper),
 	rough(x_size,x_size, rough_random)
@@ -402,8 +425,9 @@ SIR_kalman_filter::SIR_kalman_filter (size_t x_size, size_t s_size, Random& rand
 
 void SIR_kalman_filter::init ()
 /*
- * Initialise sampling
- *		Post: S
+ * Initialise sampling from kalman statistics
+ *	Pre: x,X
+ *	Post: x,X,S
  */
 {
 						// Samples at mean
@@ -422,7 +446,7 @@ void SIR_kalman_filter::init ()
 	rough.init_GqG();
 	predict (rough);
 
-	SIR_filter::init(S);
+	SIR_filter::init();
 }
 
 
@@ -443,29 +467,25 @@ void SIR_kalman_filter::mean ()
 	x /= Float(S.size2());
 }
 
-void SIR_kalman_filter::covariance ()
+
+SIR_kalman_filter::Float
+ SIR_kalman_filter::update_resample (const Importance_resampler& resampler)
 /*
- * Update state mean and covariance
- *		Pre : S
- *		Post: x,X,S
- * See numerical note on update()
+ * Modified SIR_filter update implementation
+ *  update mean and covariance of sampled distribution with update_statistics
  */
 {
-	mean ();
-	X.clear();				// Covariance
+	Float lcond = SIR_filter::update_resample(resampler);	// Resample particles
 
-	const size_t nSamples = S.size2();
-	for (size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Si(S,i);
-		X.plus_assign (FM::outer_prod(Si, Si));
-	}
-	X /= Float(nSamples-1);
-	X.minus_assign (FM::outer_prod(x, x));
+	update_statistics();			// Estimate sample mean and covariance
+
+	// No assert_isPSD (X) as it may fail due to normal numerical circumstances
+	return lcond;
 }
 
-
-void SIR_kalman_filter::update (Float& lcond)
+void SIR_kalman_filter::update_statistics ()
 /*
+ * Update kalman statistics without resampling
  * Update mean and covariance of sampled distribution => mean and covariance of particles
  *		Pre : S (s_size >=1 enforced by state_filter base)
  *		Post: x,X,S	(X may be non PSD)
@@ -481,11 +501,16 @@ void SIR_kalman_filter::update (Float& lcond)
  *  Use with care and check the results of any algorithms relying on X
  */
 {
-	SIR_filter::update(lcond);	// Resample particles
+	mean ();
+	X.clear();				// Covariance
 
-	covariance();			// Estimate sample mean and covariance
-
-	// No assert_isPSD (X) as it may fail due to normal numerical circumstances
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		X.plus_assign (FM::outer_prod(Si, Si));
+	}
+	X /= Float(nSamples-1);
+	X.minus_assign (FM::outer_prod(x, x));
 }
 
 
@@ -508,7 +533,7 @@ void SIR_kalman_filter::roughen_correlated (ColMatrix& P, Float K)
 						// Scale variance by constant and state dimensions
 	Float VarScale = sqr(K) * pow (Float(P.size2()), -2./Float(x_size));
 
-	covariance();		// Estimate sample mean and covariance
+	update_statistics();	// Estimate sample mean and covariance
 
 						// Decorrelate states
 	Matrix UD(x_size,x_size);

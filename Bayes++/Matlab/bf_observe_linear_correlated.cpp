@@ -10,7 +10,7 @@
  */
 
 #include <mex.h>
-#include "bfilter.h"
+#include "matlabBfilter.h"
 
 using namespace::Matlab_convert;
 
@@ -67,7 +67,7 @@ void mexFunction(
 		if (Bayesian_filter::Sample_filter* f = dynamic_cast<Bayesian_filter::Sample_filter*>(filter)) {
 			bFilterOp = true;
 			f->observe (model, z);
-			f->update (rcond);
+			rcond = f->update_resample ();
 		}
 		else
 		if (Bayesian_filter::Linrz_filter* f = dynamic_cast<Bayesian_filter::Linrz_filter*>(filter)) {

@@ -128,7 +128,7 @@ inline Vec::value_type mult_SPD (const Vec& x, const SymMatrix& S)
 	Vec::const_iterator xi = x.begin();
 	for (SymMatrix::const_iterator1 Si = S.begin1(); Si != S.end1(); ++Si, ++xi)
 	{
-		p += *xi * ublas::inner_prod(SymMatrix::row(Si), x);
+		p += *xi * ublas::inner_prod(SymMatrix::rowi(Si), x);
 	}
 	return p;
 }
@@ -197,7 +197,7 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
 		for (; Xb != Xend; ++Xb,++Pab)
 		{
 			SymMatrix::value_type p = *Pab;				// Simply multiple row Xa by row Xb
-			p += ublas::inner_prod( MatrixX::row(Xa), MatrixX::row(Xb) );
+			p += ublas::inner_prod( MatrixX::rowi(Xa), MatrixX::rowi(Xb) );
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
@@ -221,12 +221,12 @@ void mult_SPD (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 
 	for (; Xa != Xend; ++Xa,++Pa)			// Iterate Rows
 	{
-		stemp.assign( ublas::prod(S, MatrixX::row(Xa)) );			// treated as a column vector
+		stemp.assign( ublas::prod(S, MatrixX::rowi(Xa)) );			// treated as a column vector
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required
 		SymMatrix::iterator2 Pab= Pa.begin();
 		for (; Xb!= Xend; ++Xb,++Pab)
 		{
-			SymMatrix::value_type p = *Pab + ublas::inner_prod(stemp, MatrixX::row(Xb));
+			SymMatrix::value_type p = *Pab + ublas::inner_prod(stemp, MatrixX::rowi(Xb));
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
@@ -251,12 +251,12 @@ void mult_SPDT (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 
 	for (; Xa != Xend; ++Xa,++Pa)			// Iterate Rows
 	{
-		stemp = ublas::prod(S, MatrixX::column(Xa));			// treated as a column vector
+		stemp = ublas::prod(S, MatrixX::columni(Xa));			// treated as a column vector
 		Xb = Xa;							// Start at the column Xa, only one triangle of symertric result required
 		SymMatrix::iterator2 Pab= Pa.begin();
 		for (; Xb != Xend; ++Xb,++Pab)
 		{
-			SymMatrix::value_type p = *Pab + ublas::inner_prod(stemp, MatrixX::column(Xb));
+			SymMatrix::value_type p = *Pab + ublas::inner_prod(stemp, MatrixX::columni(Xb));
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
@@ -311,7 +311,7 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 		for (; Xb != Xend; ++Xb,++Pab)
 		{
 			SymMatrix::value_type p = *Pab;				// Simply multiple col Xa by col Xb
-			p += ublas::inner_prod( MatrixX::column(Xa), MatrixX::column(Xb) );
+			p += ublas::inner_prod( MatrixX::columni(Xa), MatrixX::columni(Xb) );
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}

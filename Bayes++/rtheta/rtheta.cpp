@@ -59,7 +59,7 @@ inline scalar sqr(scalar x)
 }
 
 // Random numbers for filters from Boost
-class Boost_random : public SIR_filter::Random
+class Boost_random : public SIR_random
 /*
  * Random number distributions
  */
@@ -341,12 +341,11 @@ class Filter<SIR_kalman_filter> : public SIR_kalman_filter
 {
 public:
 	Filter (const Vec& x_init, const SymMatrix& X_init);
-	virtual Float weighted_resample (resamples_t& Presamples, unsigned& uresamples, FM::Vec& w) const
-	{		// Choose a resampler
-		return systematic_resample(Presamples, uresamples, w);
+	Float update_resample ()
+	// Modifiy Default SIR_filter update
+	{
+		return SIR_filter::update_resample (Systematic_resampler());
 	}
-
-
 };
 
 Filter<SIR_kalman_filter>::Filter (const Vec& x_init, const SymMatrix& X_init)

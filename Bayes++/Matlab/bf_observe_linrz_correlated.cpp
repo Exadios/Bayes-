@@ -10,7 +10,7 @@
  */
 
 #include <mex.h>
-#include "bfilter.h"
+#include "matlabBfilter.h"
 
 using namespace::Matlab_convert;
 

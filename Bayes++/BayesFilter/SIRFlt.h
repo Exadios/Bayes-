@@ -13,8 +13,6 @@
  * Sampling Importance Resampleing Filter.
  *  Bootstrap filter as an Abstract class
  *
- * Bootstap filter (Sequential Importance Resampleing).
- *
  * References
  *  [1] "Novel approach to nonlinear-non-Guassian Bayesian state estimation"
  *   NJ Gordon, DJ Salmond, AFM Smith IEE Proceeding-F Vol.140 No.2 April 1993
@@ -48,38 +46,88 @@
 namespace Bayesian_filter
 {
 
+struct SIR_random
+/* Random number generators interface
+ *  Helper to allow polymorthic use of random number generators 
+ */
+{
+	virtual void normal(FM::Vec& v) = 0;
+	virtual void uniform_01(FM::Vec& v) = 0;
+};
+
+
+class Importance_resampler : public Bayes_base
+/*
+ * Importance resampler
+ *  Represents a function that computes the posterior resampling baes on importance weights
+ *  Polymorphic function object use to parameterise the resampling operation
+ */
+{
+public:
+	typedef std::vector<size_t> Resamples_t;	// resampling counts
+
+	virtual Float resample (Resamples_t& presamples, size_t& uresamples, FM::Vec& w, SIR_random& r) const = 0;
+	/*
+	 * The resampling function
+	 *  Weights w are proportional to the posterior Likelihood of a state
+	 * Sideeffect
+	 *  w becomes a normalised cumulative sum
+	 *  Random draws can be made from 'r'
+	 *
+	 * Exceptions:
+	 *  bayes_filter_exception for numerical problems with weights including
+	 *   any w < 0, all w == 0
+	 * Return
+	 *	lcond, smallest normalised weight, represents conditioning of resampling solution
+	 *	presamples: posterior resample, the number of times each sample should appear posterior baes on it weight
+	 *  uresample: the number of unique resamples in the posterior == number of non zero elements in presamples
+	 * Preconditions
+	 *  wresample,w must have same size
+	 */
+};
+
+class Standard_resampler : public Importance_resampler
+// Standard resample algorithm from [1]
+{
+	Float resample (Resamples_t& presamples, size_t& uresamples, FM::Vec& w, SIR_random& r) const;
+};
+
+class Systematic_resampler : public Importance_resampler
+// Systematic resample algorithm from [2]
+{
+	Float resample (Resamples_t& presamples, size_t& uresamples, FM::Vec& w, SIR_random& r) const;
+};
+
+
 class SIR_filter : public Sample_filter
 /*
  * Sampling Importance Resampleing Filter.
- *  A stochastic sample := a sample with a unqiue stochastic history other then roughening
+ *  Implement a general form of SIR filter.
+ *  Importance resampling is delayed until an update is required. The sampler used
+ *  is a parameter of update to allow a wide variety of usage.
+ *  A stochastic sample is defined as a sample with a unqiue stochastic history other then roughening
  */
 {
 	friend class SIR_kalman_filter;
 public:
 	size_t stochastic_samples;	// Number of stochastic samples in S
-	typedef std::vector<size_t> resamples_t;	// resampling counts
 
-	struct Random
-	/* Random number generators interface
-	 *  Helper to allow polymorthic use of random number generators 
-	 */
-	{
-		virtual void normal(FM::Vec& v) = 0;
-		virtual void uniform_01(FM::Vec& v) = 0;
-	};
-
-	SIR_filter (size_t x_size, size_t s_size, Random& random_helper);
+	SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper);
 	SIR_filter& operator= (const SIR_filter&);
 	// Optimise copy assignment to only copy filter state
 
 	/* Specialisations for filter algorithm */
-	void init (const FM::ColMatrix& S);
+	void init ();
 
-	void update (Float& lcond);
-	/* Resample particles using weights and roughen
-	 *  Return: lcond smallest normalised weight, represents conditioning of resampling solution
-	 *          lcond == 1. if no resampling preformed
-	 *			This should by multipled by the number of samples to get the Likelihood function conditioning
+	Float update_resample ()
+	// Default resampling update
+	{
+		return update_resample (Standard_resampler());
+	}
+
+	virtual Float update_resample (const Importance_resampler& resampler);
+	/* Update: resample particles using weights and then roughen
+	 *  Return: lcond
 	 */
 
 	void predict (Sampled_predict_model& f);
@@ -88,6 +136,9 @@ public:
 	void observe (Likelihood_observe_model& h, const FM::Vec& z);
 	// Weight particles using likelihood model h and z
 
+	void observe_likelihood (const FM::Vec& lw);
+	// Observation fusion directly from likelihood weights
+
 	Float rougheningK;			// Current roughening value (0 implies no roughening)
 	virtual void roughen()
 	{	// Generalised roughening:  Default to roughen_minmax
@@ -95,73 +146,51 @@ public:
 			roughen_minmax (S, rougheningK);
 	}
 
-	virtual Float weighted_resample (resamples_t& Presamples, size_t& uresamples, FM::Vec& w) const
-	/*
-	* Resample from P(rior) using on importance weights w
-	*  Weights w are proportional to the posterior Likelihood of the state represented by a particle
-	*  Selects particles from priot to represent the posterior distribution based on their weights w
-	* Sideeffect
-	*  w becomes a normalised cumulative sum
-	*  Draws are made from this instances 'random'
-	*
-	* Exceptions:
-	*  bayes_filter_exception for numerical problems with weights including
-	*   any w < 0, all w == 0
-	* Return
-	*	Smallest normalised weight, represents conditioning of resampling solution
-	*	Presamples: the number of times each sample in P is resampled in posterior
-	*   uresample: the number of unique resamples in the posterior == number of non zero elements in Presamples
-	* Preconditions
-	*  Presample,w must  have same size
-	*/
-	{				// Default to use standard resample algorithm from [1]
-		return standard_resample(Presamples, uresamples, w);
-	}
+	static void copy_resamples (FM::ColMatrix& P, const Importance_resampler::Resamples_t& presamples);
+	// Update P by selectively copying based on presamples 
 
-	Float standard_resample (resamples_t& Presamples, size_t& uresamples, FM::Vec& w) const;
-	// Standard resample algorithm from [1]
+	SIR_random& random;			// Reference random number generator helper
 
-	Float systematic_resample (resamples_t& Presamples, size_t& uresamples, FM::Vec& w) const;
-	// Systematic resample algorithm from [2]
-
-	static void copy_resamples (FM::ColMatrix& P, const resamples_t& Presamples);
-	// Update P by selectively copying Presamples 
-
-protected:			   		// Permenantly allocated temps
+protected:
 	void roughen_minmax (FM::ColMatrix& P, Float K) const;	// Roughening using minmax of P distribution
-	resamples_t resamples;		// resampling counts
+	Importance_resampler::Resamples_t resamples;		// resampling counts
 	FM::Vec wir;				// resamping weights
 	bool wir_update;			// weights have been updated requring a resampling on update
 private:
 	static const Float rougheningKinit;
-	Random& random;		// Reference Random number generator
 	size_t x_size;
 };
+
 
 
 class SIR_kalman_filter : public SIR_filter, public Kalman_filter
 /*
  * SIR implementation of a Kalman filter
- * Note: 
- *  Provided same interface but is not a Sample_filter, samples only used for layered implementation
+ *  Updates Kalman statistics of SIR_filter
+ *  These statistics are use to provide a specialised correlated roughening procedure
  */
 {
 public:
 	using Kalman_filter::x;
-	SIR_kalman_filter (size_t x_size, size_t s_size, Random& random_helper);
+	SIR_kalman_filter (size_t x_size, size_t s_size, SIR_random& random_helper);
 
 	/* Specialisations for filter algorithm */
-	void init ();
-	void update ()
-	// Modified update with correlated roughening
+	void Kalman_filter::init();
+	// Initialisation from kalman statistics
+
+	// Init from S is already defined by SIR_filter
+
+	virtual void update ()
+	// Implement Default Kalman_filter update
 	{
-		Float lcond_ignore;
-		update (lcond_ignore);
+		Float ignore_lcond = SIR_filter::update_resample();
 	}
 
-	void update (Float& lcond);
-	// Modified update with correlated roughening
+	Float update_resample (const Importance_resampler& resampler);
+	// Modified SIR_filter update implementation: update mean and covariance of sampled distribution
 
+	void update_statistics ();
+	// Update kalman statistics without resampling
 
 	void roughen()
 	{	// Specialised correlated roughening
@@ -176,7 +205,7 @@ protected:
 	class Roughen_random : public General_LiAd_predict_model::Random
 	{
 	public:
-		Roughen_random(SIR_filter::Random& random_helper) :
+		Roughen_random(SIR_random& random_helper) :
 			random(random_helper)
 		{}
 		virtual void normal(FM::Vec& v)
@@ -185,13 +214,12 @@ protected:
 		}
 	
 	private:
-		SIR_filter::Random& random;
+		SIR_random& random;
 	} rough_random;
 	General_LiAd_predict_model rough;
 private:
 	static Float scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& S);
 	void mean();
-	void covariance();
 };
 
 

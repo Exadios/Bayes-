@@ -14,21 +14,25 @@ Global
 		SccProjectName0 = --\u0020using\u0020Perforce\u0020--
 		SccLocalPath0 = .
 		SccProvider0 = MSSCCI:Perforce\u0020SCM
+		CanCheckoutShared = true
 		SccProjectFilePathRelativizedFromConnection0 = VClib\\
 		SccProjectUniqueName1 = Simple\\simple.vcproj
 		SccProjectName1 = --\u0020using\u0020Perforce\u0020--
 		SccLocalPath1 = .
 		SccProvider1 = MSSCCI:Perforce\u0020SCM
+		CanCheckoutShared = true
 		SccProjectFilePathRelativizedFromConnection1 = Simple\\
 		SccProjectUniqueName2 = PV\\PV.vcproj
 		SccProjectName2 = --\u0020using\u0020Perforce\u0020--
 		SccLocalPath2 = .
 		SccProvider2 = MSSCCI:Perforce\u0020SCM
+		CanCheckoutShared = true
 		SccProjectFilePathRelativizedFromConnection2 = PV\\
 		SccProjectUniqueName3 = Quadradtic\u0020Calib\\Quadradtic\u0020Calib.vcproj
 		SccProjectName3 = --\u0020using\u0020Perforce\u0020--
 		SccLocalPath3 = .
 		SccProvider3 = MSSCCI:Perforce\u0020SCM
+		CanCheckoutShared = true
 		SccProjectFilePathRelativizedFromConnection3 = Quadradtic\u0020Calib\\
 	EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
@@ -58,7 +62,8 @@ Global
 		{B26C5558-9DDE-4CB9-922B-B7F6AC25BB7F}.uBLAS Release.Build.0 = uBLAS Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionItems) = postSolution
-		Item:1 = Bayesian Filtering Classes.htm
+		Item:1 = Bayes++.htm
+		Item:2 = Bayesian Filtering Classes.htm
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

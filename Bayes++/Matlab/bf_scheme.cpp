@@ -6,10 +6,10 @@
 
 /*
  * MATLAB MEX interface for Bayes++
- *  bf_scheme: Constuct a Bayes++ filter scheme and return its handle
+ *  bf_scheme: Construct a Bayes++ filter scheme and return its handle
  */
 
-#include "bfilter.h"
+#include "matlabBfilter.h"
 
 using namespace::Matlab_convert;
 
@@ -109,7 +109,7 @@ Bf_maker::Filter
 	// Use a temporary filter to create samples
 	Bayesian_filter::SIR_kalman_filter tempS(f->S.size1(), f->S.size2(), randomHelper);
 	tempS.init_kalman (init_x,init_X);
-	f->init(tempS.S);
+	f->init_sample(tempS.S);
 				// Overide filter default
 	if (rougheningK != -1.)
 		f->rougheningK = rougheningK;

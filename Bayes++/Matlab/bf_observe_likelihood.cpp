@@ -10,7 +10,7 @@
  */
 
 #include <mex.h>
-#include "bfilter.h"
+#include "matlabBfilter.h"
 
 using namespace::Matlab_convert;
 
@@ -103,7 +103,7 @@ void mexFunction(
 					// Observe filter using Matlab function
 		double lcond;
 		f->observe(model, z);
-		f->update (lcond);
+		lcond = f->update_resample();
 				
 		if (nlhs == 1)		// Optional return value
 			plhs[0] = Array(lcond);

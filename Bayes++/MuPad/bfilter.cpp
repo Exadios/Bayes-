@@ -52,13 +52,13 @@ void MuFilter::checkdef(const Bayesian_filter::Bayes_filter_base* derived) const
 
 struct Mu_SIR : public MuFilter, public Bayesian_filter::SIR_filter
 {
-	Mu_SIR(unsigned x, unsigned s, Bayesian_filter::SIR_filter::Random& r) :
+	Mu_SIR(unsigned x, unsigned s, Bayesian_filter::SIR_random& r) :
 		SIR_filter(x,s,r) {}
 };
 
 struct Mu_SIR_kalman : public MuFilter, public Bayesian_filter::SIR_kalman_filter
 {
-	Mu_SIR_kalman(unsigned x, unsigned s, Bayesian_filter::SIR_kalman_filter::Random& r) :
+	Mu_SIR_kalman(unsigned x, unsigned s, Bayesian_filter::SIR_random& r) :
 		SIR_kalman_filter(x,s,r) {}
 };
 
