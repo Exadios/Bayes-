@@ -92,7 +92,7 @@ bool isSymmetric (const Matrix &M)
 	std::size_t size = M.size1();
 	for (std::size_t r = 0; r < size; ++r) {
 		for (std::size_t c = 0; c <= r; ++c) {
-			if( M(r,c) != M(c,r) ) {
+			if (M(r,c) != M(c,r)) {
 				bSym = false;
 			}
 		}
