@@ -20,54 +20,14 @@
  */
  
 // Common headers required for declerations
-#include <exception>
-#include "matSupSub.hpp"	// matrix filter support subsystem
+#include "bayesException.hpp"	// exception types
+#include "matSupSub.hpp"			// matrix support subsystem
 
 /* Filter namespace */
 namespace Bayesian_filter
 {
 	// Allow use of a short name for matrix namespace
 	namespace FM = Bayesian_filter_matrix;
-
-
-class Filter_exception : public std::exception
-/*
- *	Base class for all exception produced by filter heirachy
- */
-{
-public:
-	const char *what() const throw()
-	{	return error_description;
-	}
-protected:
-	Filter_exception (const char* description)
-	{	error_description = description;
-	};
-private:
-	const char* error_description;
-};
-
-class Logic_exception : public Filter_exception
-/*
- * Logic Exception
- */
-{
-public:
-	Logic_exception (const char* description) :
-		Filter_exception (description)
-	{};
-};
-
-class Numeric_exception : public Filter_exception
-/*
- * Numeric Exception
- */
-{
-public:
-	Numeric_exception (const char* description) :
-		Filter_exception (description)
-	{};
-};
 
 
 /*
