@@ -173,7 +173,7 @@ Fast_SLAM::Float
 		wir_update = false;
 									// Update S bases on resampling, and init filter
 		L.copy_resamples (L.S, presamples);
-		L.init();
+		L.init_S ();
 									// Propogate resampling to All features
 		FeatureCondMap fmr(nparticles);		// Resampled feature map
 		for (AllFeature::iterator fi = M.begin(); fi != M.end(); ++fi)	// All Features
@@ -192,7 +192,7 @@ Fast_SLAM::Float
 			fm = fmr;				// Copy in resamples feature map
 		}
 
-		L.roughen();				// Roughen location
+		L.roughen ();				// Roughen location
 		L.stochastic_samples = R_unique;
 		return lcond;
 	}

@@ -92,13 +92,28 @@ struct SLAMDemo
 		mutable FM::Vec t;
 	};
 
-	class Kalman_statistics : public BF::Kalman_state_filter
+	struct Kalman_statistics : public BF::Kalman_state_filter
 	// Kalman_statistics without any filtering
-	{	public:
+	{
 		Kalman_statistics (size_t x_size) : Kalman_state_filter(x_size) {}
 		void init() {}
 		void update() {}
 	};
+
+	template <class Filter>
+	struct Full_manager : public Full_filter
+	// Generate and dispose of predefined filter types
+	{
+		Filter_type* generate( unsigned full_size )
+		{
+			return new Filter(full_size);
+		}
+		void dispose( Filter_type* filter )
+		{
+			delete filter;
+		}
+	};
+
 
 	void display( const std::string label, const BF::Kalman_state_filter& stats)
 	{
@@ -141,14 +156,14 @@ void SLAMDemo::OneDExperiment()
 	true1.sub_range(0,nL) = x_init; true1[nL] = 70.;
 	FM::Vec z(1);
 
-	// Kalman_SLAM filter: ISSUE Use Covariance for resize
-	BF::Covariance_scheme full_filter(nL);
-	full_filter.x.clear(); full_filter.X.clear();
-	full_filter.x[0] = x_init[0];
-	full_filter.X(0,0) = X_init(0,0);
-	full_filter.init();
 
-	Kalman_SLAM kalm (full_filter);
+	// Kalman_SLAM filter:
+	Full_manager<BF::Covariance_scheme> full_filter;
+
+	Kalman_SLAM kalm (nL, full_filter);
+	kalm.full->x = x_init;
+	kalm.full->X = X_init;
+	kalm.full->init();
 
 	// Fast_SLAM filter
 #ifdef NDEBUG
@@ -173,44 +188,44 @@ void SLAMDemo::OneDExperiment()
 	kalm.observe_new (1, observe_new1, z);
 	fast.observe_new (1, observe_new1, z);
 
-	kalm.update(); display("Feature Kalm", full_filter);
 	fast.update(); fast.statistics_sparse(stat); display("Feature Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Feature Kalm", stat);
 
 	// Predict the filter forward
-	full_filter.predict (all_predict);
-	kalm.update(); display("Predict Kalm", full_filter);
 	fast_location.predict (location_predict);
+	kalm.full->predict (all_predict);
 	fast.update(); fast.statistics_sparse(stat); display("Predict Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Predict Kalm", stat);
 
 	// Observation feature 0
 	z = observe0.h(true0);
 	z[0] += 0.5;			// Observe a relative position between location and map landmark
-	kalm.observe( 0, observe0, z );
-	kalm.update(); display("ObserveA Kalm", full_filter);
 	fast.observe( 0, observe0, z );
+	kalm.observe( 0, observe0, z );
 	fast.update(); fast.statistics_sparse(stat); display("ObserveA Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("ObserveA Kalm", stat);
 
 	// Observation feature 1
 	z = observe1.h(true1);
 	z[0] += 1.0;			// Observe a relative position between location and map landmark
-	kalm.observe( 1, observe1, z );
-	kalm.update(); display("ObserveB Kalm", full_filter);
 	fast.observe( 1, observe1, z );
+	kalm.observe( 1, observe1, z );
 	fast.update(); fast.statistics_sparse(stat); display("ObserveB Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("ObserveB Kalm", stat);
 
 	// Observation feature 0
 	z = observe0.h(true0);
 	z[0] += 0.5;			// Observe a relative position between location and map landmark
-	kalm.observe( 0, observe0, z );
-	kalm.update(); display("ObserveC Kalm", full_filter);
 	fast.observe( 0, observe0, z );
+	kalm.observe( 0, observe0, z );
 	fast.update(); fast.statistics_sparse(stat); display("ObserveC Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("ObserveC Kalm", stat);
 
 	// Forget feature 0
-	kalm.forget(0);
-	kalm.update(); display("Forget Kalm", full_filter);
 	fast.forget(0);
+	kalm.forget(0);
 	fast.update(); fast.statistics_sparse(stat); display("Forget Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Forget Kalm", stat);
 }
 
 
@@ -248,12 +263,12 @@ void SLAMDemo::InformationLossExperiment()
 	FM::Vec z(1);
 
 	// Kalman_SLAM filter
-	BF::Unscented_scheme full_filter(nL+nM);
-	full_filter.x.clear(); full_filter.X.clear();
-	full_filter.x[0] = x_init[0];
-	full_filter.X(0,0) = X_init(0,0);
-	full_filter.init();
-	Kalman_SLAM kalm (full_filter);
+	Full_manager<BF::Unscented_scheme> full_filter;
+
+	Kalman_SLAM kalm (nL, full_filter);
+	kalm.full->x = x_init;
+	kalm.full->X = X_init;
+	kalm.full->init();
 
 	// Fast_SLAM filter
 	unsigned nParticles = 1000;
@@ -282,7 +297,7 @@ void SLAMDemo::InformationLossExperiment()
 		// Groups of observations without resampling
 		{
 			// Predict the filter forward
-			full_filter.predict (all_predict);
+			kalm.full->predict (all_predict);
 			fast_location.predict (location_predict);
 
 			// Observation feature 0 with bias
@@ -292,7 +307,7 @@ void SLAMDemo::InformationLossExperiment()
 			fast.observe( 0, observe0, z );
 
 			// Predict the filter forward
-			full_filter.predict (all_predict);
+			kalm.full->predict (all_predict);
 			fast_location.predict (location_predict);
 
 			// Observation feature 1 with bias
@@ -306,7 +321,7 @@ void SLAMDemo::InformationLossExperiment()
 		kalm.update();
 		fast.update();
 		
-		display("Kalm", full_filter);
+		kalm.statistics_sparse(stat); display("Kalm", stat);
 		fast.statistics_sparse(stat); display("Fast", stat);
 		std::cout << fast_location.stochastic_samples <<','<< fast_location.unique_samples()
 			<<' '<< fast.feature_unique_samples(0) <<','<< fast.feature_unique_samples(1) <<std::endl;
