@@ -38,11 +38,11 @@ Bayes_base::Float
  * Extended linrz correlated observe, compute innovation for observe_innovation
  */
 {
-	FM::Vec zp = h.h(x);	// Observation model
-	h.normalise(zp, z);
+	FM::Vec s = h.h(x);		// Observation model, s is predicted observation
+	h.normalise(s, z);
 
-	zp.assign (z-zp);	// Innovation
-	return observe_innovation (h, zp);
+	s.assign (z-s);		// Innovation s
+	return observe_innovation (h, s);
 }
 
 Bayes_base::Float
@@ -51,11 +51,11 @@ Bayes_base::Float
  * Extended linrz uncorrelated observe, compute innovation for observe_innovation
  */
 {
-	FM::Vec zp = h.h(x);	// Observation model
-	h.normalise(zp, z);
+	FM::Vec s = h.h(x);		// Observation model, s is predicted observation
+	h.normalise(s, z);
 
-	zp.assign (z-zp);	// Innovation
-	return observe_innovation (h, zp);
+	s.assign (z-s);		// Innovation s
+	return observe_innovation (h, s);
 }
 
 
