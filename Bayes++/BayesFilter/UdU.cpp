@@ -587,18 +587,31 @@ bool UTinverse (UTriMatrix& U)
 	assert (size == U.size2());
 
 	bool singular = false;
-	UTriMatrix UI(size,size);	// ISSUE Temporay matrix
-	identity(UI);
+	// Invert U in place
+	if (size > 0)
+	{
+		size_t i = size-1;
+		do {
+			UTriMatrix::Row Ui(U,i);
+			UTriMatrix::value_type d = Ui[i];
+			if (d == 0.)
+			{
+				singular = true;
+				break;
+			}
+			d = 1./d;
+			Ui[i] = d;
 
-	// Thanks to Joerg boost 1.30.0 has a very nice inplace_solve
-	try {
-		ublas::inplace_solve (U, UI, ublas::upper_tag());
-	}
-	catch (ublas::singular) {
-		singular = true;
+			for (size_t j = size-1; j > i; --j)
+			{
+				UTriMatrix::value_type e = 0.;
+				for (size_t k = i; k < j; ++k)
+					e -= Ui[k] * U(k,j);
+				Ui[j] = e*U(j,j);
+			}
+		} while (i-- > 0.);
 	}
 
-	U = UI;
 	return singular;
 }
 

@@ -9,7 +9,8 @@
 
 /*
  * Matrix types for filter classes
- *  Replace this header to replace matrix support functions
+ *  Provides the predefined type 'Vec' and a variety of 'Matrix' types
+ *  Replace this header to substitute alternative matrix support
  *
  * Everything in namespace Bayes_filter_matrix is intended to support the matrix storage
  * and algebra requirements of the library. Therefore the interfaces and implementation is
@@ -21,7 +22,6 @@
  * That is boost::numeric::ublas
  *  Thanks to Joerg Walter and Mathias Koch for an excellent library!
  *
- * Provides predefined types Vec and a variety of Matrix types
  *
  * Sparse support: The macros BAYES_FILTER_(SPARSE/COMPRESSED/COORDINATE) control experimental sparse matrix support
  * These simply replace the default storage types with their sparse equivilents
@@ -32,16 +32,6 @@
 #error Requires Boost 1.30.0 or later
 #endif
 
-// Element proxies have a colourful history! They are not required by Bayes++
-// As of Boost 1.30.0 they do not allow mixed assignment of elements, and must be disabled
-#define BOOST_UBLAS_NO_ELEMENT_PROXIES
-
-// Required to allow access to all elements of triangular matrices
-#define BOOST_UBLAS_REFERENCE_CONST_MEMBER
-
-// Singularity is a numerical issue. Thanks to Joerg we can enable runtime exceptions
-#define BOOST_UBLAS_USE_EXCEPTIONS
-#define BOOST_UBLAS_SINGULAR_CHECK
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
