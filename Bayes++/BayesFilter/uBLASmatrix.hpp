@@ -223,13 +223,13 @@ public:
 		return *this;
 	}
 
-	// User defined conversions straight to a FMMatrix, equivilent to a RowMatrix types
-	operator const FMMatrix<MatrixBase>& () const
+	// Conversions straight to a FMMatrix, equivilent to a RowMatrix types
+	const FMMatrix<MatrixBase>& asRowMatrix() const
 	{
 		return static_cast<const FMMatrix<MatrixBase>& >(member);
 	}
-	operator FMMatrix<MatrixBase>& ()
-	{	
+	FMMatrix<MatrixBase>& asRowMatrix()
+	{
 		return static_cast<FMMatrix<MatrixBase>& >(member);
 	}
 

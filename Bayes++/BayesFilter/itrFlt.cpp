@@ -94,9 +94,6 @@ Bayes_base::Float
  */
 {
 						// ISSUE: Implement simplified uncorrelated noise equations
-	size_t z_size = z.size();
-	SymMatrix Z(z_size,z_size);
-	
 	Adapted_Linrz_correlated_observe_model hh(h);
 	return observe (hh, z);
 }
@@ -115,10 +112,10 @@ Bayes_base::Float
 	size_t z_size = z.size();
 	SymMatrix ZI(z_size,z_size);
 
-						// Dynamic sizing
+							// Dynamic sizing
 	observe_size (z.size());
 
-	Vec xpred = x;				// Initialise iteration
+	Vec xpred = x;			// Initialise iteration
 	SymMatrix Xpred = X;
 							// Inverse predicted covariance
 	SymMatrix XpredI(x_size,x_size);
@@ -132,27 +129,27 @@ Bayes_base::Float
 	RowMatrix HxXtemp(h.Hx.size1(),X.size2());
 	RowMatrix temp1(x_size,x_size), temp2(x_size,z_size);
 	SymMatrix temp3(x_size,x_size);
+// Initialise Hx using iterated model here
 	do {
 		const Vec& zp = h.h(x);		// Observation model
-//TODO This has to result in a recompute of h.Hx
 		HxT.assign (trans(h.Hx));
-									// Innovation
+							// Innovation
 		h.normalise(s = z, zp);
 		s.minus_assign (zp);
-									// Innovation covariance
+							// Innovation covariance
 		S = prod_SPD(h.Hx, Xpred, HxXtemp) + h.Z;
-
 							// Inverse innovation covariance
 		rcond = UdUinversePD (SI, S);
 		rclimit.check_PD(rcond, "S not PD in observe");
 
 							// Iterative observe
 		temp3.assign (prod_SPD(HxT,SI, temp2));
-		X = Xpred - prod_SPD (Xpred, temp3, temp1);
+		temp1.assign (prod(Xpred,temp3));
+		X.assign (Xpred - prod(temp1,Xpred));
 //TODO X is wrong and somestimes even not PSD
 //TODO check maybe should be also at runtime
 		assert_isPSD (X);
-
+							// New state iteration
 		temp2.assign (prod(X,HxT));
 		temp1.assign (prod(X,XpredI));
 		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));

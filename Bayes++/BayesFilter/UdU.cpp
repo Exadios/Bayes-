@@ -358,7 +358,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 	}
 
 	// Estimate the reciprocal condition number
-	return UdUrcond (static_cast<const RowMatrix&>(M));
+	return UdUrcond (RowMatrix(M));		// ISSUE Requires creation of temporary RowMatrix
 
 Negative:
    return -1.;
@@ -771,7 +771,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
  */
 {
 					// Abuse as a RowMatrix
-	RowMatrix& M_Matrix = static_cast<RowMatrix&>(M);
+	RowMatrix& M_Matrix = M.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
@@ -787,7 +787,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM)
  */
 {
 					// Abuse as a RowMatrix
-	RowMatrix& M_Matrix = static_cast<RowMatrix&>(M);
+	RowMatrix& M_Matrix = M.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
@@ -812,7 +812,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	RowMatrix& MI_Matrix = static_cast<RowMatrix&>(MI);
+	RowMatrix& MI_Matrix = MI.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
@@ -829,8 +829,8 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, SymMatrix::value_type& detM, 
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	const RowMatrix& M_Matrix = static_cast<const RowMatrix&>(M);
-	RowMatrix& MI_Matrix = static_cast<RowMatrix&>(MI);
+	const RowMatrix& M_Matrix = M.asRowMatrix();
+	RowMatrix& MI_Matrix = MI.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {

@@ -565,7 +565,7 @@ int main()
 	std::cout << "sfilter, itfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
 //	CCompare<Filter<SIR_kalman_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
-//	CCompare<Filter<Covariance_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
+	CCompare<Filter<Covariance_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	return 0;
