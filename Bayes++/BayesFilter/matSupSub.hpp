@@ -59,7 +59,7 @@
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {
-						// Allow use of ublas
+						// Allow use of a local ublas namespace
 namespace ublas = boost::numeric::ublas;
 
 /*

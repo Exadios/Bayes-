@@ -24,8 +24,7 @@
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {
-						// Allow use a few functions in own namespace
-namespace ublas = boost::numeric::ublas;
+						// Allow use a few functions in own namespace (particular useful for compilers with Konig lookup)
 using ublas::row;
 using ublas::column;
 using ublas::trans;
