@@ -1,4 +1,1 @@
 # Bayes++ project root - See Boost.build v2
-
-# Target output in Project Root
-ALL_LOCATE_TARGET ?= target ;

@@ -2,7 +2,7 @@
 # BayesFilter - The Bayesian filtering library
 
 # Propagated usage requirements
-project
+project BayesFilter
      : usage-requirements <include>".."
      : default-build release
 ;
@@ -12,16 +12,7 @@ CPP_SOURCES =
     bayesFlt bayesFltAlg matSup UdU covFlt infFlt infRtFlt itrFlt SIRFlt UDFlt unsFlt CIFlt ;
 
 # Declare the BayesFilter static link library
-lib BayesFilter : $(CPP_SOURCES).cpp
+lib BayesFilterLib : $(CPP_SOURCES).cpp
     : <link>static
-#    <toolset>gcc:<cxxflags>"-pedantic"	# Pedantic make a lot of noise with GCC2.95.3 in Boost headers because of long long
+#    <toolset>gcc <cxxflags>"-pedantic"	# Pedantic make a lot of noise with GCC2.95.3 in Boost headers because of long long
 ;
-
-#lib BayesFilter
-#      :
-#      : <file>bayesfilter.a <variant>release
-#      ;
-#lib BayesFilter
-#      :
-#      : <file>bayesfilterd.a <variant>debug
-#      ;

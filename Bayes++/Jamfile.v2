@@ -4,16 +4,30 @@
 # The project root simply build all the subprojects:
 #    BayesFilter library, and the examples.
 
-echo ZZZ $(BOOST_BASE) ;
-
 build-project BayesFilter ;
 build-project Simple ;
 build-project PV ;
 build-project QuadCalib ;
 
-
 # Project requirements
+BOOST_ROOT ?= "../boost_1_30_0" ;
+echo BOOST_ROOT $(BOOST_ROOT) ;
+
 project
-    : requirements <include>"../boost_1_30_0"
-    : build-dir "target"
+    : requirements <include>$(BOOST_ROOT)
+    : build-dir "target2"
     ;
+
+
+# Build variant to allow testing with a local uBLAS version seperated from Boost
+variant uBLAS_seperate_debug : debug : <include>"../../uBLAS" ;
+variant uBLAS_seperate_release : release : <include>"../../uBLAS" ;
+
+# Build variant to allow testing with a local boost_CVS version
+variant boost_CVS_debug : debug : <include>"../../boost_CVS"  ;
+variant boost_CVS_release : release : <include>"../../boost_CVS" ;
+
+# Build variant for full compiler optimization
+variant hardoptimize_release : release : 
+ 	<toolset>gcc <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000"
+;

@@ -8,5 +8,5 @@ project
 
 exe PV :
      PV.cpp
-     ../BayesFilter/BayesFilter
+     ../BayesFilter/BayesFilterLib
 ;

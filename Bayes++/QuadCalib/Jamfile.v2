@@ -8,5 +8,5 @@ project
 
 exe quadcalib :
      "QuadCalib.cpp"
-     ../BayesFilter/BayesFilter
+     ../BayesFilter/BayesFilterLib
 ;
