@@ -38,7 +38,7 @@ Fast_SLAM::Fast_SLAM( BF::SIR_filter& L_filter ) :
 	wir(L.S.size2())
 // Construct filter using referenced SIR_filter for resampling
 {
-	std::fill (wir.begin(), wir.end(), 1.);		// Initial uniform weights
+	std::fill (wir.begin(), wir.end(), Float(1.));		// Initial uniform weights
 	wir_update = false;
 }
 
@@ -129,7 +129,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 		const Float q = m1.x;
 		const Float Q = m1.X;
 											// Multiplicive fussion of observation weights
- 		wir[pi] *= exp(-0.5 *sqr(p-q) / (P+Q)) / sqrt(P+Q);		// Integrate(g(p,P)*g(q,Q)
+ 		wir[pi] *= exp(Float(-0.5) *sqr(p-q) / (P+Q)) / sqrt(P+Q);		// Integrate(g(p,P)*g(q,Q)
 	}
 	wir_update = true;			// Weights have been updated requiring a resampling
 
@@ -169,7 +169,7 @@ Fast_SLAM::Float
 		Float lcond = resampler.resample (presamples, R_unique, wir, L.random);
 
 									// Initial uniform weights
-		std::fill (wir.begin(), wir.end(), 1.);
+		std::fill (wir.begin(), wir.end(), Float(1.));
 		wir_update = false;
 									// Update S bases on resampling, and init filter
 		L.copy_resamples (L.S, presamples);

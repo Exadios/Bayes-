@@ -177,7 +177,7 @@ Bayes_base::Float
 	rclimit.check_PD(rcond, "Zv not PD in observe");
 	ZI.clear();
 	for (size_t w = 0; w < h.Zv.size(); ++w)
-		ZI(w,w) = 1./ h.Zv[w];					// inverse(Z)
+		ZI(w,w) = Float(1.) / h.Zv[w];			// inverse(Z)
 												// Calculate EIF i
 	i = prod(trans(h.Hx), prod(ZI,zz));						// ISSUE: Efficiency ZI is diagonal
 												// Calculate EIF I

@@ -39,9 +39,9 @@ class Test_random
 public:
 	Test_random() : gen_normal(rng), gen_uniform(rng), gen_exponential(rng, 1.)
 	{}
-	double normal(const double mean, const double sigma)
+	Float normal(const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937> gen(rng, mean, sigma);
+		boost::normal_distribution<boost::mt19937, Float> gen(rng, mean, sigma);
 		return gen();
 	}
 	void normal(Vec& v)
@@ -153,8 +153,8 @@ void test_SPD_all()
 	S(0,0) = 5.;
 	x[0] = 1.;
 
-	double v1 = ublas::inner_prod (x, ublas::prod(S,x) );
-	double v2 = prod_SPDT(x,S);
+	Float v1 = ublas::inner_prod (x, ublas::prod(S,x) );
+	Float v2 = prod_SPDT(x,S);
 	(void)v1,(void)v2;
 	test_SPD();
 }
@@ -210,7 +210,7 @@ void test_UdU()
 	std::cout << S << std::endl;
 
 	UTriMatrix UD(3,3);
-	double rcond = UCfactor (UD, S);
+	Float rcond = UCfactor (UD, S);
 	std::cout <<rcond << std::endl;
 
 	std::cout << UD << std::endl;

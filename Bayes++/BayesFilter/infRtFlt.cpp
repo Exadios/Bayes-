@@ -320,7 +320,7 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_uncorrelate
 	for (size_t i = 0; i < z_size; ++i)
 	{
 		using namespace std;
-		Zir(i,i) = 1./ sqrt(h.Zv[i]);
+		Zir(i,i) = Float(1.)/ sqrt(h.Zv[i]);
 	}
 						// Form Augmented matrix for factorisation
 	ColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing

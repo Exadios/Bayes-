@@ -34,7 +34,7 @@ class Bayes_base {
  * Interface provides: type, internal error handing, and destruction
  */
 public:
-	typedef double Float;
+	typedef Bayesian_filter_matrix::Float Float;
 	// Type used thoughout as a number representation for state etc
 
 	virtual ~Bayes_base() = 0;

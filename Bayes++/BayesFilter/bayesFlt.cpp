@@ -24,7 +24,7 @@ namespace Bayesian_filter
 
 /* Minimum allowable reciprocal condition number for PD Matrix factorisations
  * Initialised default gives 5 decimal digits of headroom */
-const Bayes_base::Float Numerical_rcond::limit_PD_init = std::numeric_limits<Bayes_base::Float>::epsilon() * 1e5;
+const Bayes_base::Float Numerical_rcond::limit_PD_init = std::numeric_limits<Bayes_base::Float>::epsilon() * Bayes_base::Float(1e5);
 
 
 Bayes_base::~Bayes_base()

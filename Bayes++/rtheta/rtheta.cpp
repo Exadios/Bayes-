@@ -34,18 +34,18 @@ const size_t NS = 1000;			// Number of samples for a sampled representation
 const bool RA_MODEL = true;		// Use Range angle NON-linear model (requires normalising angle)
 const bool NOISE_MODEL = true;		// Add noise to truth model
 const bool TRUTH_STATIONARY = false;// Truth model setup
-const double INIT_XY[2] = {1.,-0.2};// XY initial position
-const double TARGET[2] = {-11.,0.};	// XY position of target
+const Float INIT_XY[2] = {1.,-0.2};// XY initial position
+const Float TARGET[2] = {-11.,0.};	// XY position of target
 
-const double RANGE_NOISE = NOISE_MODEL ? 0.1 : 1e-6;
-const double ANGLE_NOISE = NOISE_MODEL ? (5. * angled::Pi / 180.) : 1e-6;
-const double Z_CORRELATION = 0e-1;	// Correlated observation model
-const double X_NOISE = 0.05;		// Prediction model
-const double Y_NOISE = 0.09;
-const double XY_NOISE_COUPLING = 0.05;
-const double INIT_X_NOISE = 0.07;
-const double INIT_Y_NOISE = 0.10;
-const double INIT_XY_NOISE_CORRELATION = 0.04;
+const Float RANGE_NOISE = NOISE_MODEL ? 0.1 : 1e-6;
+const Float ANGLE_NOISE = NOISE_MODEL ? (5. * angled::Pi / 180.) : 1e-6;
+const Float Z_CORRELATION = 0e-1;	// Correlated observation model
+const Float X_NOISE = 0.05;		// Prediction model
+const Float Y_NOISE = 0.09;
+const Float XY_NOISE_COUPLING = 0.05;
+const Float INIT_X_NOISE = 0.07;
+const Float INIT_Y_NOISE = 0.10;
+const Float INIT_XY_NOISE_CORRELATION = 0.04;
 
 
 // Square 
@@ -64,7 +64,7 @@ class Boost_random : public SIR_random
 public:
 	Boost_random() : gen_normal(rng), gen_uniform(rng)
 	{}
-	double normal(const double mean, const double sigma)
+	Float normal(const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<boost::mt19937> gen(rng, mean, sigma);
 		return gen();
@@ -150,7 +150,7 @@ pred_model::pred_model () :
 	// No inverse for empty parts of G
 	inv.G.assign(ublas::scalar_matrix<Float>(inv.G.size1(),inv.G.size2(),
 			std::numeric_limits<Float>::infinity() ) );
-	double Gdet = sqr(1.) - sqr(XY_NOISE_COUPLING);
+	Float Gdet = sqr(1.) - sqr(XY_NOISE_COUPLING);
 	inv.G(0,0) = inv.G(1,1) = 1./ Gdet;
 	inv.G(0,1) = inv.G(1,0) = -XY_NOISE_COUPLING / Gdet;
 }
@@ -205,12 +205,12 @@ cobs_model::cobs_model(uobs_model& u) :
 
 void uobs_model::state (const Vec& x)
 {
-	double dx = TARGET[0] - x[0];
-	double dy = TARGET[1] - x[1];
+	Float dx = TARGET[0] - x[0];
+	Float dy = TARGET[1] - x[1];
 
 	if (RA_MODEL) {
-		double distSq = dx*dx + dy*dy;
-		double dist = sqrt (distSq);
+		Float distSq = dx*dx + dy*dy;
+		Float dist = sqrt (distSq);
 		Hx.clear();
 		Hx(0,0) = -dx / dist;
 		Hx(0,1) = -dy / dist;
@@ -233,13 +233,13 @@ void cobs_model::state (const FM::Vec& x)
 
 const Vec& uobs_model::h (const Vec& x) const
 {
-	double dx = TARGET[0] - x[0];
-	double dy = TARGET[1] - x[1];
+	Float dx = TARGET[0] - x[0];
+	Float dy = TARGET[1] - x[1];
 
 	z_pred.clear();
 	if (RA_MODEL) {
-		double distSq = dx*dx + dy*dy;
-		double dist = sqrt (distSq);
+		Float distSq = dx*dx + dy*dy;
+		Float dist = sqrt (distSq);
 
 		z_pred.clear();
 		z_pred[0] = dist;
@@ -439,7 +439,7 @@ CCompare<Tf1,Tf2>::CCompare (const Vec x_init, const SymMatrix X_init, unsigned 
 template<class Tf1, class Tf2>
 void CCompare<Tf1, Tf2>::dumpCompare ()
 {
-	double zx, zy;
+	Float zx, zy;
 	if (RA_MODEL) {
 		zx = truth.x[0] + z[0] * cos (z[1]);
 		zy = truth.x[1] + z[0] * sin (z[1]);

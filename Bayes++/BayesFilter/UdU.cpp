@@ -202,7 +202,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
 			// Diagonal element
 			if (d > 0.0)
 			{	// Positive definate
-				d = 1. / d;
+				d = Float(1.) / d;
 
 				for (i = 0; i < j; ++i)
 				{
@@ -333,7 +333,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 		if (d > 0.0)
 		{
 			// Positive definate
-			d = 1. / d;
+			d = Float(1.) / d;
 
 			for (i = j+1; i < n; ++i)
 			{
@@ -400,7 +400,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 				// Positive definate
 				d = sqrt(d);
 				M(j,j) = d;
-				d = 1. / d;
+				d = Float(1.) / d;
 
 				for (i = 0; i < j; ++i)
 				{
@@ -536,7 +536,7 @@ bool UdUinverse (RowMatrix& UD)
 	{
 		// Detect singular element
 		if (UD(i,i) != 0.)
-			UD(i,i) = 1./UD(i,i);
+			UD(i,i) = Float(1.)/UD(i,i);
 		else
 			singular = true;
 	}
@@ -571,7 +571,7 @@ bool UTinverse (UTriMatrix& U)
 				singular = true;
 				break;
 			}
-			d = 1./d;
+			d = Float(1.)/d;
 			Ui[i] = d;
 
 			for (j = n-1; j > i; --j)

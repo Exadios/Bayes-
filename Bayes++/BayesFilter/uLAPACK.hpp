@@ -30,8 +30,16 @@ namespace rawLAPACK {
 			double dwork[],
 			const int& ldwork,
 			int& info);
+	void sgeqrf_(
+			const int & m,
+			const int & n,
+			float da[],
+			const int & lda,
+			float dtau[],
+			float dwork[],
+			const int& ldwork,
+			int& info);
 
-	   
 	void dgetrs_(
 			const char& transa,
 			const int& n,
@@ -42,6 +50,16 @@ namespace rawLAPACK {
 			double db[],
 			const int& ldb,
 			int& info);
+	void sgetrs_(
+			const char& transa,
+			const int& n,
+			const int& nrhs,
+			const float da[],
+			const int& lda,
+			int ipivot[],
+			float db[],
+			const int& ldb,
+			int& info);
 
 	void dgetrf_(
 			const int& m,
@@ -50,9 +68,41 @@ namespace rawLAPACK {
 			const int& lda,
 			int ipivot[],
 			int& info);
-
+	void sgetrf_(
+			const int& m,
+			const int& n,
+			float da[],
+			const int& lda,
+			int ipivot[],
+			int& info);
 
 	}// extern "C"
+
+	// Type overloads for C++
+	inline void geqrf( const int & m, const int & n, double da[], const int & lda, double dtau[], double dwork[], const int& ldwork, int& info)
+	{
+		dgeqrf_(m,n,da,lda,dtau,dwork,ldwork,info);
+	}
+	inline void geqrf( const int & m, const int & n, float da[], const int & lda, float dtau[], float dwork[], const int& ldwork, int& info)
+	{
+		sgeqrf_(m,n,da,lda,dtau,dwork,ldwork,info);
+	}
+	inline void getrs( const char& transa, const int& n, const int& nrhs, const double da[], const int& lda, int ipivot[], double db[], const int& ldb, int& info)
+	{
+		dgetrs_(transa,n,nrhs,da,lda,ipivot,db,ldb,info);
+	}
+	inline void getrs( const char& transa, const int& n, const int& nrhs, const float da[], const int& lda, int ipivot[], float db[], const int& ldb, int& info)
+	{
+		sgetrs_(transa,n,nrhs,da,lda,ipivot,db,ldb,info);
+	}
+	inline void getrf( const int& m, const int& n, double da[], const int& lda, int ipivot[], int& info)
+	{
+		dgetrf_(m,n,da,lda,ipivot,info);
+	}
+	inline void getrf( const int& m, const int& n, float da[], const int& lda, int ipivot[], int& info)
+	{
+		sgetrf_(m,n,da,lda,ipivot,info);
+	}
 }// namespace rawLAPACK
 
 
@@ -83,9 +133,8 @@ int geqrf (matrix_t& a, vector_t& tau)
 		return -104;
 
 	int ldwork = _n*_n;
-	double* dwork   = new double[ldwork];
-	rawLAPACK::dgeqrf_ (_m, _n, a.data().begin(), _lda, tau.data().begin(), dwork, ldwork, _info);
-	delete [] dwork;
+	vector_t dwork(ldwork);
+	rawLAPACK::geqrf (_m, _n, a.data().begin(), _lda, tau.data().begin(), dwork.data().begin(), ldwork, _info);
 
 	return _info;
 }
@@ -108,7 +157,7 @@ int getrf (matrix_t& a, pivot_t& ipivot)
 	int _lda = _m;	// minor size
 	int _info;
 
-	rawLAPACK::dgetrf_ (_m, _n,	_a, _lda, ipivot.data().begin(), _info);
+	rawLAPACK::getrf (_m, _n,	_a, _lda, ipivot.data().begin(), _info);
 
 	return _info;
 }
@@ -144,7 +193,7 @@ int getrs (char transa, matrix_t& a,
 		return -102;
 
 	int _info;
-	rawLAPACK::dgetrs_ (transa, a_n, _nrhs, _a,	_lda, ipivot.data().begin(), 
+	rawLAPACK::getrs (transa, a_n, _nrhs, _a,	_lda, ipivot.data().begin(), 
 				_b, _ldb, _info);
 
 	return _info;

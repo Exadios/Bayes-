@@ -50,7 +50,7 @@ namespace
 		boost::normal_distribution<boost::mt19937> gen(localRng);
 		std::generate (v.begin(), v.end(), gen);
 	}
-	inline void randNormal(Vec& v, const double mean, const double sigma)
+	inline void randNormal(Vec& v, const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<boost::mt19937> gen(localRng, mean, sigma);
 		std::generate (v.begin(), v.end(), gen);
@@ -61,15 +61,15 @@ namespace
 
 	// Filter Parameters
 	// Prediction parameters for Integrated Ornstein-Uhlembeck Process
-	const double dt = 0.01;
-	const double V_NOISE = 0.1;	// Velocity noise, giving mean squared error bound
-	const double V_GAMMA = 1.;	// Velocity correlation, giving velocity change time constant
+	const Float dt = 0.01;
+	const Float V_NOISE = 0.1;	// Velocity noise, giving mean squared error bound
+	const Float V_GAMMA = 1.;	// Velocity correlation, giving velocity change time constant
 	// Filter's Initial state uncertainty: System state is unknown
-	const double i_P_NOISE = 1000.;
-	const double i_V_NOISE = 10.;
+	const Float i_P_NOISE = 1000.;
+	const Float i_V_NOISE = 10.;
 	// Noise on observing system state
-	const double OBS_INTERVAL = 0.10;
-	const double OBS_NOISE = 0.001;
+	const Float OBS_INTERVAL = 0.10;
+	const Float OBS_NOISE = 0.001;
 
 }//namespace
 
@@ -86,13 +86,13 @@ public:
 PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 {
 	// Position Velocity dependance
-	const double Fvv = exp(-dt*V_GAMMA);
+	const Float Fvv = exp(-dt*V_GAMMA);
 	Fx(0,0) = 1.;
 	Fx(0,1) = dt;
 	Fx(1,0) = 0.;
 	Fx(1,1) = exp(-dt*V_GAMMA);
 	// Setup constant noise model: G is identity
-	q[0] = dt*sqr((1.-Fvv)*V_NOISE);
+	q[0] = dt*sqr((Float(1.)-Fvv)*V_NOISE);
 	G(0,0) = 0.;
 	G(1,0) = 1.;
 }
@@ -175,14 +175,14 @@ int main()
 
 	// Iterate the filter with test observations
 	Vec u(1), z_true(1), z(1);
-	double time = 0.; double obs_time = 0.;
+	Float time = 0.; Float obs_time = 0.;
 	for (unsigned i = 0; i < 100; ++i)
 	{
 		// Predict true state using Normally distributed acceleration
 		// This is a Guassian
 		x_true = linearPredict.f(x_true);
 		randNormal (u);		// normally distributed mean 0., stdDev for stationary IOU
-		x_true[1] += u[0]* sqr(V_NOISE)/(2.*V_GAMMA);
+		x_true[1] += u[0]* sqr(V_NOISE)/(Float(2.)*V_GAMMA);
 
 		// Predict filter with known pertubation
 		f1.predict (linearPredict);

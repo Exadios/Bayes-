@@ -159,19 +159,19 @@
 	</Configurations>
 	<Files>
 		<File
-			RelativePath=".\SLAM.h">
+			RelativePath="SLAM.hpp">
 		</File>
 		<File
 			RelativePath=".\fastSLAM.cpp">
 		</File>
 		<File
-			RelativePath=".\fastSLAM.h">
+			RelativePath="fastSLAM.hpp">
 		</File>
 		<File
 			RelativePath="kalmanSLAM.cpp">
 		</File>
 		<File
-			RelativePath="kalmanSLAM.h">
+			RelativePath="kalmanSLAM.hpp">
 		</File>
 		<File
 			RelativePath=".\testFastSLAM.cpp">

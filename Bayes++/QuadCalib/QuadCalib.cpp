@@ -44,7 +44,7 @@ namespace
 		boost::normal_distribution<boost::mt19937> gen(localRng);
 		std::generate (v.begin(), v.end(), gen);
 	}
-	inline void randNormal(FM::Vec& v, const double mean, const double sigma)
+	inline void randNormal(FM::Vec& v, const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<boost::mt19937> gen(localRng, mean, sigma);
 		std::generate (v.begin(), v.end(), gen);
@@ -61,15 +61,15 @@ namespace
 
 	// Filter Parameters
 	// Noise on observing system state
-	const double OBS_NOISE = 0.01;
+	const Float OBS_NOISE = 0.01;
 	// Prediction Noise: no Prediction noise as pertubation is known
-	const double X_NOISE = 0.0;	// System State	
-	const double S_NOISE = 0.0;	// Scale
-	const double B_NOISE = 0.0;	// Bias
+	const Float X_NOISE = 0.0;	// System State	
+	const Float S_NOISE = 0.0;	// Scale
+	const Float B_NOISE = 0.0;	// Bias
 	// Filter's Initial state uncertainty: System state is unknown
-	const double i_X_NOISE = 1000.;
-	const double i_S_NOISE = 0.1;
-	const double i_B_NOISE = 0.1;
+	const Float i_X_NOISE = 1000.;
+	const Float i_S_NOISE = 0.1;
+	const Float i_B_NOISE = 0.1;
 
 }//namespace
 
@@ -80,7 +80,7 @@ namespace
  */
 class QCpredict : public Bayesian_filter::Linrz_predict_model
 {
-	double motion;
+	Float motion;
 	mutable FM::Vec fx;
 public:
 	QCpredict();
@@ -146,11 +146,11 @@ QCobserve::QCobserve () :
  */
 class QCfilter : public FilterNumericalAlgorithm {
 public:
-	QCfilter (const double SystemStateGuess);
+	QCfilter (const Float SystemStateGuess);
 private:
 };
 
-QCfilter::QCfilter (const double SystemStateGuess)
+QCfilter::QCfilter (const Float SystemStateGuess)
 	: FilterNumericalAlgorithm (NX)
 /*
  * Construct the filter

@@ -37,20 +37,23 @@ namespace ublas = boost::numeric::ublas;
 using ublas::row;
 using ublas::column;
 using ublas::trans;
-using ublas::prod;			// These do not applie to the templated prod<temp> funtions
+using ublas::prod;		// These do not apply to the templated prod<temp> funtions
 using ublas::inner_prod;
 using ublas::outer_prod;
 
 enum EmptyTag {Empty};	// Tag type used for empty matrix constructor
 
+// Declare the value used for ALL linear algebra operations
+// Also required as the matrix/vector container value_type
+typedef float Float;
 
 
 /*
  * Filter Vec type
  */
-class Vec: public ublas::vector<double>
+class Vec: public ublas::vector<Float>
 {
-	typedef ublas::vector<double> VecBase;
+	typedef ublas::vector<Float> VecBase;
 public:
 	// No Default Constructor. Empty creation is very error prone
 	explicit Vec(EmptyTag) : VecBase()
@@ -217,11 +220,11 @@ public:
  *  This requires they both use the same dense represenation. Therefore
  *  we use a symmetric_adaptor to provide the base for symmetric matrices.
  */
-typedef ublas::matrix<double, ublas::row_major> BaseRowMatrix;
-typedef ublas::matrix<double, ublas::column_major> BaseColMatrix;
-typedef ublas::triangular_matrix<double, ublas::upper, ublas::row_major> BaseUpperTriMatrix;
-typedef ublas::triangular_matrix<double, ublas::lower, ublas::row_major> BaseLowerTriMatrix;
-typedef ublas::banded_matrix<double> BaseDiagMatrix;
+typedef ublas::matrix<Float, ublas::row_major> BaseRowMatrix;
+typedef ublas::matrix<Float, ublas::column_major> BaseColMatrix;
+typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseUpperTriMatrix;
+typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseLowerTriMatrix;
+typedef ublas::banded_matrix<Float> BaseDiagMatrix;
 
 // Helper class for _BaseSymMatrix allow construction of BaseRowMatrix (rm) before symmertic_adaptor
 class BaseSymMatrix;

@@ -175,7 +175,7 @@ Bayes_base::Float
 		++zInnovi;
 	}
 	using namespace std;
-	return exp(-0.5*(logL + logdetZ));
+	return exp(Float(-0.5)*(logL + logdetZ));
 }
 
 void General_LzUnAd_observe_model::Lz (const FM::Vec& zz)
@@ -193,7 +193,7 @@ void General_LzUnAd_observe_model::Lz (const FM::Vec& zz)
 	FM::Vec::iterator ZIi = Zv_inv.begin();
 	for (FM::Vec::const_iterator zi = Zv.begin(); zi != Zv.end(); ++zi) {
 		detZ *= *zi;
-		*ZIi = 1./ (*zi);		// Protected from /0 by rcond check
+		*ZIi = Float(1.)/ (*zi);		// Protected from /0 by rcond check
 		++ZIi;
 	}
 	using namespace std;
@@ -221,7 +221,7 @@ Bayes_base::Float
 
 	Float logL = scaled_vector_square(zInnov, Z_inv);
 	using namespace std;
-	return exp(-0.5*(logL + logdetZ));
+	return exp(Float(-0.5)*(logL + logdetZ));
 }
 
 void General_LzCoAd_observe_model::Lz (const FM::Vec& zz)
