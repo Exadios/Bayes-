@@ -43,14 +43,16 @@ Standard_resampler::Float
 /*
  * Standard resampler from [1]
  * Algorithm:
- *	Complexity O(n*log(n)) complexity required to sort the random draws made.
- *	This allows comparing of the two ordered lists w and ur.
+ *	A particle is chosen once for each time its cumulative weight intersects with a uniform random draw.
+ *	Complexity O(n*log(n))
+ *  This complexity is required to sort the uniform random draws made,
+ *	this allows comparing of the two ordered lists w(cumulative) and ur (the sort random draws).
  * Output:
- *  Presamples number of times this particle should be resampled
+ *  presamples number of times this particle should be resampled
  *  uresamples number of unqiue particles (number of non zeros in Presamples)
  *  w becomes a normalised cumulative sum
  * Sideeffects:
- *  A draw is made from this instances 'random' for each particle
+ *  A draw is made from 'r' for each particle
  */
 {
 	assert (presamples.size() == w.size());
@@ -115,15 +117,15 @@ Systematic_resampler::Float
 /*
  * Systematic resample algorithm from [2]
  * Algorithm:
- *	Particles are chosesn from those whose cumulative weight intersect with an equidistant grid
- *	A uniform random draw is chosen to position the grid with the cumulative weights
+ *	A particle is chosen once for each time its cumulative weight intersects with an equidistant grid.
+ *	A uniform random draw is chosen to position the grid within the cumulative weights
  *	Complexity O(n)
  * Output:
- *  Presamples number of times this particle should be resampled
+ *  presamples number of times this particle should be resampled
  *  uresamples number of unqiue particles (number of non zeros in Presamples)
  *  w becomes a normalised cumulative sum
  * Sideeffects:
- *  A single draw is made from this instances 'random'
+ *  A single draw is made from 'r'
  */
 {
 	size_t nParticles = presamples.size();
@@ -201,15 +203,14 @@ SIR_scheme::SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper)
 }
 
 SIR_scheme& SIR_scheme::operator= (const SIR_scheme& a)
-/* Optimise copy assignment to only copy explict filter state (particles)
+/* Optimise copy assignment to only copy public filter state (particles and weights)
  * random helper is not part of filter state
  * Precond: matrix size conformance
  */
 {
-	*static_cast<Sample_filter*>(this) = a;
-	stochastic_samples = S.size2();
-	std::fill (wir.begin(), wir.end(), Float(1));		// Initial uniform weights
-	wir_update = false;
+	Sample_filter::operator=(a);
+	stochastic_samples = a.stochastic_samples;			// Copy weights
+	wir_update = a.wir_update;
 	return *this;
 }
 
