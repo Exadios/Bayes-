@@ -44,7 +44,7 @@ const Float RANGE_NOISE = NOISE_MODEL ? Float(0.1) : Float(1e-6);
 const Float ANGLE_NOISE = NOISE_MODEL ? Float(5. * angle<Float>::Deg2Rad) : Float(1e-6);
 const Float Z_CORRELATION = Float(0e-1);	// (Un)Correlated observation model
 
-const Float X_NOISE = Float(0.05);		// Prediction model
+const Float X_NOISE = Float(0.05);		// predict model
 const Float Y_NOISE = Float(0.09);
 const Float XY_NOISE_COUPLING = Float(0.05);
 const Float Q_NOISE = Float(1.0);		// Noise in addition Q terms
@@ -91,7 +91,7 @@ public:
 
 
 /*
- * Linear prediction model
+ * Linear predict model
  *  x static and y tending to x
  *  Correlated additive noise
  */
@@ -302,10 +302,10 @@ void walk::predict ()
 class Information_linrz_scheme : public Information_scheme
 {
 public:
-	Information_linrz_scheme (size_t x_size, size_t z_initialsize = 0) :
+	Information_linrz_scheme (size_t x_size) :
 		Kalman_state_filter (x_size),
 		Information_state_filter (x_size),
-		Information_scheme (x_size, z_initialsize)
+		Information_scheme (x_size)
 	{}
 	Float predict (Linrz_predict_model& f)
 	// Enforce use of Linrz predict
@@ -314,12 +314,12 @@ public:
 	}
 };
 
-// Filter_schmeme Information_linrz_scheme specialisation
+// Filter_scheme Information_linrz_scheme specialisation
 template <>
-Filter_scheme<Information_linrz_scheme>::Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
+Filter_scheme<Information_linrz_scheme>::Filter_scheme(size_t x_size, size_t q_maxsize) :
 	Kalman_state_filter (x_size),
 	Information_state_filter (x_size),
-	Information_linrz_scheme (x_size, z_initialsize)
+	Information_linrz_scheme (x_size)
 {}
 
 /*
@@ -358,7 +358,7 @@ public:
 
 template <class TestScheme>
 Filter<TestScheme>::Filter (const Vec& x_init, const SymMatrix& X_init) :
-	ts (x_init.size(), NQ, NZ)
+	ts (x_init.size(), NQ)
 {
 	ts.init_kalman (x_init, X_init);
 }
