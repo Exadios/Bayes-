@@ -9,7 +9,7 @@
 /*
  * Example of using Bayesian Filter Class to solve a simple problem.
  *  The example implements a Position and Velocity Filter with a Position observation.
- *  The motion model is the so called IOU Integrated Ornstein-Uhlembeck Process Ref[1]
+ *  The motion model is the so called IOU Integrated Ornstein-Uhlenbeck Process Ref[1]
  *    Velocity is Brownian with a trend towards zero proportional to the velocity
  *    Position is just Velocity integrated.
  *  This model has a well defined velocity and the mean squared speed is parameterised. Also
