@@ -409,13 +409,13 @@ typename prod_expression_result<EX,ET>::E1E2T_type
 template<class EX, class ES, class ET> inline
 ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s, ublas::matrix_expression<ET>& Ptemp)
 /*
- * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X', Ptemp = return value
+ * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X'
  * Precond: Ptemp must be size conformant with the product
- * TODO requires a prod_diag(X,s)
+ *  DEPRECATED With explicit Ptemp, do not rely on it's value
  */
 {
-	const EX& XX = X();
 	Vec::const_iterator si, send = s().end();
+	const EX& XX = X();
 	typename EX::const_iterator1 Xa = XX.begin1();
 	const typename EX::const_iterator1 Xend = XX.end1();
 	typename EX::const_iterator1 Xb;
@@ -439,6 +439,20 @@ ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expressi
 		}
 	}
 	return Ptemp();
+}
+
+template<class EX, class ES> inline
+SymMatrix prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s)
+/*
+ * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X'
+ * TODO requires a prod_diag(X,s)
+ */
+{
+	SymMatrix Ptemp(X().size1(),X().size1());
+	Ptemp.clear();
+
+	(void) prod_SPD (X(),s(), Ptemp);
+	return Ptemp;
 }
 
 
@@ -469,7 +483,7 @@ ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_express
 /*
  * Symmetric Positive (Semi) Definate product: X'*diag_matrix(s)*X, Ptemp = return value
  * Precond: Ptemp must be size conformant with the product
- * TODO requires a prod_diag(X,s)
+ *  DEPRECATED With explicit Ptemp, do not rely on it's value
  */
 {
 	const EX& XX = X();
@@ -497,6 +511,20 @@ ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_express
 		}
 	}
 	return Ptemp();
+}
+
+template<class EX, class ES> inline
+SymMatrix prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s)
+/*
+ * Symmetric Positive (Semi) Definate product: X'*diag_matrix(s)*X
+ * TODO requires a prod_diag(X,s)
+ */
+{
+	SymMatrix Ptemp(X().size1(),X().size1());
+	Ptemp.clear();
+
+	(void) prod_SPDT (X(),s(), Ptemp);
+	return Ptemp;
 }
 
 inline Vec::value_type prod_SPDT (const Vec& x, const Vec& s)
