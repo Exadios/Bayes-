@@ -13,6 +13,8 @@
 
 		// Bayes++ Bayesian filtering schemes
 #include "BayesFilter/bayesFlt.hpp"
+#include <iostream>
+#include "boost/numeric/ublas/io.hpp"
 		// Bayes++ SLAM
 #include "SLAM.hpp"
 #include "kalmanSLAM.hpp"
@@ -31,7 +33,7 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 Kalman_SLAM::Kalman_SLAM( Kalman_filter_generator& filter_generator ) :
 	SLAM(),
 	fgenerator(filter_generator),
-	loc(NULL), full(NULL)
+	full(NULL)
 {
 	nL = 0;
 	nM = 0;
@@ -39,7 +41,6 @@ Kalman_SLAM::Kalman_SLAM( Kalman_filter_generator& filter_generator ) :
 
 Kalman_SLAM::~Kalman_SLAM()
 {
-	fgenerator.dispose (loc);
 	fgenerator.dispose (full);
 }
 
@@ -48,10 +49,7 @@ void Kalman_SLAM::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	// TODO maintain map states
 	nL = x.size();
 	nM = 0;
-	if (loc) fgenerator.dispose (loc);
 	if (full) fgenerator.dispose (full);
-		// generate a location filter for prediction
-	loc = fgenerator.generate(nL);
 		// generate full filter
 	full = fgenerator.generate(nL);
 		// initialise location states
@@ -60,19 +58,17 @@ void Kalman_SLAM::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	full->init();
 }
 
-void Kalman_SLAM::predict( BF::Linrz_predict_model& lpred )
+void Kalman_SLAM::predict( BF::Linear_predict_model& lpred )
 {
-		// extract location part of full
-	loc->x = full->x.sub_range(0,nL);
-	loc->X = full->X.sub_matrix(0,nL,0,nL);
-		// predict location, independant of map
-	loc->init();
-	loc->predict (lpred);
-	loc->update();
-		// return location to full
-	full->x.sub_range(0,nL) = loc->x;
-	full->X.sub_matrix(0,nL,0,nL) = loc->X;
-	full->init();
+		// build full predict model by augmenting location predict with map identity predict model
+	BF::Linear_predict_model fullpred (full->x.size(), lpred.q.size());
+	FM::identity (fullpred.Fx);
+	fullpred.Fx.sub_matrix(0,lpred.Fx.size1(),0,lpred.Fx.size2()) = lpred.Fx;
+	fullpred.G.clear ();
+	fullpred.G.sub_matrix(0,lpred.G.size1(), 0,lpred.G.size2()) = lpred.G;
+	fullpred.q = lpred.q;
+		// predict 
+	full->predict (fullpred);
 }
 
 void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z )
@@ -95,10 +91,14 @@ void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const F
 void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
 // fom: must have a the special from required for SLAM::obeserve_new
 {
-	FM::Vec sz(nL+1);
+	FM::Vec sz(nL+z.size());
 	sz.sub_range(0,nL) = full->x.sub_range(0,nL);
-	sz[nL] = z[0];
+	sz.sub_range(nL,nL+z.size() )= z;
 	FM::Vec t = fom.h(sz);
+	FM::SymMatrix Xl (full->X.sub_matrix(0,nL, 0,nL) );
+	FM::Matrix Ha (fom.Hx.sub_matrix(0,1, 0,nL) );
+	FM::Matrix Hb (fom.Hx.sub_matrix(0,1, nL,nL+z.size()) );
+	FM::Matrix temp (1,nL);
 
 		// Make space in scheme for feature, requires the scheme can deal with resized state
 	if (feature >= nM)
@@ -108,23 +108,25 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
 		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
-		nf->x[nL+feature] = t[0];
-		nf->X(nL+feature,nL+feature) = fom.Zv[0];
-		nf->init ();
 		fgenerator.dispose(full);
 		full = nf;
 	}
-	else
-	{
-		full->x[nL+feature] = t[0];
-		full->X(nL+feature,nL+feature) = fom.Zv[0];
-			// ISSUE uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, there two two parts seperately
-		zero( full->X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
-		zero( full->X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full->X.size1()) );
-		full->init ();
+std::cout << full->x <<std::endl;
+std::cout << full->X <<std::endl;
+	full->x[nL+feature] = t[0];
+std::cout << full->x <<std::endl;
+	full->X(nL+feature,nL+feature) = ( FM::prod_SPD(Ha,Xl,temp) + FM::prod_SPD(Hb,fom.Zv) )(0,0);
+std::cout << full->X <<std::endl;
+	//	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL) = prod(Ha,Xl);
+	{	// Old uBLAS has problems assigning to symmetric proxy as above, go element by element
+		const FM::Matrix cross (prod(Ha,Xl) );
+		const FM::Float definate_epsilon = 0.9999;
+		for (size_t i = 0; i != nL; ++i)
+			full->X(nL+feature, i) = definate_epsilon * cross(0,i);
 	}
-
-	full->X(nL+feature,nL+feature) = fom.Zv[0];
+std::cout << full->X <<std::endl;
+		
+	full->init ();
 }
 
 void Kalman_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::Float& T )
