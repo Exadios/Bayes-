@@ -1,0 +1,20 @@
+# Bayes++ Jamfile - See Boost.build
+# Range Angle test for all filter schemes
+
+# Declare the location of this subproject relative to the project root.
+subproject "rtheta" ;
+
+
+# The executable for testing
+
+exe rtheta :
+     rtheta.cpp
+     tests.cpp
+     <lib>../BayesFilter/BayesFilter
+    :
+     <include>$(BOOST_ROOT)
+     <include>$(BAYES_ROOT)
+     <sysinclude>../../libs
+     <gcc><*><find-library>"lapack -lg2c"		# LAPACK required, usualy built with g77 for gcc tools
+    : debug release
+;
