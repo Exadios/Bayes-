@@ -400,7 +400,7 @@ typename prod_expression_result<EX,ET>::E1E2T_type
  prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::matrix_expression<ES>& S, ublas::matrix_expression<ET>& XStemp)
 /*
  * Symmetric Positive (Semi) Definate product: X*(X*S)', XStemp = X*S
- * Assumes S symmetric
+ *  Result symmetric if S is symmetric
  */
 {
 	return prod( X, trans(prod(X,S,XStemp())) );
@@ -458,7 +458,7 @@ typename prod_expression_result<ET,EX>::E1TE2_type
  prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::matrix_expression<ES>& S, ublas::matrix_expression<ET>& SXtemp)
 /*
  * Symmetric Positive (Semi) Definate product: (S*X)'*X, SXtemp = S*X
- * Assumes S symmetric
+ *  Result symmetric if S is symmetric
  */
 {
 	return prod( trans(prod(S,X,SXtemp())), X);
@@ -504,7 +504,17 @@ inline Vec::value_type prod_SPDT (const Vec& x, const Vec& s)
  * Symmetric Positive (Semi) Definate product: x'*diag_matrix(s)*x
  */
 {
-	return inner_prod(x, ublas::element_prod(s,x));
+	const Vec::const_iterator xi_end = x.end();
+	Vec::const_iterator si = s.begin();
+	Vec::const_iterator xi=x.begin();
+	Vec::value_type p = Vec::value_type(0);
+	while (xi != xi_end)
+	{
+		p += (*xi) * (*si) * (*xi);
+		++xi; ++ si;
+	}
+	
+	return p;
 }
 
 inline Vec::value_type prod_SPDT (const Vec& x, const SymMatrix& S)
