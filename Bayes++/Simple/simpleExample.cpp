@@ -11,9 +11,9 @@
  *  A linear filter with one state and constant noises
  */
 
-#include <iostream>
 // Include all the Bayes++ Bayesian filtering classes
 #include "BayesFilter/allFilters.hpp"
+#include <iostream>
 #include <boost/numeric/ublas/io.hpp>
 
 using namespace std;

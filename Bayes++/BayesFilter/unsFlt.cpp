@@ -67,9 +67,8 @@ void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& 
 						// Generate XX with the same sample Mean and Covar as before
 	column(XX,0) = x;
 
-	Vec SigmaCol(x_size);
 	for (size_t c = 0; c < x_size; ++c) {
-		SigmaCol.assign (column(Sigma,c));
+		const ublas::matrix_column<UTriMatrix> SigmaCol = column(Sigma,c);
 		column(XX,c+1).assign (x  + SigmaCol);
 		column(XX,x_size+c+1).assign (x - SigmaCol);
 	}
@@ -213,8 +212,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 		column(fXX,i).minus_assign (x);
 	}
 							// Center point, premult here by 2 for efficency
-	X.clear();
-	X.plus_assign (FM::outer_prod(column(fXX,0), column(fXX,0)));
+	X.assign (FM::outer_prod(column(fXX,0), column(fXX,0)));
 	X *= 2*Kappa;
 							// Remaining unscented points
 	for (i = 1; i < XX_size; ++i) {
@@ -311,27 +309,24 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 	}
 							// Center point, premult here by 2 for efficency
 	{
-		Vec tzXX0 = column(zXX,0);		// TODO Make this a reference
-		Xzz.clear();
-		Xzz.plus_assign (FM::outer_prod(tzXX0, tzXX0));
+		const ublas::matrix_column<ColMatrix> tzXX0 = column(zXX,0);
+		Xzz.assign (FM::outer_prod(tzXX0, tzXX0));
 		Xzz *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (i = 1; i < zXX.size2(); ++i) {
-		Vec tzXXi = column(zXX,i);		// TODO Make this a reference
+		const ublas::matrix_column<ColMatrix> tzXXi = column(zXX,i);
 		Xzz.plus_assign (FM::outer_prod(tzXXi, tzXXi));
 	}
 	Xzz /= 2*x_Kappa;
 
 						// Correlation of state with observation: Xxz
 							// Center point, premult here by 2 for efficency
-	Xxz.clear();
-	Xxz.plus_assign (FM::outer_prod(column(XX,0) - x, column(zXX,0)));
+	Xxz.assign (FM::outer_prod(column(XX,0) - x, column(zXX,0)));
 	Xxz *= 2*Kappa;
 							// Remaining unscented points
 	for (i = 1; i < zXX.size2(); ++i) {
 		Xxz.plus_assign (FM::outer_prod(column(XX,i) - x, column(zXX,i)));
-		Vec v1 = column(XX,i) -x, v2 = column(zXX,i);
 	}
 	Xxz /= 2* (Float(x_size) + Kappa);
 
