@@ -302,9 +302,9 @@ class Information_linrz_scheme : public Information_scheme
 {
 public:
 	Information_linrz_scheme (size_t x_size, size_t z_initialsize = 0) :
-		Information_scheme (x_size, z_initialsize),
 		Kalman_state_filter (x_size),
-		Information_state_filter (x_size)
+		Information_state_filter (x_size),
+		Information_scheme (x_size, z_initialsize)
 	{}
 	Float predict (Linrz_predict_model& f)
 	// Enforce use of Linrz predict
