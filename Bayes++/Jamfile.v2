@@ -9,26 +9,32 @@ build-project Simple ;
 build-project PV ;
 build-project QuadCalib ;
 
-# Project requirements
+# Boost requirements
 BOOST_ROOT ?= "../boost_1_30_0" ;
 echo BOOST_ROOT $(BOOST_ROOT) ;
 
+# Project requirements
 project
     : requirements <include>$(BOOST_ROOT)
     : build-dir "target"
     ;
 
-
-# Build variant to allow testing with a local uBLAS version seperated from Boost
+# Build variant to allow testing with a local uBLAS version seperated from Boost. It named @uBLAS so it sorted name is included first
 # Tested with compressed matrices
-variant uBLAS_seperate_debug : debug : <include>"../../uBLAS" <define>BAYES_FILTER_COMPRESSED ;
-variant uBLAS_seperate_release : release : <include>"../../uBLAS" <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_debug : debug : <include>"../@uBLAS" ;
+variant uBLAS_seperate_release : release : <include>"../@uBLAS" ;
+
+# Tested with compressed matrices
+variant compress_debug : debug : <define>BAYES_FILTER_COMPRESSED ;
+variant compress_release : release : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_compress_debug : uBLAS_seperate_debug : <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_compress_release : uBLAS_seperate_release : <define>BAYES_FILTER_COMPRESSED ;
 
 # Build variant to allow testing with a local boost_CVS version
-variant boost_CVS_debug : debug : <include>"../../boost_CVS"  ;
-variant boost_CVS_release : release : <include>"../../boost_CVS" ;
+variant boost_CVS_debug : debug : <include>"../boost_CVS"  ;
+variant boost_CVS_release : release : <include>"../boost_CVS" ;
 
 # Build variant for full compiler optimization
 variant hardoptimize_release : release : 
- 	<toolset>gcc <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000"
-;
+ 	<toolset>gcc <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
+
