@@ -6,7 +6,7 @@
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.0.1  (Linux)">
 	<META NAME="CREATED" CONTENT="20030727;11013700">
 	<META NAME="CHANGEDBY" CONTENT="Michael Stevens">
-	<META NAME="CHANGED" CONTENT="20030818;15075100">
+	<META NAME="CHANGED" CONTENT="20030822;10324700">
 </HEAD>
 <BODY LANG="en-US">
 <H1 ALIGN=CENTER><U>Bayes++</U></H1>
@@ -229,16 +229,16 @@ following tests.
 <OL>
 	<LI><P>Build system: Compatibility with both Boost Build version 1
 	and version 2.<BR>Successfully complete &ldquo;bjam&rdquo; to build
-	default libraries and examples.<BR>Successfully complete &ldquo;bjam
-	SLAM&rdquo; to build SLAM system.<BR>Successfully build with VC7
-	from &ldquo;Bayes++.sln&rdquo;.</P>
+	default libraries and examples.<BR>Successfully complete &ldquo;bjam&rdquo;
+	to build SLAM system.<BR>Successfully build with VC7 from
+	&ldquo;Bayes++.sln&rdquo;.</P>
 	<LI><P>Test examples: simpleExample, PV, QuadCalib <BR>Compile debug
 	and release builds (using Boost Build version 2) :- with no errors
 	and no warnings.<BR>Execution output :- Identical to expected
 	reference results.<BR><I>As of Boost-1.31.0 PV and QuadCalib are
 	excluded from tests with gcc 2.95.3 as it is no able to compile the
 	new Boost.Random.</I></P>
-	<LI><P><FONT SIZE=3><FONT FACE="Times">Numerical tests: rtheta -
+	<LI><P><FONT FACE="Times"><FONT SIZE=3>Numerical tests: rtheta -
 	Range angle observer.<BR><FONT COLOR="#000000">A non-linear range
 	angle observer test. The observer moves in a 2 dimensional state
 	space. Motion prediction occurs with a linear model with additive
@@ -248,18 +248,18 @@ following tests.
 	the observations have additional non observed (singular) states.
 	Model sizes, coupling parameters and model types can be varied for
 	additional tests. All schemes are tested </FONT>over 5 iterations of
-	the model. The SIR scheme is tested with 1000 samples.<BR>Because 
+	the model. The SIR scheme is tested with 1000 samples.<BR>Because
 	the different numerical implementations results are not expected to
 	be identical between Schemes. Therefore testing requires:<BR>Regression
 	testing :- Changed in output for any Scheme from the previous
 	release.<BR>Consistency testing :- Comparison of the output for
-	Scheme pairs know to produce numerically similar results.<BR><I>
-	Test with gcc 2.95.3 is not possible as it is no able to compile
+	Scheme pairs know to produce numerically similar results.<BR><I>Test
+	with gcc 2.95.3 is not possible as it is no able to compile
 	Boost.Format.</I></FONT></FONT></P>
-	<LI><P>SLAM test: testFastSLAM<BR><FONT SIZE=3><FONT FACE="Times">Consistency
+	<LI><P>SLAM test: testFastSLAM<BR><FONT FACE="Times">Consistency
 	testing :- Comparison of FastSLAM result with <FONT COLOR="#000000">1,000,000
 	samples with Kalman SLAM. Deviations of state and covariance
-	expected to be approx 1/1000<SUP>th</SUP>.</FONT></FONT></FONT></P>
+	expected to be approx 1/1000<SUP>th</SUP>.</FONT></FONT></P>
 </OL>
 <H2>FAQ</H2>
 <H4>Does Bayes++ do Kalman Filtering?</H4>
