@@ -15,11 +15,3 @@ lib BayesFilter : $(CPP_SOURCES).cpp
 #     <gcc><*><cxxflags>"-pedantic"		# Pedantic make a lot of noise with GCC2.95.3 in Boost headers because of long long
     : debug release
 ;
-
-# Provide the static libraries in convenient location named "lib"
-#   debug libraries are given a "d" suffix
-stage ../lib  :  <lib>BayesFilter
-    :  <tag><debug>"d"
-    : debug release
-;
-
