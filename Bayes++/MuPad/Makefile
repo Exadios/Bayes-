@@ -1,6 +1,6 @@
 # Make Bfilter for MuPAD Module Generator
 
-INC=-I.. -I../UBLASmatSup
+INC=-I..
 MODULES=$(PROGRAMFILES)/SciFace/MuPAD Pro 2.0/modules
 MMG="$(MODULES)/bin/Mmg.exe"
 

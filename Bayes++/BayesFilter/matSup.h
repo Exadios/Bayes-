@@ -120,28 +120,46 @@ void identity(FMMatrix<Base>& I)
  * Symmetric Positive (Semi) Definate multiply:	X*S*X'
  *  Optimised product for dense matrices
 *   Exploits the symmetry of the computation of X * X' and symmetry of result
- *  Couldn't find a better name for this operation. Result is actually only PD if S is
+ *  Couldn't find a better name for this operation. Result is actually only PD if S is PD
  */
 
-inline Vec::value_type mult_SPD (const Vec& x, const SymMatrix& S)
-/*
- * Symmetric Positive (Semi) Definate multiply:	p = x*S*x'
- * S must be Symetric (SPD -> p is SPD)
- */
-{
-	Vec::value_type p = 0.;
-	Vec::const_iterator xi = x.begin();
-	for (SymMatrix::const_iterator1 Si = S.begin1(); Si != S.end1(); ++Si, ++xi)
-	{
-		p += *xi * ublas::inner_prod(SymMatrix::rowi(Si), x);
-	}
-	return p;
-}
+template <class X, class S>
+struct mult_SPD_matrix_matrix_traits
+{	// Provide ET result type for prod(X,prod(S,trans(X))
+	typedef ublas::matrix_unary2_traits<X, ublas::scalar_identity<typename X::value_type> >::result_type  XT_type;
+	typedef ublas::matrix_matrix_binary_traits<typename S::value_type, S, 
+                                        XT_type::value_type, XT_type>::result_type  SXT_type;
+	typedef ublas::matrix_matrix_binary_traits<typename X::value_type, X, 
+                                        SXT_type::value_type, SXT_type>::result_type  XSXT_type;
+// ISSUE Final part of mult_SPD ET is symmetric. How can this be done?
+// For now skip this
+	typedef XSXT_type  result_type;
+};
+
+/* VERY BAD. The temporay created by prod<T> is reference and then goes out of scope
+template <class X, class T, class S>
+struct mult_SPD_matrix_temp_matrix_traits
+{	// Provide ET result type for prod(X,prod<T>(S,trans(X))
+	typedef ublas::matrix_unary2_traits<X, ublas::scalar_identity<typename X::value_type> >::result_type  XT_type;
+	typedef T  SXT_type;
+	typedef ublas::matrix_matrix_binary_traits<typename X::value_type, X, 
+                                        typename SXT_type::value_type, SXT_type>::result_type  XSXT_type;
+// ISSUE Final part of mult_SPD ET is symmetric. How can this be done?
+// For now skip this
+	typedef XSXT_type  result_type;
+};
+*/ 
+/*template <>
+struct mult_SPD_traits<RowMatrix,Vec>
+{	// Provide return value ET type for mult_SPD
+	typedef RowMatrix X; typedef Vec S
+};*/
 
 inline Vec::value_type mult_SPD (const Vec& x, const Vec& s)
 /*
  * Symmetric Positive (Semi) Definate multiply:	p = x*diag_matrix(s)*x'
  * Optimised to exploit the symmetry of the computation of x * x' and result p
+ * ISSUE: not sparse efficient
  */
 {
 	Vec::value_type p = 0.;
@@ -202,7 +220,7 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
 		for (; Xb != Xend; ++Xb,++Pab)
 		{
 			SymMatrix::value_type p = *Pab;				// Simply multiple row Xa by row Xb
-			p += ublas::inner_prod( MatrixX::rowi(Xa), MatrixX::rowi(Xb) );
+			p += inner_prod( MatrixX::rowi(Xa), MatrixX::rowi(Xb) );
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
@@ -231,12 +249,20 @@ void mult_SPD (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 		SymMatrix::iterator2 Pab= Pa.begin();
 		for (; Xb!= Xend; ++Xb,++Pab)
 		{
-			SymMatrix::value_type p = *Pab + ublas::inner_prod(stemp, MatrixX::rowi(Xb));
+			SymMatrix::value_type p = *Pab + inner_prod(stemp, MatrixX::rowi(Xb));
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
 }
 
+
+inline Vec::value_type mult_SPDT (const Vec& x, const SymMatrix& S)
+/*
+ * Symmetric Positive (Semi) Definate multiply:	p = x'*S*x
+ */
+{
+	return inner_prod (x, ublas::prod(S,x) );
+}
 
 template <class MatrixX>
 void mult_SPDT (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
@@ -261,7 +287,7 @@ void mult_SPDT (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 		SymMatrix::iterator2 Pab= Pa.begin();
 		for (; Xb != Xend; ++Xb,++Pab)
 		{
-			SymMatrix::value_type p = *Pab + ublas::inner_prod(stemp, MatrixX::columni(Xb));
+			SymMatrix::value_type p = *Pab + inner_prod(stemp, MatrixX::columni(Xb));
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
@@ -316,7 +342,7 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 		for (; Xb != Xend; ++Xb,++Pab)
 		{
 			SymMatrix::value_type p = *Pab;				// Simply multiple col Xa by col Xb
-			p += ublas::inner_prod( MatrixX::columni(Xa), MatrixX::columni(Xb) );
+			p += inner_prod( MatrixX::columni(Xa), MatrixX::columni(Xb) );
 			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
 		}
 	}
@@ -329,23 +355,31 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 #if !defined(BAYESFILTER_NOTEMPOPS)
 
 
-inline SymMatrix mult_SPD (const RowMatrix& X, const SymMatrix& S)
+
+
+inline
+mult_SPD_matrix_matrix_traits<RowMatrix,SymMatrix>::result_type 
+	mult_SPD (const RowMatrix& X, const SymMatrix& S)
 /*
- * Symetric Positive (Semi) Definate multiply: return X*S*X'
+ * Symmetric Positive (Semi) Definate multiply: return X*S*X'
  */
 {
-	SymMatrix P(X.size1(),X.size1());
+	return prod( X, prod(S,trans(X)) );
+// ISSUE: need trait for 
+//	symmetric_adaptor<XSXT_type::matrix_type> prod (X, prod(S,trans(X)));
+/*	SymMatrix P(X.size1(),X.size1());
 	P.clear();
 	Vec stemp(S.size1());
 	mult_SPD(X,S, P, stemp);
-	return P;
+	return P;*/
 }
 
 inline SymMatrix mult_SPD (const RowMatrix& X, const Vec& s)
 /*
- * Symetric Positive (Semi) Definate multiply: return X*diag_matrix(s)*X'
+ * Symmetric Positive (Semi) Definate multiply: return X*diag_matrix(s)*X'
  */
 {
+//    return prod (X, prod(s,trans(X))); Need a solution to create diag matrix
 	SymMatrix P(X.size1(),X.size1());
 	P.clear();
 	mult_SPD(X,s, P);
@@ -354,7 +388,7 @@ inline SymMatrix mult_SPD (const RowMatrix& X, const Vec& s)
 
 inline SymMatrix mult_SPD (const RowMatrix& X)
 /*
- * Symetric Positive (Semi) Definate multiply:	return X*X'
+ * Symmetric Positive (Semi) Definate multiply:	return X*X'
  */
 {
 	SymMatrix P(X.size1(),X.size1());
@@ -377,7 +411,7 @@ inline SymMatrix mult_SPDT (const RowMatrix& X, const SymMatrix& S)
 
 inline SymMatrix mult_SPDT (const RowMatrix& X, const Vec& s)
 /*
- * Symetric Positive (Semi) Definate multiply:	return X'*diag_matrix(s)*X
+ * Symmetric Positive (Semi) Definate multiply:	return X'*diag_matrix(s)*X
  */
 {
 	SymMatrix P(X.size2(),X.size2());
@@ -388,7 +422,7 @@ inline SymMatrix mult_SPDT (const RowMatrix& X, const Vec& s)
 
 inline SymMatrix mult_SPDT (const RowMatrix& X)
 /*
- * Symetric Positive (Semi) Definate multiply:	return X'*X
+ * Symmetric Positive (Semi) Definate multiply:	return X'*X
  */
 {
 	SymMatrix P(X.size2(),X.size2());

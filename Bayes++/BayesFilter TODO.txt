@@ -8,13 +8,14 @@ TODO
 
 	infRoot: Use seperate G and q predict, check linrz form
 	add a common base of h() in observe
-	add a polymorphic observe s,S extraction mechanism
+	add a polymorphic observe s,S extraction mechanism OR parametise observe
 
 NEW FILTERS
 	Factorised UKF or DDF2
 	VSDF (factorised from) from Matt Deans
 	SIR with Auxilary variables
-	Sparse matrix implementations
+	Sparse matrix implementations: Requires sparse UdU. Great care of ublas sparse_matrix as it is row/column major
+	 This make a big difference to speed. Hard for prod(L,R) need to have oposite orienation
 
 TO REVIEW
 	Allow sub models of smaller dimensions then representation? Causes problems for multiply conformance

@@ -143,6 +143,38 @@ void test_SPD()
 	std::cout << P << std::endl;
 }
 
+void test_SPD_all()
+{
+	{
+	SymMatrix S(1,1);
+	SymMatrix::iterator1 Si = S.begin1();
+	SymMatrix::rowi(Si);
+	}
+	{
+	const SymMatrix S(1,1);
+	SymMatrix::const_iterator1 Si = S.begin1();
+	SymMatrix::rowi(Si);
+	}
+
+	SymMatrix S(1,1);
+	Vec x(1);
+	S(0,0) = 5.;
+	x[0] = 1.;
+
+	double v1 = ublas::inner_prod (x, ublas::prod(S,x) );
+
+	double v2 = mult_SPDT(x,S);
+
+	test_SPD();
+}
+
+void test_temp_prod()
+{
+	Matrix A(2,2);
+	Matrix R = prod( ublas::prod<Matrix>(A,A), ublas::prod<Matrix>(A,A));
+}
+
+
 #ifdef REMOVED
 // Test MTL storage problems
 void test_storage()
@@ -250,4 +282,6 @@ void test_addative()
 void other_tests()
 {
 	//	test_();
+	test_SPD_all();
+	test_temp_prod();
 }

@@ -24,7 +24,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
@@ -74,7 +74,7 @@
 				ImproveFloatingPointConsistency="TRUE"
 				FavorSizeOrSpeed="1"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="NDEBUG,_LIB"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -116,7 +116,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)../boost"
+				AdditionalIncludeDirectories="$(SolutionDir)../boost"
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
@@ -198,16 +198,16 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Matrix Support"
+			Name="uBlas"
 			Filter="">
 			<File
-				RelativePath="..\UBLASmatSup\matSupSub.h">
+				RelativePath="..\BayesFilter\matSupSub.h">
 			</File>
 			<File
-				RelativePath="..\UBLASmatSup\uBLASmatrix.h">
+				RelativePath="..\BayesFilter\uBLASmatrix.h">
 			</File>
 			<File
-				RelativePath="..\uBLASmatSup\uLAPACK.h">
+				RelativePath="..\BayesFilter\uLAPACK.h">
 			</File>
 		</Filter>
 		<Filter

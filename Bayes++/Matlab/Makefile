@@ -6,7 +6,7 @@
 BAYESFILTER = ..
 CLAPACKLIB = ../../CLAPACK3/Release/clapack7.lib
 
-MEXOPTS = -I$(BAYESFILTER) -I$(BAYESFILTER)/uBLASmatSup
+MEXOPTS = -I$(BAYESFILTER)
 LIBS = $(BAYESFILTER)/VClib/BayesFilter_UBLAS_MD7.lib $(CLAPACKLIB)
 
 all : bf_all slam_all
