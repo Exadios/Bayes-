@@ -1,0 +1,20 @@
+# Bayes++ Jamfile - See Boost.build
+# Simple - Simple filter example
+
+# Declare the location of this subproject relative to the root.
+subproject Simple ;
+
+#######################
+# Declare the BayesFilter static link library
+
+exe simple :
+     simpleExample.cpp 
+     <lib>../BayesFilter
+    : 
+     <include>../uBLASmatSup
+     <include>$(BAYES++_ROOT)
+     <include>$(BOOST_ROOT)
+     <vc7>cxxflags=/Za
+    : debug release <runtime-link>static
+;
+
