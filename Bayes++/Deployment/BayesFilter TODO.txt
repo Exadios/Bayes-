@@ -28,6 +28,8 @@ PROFILING
 	valgrind --skin=cachegrind target/SLAM/gcc/release/debug-symbols-on/
 	
 TODO
+	Parametised_observe_model could loose h
+		this would allow observe_innovation to use a model without h
 	Extend error with module identity and function location
 	Extended_filter would be the place for an update managment helper
 	Replace UdU function with UdU class. Requires a general uBLAS factor object
