@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -18,7 +20,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_filter::Information_filter (Subscript x_size, Subscript z_initialsize) :
+Information_filter::Information_filter (size_t x_size, size_t z_initialsize) :
 		Extended_filter(x_size),
 		y(x_size), Y(x_size,x_size),
 		i(x_size), I(x_size,x_size),
@@ -116,7 +118,7 @@ Bayes_base::Float
 	return rcond;
 }
 
-inline void Information_filter::observe_size (Subscript z_size)
+inline void Information_filter::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -172,7 +174,7 @@ Bayes_base::Float
 	Float rcond = UdUrcond_vec(h.Zv);
 	rclimit.check_PD(rcond, "Zv not PD in observe");
 	ZI.clear();
-	for (Subscript w = 0; w < h.Zv.size(); ++w)
+	for (size_t w = 0; w < h.Zv.size(); ++w)
 		ZI(w,w) = 1./ h.Zv[w];					// inverse(Z)
 												// Calculate EIF i
 	i = prod(trans(h.Hx), prod(ZI,zz));						// ISSUE: Efficiency ZI is diagonal
@@ -188,7 +190,7 @@ Bayes_base::Float
 }
 
 
-Information_joseph_filter::Information_joseph_filter (Subscript x_size, Subscript z_initialsize) :
+Information_joseph_filter::Information_joseph_filter (size_t x_size, size_t z_initialsize) :
 		Information_filter(x_size, z_initialsize),
 		t(x_size)
 /*
@@ -197,7 +199,7 @@ Information_joseph_filter::Information_joseph_filter (Subscript x_size, Subscrip
 {
 }
 
-Information_joseph_filter::Predict_temp::Predict_temp (FM::Subscript x_size) :
+Information_joseph_filter::Predict_temp::Predict_temp (size_t x_size) :
 /* Construct intermediate space for predict
  */
 	inv_Q(x_size, x_size),

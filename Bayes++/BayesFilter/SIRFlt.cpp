@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  *
@@ -40,7 +42,7 @@ namespace Bayesian_filter
 // use 1 std.dev. per sample as default roughening
 const SIR_filter::Float SIR_filter::rougheningKinit = 1.;
 
-SIR_filter::SIR_filter (Subscript x_size, Subscript s_size, Random& random_helper) :
+SIR_filter::SIR_filter (size_t x_size, size_t s_size, Random& random_helper) :
 		Sample_filter(x_size, s_size),
 		resamples(s_size), wir(s_size),
 		random(random_helper)
@@ -99,8 +101,8 @@ void
 	if (wir_update)		// Resampleing only required if weights have been updated
 	{
 		// Resample based on likelihood weights
-		unsigned R_unique;
-		lcond = weighted_resample (resamples, R_unique, S, wir);
+		size_t R_unique; 
+		lcond = weighted_resample (resamples, R_unique, wir);
 
 							// No resampling exceptions: update S
 		copy_resamples (S, resamples);
@@ -123,8 +125,10 @@ void
  */
 {
 						// Predict particles S using supplied predict model
-	for (ColMatrix::iterator si = S.begin(); si != S.end(); ++si) {
-		(*si).assign (f.fx(*si));
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		Si.assign (f.fx(Si));
 	}
 	stochastic_samples = S.size2();
 }
@@ -141,11 +145,11 @@ void
 	h.Lz (z);			// Observe likelihood at z
 
 	{					// Weight Particles. Fused with previous weight
-		ColMatrix::iterator si, si_end = S.end();
 		Vec::iterator wi = wir.begin();
-		for (si = S.begin(); si != si_end; ) {
-			*wi *= h.L(*si);
-			++wi; ++si;
+		const size_t nSamples = S.size2();
+		for (size_t i = 0; i != nSamples; ++i) {
+			*wi *= h.L(FM::column(S,i));
+			++wi;
 		}
 	}
 	wir_update = true;
@@ -153,23 +157,26 @@ void
 
   
 SIR_filter::Float
-SIR_filter::standard_resample (resamples_t& Presamples, unsigned& uresamples, const ColMatrix& P, Vec& w) const
+SIR_filter::standard_resample (resamples_t& Presamples, size_t& uresamples, Vec& w) const
 /*
  * Standard resampler from [1]
- * This algorithm has O(n*log(n)) complexity required to sort the random draws made.
- * This allows comparing of two ordered lists.
- * Sideeffects
+ * Algorithm:
+ *	Complexity O(n*log(n)) complexity required to sort the random draws made.
+ *	This allows comparing of the two ordered lists w and ur.
+ * Output:
+ *  Presamples number of times this particle should be resampled
+ *  uresamples number of unqiue particles (number of non zeros in Presamples)
  *  w becomes a normalised cumulative sum
+ * Sideeffects:
  *  A draw is made from this instances 'random' for each particle
  */
 {
-	assert (P.size2() == Presamples.size());
-	assert (P.size2() == w.size());
+	assert (Presamples.size() == w.size());
 						// Normalised cumulative sum of likelihood weights, find smallest weight
 	Float wcum = 0.;
 	Float wmin = std::numeric_limits<Float>::max();
-	Vec::iterator wi;
-	for (wi = w.begin(); wi != w.end(); ++wi) {
+	Vec::iterator wi, wi_end = w.end();
+	for (wi = w.begin(); wi != wi_end; ++wi) {
 		if (*wi < wmin) {
 			wmin = *wi;
 		}
@@ -192,16 +199,14 @@ SIR_filter::standard_resample (resamples_t& Presamples, unsigned& uresamples, co
 	ur *= wcum;
 
 						// Resamples based on cumulative weights from sorted resample random values
-	ColMatrix::const_iterator pi = P.begin(), pi_end = P.end();
 	resamples_t::iterator pri = Presamples.begin();
 	wi = w.begin();
 	Vec::iterator ui = ur.begin(), ui_end = ur.end();
-	unsigned unique = 0;
+	size_t unique = 0;
 
-	while (pi != pi_end)
+	while (wi != wi_end)
 	{
-		unsigned Pres = 0;			// assume P not resampled until find out otherwise
-		assert(wi != w.end());
+		size_t Pres = 0;			// assume P not resampled until find out otherwise
 		if (ui != ui_end && *ui < *wi)
 		{
 			++unique;
@@ -211,10 +216,10 @@ SIR_filter::standard_resample (resamples_t& Presamples, unsigned& uresamples, co
 				++ui;
 			} while (ui != ui_end && *ui < *wi);
 		}
-		++wi; ++pi;
+		++wi;
 		*pri++ = Pres;
 	}
-	assert(ui==ui_end); assert(wi==w.end());
+	assert(ui==ui_end); assert(pri==Presamples.end());
 
 	uresamples = unique;
 	return wmin / wcum;
@@ -222,25 +227,28 @@ SIR_filter::standard_resample (resamples_t& Presamples, unsigned& uresamples, co
 
 
 SIR_filter::Float
-SIR_filter::systematic_resample (resamples_t& Presamples, unsigned& uresamples, const ColMatrix& P, Vec& w) const
+SIR_filter::systematic_resample (resamples_t& Presamples, size_t& uresamples, Vec& w) const
 /*
  * Systematic resample algorithm from [2]
- * This algorithm has O(n) complexity
- * Particles are chosesn from those whose cumulative weight intersect with an equidistant grid
- * A uniform random draw is chosen to position the grid with the cumulative weights
- * Sideeffects
+ * Algorithm:
+ *	Particles are chosesn from those whose cumulative weight intersect with an equidistant grid
+ *	A uniform random draw is chosen to position the grid with the cumulative weights
+ *	Complexity O(n)
+ * Output:
+ *  Presamples number of times this particle should be resampled
+ *  uresamples number of unqiue particles (number of non zeros in Presamples)
  *  w becomes a normalised cumulative sum
- *  A simple draw is made from this instances 'random'
+ * Sideeffects:
+ *  A single draw is made from this instances 'random'
  */
 {
-	unsigned nParticles = P.size2();
-	assert (nParticles == Presamples.size());
+	size_t nParticles = Presamples.size();
 	assert (nParticles == w.size());
 						// Normalised cumulative sum of likelihood weights, find smallest weight
 	Float wcum = 0.;
 	Float wmin = std::numeric_limits<Float>::max();
-	Vec::iterator wi;
-	for (wi = w.begin(); wi != w.end(); ++wi) {
+	Vec::iterator wi, wi_end = w.end();
+	for (wi = w.begin(); wi != wi_end; ++wi) {
 		if (*wi < wmin) {
 			wmin = *wi;
 		}
@@ -262,15 +270,14 @@ SIR_filter::systematic_resample (resamples_t& Presamples, unsigned& uresamples, 
 	assert(ur[0] >= 0. && ur[0] < 1.);		// Very bad if random is incorrect
 
 						// Resamples based on cumulative weights
-	ColMatrix::const_iterator pi = P.begin(), pi_end = P.end();
 	resamples_t::iterator pri = Presamples.begin();
 	wi = w.begin();
-	unsigned unique = 0;
+	size_t unique = 0;
 	Float s = ur[0] * wstep;	// Random initialisation
 
-	while (pi != pi_end)
+	while (wi != wi_end)
 	{
-		unsigned Pres = 0;			// assume P not resampled until find out otherwise
+		size_t Pres = 0;			// assume P not resampled until find out otherwise
 		if (s < *wi)
 		{
 			++unique;
@@ -280,10 +287,10 @@ SIR_filter::systematic_resample (resamples_t& Presamples, unsigned& uresamples, 
 				s += wstep;
 			} while (s < *wi);
 		}
-		++wi; ++pi;
+		++wi;
 		*pri++ = Pres;
 	}
-	assert(wi==w.end());
+	assert(pri==Presamples.end());
 
 	uresamples = unique;
 	return wmin / wcum;
@@ -300,32 +307,30 @@ void SIR_filter::copy_resamples (ColMatrix& P, const resamples_t& Presamples)
  */
 {
 							// reverse_copy_if live
-	ColMatrix::reverse_iterator liveri = P.rbegin(), sri = P.rbegin();
+	size_t si = P.size2(), livei = si;
 	resamples_t::const_reverse_iterator pri, pri_end = Presamples.rend();
 	for (pri = Presamples.rbegin(); pri != pri_end; ++pri) {
+		--si;
 		if (*pri > 0) {
-			(*liveri).assign (*sri);
-			++liveri;
+			--livei;
+			FM::column(P,livei).assign (FM::column(P,si));
 		}
-		++sri;
 	}
-	assert(sri == P.rend());
+	assert(si == 0);
 							// Replicate live samples
-	ColMatrix::iterator si = P.begin();
-							// ISSUE livei = liveri; should be used here but is not allowed for MTL reverse_iterators
-	ColMatrix::iterator livei = si + (liveri.index()+1);
+	si = 0;
 	resamples_t::const_iterator pi, pi_end = Presamples.end();
 	for (pi = Presamples.begin(); pi != pi_end; ++pi) {
-		unsigned res = *pi;
+		size_t res = *pi;
 		if (res > 0) {
 			do  {
-				(*si).assign (*livei);
+				FM::column(P,si).assign (FM::column(P,livei));
 				++si; --res;
 			} while (res > 0);
 			++livei;
 		}
 	}
-	assert(si == P.end()); assert(livei == P.end());
+	assert(si == P.size2()); assert(livei == P.size2());
 }
 
 
@@ -347,15 +352,15 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 	Float SigmaScale = K * pow (Float(P.size2()), -1./Float(x_size));
 
 						// Find min and max states in all P, precond P not empty
-	ColMatrix::iterator pi = P.begin();
-	Vec xmin(x_size); xmin = *pi;
-	Vec xmax(x_size); xmax = *pi;
-	while (pi != P.end())
+	Vec xmin(x_size); xmin.assign (column(P,0));
+	Vec xmax(x_size); xmax.assign (xmin);
+	ColMatrix::iterator2 pi = P.begin2();
+	while (pi != P.end2())		// Loop includes 0 to simplify code
 	{
 		Vec::iterator ni = xmin.begin();
 		Vec::iterator xi = xmax.begin();
 
-		for (ColMatrix::Column::iterator xpi = (*pi).begin(); xpi != (*pi).end(); ++xpi)
+		for (ColMatrix::iterator1 xpi = pi.begin(); xpi != pi.end(); ++xpi)
 		{
 			if (*xpi < *ni) *ni = *xpi;
 			if (*xpi > *xi) *xi = *xpi;
@@ -371,15 +376,15 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 	rootq *= SigmaScale;
    						// Apply roughening prediction based on scaled variance
 	Vec n(x_size);
-	for (ColMatrix::iterator pi = P.begin(); pi != P.end(); ++pi) {
+	for (pi = P.begin2(); pi != P.end2(); ++pi) {
 		random.normal (n);			// independant zero mean normal
 									// multiply elements by std dev
 		for (FM::Vec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
 		}
-
-		n.plus_assign (*pi);					// add to P
-		*pi = n;
+		FM::ColMatrix::Column Pi(P,pi.index2());
+		n.plus_assign (Pi);			// add to P
+		Pi = n;
 	}
 }
 
@@ -387,7 +392,7 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 /*
  * SIR implementation of a Kalman filter
  */
-SIR_kalman_filter::SIR_kalman_filter (Subscript x_size, Subscript s_size, Random& random_helper) :
+SIR_kalman_filter::SIR_kalman_filter (size_t x_size, size_t s_size, Random& random_helper) :
 	SIR_filter(x_size, s_size, random_helper), Kalman_filter(x_size),
 	rough_random(random_helper),
 	rough(x_size,x_size, rough_random)
@@ -402,8 +407,10 @@ void SIR_kalman_filter::init ()
  */
 {
 						// Samples at mean
-	for (ColMatrix::iterator si = S.begin(); si != S.end(); ++si) {
-		*si = x;
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		Si.assign (x);
 	}
 						// Decorrelate init state noise
 	Matrix UD(x_size,x_size);
@@ -428,8 +435,10 @@ void SIR_kalman_filter::mean ()
 {
 						// Mean of distribution: mean of particles
 	x.clear();
-	for (ColMatrix::iterator Si = S.begin(); Si != S.end(); ++Si) {
-		x.plus_assign (*Si);
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		x.plus_assign (Si);
 	}
 	x /= Float(S.size2());
 }
@@ -444,11 +453,13 @@ void SIR_kalman_filter::covariance ()
 {
 	mean ();
 	X.clear();				// Covariance
-	const Subscript s_size = S.size2();
-	for (ColMatrix::iterator Si = S.begin(); Si != S.end(); ++Si) {
-		X.plus_assign (FM::outer_prod(*Si, *Si));
+
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		X.plus_assign (FM::outer_prod(Si, Si));
 	}
-	X /= Float(s_size-1);
+	X /= Float(nSamples-1);
 	X.minus_assign (FM::outer_prod(x, x));
 }
 
@@ -510,8 +521,10 @@ void SIR_kalman_filter::roughen_correlated (ColMatrix& P, Float K)
 	rough.init_GqG();
 
 						// Predict particles P using rough model
-	for (ColMatrix::iterator pi = P.begin(); pi != P.end(); ++pi) {
-		*pi = rough.fx(*pi);
+	const size_t nSamples = P.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Pi(P,i);
+		Pi.assign (rough.fx(Pi));
 	}
 }
 

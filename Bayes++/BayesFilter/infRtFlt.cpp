@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -14,13 +16,17 @@
 
 #include "uLAPACK.h"	// Common LAPACK interface
 
+
 /* Filter namespace */
 namespace Bayesian_filter
 {
 	using namespace Bayesian_filter_matrix;
 
+							// Simple type to get upper triangular part of of a matrix
+typedef ublas::triangular_adaptor<const Matrix, ublas::upper> UpperTri;
 
-Information_root_filter::Information_root_filter (Subscript x_size, Subscript /*z_initialsize*/) :
+
+Information_root_filter::Information_root_filter (size_t x_size, size_t /*z_initialsize*/) :
 		Extended_filter(x_size),
 		r(x_size), R(x_size,x_size)
 /*
@@ -30,7 +36,7 @@ Information_root_filter::Information_root_filter (Subscript x_size, Subscript /*
 	// No temporaries to make use of z_initialsize
 }
 
-Information_root_info_filter::Information_root_info_filter (Subscript x_size, Subscript z_initialsize) :
+Information_root_info_filter::Information_root_info_filter (size_t x_size, size_t z_initialsize) :
 		Information_root_filter (x_size, z_initialsize),
 		y(x_size), Y(x_size,x_size)
 {}
@@ -62,14 +68,14 @@ void Information_root_filter::init_information (const Vec& yi, const SymMatrix& 
  */
 {
 					// Temporary R Matrix for factorisation
-	const Subscript n = x.size();
+	const size_t n = x.size();
 	LTriMatrix LC(n,n);
 					// Information Root
 	Float rcond = LdLfactor (LC, Yi);
 	rclimit.check_PSD(rcond, "Yi not PSD");
 
 	{				// Lower triangular Choleksy factor of LdL'
-		Subscript i,j;
+		size_t i,j;
 		for (i = 0; i < n; ++i)
 		{
 			using namespace std;		// for sqrt
@@ -84,7 +90,6 @@ void Information_root_filter::init_information (const Vec& yi, const SymMatrix& 
 		}
 	}
 	R = FM::trans(LC);			// R = (L*sqrt(d))'
-	Lzero(R);
 
 	UTriMatrix RI(n,n);
 	RI = R;
@@ -149,8 +154,8 @@ Bayes_base::Float
  * Uses LAPACK geqrf for QR decomposition (without PIVOTING)
  */
 {
-	const Subscript q_size = f.q.size();
-	const Subscript x_size = x.size();
+	const size_t q_size = f.q.size();
+	const size_t x_size = x.size();
 
 	update ();			// x is required for f(x);
 
@@ -177,7 +182,7 @@ Bayes_base::Float
 	for (Vec::const_iterator i = f.q.begin(); i != f.q.end(); ++i)
 	{
 		using namespace std;
-		Subscript ii = i.index();
+		size_t ii = i.index();
 		if (*i < 0.)
 			filter_error ("Negative q");
 		Qr(ii,ii) = sqrt(*i);
@@ -195,8 +200,7 @@ Bayes_base::Float
 	if (info != 0)
 			filter_error ("Predict no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(x_size,x_size*2, x_size,x_size*2);
-	Lzero (R);			// Zero lower triangle
+	R = UpperTri(A.sub_matrix(x_size,x_size*2, x_size,x_size*2));
 					
 	r.assign (prod(R,f.f(x)));	// compute r using f(x)
 
@@ -216,8 +220,8 @@ Bayes_base::Float
  * Uses LAPACK geqrf for QR decomposition (without PIVOTING)
  */
 {
-	const Subscript q_size = f.q.size();
-	const Subscript x_size = x.size();
+	const size_t q_size = f.q.size();
+	const size_t x_size = x.size();
 
 						// Require Root of correlated predict noise (may be semidefinite)
 	DiagMatrix Qr(q_size, q_size);
@@ -225,7 +229,7 @@ Bayes_base::Float
 	for (Vec::const_iterator i = f.q.begin(); i != f.q.end(); ++i)
 	{
 		using namespace std;
-		Subscript ii = i.index();
+		size_t ii = i.index();
 		if (*i < 0.)
 			filter_error ("Negative q");
 		Qr(ii,ii) = sqrt(*i);
@@ -245,9 +249,8 @@ Bayes_base::Float
 			filter_error ("Predict no QR factor");
 
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(x_size,x_size*2, x_size,x_size*2);
+	R = UpperTri(A.sub_matrix(x_size,x_size*2, x_size,x_size*2));
 	r = A.sub_column(x_size,x_size*2, x_size*2);
-	Lzero (R);			// Zero lower triangle
 
 	return UCrcond(R);	// compute rcond of result
 }
@@ -264,8 +267,8 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_
  * ISSUE correctness of linrz form needs validation
  */
 {
-	const Subscript x_size = x.size();
-	const Subscript z_size = s.size();
+	const size_t x_size = x.size();
+	const size_t z_size = s.size();
 						// Size consistency, z to model
 	if (z_size != h.Z.size1())
 		filter_error("observation and model size inconsistent");
@@ -288,9 +291,8 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_
 	if (info != 0)
 			filter_error ("Observe no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(0,x_size, 0,x_size);
+	R = UpperTri(A.sub_matrix(0,x_size, 0,x_size));
 	r = A.sub_column(0,x_size, x_size);
-	Lzero (R);			// Zero lower triangle
 
 	return UCrcond(R);	// compute rcond of result
 }
@@ -308,8 +310,8 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_uncorrelate
  * ISSUE Efficiency. Product of Zir can be simplified
  */
 {
-	const Subscript x_size = x.size();
-	const Subscript z_size = s.size();
+	const size_t x_size = x.size();
+	const size_t z_size = s.size();
 						// Size consistency, z to model
 	if (z_size != h.Zv.size())
 		filter_error("observation and model size inconsistent");
@@ -317,7 +319,7 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_uncorrelate
 						// Require Inverse of Root of uncorrelated observe noise
 	DiagMatrix Zir(z_size,z_size);
 	Zir.clear();
-	for (Subscript i = 0; i < z_size; ++i)
+	for (size_t i = 0; i < z_size; ++i)
 	{
 		using namespace std;
 		Zir(i,i) = 1./ sqrt(h.Zv[i]);
@@ -335,9 +337,8 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_uncorrelate
 	if (info != 0)
 			filter_error ("Observe no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(0,x_size, 0,x_size);
+	R = UpperTri(A.sub_matrix(0,x_size, 0,x_size));
 	r = A.sub_column(0,x_size, x_size);
-	Lzero (R);			// Zero lower triangle
 
 	return UCrcond(R);	// compute rcond of result
 }

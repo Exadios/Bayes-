@@ -1,264 +1,225 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
-<head>
-  <title>Bayesiean Filtering Classes</title>
- 		 		
-  <link media="all" href="/style.css" type="text/css" rel="Stylesheet">
-</head>
-  	<body vlink="blue" link="blue">
- 		
-<h1 align="center"><u>Bayes++ Bayesian Filter Classes</u></h1>
- 		
-<div> 			
-<table height="203" cellpadding="0" align="center" border="0">
- 				<tbody>
- 					<tr>
- 						<td valign="top" width="368" height="48"> 							
-      <h2><a href="Bayesian%20Filtering%20Classes.htm"><font
- face="Verdana" size="5">Bayes++  										Documentation</font></a></h2>
- 						</td>
- 						<td valign="top" width="330" height="48"> 							
-      <p align="right"><a href="mailto:michael@acfr.usyd.edu.au"><span
- style="font-weight: normal; font-size: 18pt; font-family: Verdana;">michael@acfr.usyd.edu.au</span></a></p>
- 						</td>
- 					</tr>
- 					<tr>
- 						<td valign="top" width="368"> 							
-      <h2><a href="Class%20Documentation/html/index.html"><span
- style="font-weight: normal; font-size: 18pt; font-family: Verdana;">C++ Class
+	<head>
+		<title>Bayesiean Filtering Classes</title>
+		<link media="all" href="/style.css" type="text/css" rel="Stylesheet">
+	</head>
+	<body vlink="blue" link="blue">
+		<h1 align="center"><u>Bayes++ Bayesian Filter Classes</u></h1>
+		<div>
+			<table height="203" cellpadding="0" align="center" border="0">
+				<tbody>
+					<tr>
+						<td valign="top" width="368" height="48">
+							<h2><a href="Bayesian%20Filtering%20Classes.htm"><font face="Verdana" size="5">Bayes++ 
+										Documentation</font></a></h2>
+						</td>
+						<td valign="top" width="330" height="48">
+							<p align="right"><a href="mailto:michael@acfr.usyd.edu.au"><span style="FONT-WEIGHT: normal; FONT-SIZE: 18pt; FONT-FAMILY: Verdana">michael@acfr.usyd.edu.au</span></a></p>
+						</td>
+					</tr>
+					<tr>
+						<td valign="top" width="368">
+							<h2><a href="Class%20Documentation/html/index.html"><span style="FONT-WEIGHT: normal; FONT-SIZE: 18pt; FONT-FAMILY: Verdana">C++ Class
 View</span></a></h2>
- 							
-      <p>View the class structure of Bayes++</p>
- 						</td>
- 						<td valign="top" width="330"> 							
-      <p align="right"><strong><strong>Bayes++&nbsp;July&nbsp;2002&nbsp;Release<br>
- 									</strong><strong>EXPERIMENTAL Exclusively&nbsp;uBLAS&nbsp;matrices<br>
-      </strong></strong><strong><strong>see <a
- href="Bayes++.htm#whatsnew">Whats New</a><br>
- 									</strong></strong>All supported compilers <strong><a
- href="bayes++2002.7.zip">Download  										ZIP</a></strong></p>
- 							
-      <p align="right"><strong>Bayes++&nbsp;June&nbsp;2002 (2nd) Release<br>
- 								</strong><strong>Includes uBLAS and MTL matrix support</strong><br>
- 								All supported compilers <a href="bayes++2002.6-2.zip">Download ZIP</a></p>
- 							
-      <p align="right"><strong>MTL Matrix Template Library<br>
- 								</strong>Patched for Visual C++ 6/7, GCC3 <a
- href="mtl-2.1.2-20ms.zip">Download ZIP</a></p>
- 							
-      <p align="right"><strong>C++ Boost<br>
- 								</strong><a href="http://www.boost.org/" target="_top"> 									<span
- style="font-family: Verdana;">http://www.boost.org</span></a></p>
- 						</td>
- 					</tr>
- 				
-  </tbody> 			
-</table>
- 		</div>
- 		
-<p>Bayesian Filtering is a probabilistic technique for data fusion. The technique
- 			results from using a concise mathematical formulation of the state of
-a system.  			Probabilities are used to represent states, likelihood functions
-to represent  			their relationships. In this form Bayes rule can be applied
-and further related  			probabilities deduced.</p>
- 		
-<p>The Bayesian formulation results in a naturally iterative solution to
-data  			fusion and particularly to filtering problems. For linear dynamic
-systems,  			discrete solutions such as the Kalman filter apply.</p>
- 		
-<p>Bayes++ is a library of C++ classes. These classes represent and implement
-a  			wide variety of numerical estimation algorithms for Bayesian Filtering.
-The  			classes provide tested and consistent numerical methods and the class
-hierarchy  			explicitly represents the variety of filtering algorithms and
-model types.</p>
- 		
-<h2>Simple Example</h2>
- 		
-<p>This is very simple example; for those who have never used the Bayesian
- 			Filtering Classes before. If you wish, <a href="simpleExample.cpp"> 				<span
- style="font-family: Verdana;">View the Source</span></a> online. 		</p>
- 		
-<p>The example shows how two classes are built. The first is the prediction
-model,  			the second the observation model. In this example they represent
-a simple  			linear problem with only one state variable and constant model
-noises.</p>
- 		
-<h2> 		</h2>
- 		
-<h2>Compiling the Examples</h2>
- 		
-<p>First <a href="Bayes++.htm">download</a> and extract Bayes++. If you  			also&nbsp;wish
-to compile the PV and Quadratic Calib example or use uBLAS then <em>Boost</em> 
-			is also required. <em>Boost</em> can be placed anywhere relative to Bayes++,
- 			but it is easy&nbsp;if you&nbsp;follow this&nbsp;structure:</p>
- 		
-<dl>
-  <dl>
-    <dt><em>sourceDirectory</em> 					</dt>
-    <dl>
-      <dt> 							
-        <div>Bayes++</div>
- 							</dt>
-      <dl>
-        <dt> 									
-          <div>BayesFilter</div>
- 									</dt>
-        <dt>PV </dt>
-        <dt> 											
-          <div>Quadratic Calib</div>
- 											</dt>
-        <dt> 												
-          <div>Simple</div>
- 												</dt>
-        <dt> 													
-          <div>VClib</div>
- 													</dt>
-        <dt> 														
-          <div> 															
-          <div>uBLASmatSup</div>
- 														</div>
- 														</dt>
-        <dt> 															
-          <div> 																
-          <div>uBLAS</div>
- 															</div>
- 														</dt>
-      </dl>
-      <dt>boost_1_28_0 </dt>
-      <dt> 									
-        <dl>
-          <dt> 											
-            <div>boost</div>
- 										</dt>
-        </dl>
- 								</dt>
-    </dl>
-  </dl>
-</dl>
- 		
-<p dir="ltr">With&nbsp;VC 6 compile the&nbsp;examples&nbsp;using the workspace
-<strong>Bayes++.dsw</strong> 			and the active configuration&nbsp;<strong>uBLAS
-Debug</strong>.&nbsp;For VC  			7&nbsp; use the solution&nbsp; <strong>Bayes++.sln</strong>
-and the active  			configuration&nbsp; <strong>uBLAS Debug</strong>. Please
-ignore any error  			regarding access to source code control. Once you have
-ignored these once your  			local workspace/solution options will be corrected.</p>
- 		
-<p dir="ltr">The compiler options must be set so the additional <em>Boost</em>
-include  			files can be found. In this case the <u>include path</u> must
-contain the base  			directory of Boost. That is <strong>sourceDirectory/boost_1_28_0.
-</strong>In  			Visual C++ you should do this by using <em>Tools/Options/Directories</em>
-for  			VC6 or&nbsp; <em>Tools/Options/Projects/VC++ Directories</em> for
-VC7. 		</p>
- 		
-<h2>Licensing</h2>
- 		
-<p>The source code includes a copyright notice. The ACFR retains the copyright
-on  			the original source code. This reflects the normal copyright protection
-of any  			academic publication. This in no way restricts any commercial
-use you may wish  			to make using our source code. It is free of any rights
-on any product you may  			make using it. As long as you respect the copyright,
-I and the ACFR are happy  			to for you to use it in any way you wish. 		</p>
- 		
-<h2>FAQ</h2>
- 		
-<h4>Does Bayes++ do Kalman Filtering?</h4>
- 		
-<p>Yes, there are many implementations in Bayes++. The standard Kalman Filter
-or  			Extended Kalman Filter is implemented by the <em>Covariance_filter</em>
-Scheme.</p>
- 		
-<h4>How fast is Bayes++?</h4>
- 		
-<p>Pretty quick! Depends on the filter Scheme used.</p>
- 		
-<h4>Why should I use Bayes++? After all, writting a Kalman filter in Matlab
-is not  			too hard.</h4>
- 		
-<p>For a simple test this may be true. If you have ever tried to deal with
-the wide  			variety of numerical failures and normalisations required to
-deal with  			discontinues model you will realises that is more to implementing
-a Kalman  			filter then a hand full of linear algebra equations!</p>
- 		
-<p>Many DIY Kalman filter implementations fail as they do not maintain the
-symmetry  			of matrices. If this is problem is corrected, they usually use
-numerically  			inaccurate algorithms and also will silently continue to
-operate even when the  			results no longer make sense. The matrices are
-ill conditioned! All these hard  			problems have been solved for you by
-Bayes++.</p>
- 		
-<p>However Bayes++ most powerful feature is <strong>not</strong> that it
-just does  			things correctly? It provides a consistent methodology to apply
-multiple  			Bayesian filtering techniques. Once you have codified the models
-that represent  			a problem you can solve your problem with many difference
-Bayesian filtering  			techniques. These may be simple Kalman filters such
-as the <em>Information_filter</em> 			Scheme, or even a particle filter such
-as the <em>SIR_filter</em> Scheme.</p>
- 		
-<h4>Is Bayes++ stable?</h4>
- 		
-<p>Although many things have been added to Bayes++ over the last two years
-they  			have only added to the variety of implementations. Bayes++'s interface
-has now  			reached a very mature stage with little or no change required
-to add new types  			of Bayesian filtering.</p>
- 		
-<p>The implementations of filtering Schemes, included in the web release,
-have all  			been tested with a range angle observation problem. I also use
-the filtering  			Schemes for my own work, and others do so in the ACFR.
-Be aware however that  			the implementation of the Matrix library functions
-may change in the future.</p>
- 		
-<h4>Do I need to program in C++ to use Bayes++?</h4>
- 		
-<p>Yes! Bayes++ was developed to provide the maximum functionality in C++.
-A good  			C++ text book&nbsp;will help you understand how Bayes++ works.&nbsp;&nbsp;There
- 			is no need to learn C programming first. Learning C is not a good introduction
- 			to modern C++&nbsp;programming techniques used in Bayes++. I would recommend
- 			Deitel and Deitel, &#8220;C++: How to Program&#8221;, Second Edition, Prentice Hall,
-ISBN  			0-13-528910-6. It is an excellent beginners book; and includes many
-useful tips  			and a 			<span lang="en-US">thorough </span>understanding
-of the langauge.</p>
- 		
-<h4>What Matrix library do you recommend?</h4>
- 		
-<p>From the June 2002 release Bayes++ supports both <a
- href="http://www.genesys-e.org/ublas/index.htm"> 				uBLAS</a> and <a
- href="http://www.osl.iu.edu/research/mtl/">MTL</a>. In  			fact the release
-now includes a uBLAS folder with the complete source. The more  			I use
-uBLAS the more I like it! The&nbsp;included version 			<span
- style="font-size: 12pt; font-family: 'Times New Roman';">incorporates  </span>a
- 			few&nbsp;changes required for Bayes++. At present I am working with the
-uBLAS  			authors so these will not be required in the future. By changing
-the compiler  			include paths a standard version of uBLAS can be used.</p>
- 		
-<p> 			Credit&nbsp;for everything in&nbsp;the uBLAS folder goes to&nbsp;Joerg
-Walter  			and Mathias Koch. uBLAS is a 			<span
- style="font-size: 12pt; font-family: 'Times New Roman';">excellent  </span>library.&nbsp;Using
- 			it&nbsp;with Bayes++,&nbsp;really shows its 			<span
- style="font-size: 12pt; font-family: 'Times New Roman';">excellent  </span> 
+							<p>View the class structure of Bayes++</p>
+						</td>
+						<td valign="top" width="330">
+							<p align="right"><strong><strong>Bayes++&nbsp;July&nbsp;2002&nbsp;Release<br>
+									</strong><strong>EXPERIMENTAL Exclusively&nbsp;uBLAS&nbsp;matrices<br>
+									</strong></strong><strong><strong>see <a href="Bayes++.htm#whatsnew">Whats New</a><br>
+									</strong></strong>All supported compilers <strong><a href="bayes++2002.7.zip">Download 
+										ZIP</a></strong></p>
+							<p align="right"><strong>Bayes++&nbsp;June&nbsp;2002 (2nd) Release<br>
+								</strong><strong>Includes uBLAS and MTL matrix support</strong><br>
+								All supported compilers <a href="bayes++2002.6-2.zip">Download ZIP</a></p>
+							<p align="right"><strong>MTL Matrix Template Library<br>
+								</strong>Patched for Visual C++ 6/7, GCC3 <a href="mtl-2.1.2-20ms.zip">Download ZIP</a></p>
+							<p align="right"><strong>C++ Boost<br>
+								</strong><a href="http://www.boost.org/" target="_top">
+									<span style="FONT-FAMILY: Verdana">http://www.boost.org</span></a></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p>Bayesian Filtering is a probabilistic technique for data fusion. The technique 
+			results from using a concise mathematical formulation of the state of a system. 
+			Probabilities are used to represent states, likelihood functions to represent 
+			their relationships. In this form Bayes rule can be applied and further related 
+			probabilities deduced.</p>
+		<p>The Bayesian formulation results in a naturally iterative solution to data 
+			fusion and particularly to filtering problems. For linear dynamic systems, 
+			discrete solutions such as the Kalman filter apply.</p>
+		<p>Bayes++ is a library of C++ classes. These classes represent and implement a 
+			wide variety of numerical estimation algorithms for Bayesian Filtering. The 
+			classes provide tested and consistent numerical methods and the class hierarchy 
+			explicitly represents the variety of filtering algorithms and model types.</p>
+		<h2>Simple Example</h2>
+		<p>This is very simple example; for those who have never used the Bayesian 
+			Filtering Classes before. If you wish, <a href="simpleExample.cpp">
+				<span style="FONT-FAMILY: Verdana">View the Source</span></a> online.
+		</p>
+		<p>The example shows how two classes are built. The first is the prediction model, 
+			the second the observation model. In this example they represent a simple 
+			linear problem with only one state variable and constant model noises.</p>
+		<h2>
+		</h2>
+		<h2>Compiling the Examples</h2>
+		<p>First <a href="Bayes++.htm">download</a> and extract Bayes++. If you 
+			also&nbsp;wish to compile the PV and Quadratic Calib example or use uBLAS then <em>Boost</em>
+			is also required. <em>Boost</em> can be placed anywhere relative to Bayes++, 
+			but it is easy&nbsp;if you&nbsp;follow this&nbsp;structure:</p>
+		<dl>
+			<dl>
+				<dt><em>sourceDirectory</em>
+					<dl>
+						<dt>
+							<div>Bayes++</div>
+							<dl>
+								<dt>
+									<div>BayesFilter</div>
+									<dt>PV <dt>
+											<div>Quadratic Calib</div>
+											<dt>
+												<div>Simple</div>
+												<dt>
+													<div>VClib</div>
+													<dt>
+														<div>
+															<div>uBLASmatSup</div>
+														</div>
+														<dt>
+															<div>
+																<div>uBLAS</div>
+															</div>
+														</dt>
+							</dl>
+							<dt>boost_1_28_0 <dt>
+									<dl>
+										<dt>
+											<div>boost</div>
+										</dt>
+									</dl>
+								</dt>
+					</dl>
+				</dt>
+			</dl>
+		</dl>
+		<p dir="ltr">With&nbsp;VC 6 compile the&nbsp;examples&nbsp;using the workspace <strong>Bayes++.dsw</strong>
+			and the active configuration&nbsp;<strong>uBLAS Debug</strong>.&nbsp;For VC 
+			7&nbsp; use the solution&nbsp; <strong>Bayes++.sln</strong> and the active 
+			configuration&nbsp; <strong>uBLAS Debug</strong>. Please ignore any error 
+			regarding access to source code control. Once you have ignored these once your 
+			local workspace/solution options will be corrected.</p>
+		<p dir="ltr">The compiler options must be set so the additional <em>Boost</em> include 
+			files can be found. In this case the <u>include path</u> must contain the base 
+			directory of Boost. That is <strong>sourceDirectory/boost_1_28_0. </strong>In 
+			Visual C++ you should do this by using <em>Tools/Options/Directories</em> for 
+			VC6 or&nbsp; <em>Tools/Options/Projects/VC++ Directories</em> for VC7.
+		</p>
+		<h2>Licensing</h2>
+		<P>All&nbsp;Bayes++&nbsp;source code files are&nbsp;copyright with the licence 
+			conditions as given here. The copyright notice is that of the MIT license. This 
+			in no way restricts any commercial use you may wish to make using our source 
+			code. As long as you respect the copyright and license condition,&nbsp;Michael 
+			Stevens&nbsp;and the ACFR are happy to for you to use it in any way you wish.
+		</P>
+		<P>Bayes++ the Bayesian Filtering Library</P>
+		<P>Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics</P>
+		<P>Permission is hereby granted, free of charge, to any person obtaining a copy of 
+			this software and associated documentation files (the "Software"), to deal in 
+			the Software without restriction, including without limitation the rights to 
+			use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+			of the Software, and to permit persons to whom the Software is furnished to do 
+			so, subject to the following conditions:</P>
+		<P>The above copyright notice and this permission notice shall be included in all 
+			copies or substantial portions of the Software.</P>
+		<P>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+			IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+			FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+			AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+			LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+			OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+			SOFTWARE.</P>
+		<h2>FAQ</h2>
+		<h4>Does Bayes++ do Kalman Filtering?</h4>
+		<p>Yes, there are many implementations in Bayes++. The standard Kalman Filter or 
+			Extended Kalman Filter is implemented by the <em>Covariance_filter</em> Scheme.</p>
+		<h4>How fast is Bayes++?</h4>
+		<p>Pretty quick! Depends on the filter Scheme used.</p>
+		<h4>Why should I use Bayes++? After all, writting a Kalman filter in Matlab is not 
+			too hard.</h4>
+		<p>For a simple test this may be true. If you have ever tried to deal with the wide 
+			variety of numerical failures and normalisations required to deal with 
+			discontinues model you will realises that is more to implementing a Kalman 
+			filter then a hand full of linear algebra equations!</p>
+		<p>Many DIY Kalman filter implementations fail as they do not maintain the symmetry 
+			of matrices. If this is problem is corrected, they usually use numerically 
+			inaccurate algorithms and also will silently continue to operate even when the 
+			results no longer make sense. The matrices are ill conditioned! All these hard 
+			problems have been solved for you by Bayes++.</p>
+		<p>However Bayes++ most powerful feature is <strong>not</strong> that it just does 
+			things correctly? It provides a consistent methodology to apply multiple 
+			Bayesian filtering techniques. Once you have codified the models that represent 
+			a problem you can solve your problem with many difference Bayesian filtering 
+			techniques. These may be simple Kalman filters such as the <em>Information_filter</em>
+			Scheme, or even a particle filter such as the <em>SIR_filter</em> Scheme.</p>
+		<h4>Is Bayes++ stable?</h4>
+		<p>Although many things have been added to Bayes++ over the last two years they 
+			have only added to the variety of implementations. Bayes++'s interface has now 
+			reached a very mature stage with little or no change required to add new types 
+			of Bayesian filtering.</p>
+		<p>The implementations of filtering Schemes, included in the web release, have all 
+			been tested with a range angle observation problem. I also use the filtering 
+			Schemes for my own work, and others do so in the ACFR. Be aware however that 
+			the implementation of the Matrix library functions may change in the future.</p>
+		<h4>Do I need to program in C++ to use Bayes++?</h4>
+		<p>Yes! Bayes++ was developed to provide the maximum functionality in C++. A good 
+			C++ text book&nbsp;will help you understand how Bayes++ works.&nbsp;&nbsp;There 
+			is no need to learn C programming first. Learning C is not a good introduction 
+			to modern C++&nbsp;programming techniques used in Bayes++. I would recommend 
+			Deitel and Deitel, “C++: How to Program”, Second Edition, Prentice Hall, ISBN 
+			0-13-528910-6. It is an excellent beginners book; and includes many useful tips 
+			and a
+			<span lang="en-US">thorough </span>understanding of the langauge.</p>
+		<h4>What Matrix library do you recommend?</h4>
+		<p>From the June 2002 release Bayes++ supports both <a href="http://www.genesys-e.org/ublas/index.htm">
+				uBLAS</a> and <a href="http://www.osl.iu.edu/research/mtl/">MTL</a>. In 
+			fact the release now includes a uBLAS folder with the complete source. The more 
+			I use uBLAS the more I like it! The&nbsp;included version
+			<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Times New Roman'">incorporates  </span>a 
+			few&nbsp;changes required for Bayes++. At present I am working with the uBLAS 
+			authors so these will not be required in the future. By changing the compiler 
+			include paths a standard version of uBLAS can be used.</p>
+		<p>
+			Credit&nbsp;for everything in&nbsp;the uBLAS folder goes to&nbsp;Joerg Walter 
+			and Mathias Koch. uBLAS is a
+			<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Times New Roman'">excellent  </span>library.&nbsp;Using 
+			it&nbsp;with Bayes++,&nbsp;really shows its
+			<span style="FONT-SIZE: 12pt; FONT-FAMILY: 'Times New Roman'">excellent  </span>
 			design and efficient implementation. Many thanks!</p>
- 		 		
-<h2><a name="whatsnew"></a>Whats new?</h2>
- 		
-<h4>Experimental uBLAS ONLY Release</h4>
- 		
-<p>To make more efficient use of uBLAS the July 2002 release supports it
- 			exclusivly. The change reflects my wish to change Bayes++ matrix  			syntax
-to more closely reflect that of uBLAS. There are a few simple  			changes
-to note, including:</p>
- 		
-<ol>
- 			<li> 				nrows() and ncols() are now size1() and size2()</li>
- 			<li> 				set(X, 0.) should be replaced by X.clear()</li>
- 			<li> 				The operator* overloading is dropped. Use the explict X = prod(A,B)<br>
- 				In the future uBLAS will introduce a form of prod that reduces the expression
- 				complexity by introducing a temporary. This will be probably look like
-    <i>prod&lt;type&gt;(A,B)</i>&nbsp;where the type is used to hold&nbsp;the
-temporary.</li>
- 			<li> 				Look out for the use of X.assign(EE). This is an optimised assignment
-when the  				expression EE is independant of X</li>
-</ol>
- 		
-<p>&nbsp;</p>
- 	<br>
-</body>
+		<h2><a name="whatsnew"></a>Whats new?</h2>
+		<h4>Experimental uBLAS ONLY Release</h4>
+		<p>To make more efficient use of uBLAS the July 2002 release supports it 
+			exclusivly. The change reflects my wish to change Bayes++ matrix syntax to more 
+			closely reflect that of uBLAS. There are a few simple changes to note, 
+			including:</p>
+		<ol>
+			<li>
+			nrows() and ncols() are now size1() and size2()
+			<li>
+			set(X, 0.) should be replaced by X.clear()
+			<li>
+				The operator* overloading is dropped. Use the explict X = prod(A,B)<br>
+				In the future uBLAS will introduce a form of prod that reduces the expression 
+				complexity by introducing a temporary. This will be probably look like <i>prod&lt;type&gt;(A,B)</i>&nbsp;where 
+			the type is used to hold&nbsp;the temporary.
+			<li>
+				Look out for the use of X.assign(EE). This is an optimised assignment when the 
+				expression EE is independant of X</li>
+		</ol>
+		<p>&nbsp;</p>
+		<br>
+	</body>
 </html>

@@ -23,6 +23,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/Zm150"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)"
 				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
@@ -33,7 +34,8 @@
 				PrecompiledHeaderFile=".\UBLAS_Debug/simple.pch"
 				WarningLevel="3"
 				DebugInformationFormat="4"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4224"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -74,7 +76,7 @@
 				Optimization="1"
 				GlobalOptimizations="TRUE"
 				ImproveFloatingPointConsistency="TRUE"
-				AdditionalIncludeDirectories="../uBLASmatSup;.."
+				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)"
 				PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
@@ -82,12 +84,62 @@
 				DisableLanguageExtensions="TRUE"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\UBLAS_Debug/simple.pch"
-				WarningLevel="3"/>
+				WarningLevel="3"
+				DisableSpecificWarnings="4224"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\MTL_Debug/simple.tlb"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="3081"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="uBLAS(Development) Debug|Win32"
+			OutputDirectory="uBLAS(Development) Debug"
+			IntermediateDirectory="uBLAS(Development) Debug"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/w44224 /Zm150"
+				Optimization="0"
+				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)../boost;$(SolutionDir)"
+				PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				DisableLanguageExtensions="TRUE"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\UBLAS_Debug/simple.pch"
+				WarningLevel="3"
+				DebugInformationFormat="4"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				LinkIncremental="2"
+				SuppressStartupBanner="TRUE"
+				GenerateDebugInformation="TRUE"
 				SubSystem="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -119,6 +171,12 @@
 			</FileConfiguration>
 			<FileConfiguration
 				Name="uBLAS Release|Win32">
+				<Tool
+					Name="VCCLCompilerTool"
+					DisableLanguageExtensions="TRUE"/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="uBLAS(Development) Debug|Win32">
 				<Tool
 					Name="VCCLCompilerTool"
 					DisableLanguageExtensions="TRUE"/>

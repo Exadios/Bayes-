@@ -2,8 +2,10 @@
 #define _BAYES_FILTER_SCHEME
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -30,28 +32,28 @@ class Filter_scheme : public Scheme
  */
 {
 public:
-	Filter_scheme(FM::Subscript x_size);
+	Filter_scheme(size_t x_size);
 	// Common fixed state size
 
-	Filter_scheme(FM::Subscript x_size, FM::Subscript z_initialsize);
-	Filter_scheme(FM::Subscript x_size, FM::Subscript q_maxsize, FM::Subscript z_initialsize);
+	Filter_scheme(size_t x_size, size_t z_initialsize);
+	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize);
 	// Allow predefined sizes. Useful for some Linrz_filter specialisations
 };
 
 template <class Scheme>
-Filter_scheme<Scheme>::Filter_scheme(FM::Subscript x_size) :
+Filter_scheme<Scheme>::Filter_scheme(size_t x_size) :
 	Scheme (x_size)
 {}
 
 // Defaults allowing specialisations for Linrz_filters
 //   They only require x_size, and can make use of z_initalsize
 template <class Scheme>
-Filter_scheme<Scheme>::Filter_scheme(FM::Subscript x_size, FM::Subscript z_initalsize) :
+Filter_scheme<Scheme>::Filter_scheme(size_t x_size, size_t z_initalsize) :
 	Scheme (x_size, z_initialsize)
 {}
 
 template <class Scheme>
-Filter_scheme<Scheme>::Filter_scheme(FM::Subscript x_size, FM::Subscript q_maxsize, FM::Subscript z_initialsize) :
+Filter_scheme<Scheme>::Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 	Scheme (x_size, z_initialsize)
 {}
 
@@ -60,7 +62,7 @@ template <>
 class Filter_scheme<UD_filter> : public UD_filter
 {
 public:
-	Filter_scheme(FM::Subscript x_size, FM::Subscript q_maxsize, FM::Subscript z_initialsize) :
+	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 		UD_filter (x_size, q_maxsize, z_initialsize)
 	{}
 };

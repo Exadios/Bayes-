@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+
+/*
  * MATLAB MEX interface for Bayes++
  *  bf_scheme: Constuct a Bayes++ filter scheme and return its handle
  */
@@ -102,7 +108,7 @@ Bf_maker::Filter
 
 	// Use a temporary filter to create samples
 	Bayesian_filter::SIR_kalman_filter tempS(f->S.size1(), f->S.size2(), randomHelper);
-	tempS.init (init_x,init_X);
+	tempS.init_kalman (init_x,init_X);
 	f->init(tempS.S);
 				// Overide filter default
 	if (rougheningK != -1.)
@@ -138,7 +144,7 @@ Bf_maker::Filter
 
 	Run_SIR_kalman* f = new Run_SIR_kalman(init_x.size(), sample_size, randomHelper);
 
-	f->init(init_x,init_X);
+	f->init_kalman (init_x,init_X);
 				// Overide filter default
 	if (rougheningK != -1.)
 		f->rougheningK = rougheningK;
@@ -157,7 +163,7 @@ Bf_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_Unscented* f = new Run_Unscented(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -172,7 +178,7 @@ Bf_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_Cov* f = new Run_Cov(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -187,7 +193,7 @@ Bf_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_Inf* f = new Run_Inf(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -202,7 +208,7 @@ Bf_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_InfJo* f = new Run_InfJo(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -217,7 +223,7 @@ Bf_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_SRIF* f = new Run_SRIF(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -232,7 +238,7 @@ Bf_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_UD* f = new Run_UD(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 

@@ -1,8 +1,10 @@
 #ifndef _BAYES_FILTER_UD
 #define _BAYES_FILTER_UD
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -10,7 +12,7 @@
 /*
  * UD Factorisation of Covariance Filter.
  *	A Covariance (Kalman) filter as an Abstract class
- *
+ * 
  * Bierman's UD factorisatised update algorithm using Agee-Turner UdU' factorisation rank 1 update
  * Thornton's MWG-S factorisation prediction  algorithm
  * References
@@ -35,10 +37,10 @@ namespace Bayesian_filter
 class UD_sequential_observe_model : public Linrz_uncorrelated_observe_model
 {
 public:
-	UD_sequential_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	UD_sequential_observe_model (size_t x_size, size_t z_size) :
 		Linrz_uncorrelated_observe_model(x_size, z_size), Hx_o(x_size)
 	{}
-	virtual FM::Vec& ho (const FM::Vec& x, const FM::Subscript o) = 0;
+	virtual FM::Vec& ho (const FM::Vec& x, const size_t o) = 0;
 	/* Supplied model (h) for observation using state x, z allows normalisation and model variation
 	   Fast model of a single element (o) in observation model
 	   Precondition: Hx_o is conformantly dimensioned
@@ -53,14 +55,14 @@ public:
 class UD_filter : public Linrz_filter
 {
 private:
-	FM::Subscript q_max;	// Maxiumum size allocated for noise model, constructed before UD
+	size_t q_max;	// Maxiumum size allocated for noise model, constructed before UD
 public:
 	FM::Matrix UD;	// UDU factorisation of X with D on diagonal
 						// Lower triangle used as workspace
 	FM::Vec s;		// Innovation
-	FM::Vec Sd;		// Innovation Covariance
+	FM::Vec Sd;		// Innovation Covariance 
 
-	UD_filter (FM::Subscript x_size, FM::Subscript q_maxsize, FM::Subscript z_initialsize = 0);
+	UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize = 0);
 	UD_filter& operator= (const UD_filter&);
 	// Optimise copy assignment to only copy filter state
 
@@ -82,8 +84,8 @@ protected:
 	Float observeUD (FM::Vec& gain, Float& alpha, const FM::Vec& h, const Float r);
 	FM::Vec a, b;		// observeUD temporaries
 						// Observation temporaies
-	void observe_size (FM::Subscript z_size);
-	FM::Subscript last_z_size;
+	void observe_size (size_t z_size);
+	size_t last_z_size;
 	FM::Vec h1;				// Single Observation model
 	FM::Vec w;				// Single Gain
 	FM::Vec zp;				// prediction

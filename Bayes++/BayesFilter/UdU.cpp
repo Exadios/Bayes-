@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -50,13 +52,13 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
  */
 {
 	// Special case an empty matrix
-	const Subscript n = UD.size1();
+	const size_t n = UD.size1();
 	if (n == 0)
 		return 0.;
 
 	RowMatrix::value_type rcond, mind = UD(0,0), maxd = 0.;
 
-	for (Subscript i = 0; i < n; ++i)	{
+	for (size_t i = 0; i < n; ++i)	{
 		RowMatrix::value_type d = UD(i,i);
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
@@ -83,13 +85,13 @@ Vec::value_type UdUrcond_vec (const Vec& D)
  */
 {
 	// Special case an empty vector
-	const Subscript n = D.size();
+	const size_t n = D.size();
 	if (n == 0)
 		return 0.;
 
 	Vec::value_type rcond, mind = D[0], maxd = 0.;
 
-	for (Subscript i = 0; i < n; ++i)	{
+	for (size_t i = 0; i < n; ++i)	{
 		Vec::value_type d = D[i];
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
@@ -128,13 +130,13 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U)
  */
 {
 	// Special case an empty matrix
-	const Subscript n = U.size1();
+	const size_t n = U.size1();
 	if (n == 0)
 		return 0.;
 
 	UTriMatrix::value_type rcond, mind = U(0,0), maxd = 0.;
 
-	for (Subscript i = 0; i < n; ++i)	{
+	for (size_t i = 0; i < n; ++i)	{
 		UTriMatrix::value_type d = U(i,i);
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
@@ -162,24 +164,24 @@ RowMatrix::value_type UdUdet (const RowMatrix& UD)
  *  Defined to be 1 for 0 size UD
  */ 
 {
-	const Subscript n = UD.size1();
+	const size_t n = UD.size1();
 	RowMatrix::value_type det = 1.;
-	for (Subscript i = 0; i < n; ++i)	{
+	for (size_t i = 0; i < n; ++i)	{
 		det *= UD(i,i);
 	}
 	return det;
 }
 
 
-RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, Subscript n)
+RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.218 Upper cholesky algorithm modified for UdU'
- *  Numerical stability may not be as good as Mk[i] is updated from previous results
+ *  Numerical stability may not be as good as M(k,i) is updated from previous results
  * Strict lower triangle of M is ignored in computation
  *
- * Input: M, n=last Subscript to be included in factorisation
+ * Input: M, n=last size_t to be included in factorisation
  * Output: M as UdU' factor
  *    strict_upper_triangle(M) = strict_upper_triangle(U)
  *    diagonal(M) = d
@@ -188,7 +190,7 @@ RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, Subscript n)
  *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
  */
 {
-	Subscript i,j,k;
+	size_t i,j,k;
 	RowMatrix::value_type e, d;
 
 	if (n > 0)
@@ -209,7 +211,7 @@ RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, Subscript n)
 					M(i,j) = d*e;
 					for (k = 0; k <= i; ++k)
 					{
-						RowMatrix::Row Mk = M[k];
+						RowMatrix::Row Mk(M,k);
 						Mk[i] -= e*Mk[j];
 					}
 				}
@@ -239,14 +241,14 @@ Negative:
 }
 
 
-RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, Subscript n)
+RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.219 right side of table
  * Strict lower triangle of M is ignored in computation
  *
- * Input: M, n=last Subscript to be included in factorisation
+ * Input: M, n=last size_t to be included in factorisation
  * Output: M as UdU' factor
  *    strict_upper_triangle(M) = strict_upper_triangle(U)
  *    diagonal(M) = d
@@ -255,14 +257,14 @@ RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, Subscript n)
  *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
  */
 {
-	Subscript i,j,k;
+	size_t i,j,k;
 	RowMatrix::value_type e, d;
 
 	if (n > 0)
 	{
 		j = n-1;
 		do {
-			RowMatrix::Row Mj = M[j];
+			RowMatrix::Row Mj(M,j);
 			d = Mj[j];
 
 			// Diagonal element
@@ -272,7 +274,7 @@ RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, Subscript n)
 				i = j;
 				do
 				{
-					RowMatrix::Row Mi = M[i];
+					RowMatrix::Row Mi(M,i);
 					e = Mi[j];
 					for (k = j+1; k < n; ++k)
 					{
@@ -310,13 +312,13 @@ Negative:
 }
 
 
-LTriMatrix::value_type LdLfactor (LTriMatrix& M, Subscript n)
+LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 /*
  * In place Modified lower triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.218 Lower cholesky algorithm modified for LdL'
  *
- * Input: M, n=last Subscript to be included in factorisation
+ * Input: M, n=last size_t to be included in factorisation
  * Output: M as LdL' factor
  *    strict_lower_triangle(M) = strict_lower_triangle(L)
  *    diagonal(M) = d
@@ -325,7 +327,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, Subscript n)
  * ISSUE: This could change to equivilient of UdUfactor_varient2
  */
 {
-	Subscript i,j,k;
+	size_t i,j,k;
 	LTriMatrix::value_type e, d;
 
 	for (j = 0; j < n; ++j)
@@ -344,7 +346,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, Subscript n)
 				M(i,j) = d*e;
 				for (k = i; k < n; ++k)
 				{
-					LTriMatrix::Row Mk = M[k];
+					LTriMatrix::Row Mk(M,k);
 					Mk[i] -= e*Mk[j];
 				}
 			}
@@ -373,14 +375,14 @@ Negative:
 }
 
 
-UTriMatrix::value_type UCfactor (UTriMatrix& M, Subscript n)
+UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 /*
  * In place Upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.218
  * Strict lower triangle of M is ignored in computation
  *
- * Input: M, n=last Subscript to be included in factorisation
+ * Input: M, n=last size_t to be included in factorisation
  * Output: M as UC factor
  *    upper_triangle(M) = upper_triangle(UC)
  * Return:
@@ -388,7 +390,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, Subscript n)
  */
 {
 	using namespace std;		// for sqrt
-	Subscript i,j,k;
+	size_t i,j,k;
 	UTriMatrix::value_type e, d;
 
 	if (n > 0)
@@ -411,7 +413,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, Subscript n)
 					M(i,j) = e;
 					for (k = 0; k <= i; ++k)
 					{
-						UTriMatrix::Row Mk = M[k];
+						UTriMatrix::Row Mk(M,k);
 						Mk[i] -= e*Mk[j];
 					}
 				}
@@ -452,7 +454,7 @@ RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
  *		see in-place UdUfactor
  */
 {
-	UD = M;
+	UD.assign (M);
 	RowMatrix::value_type rcond = UdUfactor (UD, M.size1());
 
 	Lzero (UD);	// Zero lower triangle ignored by UdUfactor
@@ -471,10 +473,10 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  *		see in-place LdLfactor 
  */
 {
-	LD = M;
+	ublas::triangular_adaptor<const SymMatrix, ublas::lower> ltriM(M);
+	LD.assign (ltriM);
 	LTriMatrix::value_type rcond = LdLfactor (LD, M.size1());
 
-	Uzero (LD);	// Zero upper triangle ignored by LdLfactor
 	return rcond;
 }
 
@@ -490,10 +492,10 @@ UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M)
  *		see in-place UCfactor
  */
 {
-	U = M;
+	ublas::triangular_adaptor<const SymMatrix, ublas::upper> utriM(M);
+	U.assign (utriM);
 	UTriMatrix::value_type rcond = UCfactor (U, M.size1());
 
-	Lzero (U);	// Zero lower triangle ignored by UCfactor. ISSUE not required for some UTriMatrix implementations
 	return rcond;
 }
 
@@ -514,15 +516,15 @@ bool UdUinverse (RowMatrix& UD)
  *		singularity (of d), true iff d has a zero element
  */
 {
-	Subscript i,j,k;
-	const Subscript n = UD.size1();
+	size_t i,j,k;
+	const size_t n = UD.size1();
 
 	// Invert U in place
 	if (n > 1)
 	{
 		i = n-2;
 		do {
-			RowMatrix::Row UDi = UD[i];
+			RowMatrix::Row UDi(UD,i);
 			for (j = n-1; j > i; --j)
 			{
 				RowMatrix::value_type UDij = - UDi[j];
@@ -558,8 +560,8 @@ bool UTinverse (UTriMatrix& U)
  *		singularity (of U), true iff diagonal of U has a zero element
  */
 {
-	Subscript i,j,k;
-	const Subscript n = U.size1();
+	size_t i,j,k;
+	const size_t n = U.size1();
 
 	bool singular = false;
 	// Invert U in place
@@ -567,7 +569,7 @@ bool UTinverse (UTriMatrix& U)
 	{
 		i = n-1;
 		do {
-			UTriMatrix::Row Ui = U[i];
+			UTriMatrix::Row Ui(U,i);
 			UTriMatrix::value_type d = Ui[i];
 			if (d == 0.)
 			{
@@ -608,15 +610,15 @@ void UdUrecompose_transpose (RowMatrix& M)
  *		M - U'dU recomposition (symetric)
  */
 {
-	Subscript i,j,k;
-	const Subscript n = M.size1();
+	size_t i,j,k;
+	const size_t n = M.size1();
 
 	// Recompose M = (U'dU) in place
 	if (n > 0)
 	{
 		i = n-1;
 		do {
-			RowMatrix::Row Mi = M[i];
+			RowMatrix::Row Mi(M,i);
 			// (U' d) row i of lower triangle from upper trinagle
 			for (j = 0; j < i; ++j)
 				Mi[j] = M(j,i) * M(j,j);
@@ -646,16 +648,16 @@ void UdUrecompose (RowMatrix& M)
  *		M - UdU' recomposition (symetric)
  */
 {
-	Subscript i,j,k;
-	const Subscript n = M.size1();
+	size_t i,j,k;
+	const size_t n = M.size1();
 
 	// Recompose M = (UdU') in place
 	for (i = 0; i < n; ++i)
 	{
-		RowMatrix::Row Mi = M[i];
+		RowMatrix::Row Mi(M,i);
 		// (d U') col i of lower triangle from upper trinagle
 		for (j = i+1; j < n; ++j) {
-			RowMatrix::Row Mj = M[j];
+			RowMatrix::Row Mj(M,j);
 			Mj[i] = M(i,j) * Mj[j];
 		}
 		// U (d U') in place
@@ -678,11 +680,11 @@ void Lzero (RowMatrix& M)
  * Zero strict lower triangle of Matrix
  */
 {
-	Subscript i,j;
-	const Subscript n = M.size1();
+	size_t i,j;
+	const size_t n = M.size1();
 	for (i = 1; i < n; ++i)
 	{
-		RowMatrix::Row Ui = M[i];
+		RowMatrix::Row Ui(M,i);
 		for (j = 0; j < i; ++j)
 		{
 			Ui[j] = 0.;
@@ -695,11 +697,11 @@ void Uzero (RowMatrix& M)
  * Zero strict upper triangle of Matrix
  */
 {
-	Subscript i,j;
-	const Subscript n = M.size1();
+	size_t i,j;
+	const size_t n = M.size1();
 	for (i = 0; i < n; ++i)
 	{
-		RowMatrix::Row Li = M[i];
+		RowMatrix::Row Li(M,i);
 		for (j = i+1; j < n; ++j)
 		{
 			Li[j] = 0.;
@@ -723,8 +725,8 @@ void UdUfromUCholesky (RowMatrix& U)
  *		U Modified Cholesky factor (UD format)
  */
 {
-	Subscript i,j;
-	const Subscript n = U.size1();
+	size_t i,j;
+	const size_t n = U.size1();
 	for (j = 0; j < n; ++j)
 	{
 		RowMatrix::value_type sd = U(j,j);
@@ -747,14 +749,14 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
  *		U and d parts of UD
  */
 {
-	Subscript i,j;
-	const Subscript n = UD.size1();
+	size_t i,j;
+	const size_t n = UD.size1();
 
 	for (j = 0; j < n; ++j)
 	{
 					// Extract d and set diagonal to 1
 		d[j] = UD(j,j);
-		RowMatrix::Row Uj = U[j];
+		RowMatrix::Row Uj(U,j);
 		Uj[j] = 1.;
 		for (i = 0; i < j; ++i)
 		{

@@ -2,8 +2,10 @@
 #define _BAYES_FILTER_INFORMATION
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -43,7 +45,7 @@ public:
 	FM::Vec y;				// Information state
 	FM::SymMatrix Y;		// Information
 
-	Information_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
+	Information_filter (size_t x_size, size_t z_initialsize = 0);
 	Information_filter& operator= (const Information_filter&);
 	// Optimise copy assignment to only copy filter state
 
@@ -62,8 +64,8 @@ protected:			   		// Permenantly allocated temps
 	FM::SymMatrix I;
 	FM::SymMatrix ZI;
 					// allow fast operation if z_size remains constant
-	FM::Subscript last_z_size;
-	void observe_size (FM::Subscript z_size);
+	size_t last_z_size;
+	void observe_size (size_t z_size);
 };
 
 /*
@@ -88,7 +90,7 @@ protected:			   		// Permenantly allocated temps
 class Information_joseph_filter : public Information_filter
 {
 public:
-	Information_joseph_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
+	Information_joseph_filter (size_t x_size, size_t z_initialsize = 0);
 
 	void predict (Linear_invertable_predict_model& f);
 
@@ -100,7 +102,7 @@ protected:			   		// Permenantly allocated temps
 		FM::Matrix Chi, IChi;
 		FM::Vec Ywork;
 	public:
-		Predict_temp (FM::Subscript x_size);
+		Predict_temp (size_t x_size);
 	} t;
 };
 

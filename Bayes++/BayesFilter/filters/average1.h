@@ -2,8 +2,10 @@
 #define _BAYES_FILTER_AVERAGE1
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -93,7 +95,7 @@ average1_filter<filter>::Float average1_filter<filter>::observe(Float zz)
 	z[0] = zz;
 
 	if (!bInit) {
-		init (z, h.Z);
+		init_kalman (z, h.Z);
 		bInit = true;
 	}
 

@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -25,7 +27,7 @@ namespace Bayesian_filter
 
 
 UD_filter::
-UD_filter (FM::Subscript x_size, FM::Subscript q_maxsize, FM::Subscript z_initialsize) :
+UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 		Linrz_filter(x_size)
 		, q_max(q_maxsize)
 		, UD(x_size,2*x_size)
@@ -87,12 +89,12 @@ void
  *		X is PSD
  */
 {
-	FM::Subscript i,j,k;
-	const FM::Subscript n = UD.size1();
+	size_t i,j,k;
+	const size_t n = UD.size1();
 						// Build X as lower tri (DU')'
 	for (i = 0; i < n; ++i)				// 0..n-1
 	{
-		FM::SymMatrix::Row Xi = X[i];
+		FM::SymMatrix::Row Xi(X,i);
 		Float d = UD(i,i);
 		Xi[i] = d;
 		for (j = 0; j < i; ++j)			// 0..i-1
@@ -105,7 +107,7 @@ void
 	{
 		for (j = 0; j <= i; ++j)		// 0..i
 		{
-			FM::Matrix::Row UDi = UD[i];
+			FM::Matrix::Row UDi(UD,i);
 			Float s = X(i,j);
 			for (k = i+1; k < n; ++k)
 				s += UDi[k] * X(k,j);
@@ -149,10 +151,10 @@ UD_filter::Float
  *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
  */
 {
-	FM::Subscript i,j,k;
-	const FM::Subscript n = x.size();
-	const FM::Subscript Nq = q.size();
-	const FM::Subscript N = n+Nq;
+	size_t i,j,k;
+	const size_t n = x.size();
+	const size_t Nq = q.size();
+	const size_t N = n+Nq;
 	Float e;
 					// Check preallocated space for q size
 	if (Nq > q_max)
@@ -167,8 +169,8 @@ UD_filter::Float
 		}
 		for (j = 0; j < n; ++j)		// 0..n-1
 		{
-			FM::Matrix::Row UDj = UD[j];
-			FM::Matrix::Row Gj = G[j];
+			FM::Matrix::Row UDj(UD,j);
+			FM::Matrix::const_Row  Gj(G,j);
 			for (i = 0; i < Nq; ++i)		// 0..Nq-1
 				UDj[i+n] = Gj[i];
 		}
@@ -183,7 +185,8 @@ UD_filter::Float
 						// Lower triangle of UD is implicity empty
 			for (i = 0; i < n; ++i) 	// 0..n-1
 			{
-				FM::Matrix::Row UDi = UD[i], Fxi = Fx[i];
+				FM::Matrix::Row UDi(UD,i);
+				FM::Matrix::const_Row Fxi(Fx,i);
 				UDi[j] = Fxi[j];
 				for (k = 0; k < j; ++k)	// 0..j-1
 					UDi[j] += Fxi[k] * d[k];
@@ -200,7 +203,7 @@ UD_filter::Float
 						// The MWG-S algorithm on UD transpose
 		j = n-1;
 		do {							// n-1..0
-			FM::Matrix::Row UDj = UD[j];
+			FM::Matrix::Row UDj(UD,j);
 			e = 0.;
 			for (k = 0; k < N; ++k)		// 0..N-1
 			{
@@ -217,7 +220,7 @@ UD_filter::Float
 				Float diaginv = 1. / e;
 				for (k = 0; k < j; ++k)	// 0..j-1
 				{
-					FM::Matrix::Row UDk = UD[k];
+					FM::Matrix::Row UDk(UD,k);
 					e = 0.;
 					for (i = 0; i < N; ++i)	// 0..N-1
 						e += UDk[i] * dv[i];
@@ -236,7 +239,7 @@ UD_filter::Float
 				// 1. / e is infinite
 				for (k = 0; k < j; ++k)	// 0..j-1
 				{
-					FM::Matrix::Row UDk = UD[k];
+					FM::Matrix::Row UDk(UD,k);
 					for (i = 0; i < N; ++i)	// 0..N-1
 					{
 						e = UDk[i] * dv[i];
@@ -256,7 +259,7 @@ UD_filter::Float
 						// Transpose and Zero lower triangle
 		for (j = 1; j < n; ++j)			// 0..n-1
 		{
-			FM::Matrix::Row UDj = UD[j];
+			FM::Matrix::Row UDj(UD,j);
 			for (i = 0; i < j; ++i)
 			{
 				UD(i,j) = UDj[i];
@@ -275,7 +278,7 @@ Negative:
 
 
 void 
- UD_filter::observe_size (FM::Subscript z_size)
+ UD_filter::observe_size (size_t z_size)
 /*
  * Optimised dyamic observation sizing
  */
@@ -305,9 +308,9 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	FM::Subscript o, j;
-	const FM::Subscript x_size = x.size();
-	const FM::Subscript z_size = z.size();
+	size_t o, j;
+	const size_t x_size = x.size();
+	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
 								// Dynamic sizing
@@ -368,9 +371,9 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	FM::Subscript o, i, j, k;
-	const FM::Subscript x_size = x.size();
-	const FM::Subscript z_size = z.size();
+	size_t o, i, j, k;
+	const size_t x_size = x.size();
+	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 						
 					// Dynamic sizing
@@ -471,9 +474,9 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	FM::Subscript o, j;
-	const FM::Subscript x_size = x.size();
-	const FM::Subscript z_size = z.size();
+	size_t o, j;
+	const size_t x_size = x.size();
+	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
 								// Dynamic sizing
@@ -531,8 +534,8 @@ UD_filter::Float
  * TODO return 0 for semi-definate
  */
 {
-	FM::Subscript i,j,k;
-	const FM::Subscript n = UD.size1();
+	size_t i,j,k;
+	const size_t n = UD.size1();
 	Float gamma, alpha_jm1, lamda;
 	// a(n) is U'a
 	// b(n) is Unweighted Kalman gain

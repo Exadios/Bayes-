@@ -42,16 +42,39 @@
 				CleanCommandLine="nmake clean"
 				Output="bfilterR.mdm"/>
 		</Configuration>
+		<Configuration
+			Name="uBLAS(Development) Debug|Win32"
+			OutputDirectory="uBLAS(Development) Debug"
+			IntermediateDirectory="uBLAS(Development) Debug"
+			ConfigurationType="0"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake debug"
+				ReBuildCommandLine="nmake debug /a"
+				CleanCommandLine="nmake clean"
+				Output="bfilterD.mdm"/>
+		</Configuration>
 	</Configurations>
 	<Files>
 		<File
 			RelativePath="Makefile">
+			<FileConfiguration
+				Name="uBLAS(Development) Debug|Win32">
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\MuPadConvert.h">
+			<FileConfiguration
+				Name="uBLAS(Development) Debug|Win32">
+			</FileConfiguration>
 		</File>
 		<File
 			RelativePath=".\bfilter.cpp">
+			<FileConfiguration
+				Name="uBLAS(Development) Debug|Win32">
+			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

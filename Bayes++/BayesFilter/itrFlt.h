@@ -2,8 +2,10 @@
 #define _BAYES_FILTER_ITERATED_COVARIANCE
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -32,12 +34,13 @@ namespace Bayesian_filter
 class Iterated_covariance_filter : public Linrz_filter
 {
 public:
-	Iterated_covariance_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
+	Iterated_covariance_filter (size_t x_size, size_t z_initialsize = 0);
 	/* Initialised filter requries an addition iteration limit for the
 	   observe algorithm */
 	Iterated_covariance_filter& operator= (const Iterated_covariance_filter&);
 	// Optimise copy assignment to only copy filter state
 
+	using Linrz_filter::init;
 	void init ();
 	void update ();
 	Float predict (Linrz_predict_model& f);
@@ -56,8 +59,8 @@ protected:
 	 */
 
 protected:					// allow fast operation if z_size remains constant
-	FM::Subscript last_z_size;
-	void observe_size (FM::Subscript z_size);
+	size_t last_z_size;
+	void observe_size (size_t z_size);
 							// Permenantly allocated temps
 	FM::Vec s;
 	FM::Matrix HxT;

@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+
+/*
  * bfilter.h - Matlab MEX support for Bayes++
  * Defines Bayes++ function for the mex enviroment of Matlab
  * Povides:

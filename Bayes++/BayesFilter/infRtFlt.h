@@ -2,8 +2,10 @@
 #define _BAYES_FILTER_INFORMATION_ROOT
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -40,7 +42,7 @@ public:
 	FM::Vec r;			// Information Root state
 	FM::UTriMatrix R;	// Information Root
 
-	Information_root_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
+	Information_root_filter (size_t x_size, size_t z_initialsize = 0);
 
 	void init ();
 	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
@@ -66,7 +68,7 @@ public:
 	FM::Vec y;				// Information state
 	FM::SymMatrix Y;		// Information
 
-	Information_root_info_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
+	Information_root_info_filter (size_t x_size, size_t z_initialsize = 0);
 
 	void update ();
 };

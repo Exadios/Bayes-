@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+
+/*
  * MATLAB MEX interface for Bayes++
  *  bf_observe_linrz_correlated:  Observe z with noise Z through non-linear h(x)
  */

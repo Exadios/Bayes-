@@ -2,9 +2,10 @@
 #define _BAYES_FILTER_SIR
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
- * $Header$
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $NoKeywords: $
  */
 
@@ -55,8 +56,8 @@ class SIR_filter : public Sample_filter
 {
 	friend class SIR_kalman_filter;
 public:
-	unsigned stochastic_samples;	// Number of stochastic samples in S
-	typedef std::vector<unsigned> resamples_t;	// resampling counts
+	size_t stochastic_samples;	// Number of stochastic samples in S
+	typedef std::vector<size_t> resamples_t;	// resampling counts
 
 	struct Random
 	/* Random number generators interface
@@ -67,7 +68,7 @@ public:
 		virtual void uniform_01(FM::Vec& v) = 0;
 	};
 
-	SIR_filter (FM::Subscript x_size, FM::Subscript s_size, Random& random_helper);
+	SIR_filter (size_t x_size, size_t s_size, Random& random_helper);
 	SIR_filter& operator= (const SIR_filter&);
 	// Optimise copy assignment to only copy filter state
 
@@ -78,7 +79,7 @@ public:
 	/* Resample particles using weights and roughen
 	 *  Return: lcond smallest normalised weight, represents conditioning of resampling solution
 	 *          lcond == 1. if no resampling preformed
-	 *	    This should by multipled by the number of samples to get the Likelihood function conditioning
+	 *			This should by multipled by the number of samples to get the Likelihood function conditioning
 	 */
 
 	void predict (Sampled_predict_model& f);
@@ -94,7 +95,7 @@ public:
 			roughen_minmax (S, rougheningK);
 	}
 
-	virtual Float weighted_resample (resamples_t& Presamples, unsigned& uresamples, const FM::ColMatrix& P, FM::Vec& w) const
+	virtual Float weighted_resample (resamples_t& Presamples, size_t& uresamples, FM::Vec& w) const
 	/*
 	* Resample from P(rior) using on importance weights w
 	*  Weights w are proportional to the posterior Likelihood of the state represented by a particle
@@ -111,16 +112,16 @@ public:
 	*	Presamples: the number of times each sample in P is resampled in posterior
 	*   uresample: the number of unique resamples in the posterior == number of non zero elements in Presamples
 	* Preconditions
-	*  P,R,w,sampleset must have same size in states/samples
+	*  Presample,w must  have same size
 	*/
 	{				// Default to use standard resample algorithm from [1]
-		return standard_resample(Presamples, uresamples, P, w);
+		return standard_resample(Presamples, uresamples, w);
 	}
 
-	Float standard_resample (resamples_t& Presamples, unsigned& uresamples, const FM::ColMatrix& P, FM::Vec& w) const;
+	Float standard_resample (resamples_t& Presamples, size_t& uresamples, FM::Vec& w) const;
 	// Standard resample algorithm from [1]
 
-	Float systematic_resample (resamples_t& Presamples, unsigned& uresamples, const FM::ColMatrix& P, FM::Vec& w) const;
+	Float systematic_resample (resamples_t& Presamples, size_t& uresamples, FM::Vec& w) const;
 	// Systematic resample algorithm from [2]
 
 	static void copy_resamples (FM::ColMatrix& P, const resamples_t& Presamples);
@@ -134,7 +135,7 @@ protected:			   		// Permenantly allocated temps
 private:
 	static const Float rougheningKinit;
 	Random& random;		// Reference Random number generator
-	FM::Subscript x_size;
+	size_t x_size;
 };
 
 
@@ -147,7 +148,7 @@ class SIR_kalman_filter : public SIR_filter, public Kalman_filter
 {
 public:
 	using Kalman_filter::x;
-	SIR_kalman_filter (FM::Subscript x_size, FM::Subscript s_size, Random& random_helper);
+	SIR_kalman_filter (size_t x_size, size_t s_size, Random& random_helper);
 
 	/* Specialisations for filter algorithm */
 	void init ();

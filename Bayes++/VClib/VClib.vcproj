@@ -14,95 +14,6 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
-			Name="valarray Release|Win32"
-			OutputDirectory="valarray_Release"
-			IntermediateDirectory="valarray_Release"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="3"
-				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="TRUE"
-				FavorSizeOrSpeed="1"
-				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)fastMatSup;$(SolutionDir)"
-				PreprocessorDefinitions="NDEBUG,_LIB"
-				StringPooling="TRUE"
-				RuntimeLibrary="2"
-				BufferSecurityCheck="FALSE"
-				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="matSup.h"
-				WarningLevel="3"
-				DisableSpecificWarnings="4624"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="BayesFilter_valarray_MD7.lib"
-				SuppressStartupBanner="TRUE"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="3081"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-		</Configuration>
-		<Configuration
-			Name="valarray Debug|Win32"
-			OutputDirectory="valarray_Debug"
-			IntermediateDirectory="valarray_Debug"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)fastMatSup;$(SolutionDir)"
-				PreprocessorDefinitions="_DEBUG,_LIB"
-				StringPooling="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="matSup.h"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				DisableSpecificWarnings="4624"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="BayesFilter_valarray_MD7d.lib"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="3081"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-		</Configuration>
-		<Configuration
 			Name="uBLAS Debug|Win32"
 			OutputDirectory="UBLAS_Debug"
 			IntermediateDirectory="UBLAS_Debug"
@@ -113,17 +24,18 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)"
+				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup"
 				PreprocessorDefinitions="_DEBUG,_LIB,WIN32"
 				StringPooling="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="matSup.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4224"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -162,15 +74,16 @@
 				ImproveFloatingPointConsistency="TRUE"
 				FavorSizeOrSpeed="1"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)"
+				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup"
 				PreprocessorDefinitions="NDEBUG,_LIB"
 				StringPooling="TRUE"
 				RuntimeLibrary="2"
 				DisableLanguageExtensions="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="3"
 				PrecompiledHeaderThrough="matSup.h"
 				WarningLevel="3"
-				CompileAs="0"/>
+				CompileAs="0"
+				DisableSpecificWarnings="4224"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -188,6 +101,50 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
+				Culture="3081"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="uBLAS(Development) Debug|Win32"
+			OutputDirectory="uBLAS(Development) Debug"
+			IntermediateDirectory="uBLAS(Development) Debug"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="$(SolutionDir)uBLASmatSup;$(SolutionDir)../boost"
+				PreprocessorDefinitions="_DEBUG,_LIB,WIN32"
+				StringPooling="TRUE"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				DisableLanguageExtensions="TRUE"
+				UsePrecompiledHeader="3"
+				PrecompiledHeaderThrough="matSup.h"
+				WarningLevel="3"
+				DebugInformationFormat="3"
+				CompileAs="0"
+				DisableSpecificWarnings="4224"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="BayesFilter_UBLAS_MD7d.lib"
+				SuppressStartupBanner="TRUE"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
 				Culture="3081"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
@@ -241,27 +198,6 @@
 			Name="Matrix Support"
 			Filter="">
 			<File
-				RelativePath="..\fastMatSup\fastMatrix.cpp">
-				<FileConfiguration
-					Name="uBLAS Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\fastMatSup\fastMatrix.h">
-			</File>
-			<File
-				RelativePath="..\fastMatSup\matSupSub.h">
-			</File>
-			<File
 				RelativePath="..\UBLASmatSup\matSupSub.h">
 			</File>
 			<File
@@ -287,176 +223,238 @@
 			<File
 				RelativePath="..\BayesFilter\SIRFlt.cpp">
 				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
 					Name="uBLAS Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"
-						DisableLanguageExtensions="FALSE"/>
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\UDFlt.cpp">
-			</File>
-			<File
-				RelativePath="..\BayesFilter\UdU.cpp">
-			</File>
-			<File
-				RelativePath="..\BayesFilter\bayesFlt.cpp">
-			</File>
-			<File
-				RelativePath="..\BayesFilter\bayesFltAlg.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm152"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\bayesFltDummy.cpp">
-				<FileConfiguration
-					Name="uBLAS Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\covFlt.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\infFlt.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\infRtFlt.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm151"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\itrFlt.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\matSup.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\BayesFilter\unsFlt.cpp">
-				<FileConfiguration
-					Name="valarray Release|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="valarray Debug|Win32"
-					ExcludedFromBuild="TRUE">
-					<Tool
-						Name="VCCLCompilerTool"/>
-				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\UdU.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\bayesFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\bayesFltAlg.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\covFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\infFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\infRtFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm200"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm200"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\itrFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\matSup.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"
+						UsePrecompiledHeader="1"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\BayesFilter\unsFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS(Development) Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
 			</File>
 		</Filter>
-		<File
-			RelativePath="..\BayesFilter TODO.txt">
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

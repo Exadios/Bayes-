@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -19,7 +21,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Iterated_covariance_filter::Iterated_covariance_filter(Subscript x_size, Subscript z_initialsize) :
+Iterated_covariance_filter::Iterated_covariance_filter(size_t x_size, size_t z_initialsize) :
 		Linrz_filter(x_size),
 		S(Empty), SI(Empty),
 		s(Empty), HxT(Empty)
@@ -66,7 +68,7 @@ Bayes_base::Float
 }
 
 
-void Iterated_covariance_filter::observe_size (Subscript z_size)
+void Iterated_covariance_filter::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -91,7 +93,7 @@ Bayes_base::Float
  */
 {
 						// ISSUE: Implement simplied uncorrelated noise equations
-	Subscript z_size = z.size();
+	size_t z_size = z.size();
 	SymMatrix Z(z_size,z_size);
 	
 	Adapted_Linrz_correlated_observe_model hh(h);
@@ -108,8 +110,8 @@ Bayes_base::Float
  * returned rcond is of S (or 1 if no iterations are performed)
  */
 {
-	Subscript x_size = x.size();
-	Subscript z_size = z.size();
+	size_t x_size = x.size();
+	size_t z_size = z.size();
 	Vec xpred(x_size);
 	SymMatrix Xpred(x_size,x_size);
 	SymMatrix XpredI(x_size,x_size);

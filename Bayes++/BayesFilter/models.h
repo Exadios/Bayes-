@@ -1,9 +1,11 @@
-#ifndef _MODELS
-#define _MODELS
+#ifndef _BAYES_FILTER__MODELS
+#define _BAYES_FILTER__MODELS
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -122,7 +124,7 @@ class General_sampled_predict_model: public Predict_model, public Sampled_predic
 public:
 	typedef General_sampled_predict_random Random;
 
-	General_sampled_predict_model (FM::Subscript x_size, FM::Subscript q_size, Random& random_helper) :
+	General_sampled_predict_model (size_t x_size, size_t q_size, Random& random_helper) :
 		Predict_model(x_size, q_size),
 		Sampled_predict_model(),
 		genn(random_helper),
@@ -191,7 +193,7 @@ typedef General_sampled_predict_model<Linear_invertable_predict_model> General_L
 class General_LzUnAd_observe_model: public Linrz_uncorrelated_observe_model, public Likelihood_observe_model
 {
 public:
-	General_LzUnAd_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	General_LzUnAd_observe_model (size_t x_size, size_t z_size) :
 		Linrz_uncorrelated_observe_model(x_size, z_size),
 		Likelihood_observe_model(z_size),
 		Zv_inv(z_size)
@@ -214,7 +216,7 @@ private:
 class General_LiUnAd_observe_model: public General_LzUnAd_observe_model
 {
 public:
-	General_LiUnAd_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	General_LiUnAd_observe_model (size_t x_size, size_t z_size) :
 		General_LzUnAd_observe_model(x_size, z_size),
 		hx(z_size)
 	{}
@@ -231,7 +233,7 @@ private:
 class General_LzCoAd_observe_model: public Linrz_correlated_observe_model, public Likelihood_observe_model
 {
 public:
-	General_LzCoAd_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	General_LzCoAd_observe_model (size_t x_size, size_t z_size) :
 		Linrz_correlated_observe_model(x_size, z_size),
 		Likelihood_observe_model(z_size),
 		Z_inv(z_size,z_size)
@@ -255,7 +257,7 @@ private:
 class General_LiCoAd_observe_model: public General_LzCoAd_observe_model
 {
 public:
-	General_LiCoAd_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	General_LiCoAd_observe_model (size_t x_size, size_t z_size) :
 		General_LzCoAd_observe_model(x_size, z_size),
 		hx(z_size)
 	{}

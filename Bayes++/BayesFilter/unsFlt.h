@@ -2,8 +2,10 @@
 #define _BAYES_FILTER_UNSCENTED
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -46,7 +48,7 @@ class Unscented_predict_model : public Predict_model_base
  */
 {
 public:
-	Unscented_predict_model (FM::Subscript q_size)
+	Unscented_predict_model (size_t q_size)
 	{
 		q_unscented = q_size;
 	}
@@ -60,18 +62,18 @@ public:
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 private:
 	friend class Unscented_filter;	// Filter implementation need to know noise size
-	FM::Subscript q_unscented;
+	size_t q_unscented;
 };
 
 
 class Unscented_filter : public Extended_filter, public Functional_filter
 {
 private:	// TODO: make XX public, requires specification of postcond on XX
-	FM::Subscript q_max;	// Maxiumum size allocated for noise model, constructed before XX
+	size_t q_max;	// Maxiumum size allocated for noise model, constructed before XX
 	FM::ColMatrix XX;		// Unscented form of state
 public:
 
-	Unscented_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
+	Unscented_filter (size_t x_size, size_t z_initialsize = 0);
 	Unscented_filter& operator= (const Unscented_filter&);
 	// Optimise copy assignment to only copy filter state
 
@@ -80,7 +82,6 @@ public:
 
 	void predict (Unscented_predict_model& f);
 	// Efficient Unscented prediction 
-	
 	void predict (Functional_predict_model& f);
 	void predict (Addative_predict_model& f);
 	Float predict (Linrz_predict_model& f)
@@ -113,21 +114,21 @@ public:						// Exposed Numerical Results
 	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
 
 protected:
-	virtual Float predict_Kappa (unsigned size) const;
-	virtual Float observe_Kappa (unsigned size) const;
+	virtual Float predict_Kappa (size_t size) const;
+	virtual Float observe_Kappa (size_t size) const;
 	/* unscented Kappa values
 	   default uses the rule to minimise mean squared error of 4th order term
 	*/
 
 protected:					// allow fast operation if z_size remains constant
-	FM::Subscript last_z_size;
-	void observe_size (FM::Subscript z_size);
+	size_t last_z_size;
+	void observe_size (size_t z_size);
 
 private:
 	void unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float Scale);
 	/* Determine Unscented points for a distribution */
-	FM::Subscript x_size;
-	FM::Subscript XX_size;	// 2*x_size+1
+	size_t x_size;
+	size_t XX_size;	// 2*x_size+1
 
 protected:			   		// Permenantly allocated temps
 	FM::ColMatrix fXX;

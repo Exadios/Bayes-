@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -40,7 +42,7 @@ void Bayes_base::filter_error (const char* errorText) const
 	throw Bayes_filter_exception (errorText);
 }
 
-Linrz_predict_model::Linrz_predict_model (FM::Subscript x_size, FM::Subscript q_size) :
+Linrz_predict_model::Linrz_predict_model (size_t x_size, size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -49,7 +51,7 @@ Linrz_predict_model::Linrz_predict_model (FM::Subscript x_size, FM::Subscript q_
 {
 }
 
-Linear_predict_model::Linear_predict_model (FM::Subscript x_size, FM::Subscript q_size) :
+Linear_predict_model::Linear_predict_model (size_t x_size, size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -58,7 +60,7 @@ Linear_predict_model::Linear_predict_model (FM::Subscript x_size, FM::Subscript 
 {
 }
 
-Linear_invertable_predict_model::Linear_invertable_predict_model (FM::Subscript x_size, FM::Subscript q_size) :
+Linear_invertable_predict_model::Linear_invertable_predict_model (size_t x_size, size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -67,14 +69,14 @@ Linear_invertable_predict_model::Linear_invertable_predict_model (FM::Subscript 
 {
 }
 
-Linear_invertable_predict_model::inverse_model::inverse_model (FM::Subscript x_size, FM::Subscript q_size) :
+Linear_invertable_predict_model::inverse_model::inverse_model (size_t x_size, size_t q_size) :
 		Fx(x_size,x_size),
 		q(q_size), G(x_size,q_size)
 {
 }
 
 
-State_filter::State_filter (FM::Subscript x_size) :
+State_filter::State_filter (size_t x_size) :
 	x(x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -85,7 +87,7 @@ State_filter::State_filter (FM::Subscript x_size) :
 }
 
 
-Kalman_filter::Kalman_filter (FM::Subscript x_size) :
+Kalman_filter::Kalman_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -94,7 +96,7 @@ Kalman_filter::Kalman_filter (FM::Subscript x_size) :
 }
 
 
-Linrz_filter::Linrz_filter (FM::Subscript x_size) :
+Linrz_filter::Linrz_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -103,7 +105,7 @@ Linrz_filter::Linrz_filter (FM::Subscript x_size) :
 }
 
 
-Extended_filter::Extended_filter (FM::Subscript x_size) :
+Extended_filter::Extended_filter (size_t x_size) :
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -112,7 +114,7 @@ Extended_filter::Extended_filter (FM::Subscript x_size) :
 }
 
 
-Sample_filter::Sample_filter (FM::Subscript x_size, FM::Subscript s_size) :
+Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
 		Likelihood_filter(),
 		S(x_size,s_size)
 

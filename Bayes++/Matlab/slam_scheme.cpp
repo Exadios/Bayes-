@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+
+/*
  * MATLAB MEX interface for Bayes++
  *  bf_scheme: Constuct a Bayes++ filter scheme and return its handle
  */
@@ -130,7 +136,7 @@ Slam_maker::Filter
 	FM::SymMatrix init_X = SymMatrix(args[1]);
 
 	Run_Unscented* f = new Run_Unscented(init_x.size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 

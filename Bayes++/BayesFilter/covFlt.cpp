@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -18,7 +20,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Covariance_filter::Covariance_filter (Subscript x_size, Subscript z_initialsize) :
+Covariance_filter::Covariance_filter (size_t x_size, size_t z_initialsize) :
 	Extended_filter(x_size),
 	S(Empty), SI(Empty)
 /*
@@ -63,7 +65,7 @@ Bayes_base::Float
 	return 1.;
 }
 
-void Covariance_filter::observe_size (Subscript z_size)
+void Covariance_filter::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
  */
@@ -117,7 +119,7 @@ Bayes_base::Float
 
 						// Innovation covariance
 	S = mult_SPD(h.Hx, X);
-	for (Subscript i = 0; i < h.Zv.size(); ++i)
+	for (size_t i = 0; i < h.Zv.size(); ++i)
 		S(i,i) += h.Zv[i];
 
 						// Inverse innovation covariance

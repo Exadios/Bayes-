@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2001
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  */
 
@@ -78,7 +80,7 @@ int main()
 	Vec x_init (1);	SymMatrix X_init (1, 1);
 	x_init[0] = 10.;		// Start at 10 with no uncertainty
 	X_init(0,0) = 0.;
-	my_filter.init (x_init, X_init);
+	my_filter.init_kalman (x_init, X_init);
 
 	cout << "Initial  " << my_filter.x << my_filter.X << endl;
 

@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+
+/*
  * MATLAB MEX interface for Bayes++
  *  bf_predict_linear:  Predict filter through Linear F with Gq addative noise
  */

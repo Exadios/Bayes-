@@ -453,7 +453,7 @@ Filter_maker::Filter
 
 	// Use a temporary filter to create samples
 	Bayesian_filter::SIR_kalman_filter tempS(f->S.size1(), f->S.size2(), randomHelper);
-	tempS.init (init_x,init_X);
+	tempS.init_kalman (init_x,init_X);
 	f->init(tempS.S);
 				// Overide filter default
 	if (rougheningK != -1.)
@@ -490,7 +490,7 @@ Filter_maker::Filter
 
 	Mu_SIR_kalman* f = new Mu_SIR_kalman(state_size(), sample_size, randomHelper);
 
-	f->init(init_x,init_X);
+	f->init_kalman (init_x,init_X);
 				// Overide filter default
 	if (rougheningK != -1.)
 		f->rougheningK = rougheningK;
@@ -508,7 +508,7 @@ Filter_maker::Filter
 	FM::Matrix init_X = MuC::Matrix(MFarg(4));
 	
 	Mu_Unscented* f = new Mu_Unscented(state_size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -522,7 +522,7 @@ Filter_maker::Filter
 	FM::Matrix init_X = MuC::Matrix(MFarg(4));
 
 	Mu_Cov* f = new Mu_Cov(state_size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -536,7 +536,7 @@ Filter_maker::Filter
 	FM::Matrix init_X = MuC::Matrix(MFarg(4));
 
 	Mu_Inf* f = new Mu_Inf(state_size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -550,7 +550,7 @@ Filter_maker::Filter
 	FM::Matrix init_X = MuC::Matrix(MFarg(4));
 
 	Mu_InfJo* f = new Mu_InfJo(state_size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -564,7 +564,7 @@ Filter_maker::Filter
 	FM::Matrix init_X = MuC::Matrix(MFarg(4));
 
 	Mu_SRIF* f = new Mu_SRIF(state_size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -578,7 +578,7 @@ Filter_maker::Filter
 	FM::Matrix init_X = MuC::Matrix(MFarg(4));
 
 	Mu_UD* f = new Mu_UD(state_size());
-	f->init (init_x,init_X);
+	f->init_kalman (init_x,init_X);
 	return f;
 }
 
@@ -1092,7 +1092,7 @@ MFUNC( sample, MCnop )
 				kf->update();
 				Boost_SIR_random_helper randomHelper;
 				Bayesian_filter::SIR_kalman_filter tempS(kf->x.size(), GenerateSamples, randomHelper);
-				tempS.init(kf->x, kf->X);
+				tempS.init_kalman (kf->x, kf->X);
 				MFreturn(MuC::ListTranspose(tempS.S));
 			}
 		}
@@ -1107,16 +1107,17 @@ MFUNC( sample, MCnop )
 } MFEND 
 
 
+#error This is wrong V must be a pointer like object
 class V  
 {	// Vector proxy and difference for Neariest Neighbour
 public:
-	typedef FM::ColMatrix::const_iterator NNVec;
+	typedef FM::ColMatrix::const_Column NNVec;
 
 	double distance (const V& o) const
 	{
 		double d = 0.;
-		FM::ColMatrix::OneD::const_iterator oi = (*o.dp).begin();
-		for (FM::ColMatrix::OneD::const_iterator vi = (*dp).begin(); vi != (*dp).end(); ++vi, ++oi) {
+		NNVec::const_iterator oi = (o.dp).begin();
+		for (NNVec::const_iterator vi = (dp).begin(); vi != (dp).end(); ++vi, ++oi) {
 			const double diff = *vi - *oi;
 			d += diff*diff;
 		}
@@ -1125,9 +1126,8 @@ public:
 	V()	// Empty for return value
 	{
 	}
-	V( NNVec vec )
+	V( const FM::ColMatrix& colmat, size_t i) : dp(colmat,i)
 	{
-		dp = vec;
 	}
 	NNVec dp;	// Vec data pointer
 };
@@ -1139,20 +1139,19 @@ FM::Vec find_nearest(const FM::ColMatrix& S, double radius, const FM::Vec& loc)
 {
 	// Construct NN tree of samples
 	CNearTree<V> sampleTree;
-	for (FM::ColMatrix::const_iterator si = S.begin(); si != S.end(); ++si) {
-		sampleTree.m_fnInsert( V(si) );
+	for (size_t si = 0; si != S.size2(); ++si) {
+		sampleTree.m_fnInsert( V(S,si) );
 	}
 	// Create a location as same type as a sample
 	FM::ColMatrix cmloc(S.size1(),1);
-	*cmloc.begin() = loc;
-	FM::ColMatrix::const_iterator lb = const_cast<const FM::ColMatrix&>(cmloc).begin();
+	FM::column(cmloc,0) = loc;
 
 	// Find NN
 	V nn;
-	if (sampleTree.m_bfnNearestNeighbor(radius, nn, V(lb)) )
+	if (sampleTree.m_bfnNearestNeighbor(radius, nn, V(cmloc,0)) )
 	{
 		FM::Vec rnn(S.size1());
-		rnn = *(nn.dp);
+		rnn = nn.dp;
 		return rnn;
 	}
 	else

@@ -1,4 +1,9 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+/*
  * Bayesian_filter_matrix <-> Matlab conversions
  */
 
@@ -11,12 +16,12 @@ void Array(mxArray* ma, const FilterMatrix& M)
  * Convert Filter Matrix into a mxArray
  */
 {
-	FM::Subscript rows = M.size1(), cols = M.size2();
+	size_t rows = M.size1(), cols = M.size2();
 
 	double *mai = mxGetPr(ma);
-	for (FM::Subscript c = 0; c < cols; ++c)
+	for (size_t c = 0; c < cols; ++c)
 	{
-		for (FM::Subscript r = 0; r < rows; ++r)
+		for (size_t r = 0; r < rows; ++r)
 		{
 			*mai++ = M(r,c);
 		}
@@ -29,7 +34,7 @@ mxArray* Array(const FilterMatrix& M)
  * Convert Filter Matrix into a mxArray
  */
 {
-	FM::Subscript rows = M.size1(), cols = M.size2();
+	size_t rows = M.size1(), cols = M.size2();
 	mxArray* ma = mxCreateDoubleMatrix(rows,cols, mxREAL);
 
 	Array (ma, M);
@@ -42,13 +47,13 @@ mxArray* ArrayTranspose(const FilterMatrix& M)
  * Convert Filter Matrix's transpose into a mxArray
  */
 {
-	FM::Subscript rows = M.size1(), cols = M.size2();
+	size_t rows = M.size1(), cols = M.size2();
 	mxArray* ma = mxCreateDoubleMatrix(cols,rows, mxREAL);
 
 	double *mai = mxGetPr(ma);
-	for (FM::Subscript r = 0; r < rows; ++r)
+	for (size_t r = 0; r < rows; ++r)
 	{
-		for (FM::Subscript c = 0; c < cols; ++c)
+		for (size_t c = 0; c < cols; ++c)
 		{
 			*mai++ = M(r,c);
 		}
@@ -61,9 +66,9 @@ void Array(mxArray* ma, const Bayesian_filter_matrix::Vec& V)
  * Convert Vec into a mxArray column vector
  */
 {
-	FM::Subscript size = V.size();
+	size_t size = V.size();
 	double *mai = mxGetPr(ma);
-	for (FM::Subscript r = 0; r < size; ++r)
+	for (size_t r = 0; r < size; ++r)
 	{
 		*mai++ = V[r];
 	}
@@ -74,7 +79,7 @@ mxArray* Array(const Bayesian_filter_matrix::Vec& V)
  * Convert Vec into a mxArray column vector
  */
 {
-	FM::Subscript size = V.size();
+	size_t size = V.size();
 	mxArray* ma = mxCreateDoubleMatrix(size,1, mxREAL);
 
 	Array (ma, V);

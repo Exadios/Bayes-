@@ -2,8 +2,13 @@
 #define _BAYES_FILTER
 
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -152,7 +157,7 @@ class Addative_predict_model : virtual public Predict_model_base
 */
 {
 public:
-	Addative_predict_model (FM::Subscript x_size, FM::Subscript q_size) :
+	Addative_predict_model (size_t x_size, size_t q_size) :
 		q(q_size), G(x_size, q_size)
 	{}
 
@@ -173,7 +178,7 @@ class Linrz_predict_model : public Addative_predict_model
  */
 {
 public:
-	Linrz_predict_model (FM::Subscript x_size, FM::Subscript q_size);
+	Linrz_predict_model (size_t x_size, size_t q_size);
 	FM::Matrix Fx;		// Model
 };
 
@@ -183,7 +188,7 @@ class Linear_predict_model : public Linrz_predict_model
  */
 {
 public:
-	Linear_predict_model (FM::Subscript x_size, FM::Subscript q_size);
+	Linear_predict_model (size_t x_size, size_t q_size);
 	/* Set constant sizes for
 		x_size of the state vector
 		q_size of the noise vector
@@ -205,11 +210,11 @@ class Linear_invertable_predict_model : public Linear_predict_model
  */
 {
 public:
-	Linear_invertable_predict_model (FM::Subscript x_size, FM::Subscript q_size);
+	Linear_invertable_predict_model (size_t x_size, size_t q_size);
 	// The inverse model: x(k-1|k-1) = f(x(k|k-1) and Fx,q,G are all matrix inverses
 	class inverse_model {
 	public:
-		inverse_model (FM::Subscript x_size, FM::Subscript q_size);
+		inverse_model (size_t x_size, size_t q_size);
 		FM::Matrix Fx;		// Model
 		FM::Vec q;			// Noise Covariance
 		FM::Matrix G;		// Noise Coupling
@@ -229,7 +234,7 @@ class Likelihood_observe_model : virtual public Bayes_base
  */
 {
 public:
-	Likelihood_observe_model(FM::Subscript z_size) : z(z_size)
+	Likelihood_observe_model(size_t z_size) : z(z_size)
 	{}
 	virtual Float L(const FM::Vec& x) const = 0;
 	// Likelihood L(z | x)
@@ -252,7 +257,7 @@ class Functional_observe_model : virtual public Bayes_base, public Function_mode
  */
 {
 public:
-	Functional_observe_model(FM::Subscript /*z_size*/)
+	Functional_observe_model(size_t /*z_size*/)
 	{}
 	const FM::Vec& operator()(const FM::Vec& x) const
 	{	return fx(x);
@@ -266,7 +271,7 @@ class Parametised_observe_model : virtual public Bayes_base
  */
 {
 public:
-	Parametised_observe_model(FM::Subscript /*z_size*/)
+	Parametised_observe_model(size_t /*z_size*/)
 	{}
 	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
 	/* Normalise one observation state (z_denorm) from another if observation model is discontinous.
@@ -282,7 +287,7 @@ class Uncorrelated_addative_observe_model : public Parametised_observe_model
  */
 {
 public:
-	Uncorrelated_addative_observe_model (FM::Subscript z_size) :
+	Uncorrelated_addative_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
 	FM::Vec Zv;			// Noise Variance
@@ -297,7 +302,7 @@ class Correlated_addative_observe_model : public Parametised_observe_model
  */
 {
 public:
-	Correlated_addative_observe_model (FM::Subscript z_size) :
+	Correlated_addative_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
 	FM::SymMatrix Z;	// Noise Covariance
@@ -314,7 +319,7 @@ class Jacobian_observe_model
  */
 {
 protected:
-	Jacobian_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	Jacobian_observe_model (size_t x_size, size_t z_size) :
 		Hx(z_size, x_size)
 	{}
 	FM::Matrix Hx;		// Model
@@ -329,7 +334,7 @@ class Linrz_correlated_observe_model : public Correlated_addative_observe_model,
  */
 {
 public:
-	Linrz_correlated_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	Linrz_correlated_observe_model (size_t x_size, size_t z_size) :
 		Correlated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 	using Jacobian_observe_model::Hx;
@@ -344,7 +349,7 @@ class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_mo
  */
 {
 public:
-	Linrz_uncorrelated_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	Linrz_uncorrelated_observe_model (size_t x_size, size_t z_size) :
 		Uncorrelated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 	using Jacobian_observe_model::Hx;
@@ -356,7 +361,7 @@ class Linear_correlated_observe_model : public Linrz_correlated_observe_model
  */
 {
 public:
-	Linear_correlated_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	Linear_correlated_observe_model (size_t x_size, size_t z_size) :
 		Linrz_correlated_observe_model(x_size, z_size), hx(z_size)
 	{}
 	const FM::Vec& h(const FM::Vec& x) const
@@ -374,7 +379,7 @@ class Linear_uncorrelated_observe_model : public Linrz_uncorrelated_observe_mode
  */
 {
 public:
-	Linear_uncorrelated_observe_model (FM::Subscript x_size, FM::Subscript z_size) :
+	Linear_uncorrelated_observe_model (size_t x_size, size_t z_size) :
 		Linrz_uncorrelated_observe_model(x_size, z_size), hx(z_size)
 	{}
 	const FM::Vec& h(const FM::Vec& x) const
@@ -443,7 +448,7 @@ private:
 class State_filter : virtual public Bayes_filter_base
 {
 public:
-	State_filter (FM::Subscript x_size);
+	State_filter (size_t x_size);
 	/* Set constant sizes, state must not be empty (must be >=1)
 		Exceptions:
 			bayes_filter_exception is x_size < 1
@@ -489,7 +494,7 @@ public:
 	Float rcond_limit;	// Minimum allowable reciprocal condition number for PD Matrix factorisations
 						// Applies to state covariance or its derived matrices
 
-	Kalman_filter (FM::Subscript x_size);
+	Kalman_filter (size_t x_size);
 	/* Initialise filter and set constant sizes
 	 */
 
@@ -499,7 +504,7 @@ public:
 	/* Initialise from current state and state covariance
 	     Requires x(k|k), X(k|k)
 	*/
-	virtual void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
+	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	/* Initialise from a state and state covariance
 	     Requires x(k|k), X(k|k)
 		 Parameters that reference the instance's x and X members is valid
@@ -537,7 +542,7 @@ public:
 class Linrz_filter : public Kalman_filter
 { 
 public:
-	Linrz_filter (FM::Subscript x_size);
+	Linrz_filter (size_t x_size);
 
 	/* Virtual functions for filter algorithm */
 
@@ -569,7 +574,7 @@ public:
 class Extended_filter : public Linrz_filter
 { 
 public:
-	Extended_filter (FM::Subscript x_size);
+	Extended_filter (size_t x_size);
 
 	/* Virtual functions for filter algorithm */
 
@@ -614,7 +619,7 @@ class Sample_filter : public Likelihood_filter, public Functional_filter
 public:
 	FM::ColMatrix S;		// state sampleing (x_size,s_size)
 
-	Sample_filter (FM::Subscript x_size, FM::Subscript s_size);
+	Sample_filter (size_t x_size, size_t s_size);
 	/* Initialise filter and set constant sizes for
 		x_size of the state vector
 		s_size sample size
@@ -651,7 +656,7 @@ public:
 	/* Observation state posterior using likelihood model h at z
 	*/
 
-	FM::Subscript unique_samples () const;
+	size_t unique_samples () const;
 	/*
 	 * Count number of unique (unequal value) samples in S
 	 * Default implementation required std::sort on Samples

@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -9,11 +11,11 @@
  * Implement a NON-LINEAR range angle observer
  */
 
+#include <limits>
 #include <ctime>
 #include <cmath>
 #include <iostream>
 #include <iomanip>
-#include <boost/limits.hpp>
 #include <boost/random.hpp>
 #include "timing.h"
 #include "format.h"
@@ -27,10 +29,10 @@ using namespace Bayesian_filter_matrix;
 using namespace angleArith;
 
 
-const Subscript NQ = 2;				// State dimension of noise
-const Subscript NX = NQ+0;			// State dimension (x,y) and some empty dummies so things are semidefinate
-const Subscript NZ = 2;				// Observation dimension
-const Subscript NS = 1000;			// Number of samples for a sampled representation
+const size_t NQ = 2;				// State dimension of noise
+const size_t NX = NQ+0;			// State dimension (x,y) and some empty dummies so things are semidefinate
+const size_t NZ = 2;				// Observation dimension
+const size_t NS = 1000;			// Number of samples for a sampled representation
 
 const bool RA_MODEL = true;			// Use Range angle NON-linear model (requires normalising angle)
 const bool NOISE_MODEL = true;		// Add noise to truth model
@@ -330,7 +332,7 @@ template <class TestScheme>
 Filter<TestScheme>::Filter (const Vec& x_init, const SymMatrix& X_init)
 	: Filter_scheme<TestScheme> (x_init.size(), NQ, NZ)
 {
-	init (x_init, X_init);
+	init_kalman (x_init, X_init);
 }
 
 // Specialise for SIR_kalman
@@ -339,9 +341,9 @@ class Filter<SIR_kalman_filter> : public SIR_kalman_filter
 {
 public:
 	Filter (const Vec& x_init, const SymMatrix& X_init);
-	virtual Float weighted_resample (resamples_t& Presamples, unsigned& uresamples, const FM::ColMatrix& P, FM::Vec& w) const
+	virtual Float weighted_resample (resamples_t& Presamples, unsigned& uresamples, FM::Vec& w) const
 	{		// Choose a resampler
-		return systematic_resample(Presamples, uresamples, P, w);
+		return systematic_resample(Presamples, uresamples, w);
 	}
 
 
@@ -350,7 +352,7 @@ public:
 Filter<SIR_kalman_filter>::Filter (const Vec& x_init, const SymMatrix& X_init)
 	: SIR_kalman_filter (x_init.size(), NS, ::Random2)
 {
-	init (x_init, X_init);
+	init_kalman (x_init, X_init);
 }
 
 // Specialise for Iterated_covariance_filter
@@ -368,7 +370,7 @@ Filter<Iterated_covariance_filter>::Filter (const Vec& x_init, const SymMatrix& 
 	: Iterated_covariance_filter (x_init.size())
 {
 	li = limit = 10;
-	init (x_init, X_init);
+	init_kalman (x_init, X_init);
 }
 
 bool Filter<Iterated_covariance_filter>::observe_iteration_end ()

@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -246,7 +248,7 @@ Bayes_base::Float
 	Float p = 0.;
 
 	FM::Vec::const_iterator vi = v.begin();
-	for (FM::Subscript i = 0; i < V.size1(); ++i)
+	for (size_t i = 0; i < V.size1(); ++i)
 	{
 		p += *vi * FM::inner_prod(V[i], v);
 		++vi;
@@ -260,7 +262,7 @@ Adapted_Correlated_addative_observe_model::Adapted_Correlated_addative_observe_m
 		unc(adapt)
 {
 	Z.clear();
-	for (FM::Subscript i = 0; i < unc.Zv.size(); ++i)
+	for (size_t i = 0; i < unc.Zv.size(); ++i)
 		Z(i,i) = unc.Zv[i];
 }
 
@@ -270,7 +272,7 @@ Adapted_Linrz_correlated_observe_model::Adapted_Linrz_correlated_observe_model (
 {
 	Hx = unc.Hx;
 	Z.clear();
-	for (FM::Subscript i = 0; i < unc.Zv.size(); ++i)
+	for (size_t i = 0; i < unc.Zv.size(); ++i)
 		Z(i,i) = unc.Zv[i];
 }
 
@@ -292,24 +294,32 @@ void Sample_filter::predict (Functional_predict_model& f)
  */
 {
 						// Predict particles S using supplied predict model
-	for (FM::ColMatrix::iterator si = S.begin(); si != S.end(); ++si) {
-		(*si).assign (f.fx(*si));
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		Si.assign (f.fx(Si));
 	}
 }
 
 
-FM::Subscript Sample_filter::unique_samples () const
-/*
- * Count the number of unique samples in S
- */
-{
-	typedef FM::ColMatrix::const_iterator Sref;
-	// Provide a ordering on samples
-	struct order {
-		static bool less(const Sref a, const Sref b)
+namespace {
+	// Column proxy so S can be sorted indirectly
+	struct ColProxy
+	{
+		const FM::ColMatrix* cm;
+		size_t col;
+		ColProxy& operator=(ColProxy& r)
 		{
-			FM::ColMatrix::OneD::const_iterator sai = (*a).begin();
-			FM::ColMatrix::OneD::const_iterator sbi = (*b).begin();
+			cm = r.cm;
+			col = r.col;
+			return r;
+		}
+		// Provide a ordering on columns
+		static bool less(const ColProxy a, const ColProxy b)
+		{
+			FM::ColMatrix::const_iterator1 sai = (a.cm->begin2() + a.col) .begin();
+			FM::ColMatrix::const_iterator1 sai_end = (a.cm->begin2() + a.col) .end();
+			FM::ColMatrix::const_iterator1 sbi = (b.cm->begin2() + b.col) .begin();
 			do
 			{
 				if (*sai < *sbi)
@@ -318,36 +328,35 @@ FM::Subscript Sample_filter::unique_samples () const
 					return false;
 
 				++sai; ++sbi;
-			} while (sai != (*a).end());
-			// Equal
-			return false;
+			} while (sai != sai_end);
+			return false;		// Equal
 		}
 	};
+}//namespace
 
-	// TODO: remove the temporary vector. Requires a uBlas column iterator
-						// Sorted reference container
-	typedef std::vector<Sref> SRContainer;
+size_t Sample_filter::unique_samples () const
+/*
+ * Count the number of unique samples in S
+ */
+{
+						// Temporary container to Reference each element in S
+	typedef std::vector<ColProxy> SRContainer;
 	SRContainer sortR(S.size2());
-
-						// Reference each element in S
-	{	Sref elem = S.begin();
-		SRContainer::iterator ssi = sortR.begin();
-		for (; ssi < sortR.end(); ++ssi)
-		{
-			*ssi = elem; ++elem;
-		}
+	size_t col_index = 0;
+	for (SRContainer::iterator si=sortR.begin(); si != sortR.end(); ++si) {
+		(*si).cm = &S; (*si).col = col_index++;
 	}
-
-	std::sort (sortR.begin(), sortR.end(), order::less);
+						// Sort the column proxies
+	std::sort (sortR.begin(), sortR.end(), ColProxy::less);
 
 						// Count element changes, precond: sortS not empty
-	FM::Subscript u = 1;
+	size_t u = 1;
 	SRContainer::const_iterator ssi= sortR.begin();
 	SRContainer::const_iterator ssp = ssi;
 	++ssi;
 	while (ssi < sortR.end())
 	{
-		if (order::less(*ssp, *ssi))
+		if ((*ssp).col, (*ssi).col)
 			++u;
 		ssp = ssi;
 		++ssi;

@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ */
+
+/*
  * MATLAB MEX interface for Bayes++
  *  sample:
  *  Return sample array reresenting filters state probability distribution.
@@ -56,7 +62,7 @@ void mexFunction(
 				kf->update();
 				Boost_SIR_random_helper randomHelper;
 				Bayesian_filter::SIR_kalman_filter tempS(kf->x.size(), GenerateSamples, randomHelper);
-				tempS.init(kf->x, kf->X);
+				tempS.init_kalman (kf->x, kf->X);
 				plhs[0] = ArrayTranspose(tempS.S);
 				return;
 			}

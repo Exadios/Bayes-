@@ -1,6 +1,8 @@
 /*
- * Bayesian Filtering Library
- * (c) Michael Stevens, Australian Centre for Field Robotics 2000
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * See Bayes++.htm for copyright license details
+ *
  * $Header$
  * $NoKeywords: $
  */
@@ -105,9 +107,9 @@ bool isSymmetric (const SymMatrix &M)
 
 	// Check Symmetric
 	bool bSym = true;
-	Subscript size = M.size1();
-	for (Subscript r = 0; r < size; ++r) {
-		for (Subscript c = 0; c <= r; ++c) {
+	size_t size = M.size1();
+	for (size_t r = 0; r < size; ++r) {
+		for (size_t c = 0; c <= r; ++c) {
 			if( M(r,c) != M(c,r) ) {
 				bSym = false;
 			}
@@ -129,13 +131,13 @@ void forceSymmetric (SymMatrix &M, bool bUpperToLower)
 		throw Bayes_filter_exception ("SymMatrix is not square");
 	}
 
-	Subscript size = M.size1();
+	size_t size = M.size1();
 
 	if (bUpperToLower)
 	{
 		// Copy Lower to Upper
-		for (Subscript r = 1; r < size; ++r) {
-			for (Subscript c = 0; c < r; ++c) {
+		for (size_t r = 1; r < size; ++r) {
+			for (size_t c = 0; c < r; ++c) {
 				M(c,r) = M(r,c);
 			}
 		}
@@ -143,8 +145,8 @@ void forceSymmetric (SymMatrix &M, bool bUpperToLower)
 	else
 	{
 		// Copy Upper to Lower
-		for (Subscript r = 1; r < size; ++r) {
-			for (Subscript c = 0; c < r; ++c) {
+		for (size_t r = 1; r < size; ++r) {
+			for (size_t c = 0; c < r; ++c) {
 				M(r,c) = M(c,r);
 			}
 		}
