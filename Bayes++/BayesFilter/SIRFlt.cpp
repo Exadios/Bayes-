@@ -379,7 +379,11 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 		Vec::iterator ni = xmin.begin();
 		Vec::iterator xi = xmax.begin();
 
+#ifdef BOOST_UBLAS_NO_NESTED_CLASS_RELATION
+		for (ColMatrix::iterator1 xpi = begin(pi, ublas::iterator1_tag()); xpi != pi.end(); ++xpi)
+#else
 		for (ColMatrix::iterator1 xpi = pi.begin(); xpi != pi.end(); ++xpi)
+#endif
 		{
 			if (*xpi < *ni) *ni = *xpi;
 			if (*xpi > *xi) *xi = *xpi;
