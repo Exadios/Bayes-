@@ -27,7 +27,7 @@
 #include "Test/random.hpp"
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
-
+#include <boost/lexical_cast.hpp> 
 
 using namespace SLAM_filter;
 
@@ -62,6 +62,10 @@ public:
  */
 struct SLAMDemo
 {
+	const unsigned nParticles;
+	
+	SLAMDemo (unsigned setnParticles) : nParticles(setnParticles)
+	{}
 	void OneDExperiment ();
 	void InformationLossExperiment ();
 	
@@ -122,7 +126,7 @@ struct SLAMDemo
 };
 
 
-void SLAMDemo::OneDExperiment()
+void SLAMDemo::OneDExperiment ()
 // Experiment with a one dimensional problem
 //  Use to look at implication of highly correlated features
 {
@@ -165,11 +169,6 @@ void SLAMDemo::OneDExperiment()
 	Kalman_SLAM kalm (location_filter, full_filter);
 
 	// Fast_SLAM filter
-#ifdef NDEBUG
-	unsigned nParticles = 1000000;
-#else
-	unsigned nParticles = 20;
-#endif
 	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
 	fast_location.init_kalman (x_init, X_init);
 	Fast_SLAM_Kstatistics fast (fast_location);
@@ -228,7 +227,7 @@ void SLAMDemo::OneDExperiment()
 }
 
 
-void SLAMDemo::InformationLossExperiment()
+void SLAMDemo::InformationLossExperiment ()
 // Experiment with information loss due to resampling
 {
 	// State size
@@ -269,7 +268,6 @@ void SLAMDemo::InformationLossExperiment()
 	Kalman_SLAM kalm (location_filter, full_filter);
 
 	// Fast_SLAM filter
-	unsigned nParticles = 1000;
 	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
 	fast_location.init_kalman (x_init, X_init);
 	Fast_SLAM_Kstatistics fast (fast_location);
@@ -328,14 +326,26 @@ void SLAMDemo::InformationLossExperiment()
 }
 
 
-int main()
+int main (int argc, char* argv[])
 {
 	// Global setup for test output
 	std::cout.flags(std::ios::fixed); std::cout.precision(4);
 
+	unsigned nParticles = 1000;
+	if (argv[1] != NULL)
+	{
+    	try {
+			nParticles = boost::lexical_cast<unsigned>(argv[1]);
+		}
+		catch (boost::bad_lexical_cast) {
+			// ignore error and use default
+		}
+	}
+	std::cout << "nParticles = " << nParticles << std::endl;
+
 	// Create test and run experiments
 	try {
-		SLAMDemo test;
+		SLAMDemo test(nParticles);
 		test.OneDExperiment();
 		//test.InformationLossExperiment();
 	}

@@ -8,7 +8,7 @@ subproject "SLAM" ;
 
 # The executable for testing
 
-exe testfastslam :
+exe SLAM :
      testFastSLAM.cpp
      fastSLAM.cpp
      kalmanSLAM.cpp

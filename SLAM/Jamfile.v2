@@ -6,7 +6,7 @@ project
      : default-build release
 ;
 
-exe testfastslam :
+exe SLAM :
      testFastSLAM.cpp
      fastSLAM.cpp
      kalmanSLAM.cpp
