@@ -24,8 +24,8 @@ buildSimple:
 	$(GOBJAM) '<Simple>simple'
 
 buildPV:
-	$(GOBJAM) '<PV>PV'
+	$(GOBJAM) '<PV>pv'
 
 buildQuadCalib:
-	$(GOBJAM) '<QuadCalib>Quadcalib'
+	$(GOBJAM) '<QuadCalib>quadcalib'
 
