@@ -110,6 +110,17 @@ Kalman_state_filter::Kalman_state_filter (size_t x_size) :
 		State_filter(x_size), X(x_size,x_size)
 {}
 
+void Kalman_state_filter::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
+/*
+ * Initialise from a state and state covariance
+ *  Parameters that reference the instance's x and X members are valid
+ */
+{
+	Kalman_state_filter::x = x;
+	Kalman_state_filter::X = X;
+	init ();
+}
+
 
 Information_state_filter::Information_state_filter (size_t x_size) :
 /*
@@ -117,6 +128,17 @@ Information_state_filter::Information_state_filter (size_t x_size) :
  */
 		y(x_size), Y(x_size,x_size)
 {}
+
+void Information_state_filter::init_information (const FM::Vec& y, const FM::SymMatrix& Y)
+/*
+ * Initialise from a information state and information
+ *  Parameters that reference the instance's y and Y members are valid
+ */
+{
+	Information_state_filter::y = y;
+	Information_state_filter::Y = Y;
+	init_yY ();
+}
 
 
 Sample_state_filter::Sample_state_filter (size_t x_size, size_t s_size) :
@@ -131,6 +153,16 @@ Sample_state_filter::Sample_state_filter (size_t x_size, size_t s_size) :
 		error (Logic_exception("Zero sample filter constructed"));
 }
 
+void Sample_state_filter::init_sample (const FM::ColMatrix& initS)
+/*
+ * Initialise from a sampling
+ */
+{
+	S = initS;
+	init_S();
+}
+
+
 Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
 		Sample_state_filter(x_size,s_size)
 
@@ -139,8 +171,6 @@ Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
  * Postcond: s_size >= 1
  */
 {
-	if (s_size < 1)
-		error (Logic_exception("Zero sample filter constructed"));
 }
 
 

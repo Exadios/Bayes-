@@ -36,7 +36,7 @@ namespace Bayesian_filter
 
 class Bayes_base {
 /*
- * A very abstract base representation!
+ * A very abstract Polymorphic base representation!
  * Interface provides: type, internal error handing, and destruction
  */
 public:
@@ -54,7 +54,7 @@ public:
 };
 
 
-class Numerical_rcond : private Bayes_base
+class Numerical_rcond
 /*
  * Numerical comparison of reciprocal condition numbers
  *  Required for all linear algebra in models and filters
@@ -65,30 +65,30 @@ public:
 	Numerical_rcond()
 	{	limit_PD = limit_PD_init;
 	}
-	void set_limit_PD(Float nl)
+	void set_limit_PD(Bayes_base::Float nl)
 	{	limit_PD = nl;
 	}
-	inline void check_PSD (Float rcond, const char* error_description) const
+	inline void check_PSD (Bayes_base::Float rcond, const char* error_description) const
 	/* Checks a the reciprocal condition number
 	 * Generates a Bayes_filter_exception if value represents a NON PSD matrix
 	 * Inverting condition provides a test for IEC 559 NaN values
 	 */
 	{	if (!(rcond >= 0))
-			error (Numeric_exception (error_description));
+			Bayes_base::error (Numeric_exception (error_description));
 	}
 
-	inline void check_PD (Float rcond, const char* error_description) const
+	inline void check_PD (Bayes_base::Float rcond, const char* error_description) const
 	/* Checks a reciprocal condition number
 	 * Generates a Bayes_filter_exception if value represents a NON PD matrix
 	 * I.e. rcond is bellow given conditioning limit
 	 * Inverting condition provides a test for IEC 559 NaN values
 	 */
 	{	if (!(rcond >= limit_PD))
-			error (Numeric_exception (error_description));
+			Bayes_base::error (Numeric_exception (error_description));
 	}
 private:
-	Float limit_PD;		
-	const static Float limit_PD_init;	// Initial common value for limit_PD
+	Bayes_base::Float limit_PD;		
+	const static Bayes_base::Float limit_PD_init;	// Initial common value for limit_PD
 };
 
 
@@ -494,9 +494,6 @@ class Kalman_state_filter : public State_filter
 public:
 	FM::SymMatrix X;	// state covariance
 
-	Float rcond_limit;	// Minimum allowable reciprocal condition number for PD Matrix factorisations
-						// Applies to state covariance or its derived matrices
-
 	Kalman_state_filter (size_t x_size);
 	/* Initialise filter and set constant sizes
 	 */
@@ -507,29 +504,17 @@ public:
 	/* Initialise from current state and state covariance
 	    Requires x(k|k), X(k|k)
 	*/
-	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
+	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X);
 	/* Initialise from a state and state covariance
 	    Parameters that reference the instance's x and X members are valid
-	    Resizeing is valid (x,X must be conformant)
 	*/
-	{
-		size_t x_size = x.size();
-		if (Kalman_state_filter::x.size() != x_size)
-		{
-			Kalman_state_filter::x.resize(x_size);
-			Kalman_state_filter::X.resize(x_size,x_size);
-		}
-		
-		Kalman_state_filter::x = x;
-		Kalman_state_filter::X = X;
-		init();
-	}
 	virtual void update () = 0;
 	/* Update filters state and state covariance 
 	    Updates x(k|k), X(k|k)
 	*/
-
-	Numerical_rcond rclimit;	// Applies to ALL covariance matrices in algorithms
+						
+	// Minimum allowable reciprocal condition number for PD Matrix factorisations
+	Numerical_rcond rclimit;
 };
 
 
@@ -552,15 +537,11 @@ public:
 	    Requires y(k|k), Y(k|k)
 	    Parameters that reference the instance's y and Y members are valid
 	*/
-	virtual void init_information (const FM::Vec& y, const FM::SymMatrix& Y)
+	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
 	/* Initialise from a information state and information
 	    Parameters that reference the instance's y and Y members are valid
 	*/
-	{
-		Information_state_filter::y = y;
-		Information_state_filter::Y = Y;
-		init_yY ();
-	}
+
 	virtual void update_yY () =0;
 	/* Update filters information state and information
 	    Updates y(k|k), Y(k|k)
@@ -606,13 +587,13 @@ public:
  *  Kalman state representation and linearizable models
  *
  * Common abstration for many linear filters
- *  Uses a virtual base to represent the common state
+ *  Has a virtual base to represent the common state
  */
 class Linrz_kalman_filter : public Linrz_filter, virtual public Kalman_state_filter
 {
-public:
-	Linrz_kalman_filter() : Kalman_state_filter(0)
-	{}	// Dummy virtual base constructor
+protected:
+	Linrz_kalman_filter() : Kalman_state_filter(0) // define a default constructor
+	{}
 };
 
 
@@ -624,13 +605,14 @@ public:
  * obseve model and linear part of the Linrz_observe_model
  *
  * Common abstration for many linear filters
- *  Uses a virtual base to represent the common state
+ *  Has a virtual base to represent the common state
  */
 class Extended_kalman_filter : public Linrz_kalman_filter
 {
+protected:
+	Extended_kalman_filter() : Kalman_state_filter(0) // define a default constructor
+	{}
 public:
-	Extended_kalman_filter() : Kalman_state_filter(0)
-	{}	// Dummy virtual base constructor
 	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
 	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
 	/* Observation z(k) and with (Un)correlated observation noise model
@@ -675,17 +657,13 @@ public:
 
 	/* Virtual functions for filter algorithm */
 
-	virtual void init () = 0;
+	virtual void init_S () = 0;
 	/* Initialise from current sampleing
 	*/
 
-	virtual void init_sample (const FM::ColMatrix& initS)
+	void init_sample (const FM::ColMatrix& initS);
 	/* Initialise from a sampling
 	 */
-	{
-		S.assign (initS);
-		init();
-	}
 
 	virtual Float update_resample () = 0;
 	/* Resampling update

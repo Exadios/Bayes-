@@ -114,8 +114,6 @@ void Information_root_scheme::update ()
 
 	noalias(X) = prod_SPD(RI);		// X = RI*RI'
 	noalias(x) = prod(RI,r);
-
-	assert_isPSD (X);
 }
 
 void Information_root_info_scheme::update_yY ()

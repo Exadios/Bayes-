@@ -179,7 +179,6 @@ Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_pr
 	y = prod(prod(b.tempY,trans(f.inv.Fx)), y);
 
 	update_required = true;
-	assert_isPSD (Y);
 	return rcond;
 }
 
@@ -223,7 +222,6 @@ Bayes_base::Float
 	noalias(Y) += I;
 	update_required = true;
 
-	assert_isPSD (Y);
 	return rcond;
 }
 
@@ -255,7 +253,6 @@ Bayes_base::Float
 	noalias(Y) += I;
 	update_required = true;
 
-	assert_isPSD (Y);
 	return rcond;
 }
 

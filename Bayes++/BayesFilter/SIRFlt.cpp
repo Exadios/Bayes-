@@ -215,7 +215,7 @@ SIR_scheme& SIR_scheme::operator= (const SIR_scheme& a)
 
 
 void
- SIR_scheme::init ()
+ SIR_scheme::init_S ()
 /*
  * Initialise sampling
  *		Pre: S
@@ -425,7 +425,7 @@ SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& 
 	FM::identity (rough.Fx);
 }
 
-void SIR_kalman_scheme::init_from_kalman ()
+void SIR_kalman_scheme::init ()
 /*
  * Initialise sampling from kalman statistics
  *	Pre: x,X
@@ -445,10 +445,10 @@ void SIR_kalman_scheme::init_from_kalman ()
 
 						// Use predict roughening to apply initial noise
 	UdUseperate (rough.G, rough.q, UD);
-	rough.init_GqG();
+	rough.init_GqG ();
 	predict (rough);
 
-	SIR_scheme::init();
+	SIR_scheme::init_S ();
 }
 
 
@@ -475,13 +475,14 @@ Bayes_base::Float
 /*
  * Modified SIR_scheme update implementation
  *  update mean and covariance of sampled distribution with update_statistics
+ * Normal numerical circumstances (such as all identical samples)
+ * may lead to illconditioned X which is not PSD when factorised.
  */
 {
 	Float lcond = SIR_scheme::update_resample(resampler);	// Resample particles
 
 	update_statistics();			// Estimate sample mean and covariance
 
-	// No assert_isPSD (X) as it may fail due to normal numerical circumstances
 	return lcond;
 }
 

@@ -63,7 +63,6 @@ Bayes_base::Float
 	RowMatrix temp(f.Fx.size1(), X.size2());
 	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
 
-	assert_isPSD (X);
 	return 1;
 }
 
@@ -75,7 +74,6 @@ Bayes_base::Float
 						// Predict state covariance, simply add in noise
 	noalias(X) += prod_SPD(f.G, f.q);
   
-	assert_isPSD (X);
 	return 1;
 }
 
@@ -119,7 +117,6 @@ Bayes_base::Float
 	noalias(x) += prod(W, s);
 	noalias(X) -= prod_SPD(W, S, temp_XZ);
 
-	assert_isPSD (X);
 	return rcond;
 }
 
@@ -151,7 +148,6 @@ Bayes_base::Float
 	noalias(x) += prod(W, s);
 	noalias(X) -= prod_SPD(W, S, temp_XZ);
 
-	assert_isPSD (X);
 	return rcond;
 }
 

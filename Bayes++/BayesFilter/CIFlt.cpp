@@ -63,7 +63,6 @@ Bayes_base::Float
 	RowMatrix temp(f.Fx.size1(), X.size2());
 	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
 
-	assert_isPSD (X);
 	return 1;
 }
 

@@ -71,15 +71,18 @@ class Unscented_scheme : public Linrz_kalman_filter, public Functional_filter
 {
 private:
 	size_t q_max;			// Maxiumum size allocated for noise model, constructed before XX
-	FM::ColMatrix XX;		// Unscented form of state
 public:
+	FM::ColMatrix XX;		// Unscented form of state, with associated kappa
+	Float kappa;
 
 	Unscented_scheme (size_t x_size, size_t z_initialsize = 0);
 	Unscented_scheme& operator= (const Unscented_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();
+	void init_XX ();
 	void update ();
+	void update_XX (Float kappa);
 
 	void predict (Unscented_predict_model& f);
 	// Efficient Unscented prediction 
@@ -112,7 +115,7 @@ protected:
 	virtual Float predict_Kappa (size_t size) const;
 	virtual Float observe_Kappa (size_t size) const;
 	/* unscented Kappa values
-	   default uses the rule to minimise mean squared error of 4th order term
+	   default uses the rule which minimise mean squared error of 4th order term
 	*/
 
 protected:					// allow fast operation if z_size remains constant

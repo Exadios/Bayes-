@@ -240,8 +240,16 @@ public:
 	}
 };
 
+}//namespace detail
+
+
+#if (BOOST_VERSION < 103100)
+namespace detail
+{
+
 /*
- * No Alias assignment proxy
+ * Improve syntax of effcient assignment where no aliases of LHS appear on the RHS
+ *  noalias(lhs) = rhs_expression
  */
 template <class C>
 struct NoAliasAssign
@@ -269,23 +277,20 @@ struct NoAliasAssign
 
 }//namespace detail
 
+template <class E>
+detail::NoAliasAssign<E>
+ noalias(ublas::matrix_expression<E>& lvalue)
+{
+	return detail::NoAliasAssign<E> (lvalue() );
+}
+template <class E>
+detail::NoAliasAssign<E>
+ noalias(ublas::vector_expression<E>& lvalue)
+{
+	return detail::NoAliasAssign<E> (lvalue() );
+}
 
-/*
- * Improve syntax of effcient assignment where no aliases of LHS appear on the RHS
- *  noalias(lhs) = rhs_expression
- */
-template <class VecBase>
-detail::NoAliasAssign<detail::FMVec<VecBase> >
- noalias(detail::FMVec<VecBase>& lvalue)
-{
-	return detail::NoAliasAssign<detail::FMVec<VecBase> > (lvalue);
-}
-template <class MatrixBase>
-detail::NoAliasAssign<detail::FMMatrix<MatrixBase> >
- noalias(detail::FMMatrix<MatrixBase>& lvalue)
-{
-	return detail::NoAliasAssign<detail::FMMatrix<MatrixBase> > (lvalue);
-}
+#endif
 
 
 /*
@@ -484,16 +489,6 @@ struct prod_expression_result
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<E1, ublas::scalar_identity<BOOST_UBLAS_TYPENAME E1::value_type> >::result_type  E1T_type;
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME E1T_type::value_type, E1T_type,
                                         BOOST_UBLAS_TYPENAME E2::value_type, E2>::result_type  E1TE2_type;
-};
-
-template <class X>
-struct prod_matrix_result
-{	// Provide ET result type XXT of prod(X,trans(X))
-	typedef BOOST_UBLAS_TYPENAME X::expression_type EX;
-	typedef BOOST_UBLAS_TYPENAME prod_expression_result<EX,EX>::E1E2T_type  XXT_type;
-
-	// Provide ET result type XTX of prod(trans(X),X)
-	typedef BOOST_UBLAS_TYPENAME prod_expression_result<EX,EX>::E1TE2_type  XTXT_type;
 };
 
  

@@ -72,7 +72,6 @@ Bayes_base::Float
 	RowMatrix temp_FxX(f.Fx.size1(),X.size2());
 	X = prod_SPD(f.Fx,X, temp_FxX) + prod_SPD(f.G,f.q);
 
-	assert_isPSD (X);
 	return 1;
 }
 
@@ -157,7 +156,7 @@ Bayes_base::Float
 		noalias(temp3) = prod_SPD(HxT,SI, temp2);
 		noalias(temp1) = prod(Xpred,temp3);
 		noalias(X) = Xpred - prod(temp1,Xpred);
-		assert_isPSD (X);
+
 							// New state iteration
 		noalias(temp2) = prod(X,HxT);
 		noalias(temp1) = prod(X,XpredI);

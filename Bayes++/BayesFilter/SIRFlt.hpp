@@ -118,7 +118,7 @@ public:
 	// Optimise copy assignment to only copy filter state
 
 	/* Specialisations for filter algorithm */
-	void init ();
+	void init_S ();
 
 	Float update_resample ()
 	// Default resampling update
@@ -167,22 +167,7 @@ private:
 };
 
 
-class Kalman_filter_init : virtual public Kalman_state_filter
-/* Rename init to init_from_kalman
- * Required for GCC2.95 which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
- */
-{
-protected:
-	Kalman_filter_init () : Kalman_state_filter(0)
-	{}	// Dummy virtual base constructor
-	void init() {
-		init_from_kalman();
-	}
-	virtual void init_from_kalman() = 0;
-};
-
-
-class SIR_kalman_scheme : public SIR_scheme, public Kalman_filter_init
+class SIR_kalman_scheme : public SIR_scheme, virtual public Kalman_state_filter
 /*
  * SIR implementation of a Kalman filter
  *  Updates Kalman statistics of SIR_filter
@@ -190,18 +175,13 @@ class SIR_kalman_scheme : public SIR_scheme, public Kalman_filter_init
  */
 {
 public:
-	using Kalman_filter_init::x;
 	SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper);
 
 	/* Specialisations for filter algorithm */
 
-	// SIR_filter::Init and Kalman_filter::Init are both inherited from bases
-private:
-	void init_from_kalman();
-	// Initialisation from kalman statistics
+	void init ();
 
-public:
-	virtual void update ()
+	void update ()
 	// Implement Kalman_filter::update identically to SIR_scheme
 	{	(void)SIR_scheme::update_resample();
 	}

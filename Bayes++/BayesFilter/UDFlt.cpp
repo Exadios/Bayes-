@@ -12,8 +12,7 @@
  *
  * For efficiency UD_scheme requires to know the maximum q_size of the predict_model
  * ISSUES:
-*  observeUD is restricted to a positive definate UD matrix, it could be extended to deal with semi definate case
- * observe functions: returned rcond is the minimum of each sequential update, an overall conditioning would be better
+ *  observe functions: returned rcond is the minimum of each sequential update, an overall conditioning would be better
  */
 #include "bayesFlt.hpp"
 #include "matSup.hpp"
@@ -64,10 +63,11 @@ void
 /*
  * Initialise from a state and state coveriance
  * Computes UD factor from initial covaiance
- * Predcondition:
- *		X
- * Postcondition:
- *		UdU' is PSD
+ * Predcond:
+ *  X
+ * Postcond:
+ *  X
+ *  UD=X, d is PSD
  */
 {
 					// Factorise X into left partition of UD
@@ -82,14 +82,13 @@ void
  UD_scheme::update ()
 /*
  * Defactor UD back into X
- * Predcondition:
- *		UdU' is PSD (not checked)
- * Postcondition:
- *		X is PSD
+ * Precond:
+ *  UD
+ * Postcond:
+ *  X=UD  PSD iff UD is PSD
  */
 {
 	FM::UdUrecompose (X, UD);
-	FM::assert_isPSD (X);
 }
 
 
@@ -98,10 +97,10 @@ UD_scheme::Float
 /*
  * Prediction using a diagonalised noise q, and its coupling G
  *  q can have order less then x and a matching G so GqG' has order of x
- * Predcondition:
- *		UdU' is PSD (not checked)
- * Postcondition:
- *		UdU' is PSD
+ * Precond:
+ *	UD
+ * Postcond:
+ *  UD is PSD
  */
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
@@ -118,10 +117,10 @@ UD_scheme::Float
 /*
  * MWG-S prediction from Bierman  p.132
  *  q can have order less then x and a matching G so GqG' has order of x
- * Predcondition:
- *		UdU' is PSD (not checked)
- * Postcondition:
- *		UdU' is PSD (see return value)
+ * Precond:
+ *  UD
+ * Postcond:
+ *  UD
  *
  * Return:
  *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
@@ -276,11 +275,11 @@ Bayes_base::Float
  *  The sequential observation updates state x
  *  Therefore the model of each observation needs to be computed sequentially. Generally this
  *  is inefficient and observe (UD_sequential_observe_model&) should be used instead
- * Predcondition:
- *		UdU' is PD (not checked)
- *		Zv is PSD
- * Postcondition:
- *		UdU' is PD
+ * Precond:
+ *	UD
+ *	Zv is PSD
+ * Postcond:
+ *  UD is PSD
  * Return: Minimum rcond of all squential observe
  */
 {
@@ -302,7 +301,7 @@ Bayes_base::Float
 			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h1, h.Zv[o]);
-		rclimit.check_PD(rcond, "X not PD in observe");
+		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using non-linear innovation
 		s = z[o]-zp[o];
@@ -330,10 +329,10 @@ Bayes_base::Float
  * Applies observations sequentialy in the order they appear in z
  * Creates temporary Vec and Matrix to decorelate z,Z
  * Predcondition:
- *		UdU' is PD (not checked)
- *		Z is PSD
+ *  UD
+ *  Z is PSD
  * Postcondition:
- *		UdU' is PD
+ *  UD is PSD
  * Return: Minimum rcond of all squential observe
  */
 {
@@ -410,7 +409,7 @@ Bayes_base::Float
 		}
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h1, Gz(o,o));
-		rclimit.check_PD(rcond, "X not PD in observe linear");
+		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using linear innovation
 		s = zdecol[o]-zp[o];
@@ -433,10 +432,10 @@ Bayes_base::Float
  * The sequential observation updates state x. Therefore the model of
  * each observation needs to be computed sequentially
  * Predcondition:
- *		UdU' is PD (not checked)
- *		Z is PSD
+ *  UD
+ *  Z is PSD
  * Postcondition:
- *		UdU' is PD
+ *  UD is PSD
  * Return: Minimum rcond of all squential observe
  */
 {
@@ -459,7 +458,7 @@ Bayes_base::Float
 			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h.Hx_o, h.Zv[o]);
-		rclimit.check_PD(rcond, "X not PD in observe");
+		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using non-linear innovation
 		s = z[o]-zp[o];
@@ -488,15 +487,13 @@ UD_scheme::Float
  *  alpha observation innovation variance
  * Variables with physical significance
  *  gamma becomes covariance of innovation
- * Alogirthm resrictions:
- *  Only implemented for PD matricies, assume semi-definate is negative
  * Predcondition:
- *    UdU' is PD (not checked)
- *    r is >=0 (not checked)
+ *  UD
+ *  r is PSD (not checked)
  * Postcondition:
- *    UdU' is PD (see return value)
+ *  UD (see return value)
  * Return:
- *    reciprocal condition number, -1 if negative or semi-definate (including zero)
+ *  reciprocal condition number of UD, -1 if alpha singular (negative or zero)
  */
 {
 	size_t i,j,k;
@@ -519,8 +516,8 @@ UD_scheme::Float
 
 					// Update UD(0,0), d(0) modification
 	alpha = r + b[0] * a[0];
-	if (alpha <= 0) goto NotPD;
-	gamma = Float(1) / alpha;
+	if (alpha <= 0) goto alphaNotPD;
+	gamma = 1 / alpha;
 	UD(0,0) *= r * gamma;
 					// Update rest of UD and gain b
 	for (j = 1; j < n; ++j)		// 1..n-1
@@ -529,7 +526,7 @@ UD_scheme::Float
 		alpha_jm1 = alpha;	// alpha at j-1
 		alpha += b[j] * a[j];
 		lamda = -a[j] * gamma;
-		if (alpha <= 0.) goto NotPD;
+		if (alpha <= 0.) goto alphaNotPD;
 		gamma = 1 / alpha;
 		UD(j,j) *= alpha_jm1 * gamma;
 					// U modification
@@ -548,7 +545,7 @@ UD_scheme::Float
  	// Estimate the reciprocal condition number from upper triangular part
 	return FM::UdUrcond(UD,n);
 
-NotPD:
+alphaNotPD:
 	return -1;
 }
 
