@@ -1,0 +1,12 @@
+# Bayes++ Jamfile - See Boost.build v2
+
+# PV - Position Velocity filter
+project
+     :
+     : default-build release
+;
+
+exe PV :
+     PV.cpp
+     ../BayesFilter/BayesFilter
+;

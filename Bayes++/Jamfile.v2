@@ -1,0 +1,19 @@
+# Bayes++ Jamfile - See Boost.build v2
+
+# Bayes++ Project root.
+# The project root simply build all the subprojects:
+#    BayesFilter library, and the examples.
+
+echo ZZZ $(BOOST_BASE) ;
+
+build-project BayesFilter ;
+build-project Simple ;
+build-project PV ;
+build-project QuadCalib ;
+
+
+# Project requirements
+project
+    : requirements <include>"../boost_1_30_0"
+    : build-dir "target"
+    ;

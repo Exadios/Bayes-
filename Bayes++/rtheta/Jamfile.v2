@@ -1,0 +1,19 @@
+# Bayes++ Jamfile - See Boost.build v2
+
+# Range Angle test for all filter schemes
+project
+     : requirements <include>"../../include"
+     : default-build debug
+;
+
+# System libraries
+lib lapack : : <name>lapack ;
+lib g2c : : <name>g2c ;
+
+# The executable for testing
+
+exe rtheta :
+     rtheta.cpp  tests.cpp
+     ../BayesFilter/BayesFilter lapack g2c
+;
+

@@ -1,0 +1,12 @@
+# Bayes++ Jamfile - See Boost.build v2
+
+# Simple - Simple filter example
+project
+     :
+     : default-build release
+;
+
+exe simple :
+     simpleExample.cpp
+     ../BayesFilter/BayesFilter
+;
