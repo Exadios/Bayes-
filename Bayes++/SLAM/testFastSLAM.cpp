@@ -8,7 +8,6 @@
 
 /*
  * Test the FastSLAM alogorithm
- *  A linear filter with one state and constant noisesnew
  */
 
 		// Bayes++ Bayesian filtering schemes
