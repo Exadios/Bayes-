@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens
- * See Bayes++.htm for copyright license details
+ * See accompanying Bayes++.htm for terms and conditions of use.
  */
 #define NO_TESTS
 
@@ -27,6 +27,13 @@ template Average1_filter<Covariance_scheme>;
 #include "BayesFilter/filters/indirect.hpp"
 template Indirect_state_filter<Covariance_scheme>;
 template Indirect_kalman_filter<Covariance_scheme>;
+
+void nested_prod ()
+{
+	Matrix R(1,1), A(1,1),B(1,1),C(1,1);
+	R = prod(A, prod(B,C));
+	R = prod(A, B);
+}
 
 #ifdef REMOVED
 

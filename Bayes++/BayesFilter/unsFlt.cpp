@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens
- * See Bayes++.htm for copyright license details
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
  * $NoKeywords: $
