@@ -2,11 +2,11 @@
 <html>
 <head>
   <title>Bayesiean Filtering Classes</title>
-   		 		   
+      		 		      
   <link media="all" href="http://www.acfr.usyd.edu.au/style.css"
  type="text/css" rel="Stylesheet">
 </head>
-	<body vlink="blue" link="blue">
+<body vlink="blue" link="blue">
 		
 <h1 align="center"><u>Bayesian Filtering Classes</u></h1>
 		
@@ -16,28 +16,31 @@
  style="font-weight: normal; font-size: 18pt; font-family: Verdana;">						<span
  style="font-weight: normal; font-size: 18pt; font-family: Verdana;"></span>
 					</span>				</span></blockquote>
-<a href="Bayes++.htm">Bayes++&nbsp;Overview</a>		</div>
+<h3><a href="Bayes++.htm">Bayes++&nbsp;Overview</a>		</h3>
+</div>
 		
 <h1>Introduction</h1>
 		
-<p>Bayesian Filtering is a probabilistic technique for data fusion. The techniques
-			result from using a concise mathematical formulation to represent the state
-of  			a system. Probabilities are used to represent states, likelihood functions
-to  			represent their relationships. In this form Bayes rule can be applied
-and  			further related probabilities deduced.</p>
+<p>Bayesian Filtering is a probabilistic technique for data fusion. The technique
+combines a concise mathematical formulation of a system with observtions of
+that system.	Probabilities are used to represent the state of a system, likelihood
+functions to represent their relationships. In this form Bayes rule can be
+applied and further related probabilities deduced.</p>
 		
-<p>The Bayesian formulation results in a naturally iterative solution to data
- 			fusion and particularly to filtering problems. For linear dynamic systems,
- 			discrete solutions such as the Kalman filter apply.</p>
-		
+<p>For <u>discreate</u> systems the Bayesian formulation results in a naturally
+iterative data fusion solution. For <u>dynamic</u> systems there is a class
+of solutions, discreate <u>filters</u>, that combine observed inputs to the
+system with the dynamic model . A filter that iteratively incorperates new
+information is an <u>estimator</u>. For linear dynamic systems, discrete solutions
+such as the Kalman filter apply.</p>
 <p>Bayes++ is a library of C++ classes. These classes represent and implement
-a  			wide variety of numerical estimation algorithms for Bayesian Filtering.
-The  			classes provide tested and consistent numerical methods and the class
-hierarchy  			explicitly represents the variety of filtering algorithms and
-model types.</p>
+a wide variety of numerical algorithms for Bayesian Filtering of discreate
+systems. The classes provide tested and consistent numerical methods and
+the class hierarchy explicitly represents the variety of filtering algorithms
+and system model types.</p>
 		
 <p>The following documentation summarises the classes available and provides
-some  			general comments on their use. Each class&#8217;s <b>.h</b> file provides
+some  			general comments on their use. Each class&#8217;s <b>.hpp</b> file provides
 a complete  			interface specification and the numerical form of the solution.
 Implementation  			issues are documented in the <b>.cpp</b> files.</p>
 		
@@ -76,180 +79,194 @@ associated with the  			algorithm.</p>
  size="4">Representation Requirements</font></b>						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>Covariance_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Extended Kalman Filter (EKF)</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[6]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><span><font face="Verdana">Classic 2<sup>nd</sup> order filter with
 state mean and  										covariance representation. Non-linear models require
 a gradient linearisation  										(Jacobian). Uses the common innovation
 update formulation.</font></span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">Innovation covariance invertible</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>Unscented_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Kalman filter using unscented non-linear
 approximations</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[1]</span></a><font face="Verdana"> </font>								</span></p>
 						</td>
-						<td valign="top" width="43%">							       
-      <p><span><font face="Verdana">Unscented non-linear transformations replace
-the Jacobians  										used in the EKF- reducing linearisation errors in
-all cases.</font></span></p>
+						<td valign="top" width="43%">							              
+      <p><span><font face="Verdana">Unscented non-linear transformations
+replace the Jacobians  										used in the EKF- reducing linearisation
+errors in all cases.</font></span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">Innovation covariance invertible</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>Iterated_covariance_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Modified EKF update</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[6]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><span><font face="Verdana">Kalman filter for highly non-linear observation
 models.  										Observation update is iterated using an Euler approximation.</font></span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">State, observation and innovation covariance
 invertible</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>Information_filter</h4>
-							       
+							              
       <p><font face="Verdana">Extended Information Filter (EIF)</font></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[7]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><span><font face="Verdana">Inverse Covariance or Information form
 filter. Non-linear  										prediction requires conversion back to state
 representation. Update, directly  										on information using modified
 innovation formulation.</font></span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">State, observation and innovation covariance
 invertible</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>Information_joseph_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">EIF with linear prediction</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[7]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><font face="Verdana">Invertible <u>linear</u> model allows direct
 information form  									prediction - avoids EIF conversion back to state
 and covariance.</font></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">Joseph prediction, observation and innovation
 covariance  										invertible</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>Information_root_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Square root information filter (SRIF)</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[4]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><span><font face="Verdana">Numerically stable solution using factorisation
 of inverse  										covariance as R<sup>T</sup>R</font></span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">Invertible prediction model. Prediction
 and observation  										covariance invertible</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>UD_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Square root covariance filter</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[2]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p class="MsoNormal"><span style="font-family: Veranda;"><font
  face="Verdana">Numerically  										stable solution using UdU<sup>T</sup>
 factorisation of covariance. </font>								</span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">Innovation covariance invertible. Linearized
 observation  										requires uncorrelated noise</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+      <td valign="top"><b>CI_filter<br>
+      <br>
+      </b>Covariance intersect filter
+      <p><span><a href="#References"><span style="font-family: Verdana;">See
+       Reference[8]</span></a></span></p>
+      </td>
+      <td valign="top">CI is interesting as it provides a weaker but more
+robust fussion then traditional covariance based method such as the Kalman
+filter. It estimates state and an upper bound of what its covariance could
+be.</td>
+      <td valign="top">No solution if covariances don't intersect.<br>
+      </td>
+    </tr>
+    <tr>
+						<td valign="top" width="30%">							              
       <h4>SIR_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Sequential Importance Re-sampling filter</font></span></p>
-							       
+							              
       <p><span><a href="#References"><span style="font-family: Verdana;">See
        Reference[5]</span></a></span></p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><span><font face="Verdana">A bootstrap representation of the state
 distribution &#8211; no  										linear or Gaussian assumptions required.</font></span></p>
-							       
+							              
       <p><span><font face="Verdana">Uncorrelated linear roughening of samples.</font></span></p>
 						</td>
-						<td valign="top" width="25%">							       
+						<td valign="top" width="25%">							              
       <p><span><font face="Verdana">Bootstrap samples collapse to a degenerate
 from with fewer  										samples then states.</font></span></p>
 						</td>
 					</tr>
 					<tr>
-						<td valign="top" width="30%">							       
+						<td valign="top" width="30%">							              
       <h4>SIR_kalman_filter</h4>
-							       
+							              
       <p><span><font face="Verdana">Sequential Importance Re-sampling filter</font></span></p>
-							       
+							              
       <p><span></span>							</p>
 						</td>
-						<td valign="top" width="43%">							       
+						<td valign="top" width="43%">							              
       <p><span><font face="Verdana">A bootstrap representation of the state
 distribution &#8211; no  										linear or Gaussian assumptions required.</font></span></p>
-							       
+							              
       <p><span><font face="Verdana">Additional computes state mean and covariance.
 Correlated  										linear roughening of samples. </font>								</span></p>
 						</td>
-						<td valign="top" width="25%">							       
-      <p><span><font face="Verdana">As above. Correlation non-computable from
-degenerate samples.</font></span></p>
-							       
+						<td valign="top" width="25%">							              
+      <p><span><font face="Verdana">As above. Correlation non-computable
+from degenerate samples.</font></span></p>
+							              
       <p><span></span>							</p>
 						</td>
 					</tr>
-				   
+				      
   </tbody>			
 </table>
 		</div>
@@ -259,8 +276,8 @@ degenerate samples.</font></span></p>
 <h1>Dual Abstraction</h1>
 		
 <p>			The aim of Bayes++ is to provide a powerful and extensible structure
-for  			Bayesian filtering. This is achieved by hierarchical composition of
-related  			objects. In C++ these are represented by a hierarchy of polymorphic
+for  			Bayesian filtering. This is achieved by hierarchical composition
+of related  			objects. In C++ these are represented by a hierarchy of polymorphic
 classes.  			Numerical Schemes are grouped by their state representation.
 The Schemes  			themselves provided the filtering operations on these representations.</p>
 		
@@ -308,10 +325,10 @@ the complete  			structure. 		</p>
 					</tr>
 					<tr>
 						<td valign="top" width="35%"><strong>Kalman_filter</strong>						</td>
-						<td valign="top" width="65%">							Kalman representation of state.<br>
-							Represents the filter as a state vector and a covariance matrix. That
-is the  							1st (mean) and 2nd (covariance) moments of a distribution.
-						</td>
+						<td valign="top" width="65%">							Kalman representation of state
+statistic.<br>
+							Represents a state vector and a covariance matrix. That is the  							1st
+(mean) and 2nd (covariance) moments of a distribution. 						</td>
 					</tr>
 					<tr>
 						<td valign="top" width="35%"><strong>Linrz_filter</strong>						</td>
@@ -321,10 +338,11 @@ linearized Kalman filters.<br>
 					</tr>
 					<tr>
 						<td valign="top" width="35%"><strong>Sample_filter</strong></td>
-						<td valign="top" width="65%">Base class for filters representing state
-probability  							distribution by a discrete sampling</td>
+						<td valign="top" width="65%">Discreate reprensation of state statistic.<br>
+Base class for filters representing state probability  							distribution
+by a discrete sampling</td>
 					</tr>
-				   
+				      
   </tbody>			
 </table>
 		</div>
@@ -368,7 +386,7 @@ of  							non-linear functional part</td>
 						<td valign="top" width="35%"><strong>Linear_invertable_predict_model</strong></td>
 						<td valign="top" width="65%">Linear prediction model which is invertible</td>
 					</tr>
-				   
+				      
   </tbody>			
 </table>
 		</div>
@@ -403,7 +421,7 @@ of  							non-linear functional part and additive uncorrelated noise</td>
 						<td valign="top" width="65%" height="26">as above, but with additive
 correlated  							noise</td>
 					</tr>
-				   
+				      
   </tbody>			
 </table>
 		</div>
@@ -424,10 +442,10 @@ noises.</p>
 <p>The example then constructs a filter. The <b>Unscented</b> filter scheme
 is  			chosen to illustrate how this works, even on a simple linear problem.
 After  			construction the filter is given the problem&#8217;s initial conditions.
-A prediction  			using the predefine prediction model is then made. This prediction
-is then  			fused with an external observation given by the example and the
-defined  			observation model. At each stage, the filter&#8217;s state estimate
-and variance  			estimate are printed.</p>
+A prediction  			using the predefine prediction model is then made. This
+prediction is then  			fused with an external observation given by the example
+and the defined  			observation model. At each stage, the filter&#8217;s state
+estimate and variance  			estimate are printed.</p>
 		
 <h2>Position and Velocity</h2>
 		
@@ -456,19 +474,33 @@ by a known  			perturbation.</p>
 		
 <h1>Capabilities</h1>
 		
-<h2>Linear models</h2>
+<h2>Probablistic representation of state</h2>
+Bayes rule is usualy defined in term of Probability Density Functions. However
+PDFs never appear in Bayes++. They are always represented by their statistics.<br>
+This is for good reason, there is very little that can be done algorithmically
+with a function. However the sufficient statistics, given the assumptions
+of a filter, can be easily manipulated to implement Bayes rule. Each filter
+class is derived from a base classes that represent the statisitcs used. For
+example theKalman_filter and Sample_filter base classes.<br>
+<br>
+It would be possible to use a common abstract base class for that enforces
+the implementation of a PDF function; a function that maps state to probability.
+This would provide a very weak method to view the PDF of state. However such
+a function could not be efficiently implemented by all schemes. Therefore
+to enforce this requirement in the base class would be highly restrictive.<br>
+<h2>Linear and Linearized models</h2>
 		
 <p>Many of the filters use classical linear estimation techniques, such as
 the  			Kalman filter. To make them useful they are applied in modified forms
-to cope  			with <u>linearized</u> models of some kind. They are commonly
-extended, using a  			gradient linearized model to update uncertainty, while
-the state is directly  			propagated through the non-linear model. This is
-the <i>Extended </i>form used  			by the EKF.</p>
+to cope  			with <u>linearized</u> models of some kind. Commonly a  			gradient
+linearized model is used to update uncertainty, while the state is directly
+ 			propagated through the non-linear model. This is the <i>Extended </i>form
+used  			by the Extended Kalman Filter.</p>
 		
 <p>However, some numerical schemes cannot be modified using the <i>Extended</i>
 form.  			In particular, it is not always possible to use the extended form
-with  			correlated noises. Where this is the case, the linear form of the
-model must be  			used.</p>
+with  			correlated noises. Where this is the case, the linearized model
+is  			used for uncertainty and state.</p>
 		
 <p>There are also many Bayesian filters that work with non-Gaussian noise
 and  			non-linear models - such as the <i>SIR_filter</i>. The SIR scheme
@@ -490,9 +522,12 @@ as  			the mathematical methods vary greatly. For efficiency some schemes
 also  			implement additional functions. The functions can be use to avoid
 			inefficiencies where the general form is not required.</p>
 		
-<p>Scheme class constructors are irregular (their parameter list varies) and
-must  			be used with care. Each numerical scheme has different requirements,
-and the  			representation size needs to be parameterised.</p>
+<p>Scheme class constructors are irregular (their parameter list varies)
+and must  			be used with care. Each numerical scheme has different requirements,
+and the  			representation size needs to be parameterised. A template class
+Filter_scheme can be used to provide a generic constructor interface. It
+provides provides specialisation for all the Schemes so they can be constructed
+with a common parameter list.</p>
 		
 <h3>Open interface</h3>
 		
@@ -501,14 +536,43 @@ and the  			representation size needs to be parameterised.</p>
 the  			covariance filter&#8217;s innovation covariance is public. This is to allow
 efficient  			algorithms to be implemented using the classes. In particular
 it is often the  			case that subsequent computations reuse the values that
-have already been  			computed by the numerical schemes.</p>
+have already been  			computed by the numerical schemes. &nbsp;Each scheme
+definines a <i>public presentation</i>.</p>
 		
 <p>Furthermore many temporaries are <i>protected members</i> to allow derived
 			classes to modify a scheme without requiring any additional overhead to
 			allocate its own temporaries.</p>
 		
 <p>Open interfaces are potentially hazardous. The danger is that abuse could
-result  			in unnecessary dependencies on particular implementation characteristics.</p>
+result  			in unnecessary dependencies on particular implementation characteristics.<br>
+</p>
+<h4>Init and Update</h4>
+<p>These two functions are defined in the filter class heirarchy.<br>
+</p>
+<blockquote> Whenever the public representation of a scheme is changed (externally)
+the filter should be <i>initialised</i> with <b>init</b>.<br>
+Whenever the public representation of a scheme is used the filter should
+be <i>updated</i> with <b>update</b>.<br>
+</blockquote>
+<h4>Assignment and Copy Construction</h4>
+<p>Filter classes can be assigned when they are of the same size. In cases
+where the class includes members in addition to the public representation
+this is optimised so that only public representation is assigned. Assignment
+is equvilent to <i>update, </i>assignment of public representation and <i>initialisation</i>
+from the new state.</p>
+<p>Copy Constructors are NOT defined. Generally the classes are expensive
+to copy and so copies should be avoided. Instead references, (smart) pointers,
+assignment, init and update should combined to create copies if necessary.</p>
+<h4>Resizing</h4>
+<p>Classes assume their matrices maintain a constant size. They define this
+on construction. The public representation should NOT be externally resized.</p>
+<p> To resize a filter a new filter should be created from the old. The public
+representation modified&nbsp; and then the new filter <i>initialised</i>.
+Since the definition of the schemes public representation varies, this avoids
+confusion as to how the newely sized filter is defined.<br>
+</p>
+<p>Since matrix resizing invariable involves reallocation and internal states
+must be recomputed their is no efficiency lost in the above method.</p>
 		
 <h2>Numerical and Exception Guarantees</h2>
 		
@@ -520,19 +584,20 @@ is numerically stable, computing and checking the conditioning of  			matrices.<
 		
 <p dir="ltr" style="margin-right: 0px;">			Exceptions are thrown in the case
 of numerical failure. They follow a simple  			rule:<br>
-			<em><strong>Bayes_filter_exception</strong> is thrown if an algorithm cannot
- 				continue or guarantee the numerical post-conditions of a function</em></p>
+			<em><strong>Bayes_filter_exception</strong> is thrown if an algorithm
+cannot  				continue or guarantee the numerical post-conditions of a function</em></p>
 		
-<p>The only <em>exception guarantee</em> that Bayes++ makes when throwing
-<strong><em>Bayes_filter_exception</em>			</strong>from any functions, is
-that no resources will be leaked. Therefore,  			unless otherwise specified,
-the numeric value of a class's public state is <strong>undefined</strong>
+<p>The only <em>exception guarantee</em>&nbsp; that Bayes++ makes when throwing
+<strong><em>Bayes_filter_exception</em>			</strong>from any function, is that
+no resources will be leaked. That is the <i>Weak guarantee</i> as defined
+by <a href="#Reference">Reference[9]</a>. Therefore,  			unless otherwise
+specified, the numeric value of a class's public state is <strong>undefined</strong>
 			after this exception is thrown by a member of a class.</p>
 		
 <p>Be aware that numerical post-conditions may be met even with extreme input
 			values. For example some inputs may result in overflow of a result. This
-does  			not invalidate the post-conditions that the result is positive. Even
-some <em>Not a  				Number</em> values may be valid. Therefore the results
+does  			not invalidate the post-conditions that the result is positive.
+Even some <em>Not a  				Number</em> values may be valid. Therefore the results
 may be computed  			without exception, but include <em>NaN</em> or <em>non-number</em>
 values.</p>
 		
@@ -548,11 +613,11 @@ has no  			pre-conditions) or the filter destructed.</p>
 <p>Generally to access the public state of a Scheme you must first call the
 <em>update</em>()  			function. If no exception is thrown then the post-conditions
 of update are  			guaranteed. The post-conditions of <em>update</em>() may
-include such useful  			properties as the covariance matrix is PSD. Many application
-specific tests may  			also be required. Just being PSD doesn't say much
-about X. It could even have <em>Infinity</em>			values on the diagonal! Conditioning,
-trace, determinate, and variance bounds  			can all be applied at his point.
-		</p>
+include such useful  			properties as the covariance matrix is PSD. Many
+application specific tests may  			also be required. Just being PSD doesn't
+say much about X. It could even have <em>Infinity</em>			values on the diagonal!
+Conditioning, trace, determinate, and variance bounds  			can all be applied
+at his point. 		</p>
 		
 <h1>Rational</h1>
 		
@@ -561,11 +626,12 @@ trace, determinate, and variance bounds  			can all be applied at his point.
 <p>Why are models and filter Schemes <strong>polymorphic</strong> ? OR why
 are they  			implemented with virtual functions?</p>
 		
-<blockquote dir="ltr" style="margin-right: 0px;">			   
-  <p>One alternative would be to use <strong>generic</strong> instead of 
+<blockquote dir="ltr" style="margin-right: 0px;">			      
+  <p>One alternative would be to use <strong>generic</strong> instead of
  <strong>polymorphic</strong>				Schemes. This would implement Schemes as
-templates. If the sizes of matrix  				operations could be fixed generic models
-and schemes would directly manipulate  				matrices for predefined size.</p>
+templates. If the sizes of matrix  				operations could be fixed generic
+models and schemes would directly manipulate  				matrices for predefined
+size.</p>
 		</blockquote>
 		
 <p>Bayes++ relies on a <strong>dual abstraction</strong>, separating numerical
@@ -588,12 +654,12 @@ much  			of this structure.<br>
 			In a Generic approach checking that a particular Scheme models a generic
 			concept correct would be very difficult to enforce.</p>
 		
-<p>C) <em>Compiler problems</em>: Generic programming in C++ has a nasty syntax,
-is  			very slow to compile and pushes the limits of compiler reliability.</p>
+<p>C) <em>Compiler problems</em>: Generic programming in C++ has a nasty
+syntax, is  			very slow to compile and pushes the limits of compiler reliability.</p>
 		
-<p>D) <em>Efficiency</em>: The run time overhead of a polymorphic filter is
- 			negligible compared to the matrix algebra required. In fact using common
-code  			may increase efficiency on a many computing architectures.</p>
+<p>D) <em>Efficiency</em>: The run time overhead of a polymorphic filter
+is  			negligible compared to the matrix algebra required. In fact using
+common code  			may increase efficiency on a many computing architectures.</p>
 		
 <h1 style="text-align: left;" align="left">Matrix Representation</h1>
 		
@@ -622,7 +688,7 @@ expression complexity. 			</li>
 such as  				add(a,b,c), rank_one_update etc</li>
 </ul>
 		
-<p>For uBLAS these function generally have no runtime overhead. This efficiency
+<p>For uBlas these function generally have no runtime overhead. This efficiency
 is  			due to uBLAS's excellent expression template implementation.&nbsp;For
 			MTL&nbsp;most functions&nbsp;are reasonably&nbsp;efficient,&nbsp;but some
 			functions&nbsp;create matrix temporaries to return values.</p>
@@ -630,41 +696,41 @@ is  			due to uBLAS's excellent expression template implementation.&nbsp;For
 <h2>Matrix library efficiency - Temporary object usage</h2>
 		
 <p>			Most of the filters avoid using Matrix and Vec temporaries. They also
-have  			optimisations for the fixed size of state, noise and observations.
-In  			particularly the UD_filter scheme avoids creating any temporary objects.
-All  			matrices maintain a fixed size, other then when the observation state
-size is  			varied. 		</p>
+have  			optimisations for a constant (on construction) state size, noise
+and observations. In  			particularly the UD_filter scheme avoids creating
+any temporary objects. All  			matrices maintain a fixed size, other then
+when the observation state size is  			varied. 		</p>
 		
 <p>			Why are temporary matrix objects bad? The main difficulty is construction
 and  			destruction of Matrices. This generally requires dynamic memory allocation
-			which is very slow. For small matrices this dominates compared to the cost
-of  			simple operations such as addition and multiplication. 		</p>
+			which is very slow. For small matrices this dominates compared to the
+cost of  			simple operations such as addition and multiplication. 		</p>
 		
 <p>There are three ways out of this problem. 		</p>
 		
-<blockquote dir="ltr" style="margin-right: 0px;">			   
-  <p>1. Use fixed size matrices; they can (nearly) always be efficiently allocated
-on  				the stack.<br>
+<blockquote dir="ltr" style="margin-right: 0px;">			      
+  <p>1. Use fixed size matrices; they can (nearly) always be efficiently
+allocated on  				the stack.<br>
 				2. Use stack based dynamic allocators (such as C99's dynamic arrays or
 alloca)  				for temporaries.<br>
 				3. Don't create temporaries. This is achievable with a combination of
 hard  				coding in the algorithms (pre-allocation) and by using a Matrix
-library with  				expression templates to avoid creating temporaries for return
-values.</p>
+library with  				expression templates to avoid creating temporaries for
+return values.</p>
 		</blockquote>
 		
 <p>			Bayes++ is implemented to avoid creating temporaries. At present my
 solution is  			somewhat of a compromise. MTL is only moderately efficient
 on most C++  			compilers. On release code this results in a 50% performance
-reduction if  			temporaries are avoided. uBLAS attains close to optimal efficiency
-in many  			situations.</p>
+reduction if  			temporaries are avoided. uBLAS attains close to optimal
+efficiency in many  			situations.</p>
 		
 <p>The UD_filter is a good illustration. It has been hand crafted to avoid
 			construction of any temporaries (I use it for embedding) and can be compiled
-			with either uBLAS, MTL or a special fast matrix library. UD_filter is heavily
- 			optimised to use row operations to avoid indexing overheads. uBLAS and
-the  			special library achieve comparable results,&nbsp;which I believe
-are as fast as  			can be achieved.</p>
+			with either uBLAS, MTL or a special fast matrix library. UD_filter is
+heavily  			optimised to use row operations to avoid indexing overheads.
+uBLAS and the  			special library achieve comparable results,&nbsp;which
+I believe are as fast as  			can be achieved.</p>
 		
 <p>On the flip side, the current Unscented_filter implementation shows some
 of the  			problems. Because of my wrapper classes Row/Column of a 2D matrix
@@ -672,51 +738,27 @@ are not  			compatible with the Vec type. This results in a lot of unnecessary
 copying into  			pre-allocated temporary vectors.</p>
 		
 <p>Future work includes a general method of avoiding implementation  			temporaries.&nbsp;Filter
-schemes will be parameterised with helper objects that  			deal with all the
-temporaries required. These helper objects can then hide all  			the hard
-work of pre-allocation or dynamic allocation of temporary objects. 		</p>
+schemes will be parameterised with helper objects that  			deal with all
+the temporaries required. These helper objects can then hide all  			the
+hard work of pre-allocation or dynamic allocation of temporary objects. 		</p>
 		
 <h1>Restrictions</h1>
 		
 <p>For numerical precision,<i> </i>all filter calculations use <b>doubles</b>.
-			Templates could be used o provide numerical type parameterisation but are
-not.  			However the base class <i>Bayes_filter</i> defines <i>Float,</i>
+			Templates could be used o provide numerical type parameterisation but
+are not.  			However the base class <i>Bayes_filter</i> defines <i>Float,</i>
 which is used  			throughout as the numerical type. 		</p>
 		
-<p>The <i>Bayes_filter</i> base class is constructed with constant state size.
-This  			allows efficient use of the matrix library to implement the algorithms.
-Each  			derived class requires additional representation and matrix temporaries
-and  			where possible they are restricted to a constant size. In general,
-the only  			unknown is the size of the observation state as parameterised
-by the  			observation model.</p>
+<p>The <i>Bayes_filter</i> base class is constructed with constant state
+size. This  			allows efficient use of the matrix library to implement the
+algorithms. Each  			derived class requires additional representation and
+matrix temporaries and  			where possible they are restricted to a constant
+size. In general, the only  			unknown is the size of the observation state
+as parameterised by the  			observation model.</p>
 		
 <p>Where the state size varies efficient solutions are still possible using
 either  			spares matrix representations or by recreating new filters with
 increased size. 		</p>
-		
-<h1 style="text-align: left;" align="left">Portability</h1>
-		
-<p>Bayes++ only makes use of ISO standard C++. The source code uses moderately
-			advance C++ constructs but only restricted use of the C++ template system.
-			Therefore with a few minor syntactic alterations it should compile with
-any  			modern C++ compiler.</p>
-		
-<p>Visual C++ 6 and Visual C++ 7 (.NET) are used to compile and test Bayes++.
-It is  			occasionally checked and works fine with GCC 3.x. It will compile
-with GCC  			2.95.2 but with some modifications to the class declarations
-that contain the  			line 'using Linrz_filter'. 		</p>
-		
-<p><strong>MTL</strong> works for these compilers, but the download 			<span
- style="font-size: 12pt; font-family: 'Times New Roman';">of  version 2.1.2-20</span>
-			available is <strong>not</strong> up to date and contains some major errors.
-If  			you do not wish to apply many patches yourself <a
- href="Bayes++.htm">download my  				patched ZIP archive for the Bayes++</a>.
-For compilers other then Visual  			C++ the mtl_config.h may have to be edited
-or recreated with autoconf.</p>
-		
-<p>The Position Velocity and Quadratic Calibration examples use the <a
- href="http://www.boost.org/">				<span style="font-family: Verdana;">http://www.boost.org</span></a>
-library  			for random number generation.</p>
 		
 <h1 style="text-align: left;" align="left">The future</h1>
 		
@@ -728,11 +770,12 @@ their design and in  			efficiency and numerical stability of the algorithms
 used. So where to go from  			here?</p>
 		
 <p>The basic tenant of Bayesian theory is that the Likelihood function complete
-			captures all that is know to update the state. The Bayesian Filtering classes
- 			now allow the modelling systems using Likelihood functions. At present
-the SIR  			filter is the only Likelihood filter. Sample filters will grow
-into a separate  			branch in the class hierarchy. A general set of adaptors
-will be required to  			move between these varied representations. 		</p>
+			captures all that is know to update the state. The Bayesian Filtering
+classes  			now allow the modelling systems using Likelihood functions. At
+present the SIR  			filter is the only Likelihood filter. Sample filters
+will grow into a separate  			branch in the class hierarchy. A general set
+of adaptors will be required to  			move between these varied representations.
+		</p>
 		
 <p>To further improve the abstraction, the method of internal variable exposure
 			needs to be regularised. This will require the addition of a few classes
@@ -762,9 +805,9 @@ solution  			(e.g. innovation update) AND the representation (e.g. Covariance
 matrix). Can  			these two functions be separated?</p>
 		
 <p>A highly sophisticated solution could use polymorphic (or generic) filter
-			algorithms that depend on the type (or traits) of the representation. I
-think  			this in unnecessarily complex. In Bayes++ a Scheme should only implement
-one  			algorithm.</p>
+			algorithms that depend on the type (or traits) of the representation.
+I think  			this in unnecessarily complex. In Bayes++ a Scheme should only
+implement one  			algorithm.</p>
 		
 <p>The problem I would like to address is a bit more limited. A lot of  			representations
 are naturally hierarchical and dynamic.<br>
@@ -798,9 +841,9 @@ J.  			Bierman, ISBN 0-12-097350-2</p>
 <p>[3] "Real time Kalman Filter Application", Mohinder S. Grewal, Angus P.
 Andrews,  			ISBN 0-13-211335-X</p>
 		
-<p>[4] "Extension of Square-Root Filtering to Include Process Noise", P. Dyer
-and  			S. McReynolds, Journal of Optimization Theory and Applications, Vol.3
-No.6 1969</p>
+<p>[4] "Extension of Square-Root Filtering to Include Process Noise", P.
+Dyer and  			S. McReynolds, Journal of Optimization Theory and Applications,
+Vol.3 No.6 1969</p>
 		
 <p>[5] "Novel approach to nonlinear-non-Guassian Bayesian state estimation",
 NJ  			Gordon, DJ Salmond, AFM Smith , IEE Proceeding-F, Vol.140 No.2 April
@@ -810,13 +853,15 @@ NJ  			Gordon, DJ Salmond, AFM Smith , IEE Proceeding-F, Vol.140 No.2 April
 			Press, ISBN 0-12-079760-7</p>
 		
 <p>[7] &#8220;Stochastic Models, Estimation, and Control&#8221;, Peter S Maybeck, Academic
-			Press, ISBN 0-12-480701-1</p>
-		
-<p>[8] "Exception-Safety in Generic Components", David Abrahams, Proc. of
+			Press, ISBN 0-12-480701-1<br>
+</p>
+<p>[8] &#8220;Covariance Intersect&#8221;</p>
+				
+<p>[9] "Exception-Safety in Generic Components", David Abrahams, Proc. of
 a  			Dagstuhl Seminar 'Generic Programming', Lecture Notes on Computer Science
 1766, <a href="http://www.boost.org/more/error_handling.html"
  target="_top">				http://www.boost.org/more/error_handling.html</a></p>
 		<br>
-	<br>
+<br>
 </body>
 </html>

@@ -102,6 +102,8 @@ Bayes_base::Float
 /* correlated innovation observe
  */
 {
+return -1.;
+#ifdef DOES_NOT_WORK_YET
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
 		filter_error("observation and model size inconsistent");
@@ -158,6 +160,7 @@ std::cout << K <<std::endl;
 	rcond = UdUinversePD (X, invX);
 	rclimit.check_PD(rcond, "inverse covariance not PD in observe");
 	return rcond;
+#endif
 }
 
 
@@ -167,6 +170,9 @@ CI_filter::Float CI_filter::Omega(const SymMatrix& Ai_ext, const SymMatrix& Bi_e
  *  Iterative optimization algorithm from the authors of reference [1]
  */
 {
+return 0.;
+#ifdef DOES_NOT_WORK_YET
+// Also need work to avoid predefined types sizes and constants
 	using std::sqrt;
 	const int MAX_STATES=10;	// Nast fixed value for C implementation
 	const double MINDOUBLE=1E-38;
@@ -315,6 +321,7 @@ Iwrap:
 	if (1.0-g<=2.*a) return(1.0);
 	if (g<=2.*a) return(0.0);
 	return(g);
+#endif
 }
 
 }//namespace

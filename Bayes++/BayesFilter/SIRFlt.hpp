@@ -12,7 +12,7 @@
 
 /*							
  * Sampling Importance Resampleing Filter.
- *  Also know as a weighted Booststrap 
+ *  Also know as a weighted Booststrap
  *
  * References
  *  [1] "Novel approach to nonlinear-non-Guassian Bayesian state estimation"
@@ -49,7 +49,7 @@ namespace Bayesian_filter
 
 struct SIR_random
 /* Random number generators interface
- *  Helper to allow polymorthic use of random number generators 
+ *  Helper to allow polymorthic use of random number generators
  */
 {
 	virtual void normal(FM::Vec& v) = 0;
@@ -60,8 +60,8 @@ struct SIR_random
 class Importance_resampler : public Bayes_base
 /*
  * Importance resampler
- *  Represents a function that computes the posterior resampling baes on importance weights
- *  Polymorphic function object use to parameterise the resampling operation
+ *  Represents a function that computes the posterior resampling from importance weights
+ *  Polymorphic function object used to parameterise the resampling operation
  */
 {
 public:
