@@ -1,0 +1,8 @@
+2003-07-29 Boost 1_30_0
+
+Shrew Pentium II (Katmai step 0) 450MHz
+GCC-3.2		1:09
+GCC-2.95	1:09
+VC7 (wine)	1:13
+IntelC-71	2:30	-mp1 -O3 -Ob2
+IntelC-71	1:30	-mp1 -O3
