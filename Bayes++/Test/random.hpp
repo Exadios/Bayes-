@@ -86,37 +86,38 @@ private:
 /*
  * Random numbers from Boost 1_30_0 or earlier
  */
-class Boost_random : public BF::SIR_random, public BF::General_LiInAd_predict_model::Random
+class Boost_random
 {
 public:
+	typedef Bayesian_filter_matrix::Float Float;
 	Boost_random() : gen_normal(rng), gen_uniform(rng)
 	{}
 	double normal(const double mean, const double sigma)
 	{
-		boost::normal_distribution<boost::mt19937,FM::Float> gen(rng, mean, sigma);
+		boost::normal_distribution<boost::mt19937,Float> gen(rng, mean, sigma);
 		return gen();
 	}
-	void normal(Vec& v, const FM::Float mean, const FM::Float sigma)
+	void normal(Bayesian_filter_matrix::DenseVec& v, const Float mean, const Float sigma)
 	{
-		boost::normal_distribution<boost::mt19937,FM::Float> gen(rng, mean, sigma);
+		boost::normal_distribution<boost::mt19937,Float> gen(rng, mean, sigma);
 		std::generate (v.begin(), v.end(), gen);
 	}
-	void normal(FM::Vec& v)
+	void normal(Bayesian_filter_matrix::DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_normal);
 	}
-	void uniform_01(FM::Vec& v)
+	void uniform_01(Bayesian_filter_matrix::DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_uniform);
 	}
-	void reseed()
+	void seed()
 	{
 		rng.seed();
 	}
 private:
 	boost::mt19937 rng;
-	boost::normal_distribution<boost::mt19937,FM::Float> gen_normal;
-	boost::uniform_01<boost::mt19937,FM::Float> gen_uniform;
+	boost::normal_distribution<boost::mt19937,Float> gen_normal;
+	boost::uniform_01<boost::mt19937,Float> gen_uniform;
 };
 
 #endif
