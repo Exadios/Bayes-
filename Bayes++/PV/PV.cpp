@@ -48,7 +48,7 @@ namespace
 	const unsigned NX = 2;			// Filter State dimension 	(Position, Velocity)
 
 	// Filter Parameters
-	// Prediction parameters for Integrated Ornstein-Uhlembeck Process
+	// Prediction parameters for Integrated Ornstein-Uhlenbeck Process
 	const Float dt = 0.01;
 	const Float V_NOISE = 0.1;	// Velocity noise, giving mean squared error bound
 	const Float V_GAMMA = 1.;	// Velocity correlation, giving velocity change time constant
