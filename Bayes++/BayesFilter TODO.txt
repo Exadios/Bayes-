@@ -9,6 +9,7 @@ FOR RELEASE
 		Run Simple, PV, QuadCalib
 
 TODO
+	Use f() to represent normal models parametised at state x
 	Extended update managment helper
 	Replace General_ with a form that works with functional forms
 	Replace UdU function with UdU class
