@@ -45,11 +45,11 @@ public:
 		boost::normal_distribution<boost::mt19937> gen(rng, mean, sigma);
 		return gen();
 	}
-	void normal(FM::Vec& v)
+	void normal(FM::DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_normal);
 	}
-	void uniform_01(FM::Vec& v)
+	void uniform_01(FM::DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_uniform);
 	}

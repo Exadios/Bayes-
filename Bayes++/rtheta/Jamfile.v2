@@ -7,13 +7,16 @@ project
 ;
 
 # System libraries
-lib lapack : : <name>lapack ;
 lib g2c : : <name>g2c ;
+lib lapack : : <name>lapack ;
+# TODO: Adding gcc specific target fails in Boost.build v2 M3
+# lib g2c : : <name>g2c <toolset>gcc ;
+# lib lapack : g2c : <name>lapack <toolset>gcc ;
 
 # The executable for testing
 
 exe rtheta :
      rtheta.cpp  tests.cpp
-     ../BayesFilter/BayesFilterLib lapack g2c
+     ../BayesFilter/BayesFilterLib
+     lapack g2c
 ;
-

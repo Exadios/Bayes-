@@ -16,20 +16,17 @@ path-global BAYES_ROOT ;
 # Target output in Project Root
 ALL_LOCATE_TARGET ?= target ;
 
-# Global optimization control : TODO Make this flags overide work!
-# GCC3.2 -ffast-math will fail, inline-limit increases speed slightly at cost of much larger code size
-# flags gcc CFLAGS <optimization>speed : "-O3 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-functions -finline-limit=5000" ;
-
-# Build variant for full compiler optimization
-variant hardoptimize-release : release : 
-    <gcc><*><cxxflags>"-fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000"
-      ;
 
 # Build variant to allow testing with a local uBLAS version seperated from Boost
-variant uBLAS-seperate-debug : debug : <include>"../../uBLAS" ;
-variant uBLAS-seperate-release : release : <include>"../../uBLAS" ;
+# Tested with compressed matrices
+variant uBLAS_seperate_debug : debug : <include>"../../uBLAS" <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_release : release : <include>"../../uBLAS" <define>BAYES_FILTER_COMPRESSED ;
 
 # Build variant to allow testing with a local boost_CVS version
-variant boost-CVS-debug : debug : <include>"../../boost_CVS"  ;
-variant boost-CVS-release : release : <include>"../../boost_CVS" ;
+variant boost_CVS_debug : debug : <include>"../../boost_CVS"  ;
+variant boost_CVS_release : release : <include>"../../boost_CVS" ;
 
+# Build variant for full compiler optimization
+variant hardoptimize_release : release : 
+    <gcc><*><cxxflags>"-fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000"
+      ;

@@ -15,13 +15,14 @@ echo BOOST_ROOT $(BOOST_ROOT) ;
 
 project
     : requirements <include>$(BOOST_ROOT)
-    : build-dir "target2"
+    : build-dir "target"
     ;
 
 
 # Build variant to allow testing with a local uBLAS version seperated from Boost
-variant uBLAS_seperate_debug : debug : <include>"../../uBLAS" ;
-variant uBLAS_seperate_release : release : <include>"../../uBLAS" ;
+# Tested with compressed matrices
+variant uBLAS_seperate_debug : debug : <include>"../../uBLAS" <define>BAYES_FILTER_COMPRESSED ;
+variant uBLAS_seperate_release : release : <include>"../../uBLAS" <define>BAYES_FILTER_COMPRESSED ;
 
 # Build variant to allow testing with a local boost_CVS version
 variant boost_CVS_debug : debug : <include>"../../boost_CVS"  ;

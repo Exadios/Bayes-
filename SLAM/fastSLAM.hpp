@@ -72,7 +72,7 @@ protected:
 
 private:
 	typedef Bayesian_filter::Importance_resampler::Resamples_t Resamples_t;
-	FM::Vec wir;			// Likelihood weights of map augmented particles
+	FM::DenseVec wir;			// Likelihood weights of map augmented particles
 	bool wir_update;		// weights have been updated requring a resampling on update
 };
 
