@@ -269,10 +269,17 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 		BF::Kalman_state_filter& kstat, std::size_t fs,
 		const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const
 /*
- * Compute sample mean and covariance statistics of feature.
+ * Compute sample mean and covariance statistics of feature
+ * We use the Maximum Likelihood (bias) estimate definition of covariance (1/n)
  *  fs is subscript in kstat to return statisics
  *  fi iterator of feature
  *  fend end of map iterator (statistics are computed for fi with a map subset)
+ *
+ * Numerics
+ *  No check is made for the conditioning of samples with regard to mean and covariance
+ *  Extreme ranges or very large sample sizes will result in inaccuracy
+ *  The covariance should always remain PSD however
+ * 
  * Precond: kstat contains location mean
  */
 {
@@ -284,46 +291,47 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 									// Iterate over All feature particles
 	FeatureCondMap::const_iterator fpi, fpi_begin = fm.begin(), fpi_end = fm.end();
 
-	Float mean = 0.;				// Feature mean
+	Float mean_f = 0.;				// Feature mean
 	for (fpi = fpi_begin; fpi < fpi_end; ++fpi)	{
-		mean += (*fpi).x;
+		mean_f += (*fpi).x;
 	}
-	mean /= Float(nparticles);
+	mean_f /= Float(nparticles);
 
-	Float var = 0.;					// Feature variance: 1/(n-1) is unbiased estimate given estimated mean
+	Float var_f = 0.;				// Feature variance: is ML estimate given estimated mean
 	for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
-		var += (*fpi).X + sqr((*fpi).x);
+		var_f += (*fpi).X + sqr((*fpi).x - mean_f);
 	}
-	var = (var - Float(nparticles)*sqr(mean)) / Float(nparticles-1);
+	var_f /= Float(nparticles);
 
-	kstat.x[fs] = mean;				// Copy into Kalman statistics
-	kstat.X(fs,fs) = var;
+	kstat.x[fs] = mean_f;			// Copy into Kalman statistics
+	kstat.X(fs,fs) = var_f;
 
 									// Location,feature covariance
 	for (std::size_t si=0; si < nL; ++si)
 	{
-		Float covar = 0.;
+		Float covar_f_si = 0.;
 		std::size_t spi=0;
-		for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
-			covar += (*fpi).x*L.S(si,spi);
-			++spi;
+		const Float mean_si = kstat.x[si];
+		for (fpi = fpi_begin; fpi < fpi_end; ++fpi, ++spi) {
+			covar_f_si += ((*fpi).x - mean_f) * (L.S(si,spi) - mean_si);
 		}
-		covar = (covar - Float(nparticles)*mean*kstat.x[si]) / Float(nparticles);
-		kstat.X(si,fs) = covar;
+		covar_f_si /= Float(nparticles);
+		kstat.X(si,fs) = covar_f_si;
 	}
 
 									// Feature,feature covariance. Iterate over previous features with means already computed
 	std::size_t fsj = nL;				// Feature subscript
 	for (AllFeature::const_iterator fj = M.begin(); fj != fend; ++fj, ++fsj)
 	{
-		Float covar = 0.;
+		Float covar_f_fi = 0.;
 		FeatureCondMap::const_iterator fpj = (*fj).second.begin();
+		const Float mean_fi = kstat.x[fsj];
 		for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
-			covar += (*fpi).x*(*fpj).x;
+			covar_f_fi += ((*fpi).x - mean_f) * ((*fpj).x - mean_fi);
 			++fpj;
 		}
-		covar = (covar - Float(nparticles)*mean*kstat.x[fsj]) / Float(nparticles);
-		kstat.X(fs,fsj) = covar;
+		covar_f_fi /= Float(nparticles);
+		kstat.X(fs,fsj) = covar_f_fi;
 	}
 }
 
