@@ -19,7 +19,7 @@
  *  1) A direct filter
  *  2) An indirect filter where the filter is preformed on error and state is estimated indirectly
  * Reference
- *	[1] "Bayesian Multiple Target Tracking" Lawrence D Stone, Carl A Barlow, Thomas L Corwin
+ * [1] "Bayesian Multiple Target Tracking" Lawrence D Stone, Carl A Barlow, Thomas L Corwin
  */
 
 #include "BayesFilter/allFilters.hpp"

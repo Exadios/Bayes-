@@ -219,19 +219,19 @@ cflags=
 cppflags=
 cxxflags=\s-O0 -g3 -Wall
 ldadd=
-ldflags=\s                                                      \s
+ldflags=\s                                                                 \s
 libtool_dir=
-path_to_bin_program=target/rtheta/bin/rtheta/gcc/debug/runtime-link-dynamic
+path_to_bin_program=target/rtheta/bin/rtheta/gcc/boost-CVS-debug/architecture-native/debug-symbols-on/inlining-off/instruction-set-default/optimization-off/profiling-off/rtti-on/runtime-link-dynamic/shared-linkable-false/threading-single/vtable-thunks-default
 
 [General]
 AMChanged=false
 author=Michael Stevems
 configure_args=\s--build=i386-linux --host=i386-linux --target=i386-linux\s
-dir_where_make_will_be_called=
+dir_where_make_will_be_called=./
 email=
 kdevprj_version=1.3
-lfv_open_groups=Headers,Sources
-make_options=\s-j1
+lfv_open_groups=Sources
+make_options=\s-j1 ARGS="-sBUILD=debug"
 makefiles=Makefile.am,kmake/Makefile.am,kmake/docs/Makefile.am,kmake/docs/en/Makefile.am,Simple/Makefile.am,PV/Makefile.am,QuadCalib/Makefile.am,BayesFilter/Makefile.am,BayesFilter/filters/Makefile.am,rtheta/Makefile.am
 modifyMakefiles=false
 project_name=Bayes++
