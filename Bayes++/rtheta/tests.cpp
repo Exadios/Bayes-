@@ -32,7 +32,8 @@ inline scalar sqr(scalar x)
 }
 
 
-class Test_random
+template <typename Float>
+class Test_random : public SIR_random
 /*
  * Random number distributions
  */
@@ -45,15 +46,15 @@ public:
 		boost::normal_distribution<boost::mt19937, Float> gen(rng, mean, sigma);
 		return gen();
 	}
-	void normal(Vec& v)
+	void normal(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_normal);
 	}
-	void uniform_01(Vec& v)
+	void uniform_01(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_uniform);
 	}
-	void exponential_1(Vec& v)
+	void exponential_1(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_exponential);
 	}
@@ -64,14 +65,13 @@ public:
 private:
 	typedef boost::mt19937 good_random;
 	good_random rng;
-	boost::normal_distribution<good_random> gen_normal;
-	boost::uniform_01<good_random> gen_uniform;
-	boost::exponential_distribution<good_random> gen_exponential;
+	boost::normal_distribution<good_random,Float> gen_normal;
+	boost::uniform_01<good_random,Float> gen_uniform;
+	boost::exponential_distribution<good_random,Float> gen_exponential;
 };
 
 void test_inverse()
-{	// DEBUG Just for Debugging!
-
+{
 	Matrix U (3,3);
 	U.clear();
 	U(0,0) = 1*1;
@@ -170,39 +170,6 @@ void test_temp_prod()
 }
 
 
-#ifdef REMOVED
-// Test MTL storage problems
-void test_storage()
-{
-	UTriMatrix A(2,2);
-	A(0,0) = 1.;
-	A(1,0) = 9.;
-	A(1,1) = 2.;
-	std::cout << A << std::endl;
-
-	// Show effect of banded storage
-	std::cout << A[0] << std::endl;
-	std::cout << A[1] << std::endl;
-
-	SymMatrix S(2,2);
-	set (S, 0.);
-
-	// Try mult_SPD
-	mult_SPDi(A, S);
-	std::cout << S << std::endl;
-
-	// Try mult
-	set (S, 0.);
-	mult (A, A, S);
-	std::cout << S << std::endl;
-
-	// Try mult
-	set (S, 0.);
-	mult (A, trans(A), S);
-	std::cout << S << std::endl;
-}
-#endif
-
 void test_UdU()
 {
 	SymMatrix S(3,3);
@@ -230,7 +197,6 @@ void test_ident()
 	std::cout << S << std::endl;
 }
 
-#ifdef REMOVED
 void test_info_init()
 {
 	Information_root_info_filter iri(2);
@@ -243,46 +209,53 @@ void test_info_init()
 	x[0] = 5.;
 	x[1] = 7.;
 
-	i.init(x,X);
-	iri.init(x,X);
+	i.init_kalman (x,X);
+	iri.init_kalman (x,X);
 	i.update(); iri.update();
-	FM::print_vector(i.x); FM::print_all_matrix(i.X);
-	FM::print_vector(i.y); FM::print_all_matrix(i.Y);
-	FM::print_vector(iri.x); FM::print_all_matrix(iri.X);
-	FM::print_vector(iri.y); FM::print_all_matrix(iri.Y);
+	std::cout << i.x << i.X <<std::endl;;
+	std::cout << i.y << i.Y <<std::endl;;
+	std::cout << iri.x << iri.X <<std::endl;;
+	std::cout << iri.y << iri.Y <<std::endl;;
 
-	i.init_information(x,X);
-	iri.init_information(x,X);
+	i.init_information (x,X);
+	iri.init_information (x,X);
 	i.update(); iri.update();
-	FM::print_vector(i.x); FM::print_all_matrix(i.X);
-	FM::print_vector(i.y); FM::print_all_matrix(i.Y);
-	FM::print_vector(iri.x); FM::print_all_matrix(iri.X);
-	FM::print_vector(iri.y); FM::print_all_matrix(iri.Y);
+	std::cout << i.x << i.X <<std::endl;;
+	std::cout << i.y << i.Y <<std::endl;;
+	std::cout << iri.x << iri.X <<std::endl;;
+	std::cout << iri.y << iri.Y <<std::endl;;
 }
-#endif
 
-/*
-void test_addative()
+
+void test_unique()
 {
-	Matrix G(2,1);
-	Vec q(1);
-	class ff : public Function_model
-	{
-	virtual const FM::Vec& fx(const FM::Vec& x) const {return x;7}
-	} f;
-	Simple_addative_predict_model s(f,G,q);
+	SymMatrix X(2,2);
+	X(0,0) = 2.;
+	X(1,0) = X(0,1) = 1.1;
+	X(1,1) = 3.;
+	Vec x(2);
+	x[0] = 5.;
+	x[1] = 7.;
+
+	Test_random<Float> r;
+	SIR_kalman_filter sf(2, 100, r);
+	sf.init_kalman (x,X);
+
+	std::cout << sf.unique_samples() << std::endl;
 }
-*/
+
 
 void other_tests()
 {
-//	test_SPD_all();
+	test_unique();
 }
 
 
 /* Boost Random
-template boost::uniform_smallint<boost::mt19937, Float>;
+namespace {
+template boost::uniform_smallint<boost::mt19937, int>;
 template boost::uniform_int<boost::mt19937, int>;
+typedef float Float;
 template boost::uniform_01<boost::mt19937, Float>;
 template boost::uniform_real<boost::mt19937, Float>;
 template boost::triangle_distribution<boost::mt19937, Float>;
@@ -293,4 +266,5 @@ template boost::geometric_distribution<boost::mt19937, Float>;
 template boost::normal_distribution<boost::mt19937, Float>;
 template boost::lognormal_distribution<boost::mt19937, Float>;
 template boost::uniform_on_sphere<boost::mt19937, Float>;
+}
 */

@@ -676,8 +676,7 @@ public:
 	size_t unique_samples () const;
 	/*
 	 * Count number of unique (unequal value) samples in S
-	 * Default implementation required std::sort on Samples
-	 * Post: S is ordered
+	 * Implementation requires std::sort on sample column references
 	 */
 };
 

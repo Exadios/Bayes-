@@ -8,30 +8,37 @@
  */
 
 /*
- * Matrix support functions sub header for filter classes
- * Replace this header to replace matrix support functions
- */
-
-/*
  * Matrix types for filter classes
- * Implemented using boost::numeric::ublas uBblas Basic Linear Algebra library
- *  Provides predefined types Vec and a variety of Matrix types
+ *  Replace this header to replace matrix support functions
  *
  * Everything in namespace Bayes_filter_matrix is intended to support the matrix storage
  * and algebra requirements of the library. Therefore the interfaces and implementation is
  * not intended to be stable.
- *
  */
+
+/*
+ * uBLAS version
+ * Implemented using boost::numeric::ublas uBLAS Basic Linear Algebra library
+ *  Provides predefined types Vec and a variety of Matrix types
+ * Requires Boost 1.30.0 or later
+ *
+ * Sparse support: The macro BAYES_FILTER_SPARSE controls experimental sparse matrix support
+ * This simply replaces the default storage types with their sparse eqivilents
+ */
+
+/* Element proxies have a colourful spectrum of problems. In particular mixed assignment of elements is not supported */
+#define BOOST_UBLAS_NO_ELEMENT_PROXIES
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
-#ifdef BAYES_FILTER_SPARSE
+#if defined(BAYES_FILTER_SPARSE) || defined(BAYES_FILTER_COMPRESSED) || defined(BAYES_FILTER_COORDINATE)
 #include <map>
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
+#define BAYES_FILTER_GAPPY
 #endif
 
 /* Filter Matrix Namespace */
@@ -61,14 +68,24 @@ typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseDens
 typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseDenseLowerTriMatrix;
 typedef ublas::banded_matrix<Float> BaseDenseDiagMatrix;
 							// Sparse types
-#ifdef BAYES_FILTER_SPARSE
+#if defined(BAYES_FILTER_SPARSE)
 typedef ublas::sparse_vector<Float, std::map<size_t,Float> > BaseSparseVector;
 typedef ublas::sparse_matrix<Float, ublas::row_major, std::map<size_t,Float> > BaseSparseRowMatrix;
 typedef ublas::sparse_matrix<Float, ublas::column_major, std::map<size_t,Float> > BaseSparseColMatrix;
+							// OR Compressed types
+#elif defined(BAYES_FILTER_COMPRESSED)
+typedef ublas::compressed_vector<Float> BaseSparseVector;
+typedef ublas::compressed_matrix<Float, ublas::row_major> BaseSparseRowMatrix;
+typedef ublas::compressed_matrix<Float, ublas::column_major> BaseSparseColMatrix;
+							// OR Coordinate types
+#elif defined(BAYES_FILTER_COORDINATE)
+typedef ublas::coordinate_vector<Float> BaseSparseVector;
+typedef ublas::coordinate_matrix<Float, ublas::row_major> BaseSparseRowMatrix;
+typedef ublas::coordinate_matrix<Float, ublas::column_major> BaseSparseColMatrix;
 #endif
 
-							// Default types Dense or Sparse
-#ifndef BAYES_FILTER_SPARSE
+							// Default types Dense or Gappy
+#ifndef BAYES_FILTER_GAPPY
 typedef BaseDenseVector BaseVector;
 typedef BaseDenseRowMatrix BaseRowMatrix;
 typedef BaseDenseColMatrix BaseColMatrix;

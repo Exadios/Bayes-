@@ -294,8 +294,8 @@ typedef FMMatrix<detail::BaseDenseUpperTriMatrix> DenseUTriMatrix;
 typedef FMMatrix<detail::BaseDenseLowerTriMatrix> DenseLTriMatrix;
 typedef FMMatrix<detail::BaseDenseDiagMatrix> DenseDiagMatrix;
 
-							// Explicitly sparse types
-#ifdef BAYES_FILTER_SPARSE
+							// Explicitly sparse types (any of the gappy types)
+#ifdef BAYES_FILTER_GAPPY
 typedef FMVec<detail::BaseSparseVector> SparseVec;
 typedef FMMatrix<detail::BaseDenseRowMatrix> SparseRowMatrix;
 typedef SparseRowMatrix SparseMatrix;

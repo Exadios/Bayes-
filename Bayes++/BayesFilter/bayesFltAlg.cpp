@@ -299,23 +299,18 @@ namespace {
 	{
 		const FM::ColMatrix* cm;
 		size_t col;
-		ColProxy& operator=(ColProxy& r)
+		ColProxy& operator=(ColProxy& a)
 		{
-			cm = r.cm;
-			col = r.col;
-			return r;
+			col = a.col;
+			return a;
 		}
 		// Provide a ordering on columns
-		static bool less(const ColProxy a, const ColProxy b)
+		static bool less(const ColProxy& a, const ColProxy& b)
 		{
-/*CHECK CHANGE			FM::ColMatrix::const_iterator1 sai = (a.cm->begin2() + a.col) .begin();
-			FM::ColMatrix::const_iterator1 sai_end = (a.cm->begin2() + a.col) .end();
-			FM::ColMatrix::const_iterator1 sbi = (b.cm->begin2() + b.col) .begin();*/
-			FM::ColMatrix::const_iterator1 sai = a.cm->find_first1(1,0, a.col);
-			FM::ColMatrix::const_iterator1 sai_end = a.cm->find_last1(1,0, a.col); 
-	//TODO fix above line
+			FM::ColMatrix::const_iterator1 sai = a.cm->find_first1(1, 0,a.col);
+			FM::ColMatrix::const_iterator1 sai_end = a.cm->find_last1(1, a.cm->size1(),a.col); 
 			FM::ColMatrix::const_iterator1 sbi = b.cm->find_first1(1,0, b.col);
-			do
+			while (sai != sai_end)
 			{
 				if (*sai < *sbi)
 					return true;
@@ -323,7 +318,7 @@ namespace {
 					return false;
 
 				++sai; ++sbi;
-			} while (sai != sai_end);
+			} ;
 			return false;		// Equal
 		}
 	};
@@ -331,7 +326,8 @@ namespace {
 
 size_t Sample_filter::unique_samples () const
 /*
- * Count the number of unique samples in S
+ * Count number of unique (unequal value) samples in S
+ * Implementation requires std::sort on sample column references
  */
 {
 						// Temporary container to Reference each element in S
@@ -351,7 +347,7 @@ size_t Sample_filter::unique_samples () const
 	++ssi;
 	while (ssi < sortR.end())
 	{
-		if ((*ssp).col == (*ssi).col)
+		if ((*ssp).col != (*ssi).col)
 			++u;
 		ssp = ssi;
 		++ssi;

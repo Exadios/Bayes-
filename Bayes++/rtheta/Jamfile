@@ -2,7 +2,7 @@
 # Range Angle test for all filter schemes
 
 # Declare the location of this subproject relative to the project root.
-subproject "rtheta" ;
+subproject rtheta ;
 
 
 # The executable for testing
