@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -64,7 +64,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- CI_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+ CI_scheme::eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
 				Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /*
  * Iterated Extended Kalman Filter
@@ -79,12 +79,12 @@ Bayes_base::Float
 	SymMatrix Z(z_size,z_size);
 
 	Adapted_Linrz_correlated_observe_model hh(h);
-	return observe_innovation (hh, s, S, b);
+	return eobserve_innovation (hh, s, S, b);
 }
 
 
 Bayes_base::Float
- CI_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+ CI_scheme::eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
 				Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /* Correlated innovation observe
  */

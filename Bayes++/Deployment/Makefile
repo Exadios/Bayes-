@@ -2,7 +2,7 @@
 # Provides interface project development and sourceforge maintance
 # Use bjam to compile and build Bayes++
 
-RELEASE=2004.2.1
+RELEASE=2004.2-1
 BOOST_VERSION=boost_1_31_0
 
 help:
@@ -24,10 +24,8 @@ archivesrc:
 	cd ../..; zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.htm "Bayes++/Bayesian Filtering Classes.htm"
 
 buildall :
-	cd ..; bjam -sBOOST_ROOT=../boost/$(BOOST_VERSION) debug release compress_debug compress_release gcc intellinux-70 msvc-7 . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../boost/$(BOOST_VERSION) debug release gcc-2.95 . SLAM
+	cd ..; bjam -sBOOST_ROOT=../boost/$(BOOST_VERSION) debug release compress_debug compress_release gcc-3.3.1 gcc-3.4 intellinux-71 msvc-7 . SLAM rtheta
 
 buildallCVS :
-	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc intellinux-70 msvc-7 . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release gcc-2.95 . SLAM
+	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3.1 gcc-3.4 intellinux-71 msvc-7 . SLAM rtheta
 	

@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -244,11 +244,11 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
  *
  * ISSUE: Simplified implemenation using uncorrelated noise equations
  */
-Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
+Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	Adapted_Correlated_addative_observe_model hh(h);
-	return observe (hh, z, s, S, b);
+	return eobserve (hh, z, s, S, b);
 }
 
 
@@ -256,7 +256,7 @@ Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model
  * @pre x,X
  * @post x,X is PSD
  */
-Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& h, const FM::Vec& z,
+Bayes_base::Float Unscented_scheme::eobserve (Correlated_addative_observe_model& h, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	size_t z_size = z.size();

@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -114,11 +114,11 @@ UD_scheme::Float
  */
 {
 	Predict_byproduct b(f.G.size1(), f.G.size2());
-	return predict (f, b);
+	return epredict (f, b);
 }
 
 UD_scheme::Float
- UD_scheme::predict (Linrz_predict_model& f, Predict_byproduct& b)
+ UD_scheme::epredict (Linrz_predict_model& f, Predict_byproduct& b)
 /*
  * Predict using a diagonalised noise q, and its coupling G
  *  q can have order less then x and a matching G so GqG' has order of x
@@ -284,11 +284,11 @@ Bayes_base::Float
 {
 	Observe_innovation_byproduct g(h.Hx.size2(), h.Hx.size1());
 	Observe_byproduct b(h.Hx.size2(), h.Hx.size1());
-	return observe (h, z, g, b);
+	return eobserve (h, z, g, b);
 }
 
 Bayes_base::Float
- UD_scheme::observe (Linrz_uncorrelated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
+ UD_scheme::eobserve (Linrz_uncorrelated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
 /*
  * Linrz observe with byproduct
  *  Uncorrelated observations are applied sequentialy in the order they appear in z
@@ -341,7 +341,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- UD_scheme::observe (Linear_correlated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_linear_byproduct& b)
+ UD_scheme::eobserve (Linear_correlated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_linear_byproduct& b)
 /*
  * Special Linear Hx observe for correlated Z
  *  Z must be PD and will be decorrelated
@@ -415,7 +415,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- UD_scheme::observe (Sequential_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
+ UD_scheme::eobserve (Sequential_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
 /*
  * Special observe using observe_model_sequential for fast uncorrelated linrz operation
  * Uncorrelated observations are applied sequentialy in the order they appear in z

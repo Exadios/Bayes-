@@ -1,13 +1,18 @@
 Bayes++ TODO List
 
 FOR RELEASE
-		Doxygen!
-		Build gcc-3.2 gcc-2.95 msvcms intelinux-70
+		Doxygen PROJECT_NUMBER and compile Class Documentation!
+		Commit to CVS (for file versions)
+		Build gcc-3.4 gcc-3.3.1 msvc-7 intelinux-71
 		Check VC7 solution
-	Check what UBLAS macros are needed
+		Check rtheta
+	Check what uBLAS macros are needed
 		For exceptions/errors
 		For storage
-	Run Simple, PV, QuadCalib, SLAM
+	Validate Simple, PV, QuadCalib, SLAM
+	Create archivedoc, archivesrc
+	Remove CVS from archivesrc
+	
 
 DOCUMENTATION
 	Describe generic schemes
@@ -54,7 +59,7 @@ CODE RULES
 
 TESTING
 	Unscented_filter
-		for q_size > x_size  Don´t forget more noise is injected into nonlinear model => different observe result!
+		for q_size > x_size  Donï¿½t forget more noise is injected into nonlinear model => different observe result!
 
 
 

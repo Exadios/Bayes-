@@ -3,7 +3,7 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -63,17 +63,17 @@ public:
 
 	Float predict (Linrz_predict_model& f);
 	// Extended_kalman_filter predict via state
-	Float predict (Linear_invertable_predict_model& f, Predict_linear_byproduct& b);
-	// Linear predict in information form as in Ref[2]
 	Float predict (Linear_invertable_predict_model& f);
 	// Linear predict, without byproduct
+	Float epredict (Linear_invertable_predict_model& f, Predict_linear_byproduct& b);
+	// Linear predict with explict byproduct. In information form as in Ref[2]
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
 	// Extended_kalman_filter observe
-	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+	Float eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
 				State_byproduct& i, Covariance_byproduct& I);
-	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+	Float eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
 				State_byproduct& i, Covariance_byproduct& I);
 	// Observe with explict byproduct
 

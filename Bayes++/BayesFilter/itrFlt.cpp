@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -83,7 +83,7 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Iterated_covariance_scheme::observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+ Iterated_covariance_scheme::eobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /*
  * Iterated Extended Kalman Filter
@@ -95,11 +95,11 @@ Bayes_base::Float
 {
 						// ISSUE: Implement simplified uncorrelated noise equations
 	Adapted_Linrz_correlated_observe_model hh(h);
-	return observe (hh, term, z, s, S, b);
+	return eobserve (hh, term, z, s, S, b);
 }
 
 Bayes_base::Float
- Iterated_covariance_scheme::observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+ Iterated_covariance_scheme::eobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 /*
  * Iterated Extended Kalman Filter

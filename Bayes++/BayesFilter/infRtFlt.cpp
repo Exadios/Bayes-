@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -156,7 +156,7 @@ void Information_root_scheme::inverse_Fx (FM::DenseColMatrix& invFx, const FM::M
 
 
 Bayes_base::Float
- Information_root_scheme::predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
+ Information_root_scheme::epredict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
 /* Linrz Prediction: using precomputed inverse of f.Fx
  * Precondition:
  *   r(k|k),R(k|k)
@@ -219,7 +219,7 @@ Bayes_base::Float
 	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
 	inverse_Fx (FxI, f.Fx);
 
-	return predict (f, ColMatrix(FxI), false);
+	return epredict (f, ColMatrix(FxI), false);
 }
 
 
@@ -232,7 +232,7 @@ Bayes_base::Float
 	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
 	inverse_Fx (FxI, f.Fx);
 
-	return predict (f, ColMatrix(FxI), true);
+	return epredict (f, ColMatrix(FxI), true);
 }
 
 

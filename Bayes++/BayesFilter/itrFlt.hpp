@@ -3,7 +3,7 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -105,7 +105,7 @@ public:
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return observe (h, term, z, s,S,b);
+		return eobserve (h, term, z, s,S,b);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	// Linrz_kalman_filter observe with default termination
@@ -114,11 +114,11 @@ public:
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return observe (h, term, z, s,S,b);
+		return eobserve (h, term, z, s,S,b);
 	}
-	Float observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+	Float eobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+	Float eobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
 				State_byproduct& s, Covariance_byproduct& S,  Kalman_gain_byproduct& b);
 	// Observe with iteration and explict byproduct
 

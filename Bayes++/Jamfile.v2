@@ -14,7 +14,3 @@ project
     : requirements <include>$(BOOST)
     : build-dir "target"
     ;
-
-# Build with compressed matrices
-variant compress_debug : debug : <define>BAYES_FILTER_COMPRESSED ;
-variant compress_release : release : <define>BAYES_FILTER_COMPRESSED ;

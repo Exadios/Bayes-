@@ -3,7 +3,7 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -94,28 +94,29 @@ public:
 		return 1.;		// Always well condition for addative predict
 	}
 	
-	Float observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float observe (Correlated_addative_observe_model& h, const FM::Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	///< Unscented filter implements general addative observe models with byproduct
-	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 	{	///< Linrz_kalman_filter observe
 		const size_t z_size = h.Hx.size1();
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return observe (static_cast<Uncorrelated_addative_observe_model&>(h), z, s,S,b);
+		return eobserve (static_cast<Uncorrelated_addative_observe_model&>(h), z, s,S,b);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
-	{	///< Linrz_kalman_filter observe, unused byproduct
+	{	///< Linrz_kalman_filter observe
 		const size_t z_size = h.Hx.size1();
 		State_byproduct s(z_size);
 		Covariance_byproduct S(z_size,z_size);
 		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return observe (static_cast<Correlated_addative_observe_model&>(h), z, s,S,b);
+		return eobserve (static_cast<Correlated_addative_observe_model&>(h), z, s,S,b);
 	}
+	
+	Float eobserve (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	Float eobserve (Correlated_addative_observe_model& h, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	///< General addative observe models form, with explict byproduct
+	
 
 protected:
 	//@{

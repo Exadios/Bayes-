@@ -3,7 +3,7 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -46,8 +46,6 @@ public:
 	void update ();
 	// Covariance form state interface
 
-	Float predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r);
-	/* Generialised form, using precomputed inverse of f.Fx */
 	Float predict (Linrz_predict_model& f);
 	/* Use linrz form for r, computes inverse model using inverse_Fx */
 	Float predict (Linear_predict_model& f);
@@ -55,8 +53,10 @@ public:
 	Float predict (Linear_invertable_predict_model& f)
 	/* Use linear form for r, and use inv.Fx from invertable model */
 	{
-		return predict(f, f.inv.Fx, true);
+		return epredict(f, f.inv.Fx, true);
 	}
+	Float epredict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r);
+	/* Explict form, using precomputed inverse of f.Fx */
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);

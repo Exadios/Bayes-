@@ -2,7 +2,7 @@
 #define _BAYES_FILTER_UD
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -92,23 +92,23 @@ public:
 	void init ();
 	void update ();
 
-	Float predict (Linrz_predict_model& f, Predict_byproduct& b);
-	// predict with explict byproduct
 	Float predict (Linrz_predict_model& f);
 	// Linrz_kalman_filter predict
+	Float epredict (Linrz_predict_model& f, Predict_byproduct& b);
+	// Predict with explict byproduct
 
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
 	// Linrz_kalman_filter observe
-	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z,
-			Observe_innovation_byproduct& g, Observe_byproduct& b);
-	// observe with explict byproduct
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
 	// NO solution for Correlated noise and Linearised model
 
-	Float observe (Linear_correlated_observe_model& h, const FM::Vec& z,
+	Float eobserve (Linrz_uncorrelated_observe_model& h, const FM::Vec& z,
+			Observe_innovation_byproduct& g, Observe_byproduct& b);
+	// Observe with explict byproduct
+	Float eobserve (Linear_correlated_observe_model& h, const FM::Vec& z,
 			Observe_innovation_byproduct& g, Observe_linear_byproduct& b);
 	// Special Linear observe for correlated Z, fast Z decorrelation
-	Float observe (Sequential_observe_model& h, const FM::Vec& z,
+	Float eobserve (Sequential_observe_model& h, const FM::Vec& z,
 			Observe_innovation_byproduct& g, Observe_byproduct& b);
 	// Special Linrz observe using fast sequential model
 

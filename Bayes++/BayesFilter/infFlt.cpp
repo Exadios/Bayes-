@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -136,11 +136,11 @@ Bayes_base::Float
  */
 {
 	Predict_linear_byproduct b(f.Fx.size1(),f.q.size());
-	return predict (f, b);	
+	return epredict (f, b);	
 }
 
 Bayes_base::Float
- Information_scheme::predict (Linear_invertable_predict_model& f, Predict_linear_byproduct& b)
+ Information_scheme::epredict (Linear_invertable_predict_model& f, Predict_linear_byproduct& b)
 /*
  * Linear information predict
  *  Computation is through information state y,Y only
@@ -192,7 +192,7 @@ Bayes_base::Float
 	const size_t x_size = h.Hx.size2();
 	State_byproduct i(x_size);
 	Covariance_byproduct I(x_size,x_size);
-	return observe_innovation (h, s, i,I);
+	return eobserve_innovation (h, s, i,I);
 }	
 
 Bayes_base::Float
@@ -203,11 +203,11 @@ Bayes_base::Float
 	const size_t x_size = h.Hx.size2();
 	State_byproduct i(x_size);
 	Covariance_byproduct I(x_size,x_size);
-	return observe_innovation (h, s, i,I);
+	return eobserve_innovation (h, s, i,I);
 }	
 
 Bayes_base::Float
- Information_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s, State_byproduct& i, Covariance_byproduct& I)
+ Information_scheme::eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s, State_byproduct& i, Covariance_byproduct& I)
 /* Correlated innovation observe with explict byproduct
  */
 {
@@ -237,7 +237,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s, State_byproduct& i, Covariance_byproduct& I)
+ Information_scheme::eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s, State_byproduct& i, Covariance_byproduct& I)
 /* Uncorrelated innovation observe with explict byproduct
  */
 {

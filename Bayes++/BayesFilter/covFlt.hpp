@@ -3,7 +3,7 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens
+ * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Header$
@@ -50,9 +50,9 @@ public:
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
 	// Extended_kalman_filter observe
-	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+	Float eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
 				Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+	Float eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
 				Covariance_byproduct& S, Kalman_gain_byproduct& b);
 	// Observe with explict byproduct
 
