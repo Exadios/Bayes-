@@ -22,8 +22,8 @@ namespace Bayesian_filter
 
 
 template <>
-Filter_scheme<UD_filter>::Filter_scheme(FM::Subscript x_size, FM::Subscript q_size, FM::Subscript z_size) :
-	UD_filter (x_size, q_size, z_size)
+Filter_scheme<UD_filter>::Filter_scheme(FM::Subscript x_size, FM::Subscript q_size, FM::Subscript z_initialsize) :
+	UD_filter (x_size, q_size, z_initialsize)
 {}
 
 }//namespace

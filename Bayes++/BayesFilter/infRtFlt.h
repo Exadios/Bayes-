@@ -42,7 +42,6 @@ public:
 
 	Information_root_filter (FM::Subscript x_size, FM::Subscript z_initialsize = 0);
 
-	using Extended_filter::init;
 	void init ();
 	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
 	void update ();

@@ -78,7 +78,7 @@ public:
 	/* Resample particles using weights and roughen
 	 *  Return: lcond smallest normalised weight, represents conditioning of resampling solution
 	 *          lcond == 1. if no resampling preformed
-	 * This should by multipled by the number of samples to get the Likelihood function conditioning
+	 *	    This should by multipled by the number of samples to get the Likelihood function conditioning
 	 */
 
 	void predict (Sampled_predict_model& f);
@@ -150,7 +150,6 @@ public:
 	SIR_kalman_filter (FM::Subscript x_size, FM::Subscript s_size, Random& random_helper);
 
 	/* Specialisations for filter algorithm */
-	using Kalman_filter::init;
 	void init ();
 	void update ()
 	// Modified update with correlated roughening

@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include <limits>
+#include <boost/limits.hpp>
 
 #include "SIRFlt.h"
 
@@ -91,14 +91,16 @@ void
  *		unchanged: S, stochastic_samples
  * Return
  *		lcond: Smallest normalised weight, represents conditioning of resampling solution
+ *		lcond == 1. if no resampling preformed
+ *		This should by multipled by the number of samples to get the Likelihood function conditioning
  */
 {
 	lcond = 1.;
 	if (wir_update)		// Resampleing only required if weights have been updated
 	{
 		// Resample based on likelihood weights
-		unsigned R_unique; 
-		Float lcond = weighted_resample (resamples, R_unique, S, wir);
+		unsigned R_unique;
+		lcond = weighted_resample (resamples, R_unique, S, wir);
 
 							// No resampling exceptions: update S
 		copy_resamples (S, resamples);

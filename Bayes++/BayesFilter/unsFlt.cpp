@@ -114,16 +114,14 @@ void Unscented_filter::update ()
 	assert_isPSD (X);
 }
 
-void Unscented_filter::predict (Functional_predict_model& f)
-/*
- * Adapt Unscented noise model by creating a noise model with zero noise
- * ISSUE: A simple specialisation is possible, rather then this adapted implemenation
- */
-{
-	class Adapted_model : public Unscented_predict_model
+
+// ISSUE GCC2.95 cannot link if these are localy defined in member function
+// Move them back into member functions for standard compilers
+namespace {
+	class Adapted_zero_model : public Unscented_predict_model
 	{
 	public:
-		Adapted_model(Functional_predict_model& fm) :
+		Adapted_zero_model(Functional_predict_model& fm) :
 			Unscented_predict_model(0),
 			fmodel(fm), zeroQ(0,0)
 		{}
@@ -139,22 +137,13 @@ void Unscented_filter::predict (Functional_predict_model& f)
 		Functional_predict_model& fmodel;
 		SymMatrix zeroQ;
 	};
-	Adapted_model adaptedmodel(f);
-	predict (adaptedmodel);
-}
 
-void Unscented_filter::predict (Addative_predict_model& f)
-/*
- * Adapt Unscented noise model by creating a noise model with zero noise
- *  Computes noise covariance Q = GqG'
- */
-{
 	class Adapted_model : public Unscented_predict_model
 	{
 	public:
-		Adapted_model(Subscript x_size, Addative_predict_model& am) :
-			Unscented_predict_model(0),
-			amodel(am), QGqG(x_size,x_size)		// Q gets size from GqG'
+		Adapted_model(Addative_predict_model& am) :
+			Unscented_predict_model(am.G.size1()),
+			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
 			QGqG.clear();
 			mult_SPD (am.G, am.q, QGqG);
@@ -171,8 +160,27 @@ void Unscented_filter::predict (Addative_predict_model& f)
 		Addative_predict_model& amodel;
 		mutable SymMatrix QGqG;
 	};
+}//namespace
 
-	Adapted_model adaptedmodel(f.G.size1(), f);
+
+void Unscented_filter::predict (Functional_predict_model& f)
+/*
+ * Adapt Unscented noise model by creating a noise model with zero noise
+ * ISSUE: A simple specialisation is possible, rather then this adapted implemenation
+ */
+{
+	Adapted_zero_model adaptedmodel(f);
+	predict (adaptedmodel);
+}
+
+
+void Unscented_filter::predict (Addative_predict_model& f)
+/*
+ * Adapt Unscented noise model by creating a noise model with zero noise
+ *  Computes noise covariance Q = GqG'
+ */
+{
+	Adapted_model adaptedmodel(f);
 	predict (adaptedmodel);
 }
 

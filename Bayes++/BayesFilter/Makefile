@@ -1,22 +1,24 @@
-# Bayes++ GCC3 Makefile
+# Bayes++ GCC Makefile
 # Bayesian filtering library
 
 UBLASLIB ?= ..
 BOOSTLIB ?= ../../boost_1_28_0
-INC=-I.. -I../UBLASmatSup -I${UBLASLIB} -I${BOOSTLIB}
-CPPFLAGS=-O3 -DNDEBUG -finline-limit=1000 -Wall $(INC)
+INC = -I.. -I../uBLASmatSup -I${UBLASLIB} -I${BOOSTLIB}
+CPPFLAGS = -O3 -DNDEBUG -Wall $(INC)
 
-OBJS=bayesFlt.o bayesFltAlg.o covFlt.o infFlt.o infRtFlt.o itrFlt.o matSup.o SIRFlt.o UDFlt.o UdU.o unsFlt.o
+OBJS=bayesFlt.o bayesFltAlg.o matSup.o UdU.o covFlt.o infFlt.o infRtFlt.o itrFlt.o SIRFlt.o UDFlt.o unsFlt.o
 
-all : bayesFilter_gcc3.lib
+all : bayesFilter_gcc.lib
 
-bayesFilter_gcc3.lib : $(OBJS)
+bayesFilter_gcc.lib : $(OBJS)
 	$(AR) $(ARFLAGS) $@ $(OBJS)
 
 
-$(OBJS) : bayesFlt.h matSup.h
+$(OBJS) : bayesFlt.h matSup.h ../uBLASmatSup/uBLASmatrix.h
 covFlt.o : covFlt.h
 infFlt.o : infFlt.h
-infRtFlt.o : infRtFlt.h
+infRtFlt.o : infRtFlt.h ../uBLASmatSup/uLAPACK.h
 itrFlt.o : itrFlt.h
-
+SIRFlt.o : SIRFlt.h
+UDFlt.o : UDFlt.h
+unsFlt.o : unsFlt.h

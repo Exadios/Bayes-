@@ -38,7 +38,6 @@ public:
 	Iterated_covariance_filter& operator= (const Iterated_covariance_filter&);
 	// Optimise copy assignment to only copy filter state
 
-	using Linrz_filter::init;
 	void init ();
 	void update ();
 	Float predict (Linrz_predict_model& f);

@@ -133,7 +133,7 @@ void initialise (Kalman_filter& kf, const Vec& initState)
 	kf.X(0,0) = sqr(i_P_NOISE);
 	kf.X(1,1) = sqr(i_V_NOISE);
 
-	kf.init (initState, kf.X);
+	kf.init_kalman (initState, kf.X);
 }
 
 

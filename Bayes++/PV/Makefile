@@ -1,15 +1,12 @@
-# Bayes++ GCC3 Makefile
+# Bayes++ GCC Makefile
 # PV - Position Velocity filter
 
 UBLASLIB ?= ..
 BOOSTLIB ?= ../../boost_1_28_0
-INC=-I.. -I../UBLASmatSup -I${UBLASLIB} -I${BOOSTLIB}
-CC=g++
-CPPFLAGS=-DNDEBUG -Wall $(INC)
-
-OBJS=PV.o
+INC = -I.. -I../uBLASmatSup -I${UBLASLIB} -I${BOOSTLIB}
+CPPFLAGS = -DNDEBUG -Wall $(INC)
 
 all : PV
 
-PV : $(OBJS) ../BayesFilter/bayesFilter_gcc3.lib
+PV : PV.cpp ../BayesFilter/bayesFilter_gcc.lib
 

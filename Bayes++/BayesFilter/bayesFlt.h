@@ -499,7 +499,7 @@ public:
 	/* Initialise from current state and state covariance
 	     Requires x(k|k), X(k|k)
 	*/
-	virtual void init (const FM::Vec& x, const FM::SymMatrix& X)
+	virtual void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	/* Initialise from a state and state covariance
 	     Requires x(k|k), X(k|k)
 		 Parameters that reference the instance's x and X members is valid

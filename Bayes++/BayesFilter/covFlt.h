@@ -11,7 +11,7 @@
 /*
  * Covariance Filter.
  *	A Covariance (Extended Kalman) filter as an Abstract class
- * 
+ *
  * To work with with Linear and Linrz models
  *  a) a state seperate from covariance prediction is used.
  *  b) a EKF innovation update algorithm is used.
@@ -39,7 +39,6 @@ public:
 	Covariance_filter& operator= (const Covariance_filter&);
 	// Optimise copy assignment to only copy filter state
 
-	using Extended_filter::init;
 	void init ();
 	void update ();
 	Float predict (Linrz_predict_model& f);

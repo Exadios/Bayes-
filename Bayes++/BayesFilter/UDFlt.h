@@ -10,7 +10,7 @@
 /*
  * UD Factorisation of Covariance Filter.
  *	A Covariance (Kalman) filter as an Abstract class
- * 
+ *
  * Bierman's UD factorisatised update algorithm using Agee-Turner UdU' factorisation rank 1 update
  * Thornton's MWG-S factorisation prediction  algorithm
  * References
@@ -58,13 +58,12 @@ public:
 	FM::Matrix UD;	// UDU factorisation of X with D on diagonal
 						// Lower triangle used as workspace
 	FM::Vec s;		// Innovation
-	FM::Vec Sd;		// Innovation Covariance 
+	FM::Vec Sd;		// Innovation Covariance
 
 	UD_filter (FM::Subscript x_size, FM::Subscript q_maxsize, FM::Subscript z_initialsize = 0);
 	UD_filter& operator= (const UD_filter&);
 	// Optimise copy assignment to only copy filter state
 
-	using Linrz_filter::init;
 	void init ();
 	void update ();
 	Float predict (Linrz_predict_model& f);

@@ -12,7 +12,7 @@
  *  numeric constants
  */
 #include "matSup.h" 
-#include <limits>
+#include <boost/limits.hpp>
 
 #include "bayesFlt.h"
 

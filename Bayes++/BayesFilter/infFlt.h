@@ -47,7 +47,6 @@ public:
 	Information_filter& operator= (const Information_filter&);
 	// Optimise copy assignment to only copy filter state
 
-	using Extended_filter::init;
 	void init ();
 	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
 	void update ();

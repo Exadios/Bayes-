@@ -75,12 +75,12 @@ public:
 	Unscented_filter& operator= (const Unscented_filter&);
 	// Optimise copy assignment to only copy filter state
 
-	using Extended_filter::init;
 	void init ();
 	void update ();
 
 	void predict (Unscented_predict_model& f);
 	// Efficient Unscented prediction 
+	
 	void predict (Functional_predict_model& f);
 	void predict (Addative_predict_model& f);
 	Float predict (Linrz_predict_model& f)
