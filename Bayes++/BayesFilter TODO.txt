@@ -1,6 +1,7 @@
 BayesFilter TODO List
 
 FOR RELEASE
+		Build GCC2.95.3
 	Check what UBLAS macros are needed
 		For execeptions/errors
 		For storage
