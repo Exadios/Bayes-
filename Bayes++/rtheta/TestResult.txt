@@ -1,7 +1,6 @@
-2003.3-1 Release
+2003.5-1 (debug build)
+ Rrelease build has smaller state delta for cfilter, ifilter
 
-All schemes look good.
- 
 const size_t NX = 2+1;			// State dimension (x,y) and some more to show noise coupling or singular X
 const size_t NQ = 2;			// State dimension of noise
 const size_t NZ = 2+2;			// Observation dimension (r,a) and some empty dummies
