@@ -203,14 +203,14 @@ class SymMatrixWrapper :
 	typedef BaseFromMember<MatrixBase> matrix_type;
 	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> symadaptor_type;
 public:
-	SymMatrixWrapper () : matrix_type(), symadaptor_type(this->member)
+	SymMatrixWrapper () : matrix_type(), symadaptor_type(matrix_type::member)
 	{}
-	SymMatrixWrapper (size_t size1, size_t size2) : matrix_type(size1,size2), symadaptor_type(this->member)
+	SymMatrixWrapper (size_t size1, size_t size2) : matrix_type(size1,size2), symadaptor_type(matrix_type::member)
 	{}	// Normal sized constructor
-	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), symadaptor_type(this->member)
+	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), symadaptor_type(matrix_type::member)
 	{}	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
 	template <class E>
-	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), symadaptor_type(this->member)
+	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), symadaptor_type(matrix_type::member)
 	{}	// Explict matrix_expression conversion constructor
 
 	template <class E>
@@ -223,20 +223,20 @@ public:
 	// Conversions straight to a FMMatrix, equivilent to a RowMatrix types
 	const FMMatrix<MatrixBase>& asRowMatrix() const
 	{
-		return static_cast<const FMMatrix<MatrixBase>& >(this->member);
+		return static_cast<const FMMatrix<MatrixBase>& >(matrix_type::member);
 	}
 	FMMatrix<MatrixBase>& asRowMatrix()
 	{
-		return static_cast<FMMatrix<MatrixBase>& >(this->member);
+		return static_cast<FMMatrix<MatrixBase>& >(matrix_type::member);
 	}
 
 	// Matrix storage members
 	void clear()
-	{	this->member.clear();
+	{	matrix_type::member.clear();
 	}
 	void resize(size_t nsize1, size_t nsize2)
 	{
-		this->member.resize(nsize1, nsize2);
+		matrix_type::member.resize(nsize1, nsize2);
 	}
 };
 
