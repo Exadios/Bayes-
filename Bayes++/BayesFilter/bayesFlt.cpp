@@ -8,13 +8,14 @@
  */
  
 /*
- * Bayesian_filter Implemention of:
- *  BayesFlt constructor/destructors
- *  exceptions
- *  numeric constants
+ * Implement bayesFlt.hpp :
+ *  constructor/destructors
+ *  error handlers
+ *  default virtual and member functions
  */
 #include "bayesFlt.hpp"
 #include <boost/limits.hpp>
+#include <vector>		// Only for unique_samples
 
 
 /* Filter namespace */
@@ -122,6 +123,37 @@ void Kalman_state_filter::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 }
 
 
+Bayes_base::Float
+ Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
+/*
+ * Extended linrz correlated observe, compute innovation for observe_innovation
+ */
+{
+	update ();
+	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
+
+	FM::Vec s = z;
+	h.normalise(s, zp);
+	FM::noalias(s) -= zp;
+	return observe_innovation (h, s);
+}
+
+Bayes_base::Float
+ Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+/*
+ * Extended kalman uncorrelated observe, compute innovation for observe_innovation
+ */
+{
+	update ();
+	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
+
+	FM::Vec s = z;
+	h.normalise(s, zp);
+	FM::noalias(s) -= zp;
+	return observe_innovation (h, s);
+}
+
+
 Information_state_filter::Information_state_filter (size_t x_size) :
 /*
  * Initialise state size
@@ -153,6 +185,14 @@ Sample_state_filter::Sample_state_filter (size_t x_size, size_t s_size) :
 		error (Logic_exception("Zero sample filter constructed"));
 }
 
+Sample_state_filter::~Sample_state_filter()
+/*
+ * Default definition required for a pure virtual distructor
+ * ISSUE Cannot be defined if Matrix has private distructor
+ */
+{
+}
+
 void Sample_state_filter::init_sample (const FM::ColMatrix& initS)
 /*
  * Initialise from a sampling
@@ -160,6 +200,68 @@ void Sample_state_filter::init_sample (const FM::ColMatrix& initS)
 {
 	S = initS;
 	init_S();
+}
+
+namespace {
+	// Column proxy so S can be sorted indirectly
+	struct ColProxy
+	{
+		const FM::ColMatrix* cm;
+		size_t col;
+		ColProxy& operator=(ColProxy& a)
+		{
+			col = a.col;
+			return a;
+		}
+		// Provide a ordering on columns
+		static bool less(const ColProxy& a, const ColProxy& b)
+		{
+			FM::ColMatrix::const_iterator1 sai = a.cm->find1(1, 0,a.col);
+			FM::ColMatrix::const_iterator1 sai_end = a.cm->find1(1, a.cm->size1(),a.col); 
+			FM::ColMatrix::const_iterator1 sbi = b.cm->find1(1,0, b.col);
+			while (sai != sai_end)
+			{
+				if (*sai < *sbi)
+					return true;
+				else if (*sai > *sbi)
+					return false;
+
+				++sai; ++sbi;
+			} ;
+			return false;		// Equal
+		}
+	};
+}//namespace
+
+size_t Sample_state_filter::unique_samples () const
+/*
+ * Count number of unique (unequal value) samples in S
+ * Implementation requires std::sort on sample column references
+ */
+{
+						// Temporary container to Reference each element in S
+	typedef std::vector<ColProxy> SRContainer;
+	SRContainer sortR(S.size2());
+	size_t col_index = 0;
+	for (SRContainer::iterator si = sortR.begin(); si != sortR.end(); ++si) {
+		(*si).cm = &S; (*si).col = col_index++;
+	}
+						// Sort the column proxies
+	std::sort (sortR.begin(), sortR.end(), ColProxy::less);
+
+						// Count element changes, precond: sortS not empty
+	size_t u = 1;
+	SRContainer::const_iterator ssi = sortR.begin();
+	SRContainer::const_iterator ssp = ssi;
+	++ssi;
+	while (ssi < sortR.end())
+	{
+		if (ColProxy::less(*ssp, *ssi))
+			++u;
+		ssp = ssi;
+		++ssi;
+	}
+	return u;
 }
 
 
@@ -171,6 +273,21 @@ Sample_filter::Sample_filter (size_t x_size, size_t s_size) :
  * Postcond: s_size >= 1
  */
 {
+}
+
+void Sample_filter::predict (Functional_predict_model& f)
+/*
+ * Predict samples forward
+ *		Pre : S represent the prior distribution
+ *		Post: S represent the predicted distribution
+ */
+{
+						// Predict particles S using supplied predict model
+	const size_t nSamples = S.size2();
+	for (size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		FM::noalias(Si) = f.fx(Si);
+	}
 }
 
 
