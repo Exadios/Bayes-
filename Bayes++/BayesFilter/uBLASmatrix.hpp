@@ -472,14 +472,14 @@ typename prod_expression_result<E,E>::E1E2T_type
 	return prod( X, trans(X) );
 }
 
-inline
-prod_matrix_result<RowMatrix>::XXT_type
- prod_SPD (const RowMatrix& X, const SymMatrix& S, RowMatrix& XStemp)
+template<class E1, class E2> inline
+typename prod_expression_result<E1,E2>::E1E2T_type
+ prod_SPD (const ublas::matrix_expression<E1>& X, const SymMatrix& S, ublas::matrix_expression<E2>& XStemp)
 /*
  * Symmetric Positive (Semi) Definate product: X*(X*S)', XStemp = X*S
  */
 {
-	return prod( X, trans(XStemp.assign(prod(X,S))) );
+	return prod( X, trans(XStemp().assign(prod(X,S))) );
 }
 
 inline
@@ -515,7 +515,7 @@ inline Vec::value_type prod_SPD (const Vec& x, const Vec& s)
 
 
 template<class E> inline
-typename prod_expression_result<E,E>::result2_type
+typename prod_expression_result<E,E>::E1TE2_type
  prod_SPDT (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X'*X
