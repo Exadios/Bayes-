@@ -28,6 +28,10 @@
  * For linear invertable models predict can be done directly without computing x
  * Discontinous observe models require that predict is normailised with
  * respect to the observation.
+ * NUMERICS
+ *  The state x is respresented by prod(X,y). This may be illconditioned if the product is
+ *  illconditioned. At present only the conditioning of X if checked, if y has a large range the product
+ *  may be illconditioned. This is not checked
  *
  * The filter is operated by performing a
  *  predict, observe
