@@ -1,27 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-15">
 	<TITLE>Bayes++ Bayesian Filtering</TITLE>
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.0.1  (Linux)">
 	<META NAME="CREATED" CONTENT="20030727;11013700">
 	<META NAME="CHANGEDBY" CONTENT="Michael Stevens">
-	<META NAME="CHANGED" CONTENT="20030729;12255800">
-	<LINK REL="stylesheet" HREF="style/paper.css" TYPE="text/css">
+	<META NAME="CHANGED" CONTENT="20030731;9523800">
 </HEAD>
 <BODY LANG="en-US">
 <H1 ALIGN=CENTER><U>Bayes++</U></H1>
 <H1 ALIGN=CENTER><B>Open Source Bayesian Filtering Classes</B></H1>
 <H2 ALIGN=CENTER>Michael Stevens</H2>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
+<P><BR>
 <CENTER>
 	<TABLE WIDTH=100% BORDER=5 CELLPADDING=0 CELLSPACING=4 BGCOLOR="#c0c0c0">
 		<TR VALIGN=TOP>
 			<TD WIDTH=368 HEIGHT=48>
 				<H2><A HREF="./Bayesian Filtering Classes.htm">Bayesian Filtering</A></H2>
 				<P>Overview of Bayesian filtering with the Filtering Classes 
-				</P>
 			</TD>
 			<TD WIDTH=330>
 				<H2 ALIGN=RIGHT><A HREF="mailto:michael.stevens@epost.de">michael.stevens@epost.de</A></H2>
@@ -47,13 +44,12 @@
 				<P ALIGN=RIGHT><A NAME="CVS_Repository"></A><IMG SRC="http://sourceforge.net/sflogo.php?group_id=54729&amp;type=5" NAME="Grafik1" ALT="SourceForge Logo" ALIGN=TOP WIDTH=120 HEIGHT=40 BORDER=0>
 				<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/bayesclasses">CVS
 				Repository</A><BR>Bayes++ uses the <A HREF="http://www.boost.org/" TARGET="_top"><FONT SIZE=5>Boost</FONT></A><BR>peer-reviewed
-				portable C++ source libraries</P>
-			</TD>
+				portable C++ source libraries</TD>
 		</TR>
 	</TABLE>
 </CENTER>
-<P ALIGN=JUSTIFY><BR>Bayesian Filtering is a probabilistic technique
-for data fusion. The technique combines a concise mathematical
+<P ALIGN=LEFT><BR>Bayesian Filtering is a probabilistic technique for
+data fusion. The technique combines a concise mathematical
 formulation of a system with observations of that system.
 Probabilities are used to represent the state of a system, likelihood
 functions to represent their relationships. In this form Bayesian
@@ -63,15 +59,15 @@ on <A HREF="http://www.wikipedia.org/wiki/Probability_theory">Probability
 theory</A>, <A HREF="http://www.wikipedia.org/wiki/Bayes'_theorem">Bayes
 theorem</A>, <A HREF="http://www.wikipedia.org/wiki/Bayesian_inference">Bayesian
 Inference</A>.</P>
-<P ALIGN=JUSTIFY>For <U>discrete</U> systems the Bayesian formulation
+<P ALIGN=LEFT>For <U>discrete</U> systems the Bayesian formulation
 results in a naturally iterative data fusion solution. For <U>dynamic</U>
 systems there is a class of solutions, discrete <U>filters</U>, that
 combine observed inputs to the system with the dynamic model . A
 filter that iteratively incorporates new information is an <U>estimator</U>.
 For linear dynamic systems, discrete solutions such as the Kalman
 filter apply.</P>
-<P ALIGN=JUSTIFY>Bayes++ is an open source library of C++ classes.
-These classes represent and implement a wide variety of numerical
+<P ALIGN=LEFT>Bayes++ is an open source library of C++ classes. These
+classes represent and implement a wide variety of numerical
 algorithms for Bayesian Filtering of discrete systems. The classes
 provide tested and consistent numerical methods and the class
 hierarchy explicitly represents the variety of filtering algorithms
@@ -116,7 +112,7 @@ structure:</P>
 			</DT><DL>
 				<DT>
 				boost 
-				</DT><DT STYLE="margin-bottom: 0.5cm">
+				</DT><DT>
 				<I>etc</I></DT></DL>
 		</DL>
 	</DL>
@@ -129,11 +125,11 @@ Boost explains how to obtain bjam and the sources to compile it
 yourself. For everything to work <B>bjam</B> must be placed in the
 path. <BR>To build Bayes++ and the examples simply execute: (Bayes++
 should be the current directory)</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
+<PRE>        bjam -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
 If there is more then one toolsets (compiler etc) available you may
 want to tell bjam which to use. For example to use Visual C++ 7
 execute:</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam -sTOOLS=&quot;vc7&quot; -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
+<PRE>        bjam -sTOOLS=&quot;vc7&quot; -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
 by setting it as an environment variable. A simple Makefile also
@@ -317,7 +313,7 @@ Bayes++ is built. This just requires a new version of <I>matSubSup.hpp</I>
 to be found before the one supplied in Bayes++ itself. However
 Bayes++ makes extensive use of uBLAS syntax, so a change is a
 significant task.</P>
-<H2><A NAME="whatsnew"></A>What's new in Bayes++ 2003-7?</H2>
+<H2><A NAME="whatsnew"></A>What's new in Bayes++ 2003-8?</H2>
 <H3>Compiler support</H3>
 <P>The list of compiler for which Bayes++ is built and tested has
 been extended. It is validated ofr GCC 3.2, GCC 2.95.3, VisualC++
@@ -361,7 +357,7 @@ Previously such an optimized assignment was specified with the
 I have added a new syntax for assignment. Where no aliases of
 variable assigned to (lvalue) appears in the expression on the right
 hand side of the assignment use:</P>
-<PRE STYLE="margin-bottom: 0.5cm"> noalias(lvalue) = expression;</PRE><P>
+<PRE> noalias(lvalue) = expression;</PRE><P>
 This new syntax is experimental but will probably be part of a future
 <B>uBLAS</B> release. At present the implementation introduces a
 small overhead on the supported compilers. This includes GCC 3.2.</P>
@@ -418,23 +414,17 @@ uBLAS. The change reflects my wish to change the Bayes++ matrix
 syntax to more closely reflect that of uBLAS. There are a few simple
 changes to note:</P>
 <OL>
-	<LI><P STYLE="margin-bottom: 0cm">nrows() and ncols() are now
-	size1() and size2() 
-	</P>
-	<LI><P STYLE="margin-bottom: 0cm">set(X, 0.) should be replaced by
-	X.clear() for any container type 
-	</P>
-	<LI><P STYLE="margin-bottom: 0cm">The operator* overloading is
-	dropped. Use the explict X = prod(A,B)<BR>uBLAS a has a wide variety
-	of different product. Expression complexity can be controlled by
-	introducing a temporary. For example <I>prod&lt;type&gt;(A,B)</I>
-	can be used to compute the product of A,B where the type is used to
-	hold the temporary result. 
-	</P>
-	<LI><P STYLE="margin-bottom: 0cm">Look out for the use of
-	X.assign(EE). This is an optimized assignment (instead of =) when
-	the result of the expression EE is independent of X 
-	</P>
+	<LI>nrows() and ncols() are now size1() and size2() 
+	<LI>set(X, 0.) should be replaced by X.clear() for any container
+	type 
+	<LI>The operator* overloading is dropped. Use the explict X =
+	prod(A,B)<BR>uBLAS a has a wide variety of different product.
+	Expression complexity can be controlled by introducing a temporary.
+	For example <I>prod&lt;type&gt;(A,B)</I> can be used to compute the
+	product of A,B where the type is used to hold the temporary result. 
+	<LI>Look out for the use of X.assign(EE). This is an optimized
+	assignment (instead of =) when the result of the expression EE is
+	independent of X 
 	<LI><P>The type Subscript has been removed. All interfaces now use
 	<B>size_t</B> instead</P>
 </OL>
@@ -442,5 +432,9 @@ changes to note:</P>
 <P>The effective type change from <B>unsigned</B> to <B>size_t</B>.
 This will only have an effect on a 64bit or any platform where these
 two types have a different size.</P>
+<H1 ALIGN=LEFT><A NAME="References1"></A>Copyright</H1>
+<P ALIGN=LEFT>Copyright (c) 2003 Michael Stevens. This document is
+part of the Bayes++ library - see licensing section for copyright
+license details.</P>
 </BODY>
 </HTML>

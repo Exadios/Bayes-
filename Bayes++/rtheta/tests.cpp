@@ -1,6 +1,6 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
+ * Copyright (c) 2002 Michael Stevens
  * See Bayes++.htm for copyright license details
  */
 #define NO_TESTS

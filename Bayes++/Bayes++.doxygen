@@ -4,7 +4,7 @@
 # General configuration options
 #---------------------------------------------------------------------------
 PROJECT_NAME           = "Bayes++ Bayesian Filtering Classes"
-PROJECT_NUMBER         = 2003-5
+PROJECT_NUMBER         = "Release 2003-8  - Copyright (c) 2003 Michael Stevens"
 OUTPUT_DIRECTORY       = ClassDocumentation
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
