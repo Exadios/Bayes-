@@ -23,12 +23,13 @@ DOCUMENTATION
 	Models are implicity/explictly parameterised by state
 	Use BoostBook to consistenently document pre/postconditions
 
+PROFILING
+	bjam release gcc/debug-symbols=on SLAM
+	valgrind --skin=cachegrind target/SLAM/gcc/release/debug-symbols-on/
+	
 TODO
 	Extend error with module identity and function location
-	By products: add observe parameterisation for by products and temps
-		observe innovation, surely it is something that is always computable by all schemes
-			This should be the first "by_product"
-	Extended_fiilter would be the place for an update managment helper
+	Extended_filter would be the place for an update managment helper
 	Replace UdU function with UdU class. Requires a general uBLAS factor object
 
 NEW FILTERS
