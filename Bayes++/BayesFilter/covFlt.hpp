@@ -23,7 +23,7 @@
  * A initial observation size may also be specified for efficiency.
  * 
  * The filter is operated by performing a
- * 	predict, observe
+ * predict, observe
  * cycle defined by the base class
  */
 #include "bayesFlt.hpp"

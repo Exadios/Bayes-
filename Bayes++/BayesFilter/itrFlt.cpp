@@ -45,9 +45,9 @@ Iterated_covariance_filter&
 
 void Iterated_covariance_filter::init ()
 {
-						// Preconditions
+						// Postconditions
 	if (!isPSD (X))
-		filter_error ("Xi not PSD");
+		filter_error ("Initial X not PSD");
 }
 
 void Iterated_covariance_filter::update ()
@@ -60,8 +60,8 @@ Bayes_base::Float
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
-	RowMatrix FxXtemp(f.Fx.size1(),X.size2());
-	X = prod_SPD(f.Fx,X, FxXtemp) + prod_SPD(f.G,f.q);
+	RowMatrix temp_FxX(f.Fx.size1(),X.size2());
+	X = prod_SPD(f.Fx,X, temp_FxX) + prod_SPD(f.G,f.q);
 
 	assert_isPSD (X);
 	return 1.;
@@ -76,6 +76,7 @@ void Iterated_covariance_filter::observe_size (size_t z_size)
 	if (z_size != last_z_size) {
 		last_z_size = z_size;
 
+		s.resize(z_size);
 		S.resize(z_size,z_size);
 		SI.resize(z_size,z_size);
 		HxT.resize(x.size(),z_size);
@@ -112,17 +113,15 @@ Bayes_base::Float
 {
 	size_t x_size = x.size();
 	size_t z_size = z.size();
-	Vec xpred(x_size);
-	SymMatrix Xpred(x_size,x_size);
-	SymMatrix XpredI(x_size,x_size);
 	SymMatrix ZI(z_size,z_size);
 
 						// Dynamic sizing
 	observe_size (z.size());
 
-	xpred = x;				// Initialise iteration
-	Xpred = X;
+	Vec xpred = x;				// Initialise iteration
+	SymMatrix Xpred = X;
 							// Inverse predicted covariance
+	SymMatrix XpredI(x_size,x_size);
 	Float rcond = UdUinversePD (XpredI, Xpred);
 	rclimit.check_PD(rcond, "Xpred not PD in observe");
 
@@ -130,12 +129,17 @@ Bayes_base::Float
 	rcond = UdUinversePD (ZI, h.Z);
 	rclimit.check_PD(rcond, "Z not PD in observe");
 				
+	RowMatrix HxXtemp(h.Hx.size1(),X.size2());
+	RowMatrix temp1(x_size,x_size), temp2(x_size,z_size);
+	SymMatrix temp3(x_size,x_size);
 	do {
-		Vec zp = h.h(x);		// Observation model
-		h.normalise(zp, z);
+		const Vec& zp = h.h(x);		// Observation model
+//TODO This has to result in a recompute of h.Hx
 		HxT.assign (trans(h.Hx));
-		s = z - zp;			// Innovation and covariance
-		RowMatrix HxXtemp(h.Hx.size1(),X.size2());
+									// Innovation
+		h.normalise(s = z, zp);
+		s.minus_assign (zp);
+									// Innovation covariance
 		S = prod_SPD(h.Hx, Xpred, HxXtemp) + h.Z;
 
 							// Inverse innovation covariance
@@ -143,11 +147,15 @@ Bayes_base::Float
 		rclimit.check_PD(rcond, "S not PD in observe");
 
 							// Iterative observe
-		RowMatrix temp1(Xpred.size1(), HxT.size1()), temp2(HxT.size1(), SI.size2());
-		X = Xpred - prod_SPD (Xpred, SymMatrix(prod_SPD(HxT,SI, temp2)), temp1);
-		// TODO: Remove check once proved
+		temp3.assign (prod_SPD(HxT,SI, temp2));
+		X = Xpred - prod_SPD (Xpred, temp3, temp1);
+//TODO X is wrong and somestimes even not PSD
+//TODO check maybe should be also at runtime
 		assert_isPSD (X);
-		x += prod(prod(X,HxT),prod(ZI,s)) - prod(prod(X,XpredI), (x - xpred));
+
+		temp2.assign (prod(X,HxT));
+		temp1.assign (prod(X,XpredI));
+		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));
 	} while (!observe_iteration_end());
 	return rcond;
 }

@@ -15,7 +15,7 @@
  *  Members of the Bayesian_filter_matrix namespace are used in the
  *  interface of Bayesian_filter and for internal operations.
  *  Be aware! These functions and their implemenation are more likely to change
- *   then those in Bayesian_filter.
+ *  then those in Bayesian_filter.
  */
 
 /* Filter Matrix Namespace */

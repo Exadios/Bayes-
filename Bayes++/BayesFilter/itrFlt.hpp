@@ -12,7 +12,7 @@
 
 /*
  * Iterated Covariance Filter.
- *	A non-linear Covariance (Kalman) filter as an Abstract class
+ *  A non-linear Covariance (Kalman) filter as an Abstract class
  *
  * The observe algorithm uses the iterated non-linear formulation 
  * from Bar-Shalom and Fortmann p.119 (full scheme)
@@ -20,7 +20,7 @@
  * respect to the observation.
  *
  * The filter is operated by performing a
- * 	predict, observe
+ *  predict, observe
  * cycle defined by the base class
  */
 #include "bayesFlt.hpp"
@@ -49,6 +49,7 @@ public:						// Exposed Numerical Results
 	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
 
 protected:
+	//TODO This should be part of an augmented model.
 	virtual bool observe_iteration_end () = 0;
 	/* An algorithm must be supplied to signal end of observe iteration
 	 * Precond: x,X,s,S computed for the last iteration

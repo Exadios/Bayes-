@@ -252,7 +252,7 @@ void test_unique()
 
 void other_tests()
 {
-	test_SPD();
+//	test_SPD();
 }
 
 

@@ -70,7 +70,7 @@ Linear_invertable_predict_model::Linear_invertable_predict_model (size_t x_size,
 
 Linear_invertable_predict_model::inverse_model::inverse_model (size_t x_size, size_t q_size) :
 		Fx(x_size,x_size),
-		q(q_size), G(x_size,q_size)
+		q(q_size)
 {
 }
 
@@ -109,6 +109,14 @@ Extended_filter::Extended_filter (size_t x_size) :
  * Initialise filter and set the size of things we know about
  */
 		Linrz_filter(x_size)
+{
+}
+
+Information_form_filter::Information_form_filter (size_t x_size) :
+/*
+ * Initialise filter and set the size of things we know about
+ */
+		y(x_size), Y(x_size,x_size)
 {
 }
 

@@ -44,10 +44,11 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
  * Using the D factor is fast and simple and avoids computing any squares.
  *
  * Note:
- *  Defined to be zero for semi-definate or zero or empty matrix
- *  Result may be < 0 if D contains a value  < 0 (negative matrix)
- *   This may be due to errors in the original matrix resulting in
- *   factorisation producing special values in D (e.g. -infinity)
+ *  Defined to be 0 for semi-definate or zero or empty matrix
+ *  Defined to be <0 for negative matrix (D element a value  < 0)
+ * 
+ *  A negative matrix may also be due to errors in the original matrix resulting in
+ *   a factorisation producing special values in D (e.g. -infinity,NaN etc)
  *  By definition rcond <= 1 as min<=max
  */
 {
@@ -63,14 +64,15 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
 	}
-	assert (mind <= maxd);
+	// mind is NaN, define as negative matrix
+	if (!(mind <= maxd))
+		return -1;
 
-	if (maxd == 0)	{
-		// avoid division by zero, for zero or negative matrix
-		rcond = mind;	// mind may not be zero depending on D (but mind<=maxd)
+	if (maxd == 0)	{	// avoid division by zero, for zero or negative matrix
+		rcond = mind;	// mind may be zero of less  depending on D
 	}
 	else {
-		// Rcond from min/max norm
+		// rcond from min/max norm
 		rcond = mind / maxd;
 	}
 	assert (rcond <= 1);
@@ -81,6 +83,7 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 Vec::value_type UdUrcond_vec (const Vec& D)
 /*
  * Estimate the reciprocal condition number of the diagonal vector D
+ * Note: diagonal(D) == UD_factor(diagonal(D)) so this rcond of both an original D and it factor
  * Equivilent to UdUrcond(diagonal(D))
  */
 {
@@ -96,11 +99,12 @@ Vec::value_type UdUrcond_vec (const Vec& D)
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
 	}
-	assert (mind <= maxd);
+	// mind is NaN, define as negative matrix
+	if (!(mind <= maxd))
+		return -1;
 
-	if (maxd == 0)	{
-		// avoid division by zero, for zero or negative matrix
-		rcond = mind;	// mind may not be zero depending on D (but mind<=maxd)
+	if (maxd == 0)	{	// avoid division by zero, for zero or negative matrix
+		rcond = mind;	// mind may be zero of less  depending on D
 	}
 	else {
 		// Rcond from min/max norm
@@ -115,18 +119,8 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U)
 /*
  * Estimate the reciprocal condition number of the original PSD
  * matrix for which U is the factor UU'
- * 
- * The Condition Number is defined from a matrix norm.
- *  Choose max element of D as the norm of the original matrix.
- *  Assume this norm for inverse matrix is min element D.
- * Using the D factor is fast and simple and avoids computing any squares.
  *
- * Note:
- *  Defined to be zero for semi-definate or zero or empty matrix
- *  Result may be < 0 if D contains a value  < 0 (negative matrix)
- *   This may be due to errors in the original matrix resulting in
- *   factorisation producing special values in D (e.g. -infinity)
- *  By definition rcond <= 1 as min<=max
+ * See UdUrcond(RowMatrix) for definition and return value
  */
 {
 	// Special case an empty matrix
@@ -141,11 +135,12 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U)
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
 	}
-	assert (mind <= maxd);
+	// mind is NaN, define as negative matrix
+	if (!(mind <= maxd))
+		return -1;
 
-	if (maxd == 0)	{
-		// avoid division by zero, for zero or negative matrix
-		rcond = mind;	// mind may not be zero depending on D (but mind<=maxd)
+	if (maxd == 0)	{	// avoid division by zero, for zero or negative matrix
+		rcond = mind;	// mind may be zero of less  depending on D
 	}
 	else {
 		// Rcond from min/max norm

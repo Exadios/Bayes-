@@ -16,16 +16,16 @@
  *
  * Algorithm: Square-root information propogation using QR factorisation
  * Ref:	P. Dyer and S. McReynolds, "Extension of Square-Root Filtering to Include Process Noise",
- *		Journal of Optimization Theory and Applications, Vol.3 No.6 1969
+ * [1] Journal of Optimization Theory and Applications, Vol.3 No.6 1969
  * Filter maintains r,R where
- * 		inv(R)*inv(R)' = X
- *		r = R*x
- *  R is upper triangular but not strictly a Cholesky factor as diagonal may be negative
+ *   inv(R)*inv(R)' = X
+ *   r = R*x
+ *   R is upper triangular but not strictly a Cholesky factor as diagonal may be negative
  * Observe algorithm has been extended to include linearised models
  * Discontinous observe models require that prediction is normailised with respect to the observation.
  *
  * The filter is operated by performing a
- * 	predict, observe
+ *  predict, observe
  * cycle defined by the base class
  */
 #include "bayesFlt.hpp"
@@ -45,13 +45,23 @@ public:
 	void init ();
 	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
 	void update ();
+	Float predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r);
+	/* Generialised form, using precomputed inverse of f.Fx */
 	Float predict (Linrz_predict_model& f);
-	/* Generialised from, requires invserion of Fx */
-	Float predict (Linear_invertable_predict_model& f);
-	/* Specialised linear prediction avoiding inversion of Fx */
+	/* Use linrz form for r, computes inverse model using inverse_Fx */
+	Float predict (Linear_predict_model& f);
+	/* Use linear form for r, computes inverse model using inverse_Fx */
+	Float predict (Linear_invertable_predict_model& f)
+	/* Use linear form for r, and use inv.Fx from invertable model */
+	{
+		return predict(f, f.inv.Fx, true);
+	}
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
+
+	static void inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx);
+	/* Numerical Inversion of Fx using LU factorisation */
 };
 
 

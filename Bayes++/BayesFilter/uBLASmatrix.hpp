@@ -113,28 +113,28 @@ public:
 	}
 
 	// Row,Column vector proxies
-	typedef ublas::matrix_row<MatrixBase> Row;
-	typedef const ublas::matrix_row<const MatrixBase> const_Row;
-	typedef ublas::matrix_column<MatrixBase> Column;
-	typedef const ublas::matrix_column<const MatrixBase> const_Column;
+	typedef ublas::matrix_row<FMMatrix> Row;
+	typedef const ublas::matrix_row<const FMMatrix> const_Row;
+	typedef ublas::matrix_column<FMMatrix> Column;
+	typedef const ublas::matrix_column<const FMMatrix> const_Column;
 
 	// Vector proxies from iterators - static members dependant on MatrixBase type
 	// ri() returns container associated with iterator. static_cast required as typeof(ri()) may not be typeof(MM)
 	static Row rowi(const typename MatrixBase::iterator1& ri)
 	{
-		return Row(static_cast<MatrixBase&>(ri()), ri.index1());
+		return Row(static_cast<FMMatrix&>(ri()), ri.index1());
 	}
 	static const_Row rowi(const typename MatrixBase::const_iterator1& ri)
 	{
-		return const_Row(static_cast<const MatrixBase&>(ri()), ri.index1());
+		return const_Row(static_cast<const FMMatrix&>(ri()), ri.index1());
 	}
 	static Column columni(const typename MatrixBase::iterator2& ci)
 	{
-		return Column(static_cast<MatrixBase&>(ci()), ci.index2());
+		return Column(static_cast<FMMatrix&>(ci()), ci.index2());
 	}
 	static const_Column columni(const typename MatrixBase::const_iterator2& ci)
 	{
-		return const_Column(static_cast<const MatrixBase&>(ci()), ci.index2());
+		return const_Column(static_cast<const FMMatrix&>(ci()), ci.index2());
 	}
 
 	// Sub matrix/vector helpers
@@ -188,7 +188,6 @@ protected:
 	template< typename T1, typename T2>
 	explicit base_from_member( const T1& x1, const T2& x2 ) : member( x1, x2 )
 	{}
-
 };
 
 
@@ -288,23 +287,23 @@ typedef FMMatrix<detail::SymMatrixWrapper<detail::BaseSparseRowMatrix> > SparseS
  * Filter Matrix Adaptors, simply hide the uBLAS details
  */
 template <class M>
-ublas::triangular_adaptor<M, typename UTriMatrix::functor1_type>
- UpperTri(M m)
+const ublas::triangular_adaptor<const M, typename UTriMatrix::functor1_type>
+ UpperTri(const M& m)
 /*
  * View Upper triangle of m
  */
 {
-	return ublas::triangular_adaptor<M, typename UTriMatrix::functor1_type>(m);
+	return ublas::triangular_adaptor<const M, typename UTriMatrix::functor1_type>(m);
 }
 
 template <class M>
-ublas::triangular_adaptor<M, typename LTriMatrix::functor1_type>
- LowerTri(M m)
+const ublas::triangular_adaptor<const M, typename LTriMatrix::functor1_type>
+ LowerTri(const M& m)
 /*
  * View Lower triangle of m
  */
 {
-	return ublas::triangular_adaptor<M, typename LTriMatrix::functor1_type>(m);
+	return ublas::triangular_adaptor<const M, typename LTriMatrix::functor1_type>(m);
 }
 
 
@@ -321,15 +320,21 @@ void subcopy (const FMMatrix<BaseL>& L, FMMatrix<BaseR>& R)
 }
 
 template <class Base>
+ublas::matrix_vector_range<FMMatrix<Base> >
+ diag(FMMatrix<Base>& M)
+{	// Return a vector proxy to the diagonal elements of M
+	const size_t common_size = std::min(M.size1(),M.size2());
+	return ublas::matrix_vector_range<FMMatrix<Base> >(M, ublas::range(0,common_size), ublas::range(0,common_size));
+}
+
+template <class Base>
 void identity(FMMatrix<Base>& I)
-// Clear and fill square submatrix of I as identity matrix
-{
+{	// Set I to generalised Identity matrix. Clear I and set diag(I) to one
 	I.clear();
 							// Set common diagonal elements
 	size_t common_size = std::min(I.size1(),I.size2());
 	typedef typename Base::value_type Base_value_type;
-	ublas::matrix_vector_range<Base>(I, ublas::range(0,common_size), ublas::range(0,common_size)) =
-		ublas::scalar_vector<Base_value_type>(common_size, Float(1));
+	diag(I) = ublas::scalar_vector<Base_value_type>(common_size, Base_value_type(1));
 }
 
 
@@ -341,7 +346,7 @@ void identity(FMMatrix<Base>& I)
  *  and also where possible the row by row multiplication inherent in X*X'
  */
 
-namespace detail {
+namespace detail {		// mult_SPD now an implementation detail
 	
 template <class MatrixX>
 void mult_SPD (const MatrixX& X, const Vec& s, SymMatrix& P)
@@ -412,34 +417,31 @@ void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
  */
 
 template <class E1, class E2>
-struct prod_expression_traits
-{	// Provide ET result1_type for prod(matrix_expression<E1>,trans(matrix_expression<E2>)
+struct prod_expression_result
+{	// Provide ET result E1E2T_type of prod(matrix_expression<E1>,trans(matrix_expression<E2>)
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<E2, ublas::scalar_identity<BOOST_UBLAS_TYPENAME E2::value_type> >::result_type  E2T_type;
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME E1::value_type, E1,
-                                        BOOST_UBLAS_TYPENAME E2T_type::value_type, E2T_type>::result_type  result1_type;
+                                        BOOST_UBLAS_TYPENAME E2T_type::value_type, E2T_type>::result_type  E1E2T_type;
 
-	// Provide ET result2_type or prod(trans(matrix_expression<E1>),matrix_expression<E2>)
+	// Provide ET result E1TE2_type of prod(trans(matrix_expression<E1>),matrix_expression<E2>)
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<E1, ublas::scalar_identity<BOOST_UBLAS_TYPENAME E1::value_type> >::result_type  E1T_type;
 	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME E1T_type::value_type, E1T_type,
-                                        BOOST_UBLAS_TYPENAME E2::value_type, E2>::result_type  XTX_type;
+                                        BOOST_UBLAS_TYPENAME E2::value_type, E2>::result_type  E1TE2_type;
 };
 
 template <class X>
-struct prod_SPD_matrix_traits
-{	// Provide ET result type XXT for prod(X,trans(X))
+struct prod_matrix_result
+{	// Provide ET result type XXT of prod(X,trans(X))
 	typedef typename X::expression_type EX;
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_unary2_traits<EX, ublas::scalar_identity<BOOST_UBLAS_TYPENAME X::value_type> >::result_type  XT_type;
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME X::value_type, EX,
-                                        BOOST_UBLAS_TYPENAME XT_type::value_type, XT_type>::result_type  XXT_type;
+	typedef BOOST_UBLAS_TYPENAME prod_expression_result<EX,EX>::E1E2T_type  XXT_type;
 
-	// Provide ET result type XTX for prod(trans(X),X)
-	typedef BOOST_UBLAS_TYPENAME ublas::matrix_matrix_binary_traits<BOOST_UBLAS_TYPENAME XT_type::value_type, XT_type,
-                                        BOOST_UBLAS_TYPENAME X::value_type, EX>::result_type  XTX_type;
+	// Provide ET result type XTX of prod(trans(X),X)
+	typedef BOOST_UBLAS_TYPENAME prod_expression_result<EX,EX>::E1TE2_type  XTXT_type;
 };
 
  
 template<class E> inline
-typename prod_expression_traits<E,E>::result1_type
+typename prod_expression_result<E,E>::E1E2T_type
  prod_SPD (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X*X'
@@ -450,12 +452,13 @@ typename prod_expression_traits<E,E>::result1_type
 }
 
 inline
-RowMatrix prod_SPD (const RowMatrix& X, const SymMatrix& S, RowMatrix& XStemp)
+prod_matrix_result<RowMatrix>::XXT_type
+ prod_SPD (const RowMatrix& X, const SymMatrix& S, RowMatrix& XStemp)
 /*
- * Symmetric Positive (Semi) Definate product: X*(X*S)'
+ * Symmetric Positive (Semi) Definate product: X*(X*S)', XStemp = X*S
  */
 {
-	return RowMatrix(prod( X, trans(XStemp.assign(prod(X,S))) ));
+	return prod( X, trans(XStemp.assign(prod(X,S))) );
 }
 
 inline
@@ -491,7 +494,7 @@ inline Vec::value_type prod_SPD (const Vec& x, const Vec& s)
 
 
 template<class E> inline
-typename prod_expression_traits<E,E>::result2_type
+typename prod_expression_result<E,E>::result2_type
  prod_SPDT (const ublas::matrix_expression<E>& X)
 /*
  * Symmetric Positive (Semi) Definate product: X'*X

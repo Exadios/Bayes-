@@ -17,12 +17,12 @@
  * Thornton's MWG-S factorisation prediction  algorithm
  * References
  * [1] "Factorisation Methods for Discrete Sequential Estimation" Gerald J. Bierman ISBN 0-12-097350-2
- * [2] "Real time Kalman Filter Application", Mohinder S. Grewal, Angus P. Andrews ISBN 0-13-211335-X
+ * [2] "Kalman Filtering, Theory and Practice", Mohinder S. Grewal, Angus P. Andrews ISBN 0-13-211335-X
  *
  * A initial observation size may also be specified for efficiency.
  * 
  * The filter is operated by performing a
- * 	predict, observe
+ *  predict, observe
  * cycle defined by the base class
  */
 #include "bayesFlt.hpp"

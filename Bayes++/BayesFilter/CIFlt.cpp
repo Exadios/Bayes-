@@ -45,9 +45,9 @@ CI_filter& CI_filter::operator= (const CI_filter& a)
 
 void CI_filter::init ()
 {
-						// Preconditions
+						// Postconditions
 	if (!isPSD (X))
-		filter_error ("Xi not PSD");
+		filter_error ("Initial X not PSD");
 }
 
 void CI_filter::update ()
@@ -101,56 +101,47 @@ Bayes_base::Float
 
 Bayes_base::Float
  CI_filter::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
-/* correlated innovation observe
+/* Correlated innovation observe
  */
 {
-						// Size consistency, z to model
+	const Float one = 1;
+						// size consistency, z to model
 	if (s.size() != h.Z.size1())
 		filter_error("observation and model size inconsistent");
-	observe_size (s.size());// Dynamic sizing
+	observe_size (s.size());	// dynamic sizing
 
-	// find omega  //TODO optimise of R.size==1
+						// Linear conditioning for omega
 	SymMatrix invZ(h.Z.size1(),h.Z.size2());
 	Float rcond = UdUinversePD (invZ, h.Z);
 	rclimit.check_PSD(rcond, "Z not PSD in observe");
 
-	Matrix HTran (trans(h.Hx));
-	Matrix HTranInvR (prod(HTran, invZ));
-	SymMatrix HTinvRH (prod(HTranInvR, h.Hx));
+	Matrix HTinvZ (prod(trans(h.Hx), invZ));
+	SymMatrix HTinvZH (prod(HTinvZ, h.Hx));
 
 	SymMatrix invX(X.size1(),X.size2());
 	rcond = UdUinversePD (invX, X);
 	rclimit.check_PD(rcond, "X not PD in observe");
 
 
-	Float omega = Omega(invX, HTinvRH, X);
-	const Float one = 1.;	// Correctly typed constant
+						// find omeage
+	Float omega = Omega(invX, HTinvZH, X);
 
-	/* calculate predicted innovation */
-	Matrix PHTran (prod(X, HTran));
-	Matrix HPHTran (prod(h.Hx, PHTran));
-	Matrix oHPHTran (HPHTran * (one-omega));
-	SymMatrix oR (h.Z * omega);
+						// calculate predicted innovation
+	Matrix XHT (prod(X, trans(h.Hx)));
+	Matrix HXHT (prod(h.Hx, XHT));
+	S = HXHT * (one-omega) + h.Z * omega;
 
-	S = oHPHTran + oR;
-
-	/* test for fault ??*/
-	//    error = faultTest( S, obsErr, obsNum  );
-
-	// Inverse innovation covariance
+						// inverse innovation covariance
 	rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
-	Matrix oPHTran (PHTran*(one-omega));
-	Matrix K (prod(oPHTran, SI));
+	Matrix K (prod(XHT*(one-omega), SI));
 
-	// State update
+						// state update
 	x += prod(K, s);
-	// Invserse covariance
-	SymMatrix oInvCov (invX * omega);
-	SymMatrix oHTinvRH (HTinvRH*(one-omega));
-	invX = oInvCov +oHTinvRH;
-	// Covariance
+						// inverse covariance
+	invX = invX * omega + HTinvZH*(one-omega);
+						// covariance
 	rcond = UdUinversePD (X, invX);
 	rclimit.check_PD(rcond, "inverse covariance not PD in observe");
 	return rcond;

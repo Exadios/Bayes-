@@ -21,8 +21,7 @@ namespace Bayesian_filter
 
 
 Information_filter::Information_filter (size_t x_size, size_t z_initialsize) :
-		Extended_filter(x_size),
-		y(x_size), Y(x_size,x_size),
+		Information_form_filter(x_size), Extended_filter(x_size),
 		i(x_size), I(x_size,x_size),
 		ZI(Empty)
 /*
@@ -33,6 +32,13 @@ Information_filter::Information_filter (size_t x_size, size_t z_initialsize) :
 	observe_size (z_initialsize);
 	update_required = true;	// Not a valid state, init is required before update can be used
 }
+
+Information_filter::Linear_predict_byproducts::Linear_predict_byproducts (size_t x_size, size_t q_size) :
+/* Set size of by-products for linear predict
+ */
+		 tempA(x_size,x_size), A(x_size,x_size), tempG(q_size,x_size),
+		 B(q_size,q_size), invB(q_size,q_size), tempY(x_size,x_size)
+{}
 
 Information_filter& Information_filter::operator= (const Information_filter& a)
 /* Optimise copy assignment to only copy filter state
@@ -52,29 +58,39 @@ void Information_filter::init ()
  * Precondition:
  *		x, X
  * Postcondition:
- *		x, X is PSD
+ *		x, X is PD
  *		y, Y is PSD
  */
 {
 						// Information
 	Float rcond = UdUinversePD (Y, X);
-	rclimit.check_PD(rcond, "Xi not PD");
+	rclimit.check_PD(rcond, "Initial X not PD");
 						// Information state
 	y.assign (prod(Y,x));
 	update_required = false;
 }
 
-void Information_filter::init_information (const Vec& yi, const SymMatrix& Yi)
+void Information_filter::init_yY ()
 /*
- * Special Initialisation directly from Information yi,Yi
+ * Initialisation directly from Information
+ * Precondition:
+ *		y, Y
  * Postcondition:
- *		x, X is PSD
  *		y, Y is PSD
  */
 {
-	y = yi; Y = Yi;
+						// Postconditions
+	if (!isPSD (Y))
+		filter_error ("Initial Y not PSD");
 	update_required = true;
-	update();		// Enforce postcond
+}
+
+void Information_filter::update_yY ()
+/*
+ * Postcondition:
+ *		y, Y is PSD
+ */
+{
 }
 
 void Information_filter::update ()
@@ -82,10 +98,10 @@ void Information_filter::update ()
  * Recompute x,X from y,Y
  *  Optimised using update_required (postcondition met iff update_required false)
  * Precondition:
- *		y, Y
+ *		y, Y is PD
  * Postcondition:
  *		x=X*y, X=inv(Y) is PSD
- *		y, Y is PSD
+ *		y, Y is PD
  */
 {
 	if (update_required)
@@ -119,6 +135,43 @@ Bayes_base::Float
 	return rcond;
 }
 
+Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b)
+/*
+ * Linear information prediction
+ *  Computation is through information state only
+ *  Uses x(k+1|k) = Fx * x(k|k) instead of extended x(k+1|k) = f(x(k|k))
+ * Prediction is done completely on y,Y
+ * Requires y(k|k), Y(k|k)
+ * Predicts y(k+1|k), Y(k+1|k)
+ */
+{
+						// A = Y*invFx*Y' ,Inverse Predict covariance
+	b.tempA.assign (prod(Y, f.inv.Fx));
+	b.A.assign (prod(trans(f.inv.Fx), b.tempA));
+						// B = G'*A*G+invQ , A in coupled additive noise space
+	b.tempG.assign (prod(trans(f.G), b.A));
+	b.B.assign (prod(b.tempG, f.G));
+	diag(b.B) += f.inv.q;
+						// invB ,Addative noise
+	Float rcond = UdUinversePD (b.invB, b.B);
+	rclimit.check_PD(rcond, "(G'Fx'.Y.Fx.G + invQ) not PD in predict");
+						// G*invB*G' ,in state space
+	b.tempG.assign (prod(b.invB,trans(f.G)));
+	Y.assign (prod(f.G,b.tempG));
+						// I - A* G*invB*G', information gain
+	FM::identity(b.tempY);
+	b.tempY.minus_assign (prod(b.A,Y));
+						// Information
+	Y.assign (prod(b.tempY,b.A));
+						// Information state
+	y.assign (prod(prod(b.tempY,trans(f.inv.Fx)), y));
+
+	update_required = true;
+	assert_isPSD (Y);
+	return rcond;
+}
+
+
 inline void Information_filter::observe_size (size_t z_size)
 /*
  * Optimised dynamic observation sizing
@@ -146,11 +199,13 @@ Bayes_base::Float
 						// Observation Information
 	Float rcond = UdUinversePD (ZI, h.Z);
 	rclimit.check_PD(rcond, "Z not PD in observe");
-												// Calculate EIF i
-	i = prod(trans(h.Hx), prod(ZI,zz));
-												// Calculate EIF I
-	RowMatrix temp(prod(ZI, h.Hx));
-	I = prod(trans(h.Hx), temp );
+
+	RowMatrix HxT (trans(h.Hx));
+	RowMatrix HxTZI (prod(HxT, ZI));
+												// Calculate EIF i = Hx'*ZI*zz
+	i.assign (prod(HxTZI, zz));
+												// Calculate EIF I = Hx'*ZI*Hx
+	I.assign (prod(HxTZI, trans(HxT)));				// use column matrix trans(HxT)
 
 	y += i;
 	Y += I;
@@ -175,74 +230,21 @@ Bayes_base::Float
 						// Observation Information
 	Float rcond = UdUrcond_vec(h.Zv);
 	rclimit.check_PD(rcond, "Zv not PD in observe");
-	ZI.clear();
+
+	RowMatrix HxT (trans(h.Hx));      			// HxT = Hx'*inverse(Z)
 	for (size_t w = 0; w < h.Zv.size(); ++w)
-		ZI(w,w) = 1 / h.Zv[w];			// inverse(Z)
-												// Calculate EIF i
-	i = prod(trans(h.Hx), prod(ZI,zz));						// ISSUE: Efficiency ZI is diagonal
-												// Calculate EIF I
-	RowMatrix temp(prod(ZI, h.Hx));
-	I = prod(trans(h.Hx), temp );
+		column(HxT, w) *= 1 / h.Zv[w];
+												// Calculate EIF i = Hx'*ZI*zz
+	i.assign (prod(HxT, zz));
+												// Calculate EIF I = Hx'*ZI*Hx
+	I.assign (prod(HxT, h.Hx));
 
 	y += i;
 	Y += I;
-	update_required = true;
 
+	update_required = true;
 	assert_isPSD (Y);
 	return rcond;
-}
-
-
-Information_joseph_filter::Information_joseph_filter (size_t x_size, size_t z_initialsize) :
-		Information_filter(x_size, z_initialsize),
-		t(x_size)
-/*
- * Initialise filter and set the size of things we know about
- */
-{
-}
-
-Information_joseph_filter::Predict_temp::Predict_temp (size_t x_size) :
-/* Construct intermediate space for predict
- */
-	inv_Q(x_size, x_size),
-	A(x_size, x_size),
-	inv_AQ(x_size, x_size),
-	Chi(x_size, x_size),
-	IChi(x_size, x_size),
-	Ywork(x_size, x_size)
-{
-}	
-
-void Information_joseph_filter::predict (Linear_invertable_predict_model& f)
-/*
- * Linear information prediction
- *  Computation is through information state only
- *  Uses x(k+1|k) = Fx * x(k|k) instead of extended x(k+1|k) = f(x(k|k))
- * Prediction is done completely on y,Y
- * Requires y(k|k), Y(k|k)
- * Predicts y(k+1|k), Y(k+1|k)
- */
-{
-						// Inverse Prediction noise
-	t.inv_Q.assign (prod_SPDT(f.inv.G, f.inv.q));
-	
-						// Joseph Information update using, f.inv.Fx
-	t.Ywork.assign (prod(Y, f.inv.Fx));
-	t.A.assign (prod(trans(f.inv.Fx), t.Ywork));
-
-	Float rcond = UdUinversePD (t.inv_AQ, SymMatrix(t.A+t.inv_Q));
-	rclimit.check_PD(rcond, "(Fx'.Y.Fx+inv_Q) not PD in predict");
-
-	t.Chi.assign (prod(t.A,t.inv_AQ));
-	FM::identity(t.IChi); t.IChi -= t.Chi;
-
-	RowMatrix temp1(t.IChi.size1(), t.A.size2()), temp2(t.Chi.size1(), t.inv_Q.size2());
-	Y.assign (prod_SPD(t.IChi,t.A, temp1) + prod_SPD(t.Chi, t.inv_Q, temp2));
-						// Information state
-	y = prod(prod(t.IChi,trans(f.inv.Fx)), y);
-
-	update_required = true;
 }
 
 }//namespace

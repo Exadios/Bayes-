@@ -11,10 +11,9 @@
  * UdU' Factorisation of Covariance Filter.
  *
  * For efficiency UD_filter requires to know the maximum q_size of the predict_model
- * TODO:
- *  Fix efficiency issue in observe for nonlinear z rank 2 or more
- *  Extend Observe function to deal with PSD
- *  Make rcond return overall conditioning not minium of each sequential
+ * ISSUES:
+*  observeUD is restricted to a positive definate UD matrix, it could be extended to deal with semi definate case
+ * observe functions: returned rcond is the minimum of each sequential update, an overall conditioning would be better
  */
 #include "bayesFlt.hpp"
 #include "UDFlt.hpp"
@@ -30,7 +29,7 @@ UD_filter::
 UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 		Linrz_filter(x_size)
 		, q_max(q_maxsize)
-		, UD(x_size,2*x_size)
+		, UD(x_size,x_size+q_max)
 		, s(FM::Empty), Sd(FM::Empty)
 		, d(x_size+q_max), dv(x_size+q_max), v(x_size+q_max)
 		, a(x_size), b(x_size)
@@ -66,7 +65,7 @@ void
  * Initialise from a state and state coveriance
  * Computes UD factor from initial covaiance
  * Predcondition:
- *		X is PSD
+ *		X
  * Postcondition:
  *		UdU' is PSD
  */
@@ -74,7 +73,7 @@ void
 					// Factorise X into left partition of UD
 	FM::subcopy(X, UD);
 	Float rcond = FM::UdUfactor (UD, UD.size1());
-	rclimit.check_PSD(rcond, "Xi not PSD");
+	rclimit.check_PSD(rcond, "Initial X not PSD");
 }
 
 
@@ -502,25 +501,24 @@ UD_filter::Float
  UD_filter::observeUD (FM::Vec& gain, Float & alpha, const FM::Vec& h, const Float r)
 /*
  * Linear UD factorisation update
- *	Bierman UdU' factorisation update. Bierman p.100
+ *  Bierman UdU' factorisation update. Bierman p.100
  * Input
- *	h observation coeficients
+ *  h observation coeficients
  *  r observation variance
  * Output
- *	gain  observation Kalman gain
+ *  gain  observation Kalman gain
  *  alpha observation innovation variance
  * Variables with physical significance
  *  gamma becomes covariance of innovation
  * Alogirthm resrictions:
- *	Only implemented for PD matricies, assume semi-definate is negative
+ *  Only implemented for PD matricies, assume semi-definate is negative
  * Predcondition:
- *		UdU' is PD (not checked)
- *		r is >=0 (not checked)
+ *    UdU' is PD (not checked)
+ *    r is >=0 (not checked)
  * Postcondition:
- *		UdU' is PD (see return value)
+ *    UdU' is PD (see return value)
  * Return:
- *		reciprocal condition number, -1. if negative or semi-definate (including zero)
- * TODO return 0 for semi-definate
+ *    reciprocal condition number, -1. if negative or semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -543,8 +541,8 @@ UD_filter::Float
 
 					// Update UD(0,0), d(0) modification
 	alpha = r + b[0] * a[0];
-	if (alpha <= 0.) goto NotPD;
-	gamma = Float(1.) / alpha;
+	if (alpha <= 0) goto NotPD;
+	gamma = Float(1) / alpha;
 	UD(0,0) *= r * gamma;
 					// Update rest of UD and gain b
 	for (j = 1; j < n; ++j)		// 1..n-1

@@ -22,10 +22,10 @@
  *
  *  A variety of reampling algorithms can be used for the SIR filter.
  *  There are implementations for two algorihtms:
- *	 standard_resample: Standard resample algorithm from [1]
- *	 systematic_resample: A Simple stratified resampler from [2]
+ *   standard_resample: Standard resample algorithm from [1]
+ *   systematic_resample: A Simple stratified resampler from [2]
  *  A virtual 'weighted_resample' provides an standard interface to these and defaults
- *	to the standard_resample.
+ *  to the standard_resample.
  *
  * NOTES:
  *  SIR algorithm is sensative to random generator

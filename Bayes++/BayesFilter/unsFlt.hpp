@@ -10,11 +10,14 @@
  * $NoKeywords: $
  */
 
-/*							
+/*
  * Unscented Filter.
- *	A Julier-Uhlmann unscented non-linear Kalman filter as an Abstract class
+ *  A Julier-Uhlmann Unscented non-linear Kalman filter as an Abstract class.
+ *  Uses the classic implementation of Duplex Unscented transform.
+ * The Unscented transform is used for non-linear state and observation predictions
  *
- * The innovation update algorithm is used.
+ * Observations are fused using innovation gain equations from a Covariance filter
+ *
  * Predictions of state and state covariance (and observation) use
  * unscented transformations to interpolate the non-linear predict and observe
  * models. unscented transforms can be further optimised by vary the Kappa
@@ -27,7 +30,7 @@
  * a function to normalise observeations.
  *
  * The filter is operated by performing a
- * 	predict, observe
+ *  predict, observe
  * cycle defined by the base class
  */
 #include "matSup.hpp"
@@ -65,10 +68,10 @@ private:
 };
 
 
-class Unscented_filter : public Extended_filter, public Functional_filter
+class Unscented_filter : public Linrz_filter, public Functional_filter
 {
-private:	// TODO: make XX public, requires specification of postcond on XX
-	size_t q_max;	// Maxiumum size allocated for noise model, constructed before XX
+private:
+	size_t q_max;			// Maxiumum size allocated for noise model, constructed before XX
 	FM::ColMatrix XX;		// Unscented form of state
 public:
 
@@ -91,6 +94,8 @@ public:
 	
 	Float observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z);
 	Float observe (Correlated_addative_observe_model& h, const FM::Vec& z);
+	// Unscented filter implements general addative observe models 
+	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 	{	// Adapt to use the more general addative model
 		return observe (static_cast<Uncorrelated_addative_observe_model&>(h),z);
@@ -98,14 +103,6 @@ public:
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	// Adapt to use the more general addative model
 		return observe (static_cast<Correlated_addative_observe_model&>(h),z);
-	}
-	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
-	{	// Adapt to use the more general addative model
-		return observe (static_cast<Uncorrelated_addative_observe_model&>(h),s);
-	}
-	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
-	{	// Adapt to use the more general addative model
-		return observe (static_cast<Correlated_addative_observe_model&>(h),s);
 	}
 
 public:						// Exposed Numerical Results
@@ -124,7 +121,7 @@ protected:					// allow fast operation if z_size remains constant
 	void observe_size (size_t z_size);
 
 private:
-	void unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float Scale);
+	void unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale);
 	/* Determine Unscented points for a distribution */
 	size_t x_size;
 	size_t XX_size;	// 2*x_size+1

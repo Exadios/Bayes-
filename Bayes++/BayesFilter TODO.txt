@@ -1,16 +1,24 @@
 BayesFilter TODO List
 
 TODO
+	FIX Iterated filter: Require iterated model
+	Information_root_filter does quite work for large Q values
+	
 	Replace UdU with as class using uBLAS row operations
 	  This should UD_filter to use qa new recompose for its update
 	Sharing state in filters: Provided constructors with state references
 	observe_model structure changed
-		Extened_filter observe_innovation parametrs is only Linear part of model
+		Extened_filter observe_innovation parametrs is only Linear part of model as h() not used
 	replace General_ with a form that works with functional forms
 
-	infRoot: Use seperate G and q predict, check linrz form
+	Unscented_filter
+		make XX public, requires specification of postcond on XX
+		New forms Update can be done directly in factorised form
+	UD_filter
+		observeUD : return 0 for semi-definate (or zero)
+
 	add a common base of h() in observe
-	add a polymorphic observe s,S extraction mechanism OR parametise observe
+	By products: add observe paramterisation for by products and temps
 
 NEW FILTERS
 	Factorised UKF or DDF2
@@ -20,18 +28,14 @@ NEW FILTERS
 	 This make a big difference to speed. Hard for prod(L,R) need to have oposite orienation
 
 TO REVIEW
-	Allow sub models of smaller dimensions then representation? Causes problems for multiply conformance
 	Check consistency of model to filter
 		Validate (z to h.Z) model sizes in predict and observe
 	UDpredict catching Negative matrices in observe
-	filter assert_isPSD may catch NaN faults caused by NaN in model
-	Check normalisation
+	Check normalisation: Standard for is to normalise z. It is nice to have zp consistent with itself i.e. Hx
 	Check when numerics fail for both state and obs semidefinate
 
 ISSUES
 	Enable Cov and Inf implmentations for PSD matricies where numerically possible. At present may be PD only
-	Should UdUrcond at least check U values are numeric values (maybe we need a UdUisPSD)
-	NaN in Information_Joseph are different when run under debugger or release in VC6!!!
 
 CODE RULES
 	filter
@@ -41,6 +45,14 @@ CODE RULES
 		in xxFlt.h		no vitual. These are specialised forms
 	filter_matrix
 		use Vec/Matrix x.assign (prod(a,b)); avoiding copy overhead
+
+TESTING
+	q_size > x_size
+		Unscented_filter Don`t forget more noise injected for nonlinear model => different observe result!
+
 DOCUMENTATION
 	Describe generic schemes
+	Why Gq noise model. It is always non signular. Important for any numerics
+		Q may have zeros. But if we have G then linear algebra can still use inverse.
+		This is also why inverse(G) is not needed in inverse model. It would not be defined for signular Q
 

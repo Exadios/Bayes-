@@ -38,10 +38,11 @@ Bayes_base::Float
  * Extended linrz correlated observe, compute innovation for observe_innovation
  */
 {
-	FM::Vec s = h.h(x);		// Observation model, s is predicted observation
-	h.normalise(s, z);
+	FM::Vec zp = h.h(x);		// Observation model, zp is predicted observation
 
-	s = z - s;
+	FM::Vec s = z;
+	h.normalise(s, zp);
+	s.minus_assign (zp);
 	return observe_innovation (h, s);
 }
 
@@ -51,15 +52,16 @@ Bayes_base::Float
  * Extended linrz uncorrelated observe, compute innovation for observe_innovation
  */
 {
-	FM::Vec s = h.h(x);		// Observation model, s is predicted observation
-	h.normalise(s, z);
+	FM::Vec zp = h.h(x);		// Observation model, zp is predicted observation
 
-	s = z - s;
+	FM::Vec s = z;
+	h.normalise(s, zp);
+	s.minus_assign (zp);
 	return observe_innovation (h, s);
 }
 
 
-Simple_addative_predict_model::Simple_addative_predict_model (Function_model& f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+Simple_addative_predict_model::Simple_addative_predict_model (Predict_function& f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 	Addative_predict_model (G_init.size1(), q_init.size()),
 	ff(f_init)
 /* Addative predict model initialised from function and model matricies
@@ -71,7 +73,7 @@ Simple_addative_predict_model::Simple_addative_predict_model (Function_model& f_
 	q = q_init;
 }
 
-Simple_linrz_predict_model::Simple_linrz_predict_model (Function_model& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+Simple_linrz_predict_model::Simple_linrz_predict_model (Predict_function& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 	Linrz_predict_model (Fx_init.size1(), q_init.size()),
 	ff(f_init)
 /* Linrz predict model initialised from function and model matricies
@@ -96,7 +98,7 @@ Simple_linear_predict_model::Simple_linear_predict_model (const FM::Matrix& Fx_i
 	q = q_init;
 }
 
-Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (Function_model& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
+Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
 	Linrz_correlated_observe_model (Hx_init.size2(), Hx_init.size1()),
 	ff(f_init)
 /* Linrz observe model initialised from function and model matricies
@@ -108,7 +110,7 @@ Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (Fu
 	Z = Z_init;
 };
 
-Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model (Function_model& f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
+Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
 	Linrz_uncorrelated_observe_model (Hx_init.size2(), Hx_init.size1()),
 	ff(f_init)
 /* Linrz observe model initialised from function and model matricies

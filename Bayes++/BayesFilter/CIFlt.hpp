@@ -27,7 +27,7 @@
  * The Omega function should be overloaded to produce more useful results
  *
  * The filter is operated by performing a
- * 	predict, observe
+ *  predict, observe
  * cycle derived from the Extended_filter
  */
 #include "bayesFlt.hpp"

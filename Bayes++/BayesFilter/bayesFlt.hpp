@@ -13,6 +13,12 @@
  * $NoKeywords: $
  */
 
+/*
+ * Bayesian filtering reresented as Dual heirarchy of:
+ *  Prediction and Observation models
+ *  Filtering Schemes
+ */
+ 
 // Common headers required for declerations
 #include <exception>
 #include "matSupSub.hpp"	// matrix filter support subsystem
@@ -24,7 +30,7 @@ namespace Bayesian_filter
 	namespace FM = Bayesian_filter_matrix;
 
 /*
- * Abstraction support classes
+ * Abstraction support classes, at the base of the heirarchy
  */
 
 class Bayes_base {
@@ -100,10 +106,16 @@ private:
 
 
 /*
- * Abstract model
- *  A generic function object
+ * Abstract Prediction models
+ *  Prediction model are used to parameterise predict functions of filters
  */
-class Function_model
+class Predict_model_base : public Bayes_base
+{
+	// Empty
+};
+
+class Predict_function
+// Function object for prediction of states
 {
 public:
 	virtual const FM::Vec& fx(const FM::Vec& x) const = 0;
@@ -111,16 +123,7 @@ public:
 };
 
 
-/*
- * Abstract Prediction models
- *  Prediction model are used to parameterise predict functions if filters
- */
-class Predict_model_base : public Bayes_base
-{
-	// Empty
-};
-
-class Sampled_predict_model : virtual public Predict_model_base, public Function_model
+class Sampled_predict_model : virtual public Predict_model_base, public Predict_function
 /* Sampled stochastic prediction model
     x*(k) = fx(x(k-1), w(k))
    fx should generate samples from the stochastic variable w(k)
@@ -162,7 +165,7 @@ public:
 		q(q_size), G(x_size, q_size)
 	{}
 
-	FM::Vec q;			// Noise Covariance
+	FM::DenseVec q;		// Noise variance (always dense as Coupling used for sparseness)
 	FM::Matrix G;		// Noise Coupling
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
@@ -191,11 +194,11 @@ class Linear_predict_model : public Linrz_predict_model
 public:
 	Linear_predict_model (size_t x_size, size_t q_size);
 	/* Set constant sizes for
-		x_size of the state vector
-		q_size of the noise vector
+	    x_size of the state vector
+	    q_size of the noise vector
 	   Postcondition:
-		Fx, q and G are conformantly dimensioned
-	 */
+	    Fx, q and G are conformantly dimensioned
+	*/
 	const FM::Vec& f(const FM::Vec& x) const
 	{	// Provide a linear implementation of functional f assumes model is already Linrz for Fx
 		xp.assign (FM::prod(Fx,x));
@@ -212,13 +215,15 @@ class Linear_invertable_predict_model : public Linear_predict_model
 {
 public:
 	Linear_invertable_predict_model (size_t x_size, size_t q_size);
-	// The inverse model: x(k-1|k-1) = f(x(k|k-1) and Fx,q,G are all matrix inverses
+	/* The inverse model: x(k-1|k-1) = f(x(k|k-1) with
+	   inv.Fx = inverse(Fx)
+	   inv.q = inverse(q)
+	*/
 	class inverse_model {
 	public:
 		inverse_model (size_t x_size, size_t q_size);
-		FM::ColMatrix Fx;	// Model (ColMatrix as usually transposed)
-		FM::Vec q;			// Noise Covariance
-		FM::ColMatrix G;	// Noise Coupling (ColMatrix as usually transposed)
+		FM::ColMatrix Fx;	// Model inverse (ColMatrix as usually transposed)
+		FM::DenseVec q;		// Noise variance inverse
 	} inv;
 };
 
@@ -227,6 +232,14 @@ public:
 /*
  * Observation of state model
  */
+
+class Observe_function
+// Function object for prediction of observations
+{
+public:
+	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
+	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
+};
 
 class Likelihood_observe_model : virtual public Bayes_base
 /* Likelihood observe model L(z |x)
@@ -240,16 +253,16 @@ public:
 	virtual Float L(const FM::Vec& x) const = 0;
 	// Likelihood L(z | x)
 
-	virtual void Lz (const FM::Vec& zz)
+	virtual void Lz (const FM::DenseVec& zz)
 	// Set the observation zz about which to evaluate the Likelihood function
 	{
 		z = zz;
 	}
 protected:
-	FM::Vec z;			// z set by Lz
+	FM::DenseVec z;			// z set by Lz
 };
 
-class Functional_observe_model : virtual public Bayes_base, public Function_model
+class Functional_observe_model : virtual public Bayes_base, public Observe_function
 /* Functional (non-stochastic) observe model h
  *  z(k) = hx(x(k|k-1))
  * This is a seperate fundamental model and not derived from likelihood because
@@ -260,8 +273,8 @@ class Functional_observe_model : virtual public Bayes_base, public Function_mode
 public:
 	Functional_observe_model(size_t /*z_size*/)
 	{}
-	const FM::Vec& operator()(const FM::Vec& x) const
-	{	return fx(x);
+	const FM::DenseVec& operator()(const FM::Vec& x) const
+	{	return h(x);
 	}
 
 };
@@ -274,7 +287,7 @@ class Parametised_observe_model : virtual public Bayes_base
 public:
 	Parametised_observe_model(size_t /*z_size*/)
 	{}
-	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
+	virtual void normalise (FM::DenseVec& /*z_denorm*/, const FM::DenseVec& /*z_from*/) const
 	/* Normalise one observation state (z_denorm) from another if observation model is discontinous.
 	    Default for continuous h
 	 */
@@ -291,8 +304,8 @@ public:
 	Uncorrelated_addative_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
-	FM::Vec Zv;			// Noise Variance
-	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
+	FM::DenseVec Zv;			// Noise Variance
+	virtual const FM::DenseVec& h(const FM::Vec& x) const = 0;
 	// Functional part of addative model
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
@@ -306,9 +319,9 @@ public:
 	Correlated_addative_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
-	FM::SymMatrix Z;	// Noise Covariance
+	FM::SymMatrix Z;	// Noise Covariance (not necessarly dense=
 
-	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
+	virtual const FM::DenseVec& h(const FM::Vec& x) const = 0;
 	// Functional part of addative model
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
@@ -365,13 +378,13 @@ public:
 	Linear_correlated_observe_model (size_t x_size, size_t z_size) :
 		Linrz_correlated_observe_model(x_size, z_size), hx(z_size)
 	{}
-	const FM::Vec& h(const FM::Vec& x) const
+	const FM::DenseVec& h(const FM::Vec& x) const
 	{	// Provide a linear implementation of functional h assumes model is already Linrz for Hx
 		hx.assign (FM::prod(Hx,x));
 		return hx;
 	}
 private:
-	mutable FM::Vec hx;
+	mutable FM::DenseVec hx;
 };
 
 class Linear_uncorrelated_observe_model : public Linrz_uncorrelated_observe_model
@@ -507,8 +520,7 @@ public:
 	*/
 	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 	/* Initialise from a state and state covariance
-	     Requires x(k|k), X(k|k)
-		 Parameters that reference the instance's x and X members is valid
+		 Parameters that reference the instance's x and X members are valid
 	*/
 	{
 		Kalman_filter::x = x;
@@ -521,6 +533,40 @@ public:
 	*/
 
 	Numerical_rcond rclimit;	// Applies to ALL covariance matrices in algorithms
+};
+
+
+/*
+ * Information form filter: A filter that works in information space
+ *   Y = inv(X)   Information
+ *   y = Y*x      Information state
+ */
+
+class Information_form_filter : virtual public Bayes_filter_base
+{
+public:
+	Information_form_filter (size_t x_size);
+	FM::Vec y;				// Information state
+	FM::SymMatrix Y;		// Information
+
+	virtual void init_yY () =0;
+	/* Initialise from a information state and information
+	     Requires y(k|k), Y(k|k)
+		 Parameters that reference the instance's y and Y members are valid
+	*/
+	virtual void init_information (const FM::Vec& y, const FM::SymMatrix& Y)
+	/* Initialise from a information state and information
+		 Parameters that reference the instance's y and Y members are valid
+	*/
+	{
+		Information_form_filter::y = y;
+		Information_form_filter::Y = Y;
+		init_yY ();
+	}
+	virtual void update_yY () =0;
+	/* Update filters information state and information
+	     Updates y(k|k), Y(k|k)
+	*/
 };
 
 
@@ -569,7 +615,6 @@ public:
  *
  * Observe is implemented using an innovation computed from the non-linear part of the
  * obseve model and linear part of the Linrz_observe_model
- *
  */
 
 class Extended_filter : public Linrz_filter
@@ -594,7 +639,6 @@ public:
 		Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
 	*/
 };
-
 
 
 /*

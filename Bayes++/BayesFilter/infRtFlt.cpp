@@ -14,7 +14,7 @@
 #include "infRtFlt.hpp"
 #include "matSup.hpp"
 #include "uLAPACK.hpp"	// Common LAPACK interface
-
+#include <algorithm>
 
 /* Filter namespace */
 namespace Bayesian_filter
@@ -41,15 +41,15 @@ void Information_root_filter::init ()
 /*
  * Inialise the filter from x,X
  * Predcondition:
- *		X is PSD
+ *		X
  * Postcondition:
- *		inv(R)*inv(R)' = X
+ *		inv(R)*inv(R)' = X is PSD
  *		r = R*x
  */
 {
 						// Information Root
 	Float rcond = UCfactor (R, X);
-	rclimit.check_PSD(rcond, "Xi not PSD");
+	rclimit.check_PSD(rcond, "Initial X not PSD");
 	(void)UTinverse(R);
 						// Information Root state r=R*x
 	r.assign (prod(R,x));
@@ -104,8 +104,7 @@ void Information_root_filter::update ()
  *		X = inv(R)*inv(R)'
  */
 {
-	UTriMatrix RI(x.size(), x.size());
-	RI = R;			// Invert Cholesky factor
+	UTriMatrix RI (R);	// Invert Cholesky factor
 	bool singular = UTinverse(RI);
 	if (singular)
 		filter_error ("R not PD");
@@ -135,117 +134,107 @@ void Information_root_info_filter::update ()
 }
 
 
-Bayes_base::Float
- Information_root_filter::predict (Linrz_predict_model& f)
-/* Linrz Prediction: goes back to state to compute
- * Precondition:
- *		r(k|k),R(k|k)
- * Postcondition:
- *		r(k+1|k) = R(k+1|k) * f(x(k|k)
- *		R(k+1|k) computed using QR decomposition after inverse(Fx) is computed
- *
- * Uses LAPACK geqrf for QR decomposition (without PIVOTING)
+void Information_root_filter::inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx)
+/*
+ * Numerical Inversion of Fx using LU factorisation
+ * Required LAPACK getrf (with PIVOTING) and getrs
  */
 {
-	const size_t q_size = f.q.size();
-	const size_t x_size = x.size();
+								// LU factorise with pivots
+	DenseColMatrix FxLU (Fx);
+	LAPACK::pivot_t ipivot(FxLU.size1());		// Pivots initialised to zero
+	ipivot.clear();
 
-	update ();			// x is required for f(x);
+	int info = LAPACK::getrf(FxLU, ipivot);
+	if (info < 0)
+		throw Bayes_filter_exception ("Fx not LU factorisable");
 
-						// Require inverse(Fx)
-	DenseColMatrix FxI(x_size, x_size);
-	{								// LU factorise with pivots
-		DenseColMatrix FxLU(x_size, x_size);
-		FxLU = f.Fx;
-		LAPACK::pivot_t ipivot(x_size);		// Pivots initialised to zero
-		ipivot.clear();
+	FM::identity(invFx);				// Invert
+	info = LAPACK::getrs('N', FxLU, ipivot, invFx);
+	if (info != 0)
+		throw Bayes_filter_exception ("Predict Fx not LU invertable");
+}
 
-		int info = LAPACK::getrf(FxLU, ipivot);
-		if (info < 0)
-			filter_error ("Fx not LU factorisable");
 
-		FM::identity(FxI);				// Invert
-		info = LAPACK::getrs('N', FxLU, ipivot, FxI); 
-		if (info != 0)
-			filter_error ("Predict Fx not LU invertable");
-	}
+
+Bayes_base::Float
+ Information_root_filter::predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
+/* Linrz Prediction: using precomputed inverse of f.Fx
+ * Precondition:
+ *   r(k|k),R(k|k)
+ * Postcondition:
+ *   r(k+1|k) computed using QR decomposition see Ref[1]
+ *   R(k+1|k)
+ *
+ * r can be computed in two was:
+ * Either directly in the linear form or  using extended form via R*f.f(x)
+ *
+ * Requires LAPACK geqrf for QR decomposition (without PIVOTING)
+ */
+{
+	if (!linear_r)
+		update ();		// x is required for f(x);
+
 						// Require Root of correlated predict noise (may be semidefinite)
-	Matrix Qr(q_size, q_size);		// ISSUE Requires a diagonal matrix
-	Qr.clear();
-	for (Vec::const_iterator i = f.q.begin(); i != f.q.end(); ++i)
+	Matrix Gqr (f.G);
+	for (Vec::const_iterator qi = f.q.begin(); qi != f.q.end(); ++qi)
 	{
-		using namespace std;
-		size_t ii = i.index();
-		if (*i < 0.)
-			filter_error ("Negative q");
-		Qr(ii,ii) = sqrt(*i);
+		if (*qi < 0.)
+			filter_error ("Predict with negative q");
+		column(Gqr, qi.index()) *= std::sqrt(*qi);
 	}
 						// Form Augmented matrix for factorisation
-	DenseColMatrix A(x_size*2, x_size*2);	// Column major required for LAPACK, also this property is using in indexing
-	FM::identity (A);						// Prefill with identity for topleft and zero's in off diagonals
+	const size_t x_size = x.size();
+	const size_t q_size = f.q.size();
+						// Column major required for LAPACK, also this property is using in indexing
+	DenseColMatrix A(q_size+x_size, q_size+x_size+unsigned(linear_r));
+	FM::identity (A);	// Prefill with identity for topleft and zero's in off diagonals
 
-	A.sub_matrix(x_size,x_size*2, 0,x_size).assign (prod(R, prod(FxI, prod(f.G,Qr))));
-	A.sub_matrix(x_size,x_size*2, x_size,x_size*2).assign (prod(R, FxI));
+	Matrix RFxI (prod(R, invFx));
+	A.sub_matrix(q_size,q_size+x_size, 0,q_size).assign (prod(RFxI, Gqr));
+	A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size).assign (RFxI);
+	if (linear_r)
+		A.sub_column(q_size,q_size+x_size, q_size+x_size).assign (r);
 
 						// Calculate factorisation so we have and upper triangular R
-	DenseVec tau(x_size*2);
+	DenseVec tau(q_size+x_size);
 	int info = LAPACK::geqrf (A, tau);
 	if (info != 0)
 			filter_error ("Predict no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = UpperTri( A.sub_matrix(x_size,x_size*2, x_size,x_size*2) );
-					
-	r.assign (prod(R,f.f(x)));	// compute r using f(x)
+	R = UpperTri( A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) );
+    if (linear_r)
+		r = A.sub_column(q_size,q_size+x_size, q_size+x_size);
+	else
+		r.assign (prod(R,f.f(x)));	// compute r using f(x)
 
 	return UCrcond(R);	// compute rcond of result
 }
 
 
 Bayes_base::Float
- Information_root_filter::predict (Linear_invertable_predict_model& f)
-/* Linear Prediction using linear invertable model
- * Precondition:
- *		r(k|k),R(k|k)
- * Postcondition:
- *		r(k+1|k) = R(k+1|k) * f(x(k|k)
- *		R(k+1|k) computed using QR decomposition using inverse(Fx)
- *
- * Uses LAPACK geqrf for QR decomposition (without PIVOTING)
+ Information_root_filter::predict (Linrz_predict_model& f)
+/* Linrz Prediction: computes inverse model using inverse_Fx 
  */
 {
-	const size_t q_size = f.q.size();
-	const size_t x_size = x.size();
+						// Require inverse(Fx)
+	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
+	inverse_Fx (FxI, f.Fx);
 
-						// Require Root of correlated predict noise (may be semidefinite)
-	DiagMatrix Qr(q_size, q_size);
-	Qr.clear();
-	for (Vec::const_iterator i = f.q.begin(); i != f.q.end(); ++i)
-	{
-		using namespace std;
-		size_t ii = i.index();
-		if (*i < 0.)
-			filter_error ("Negative q");
-		Qr(ii,ii) = sqrt(*i);
-	}
-						// Form Augmented matrix for factorisation
-	DenseColMatrix A(x_size*2, x_size*2+1);	// Column major required for LAPACK, also this property is using in indexing
-	FM::identity (A);						// Prefill with identity for topleft and zero's in off diagonals
+	return predict (f, ColMatrix(FxI), false);
+}
 
-	A.sub_matrix(x_size,x_size*2, 0,x_size).assign (prod(R, prod(f.inv.Fx, prod(f.G,Qr))));
-	A.sub_matrix(x_size,x_size*2, x_size,x_size*2).assign (prod(R, f.inv.Fx));
-	A.sub_column(x_size,x_size*2, x_size*2).assign (r);
 
-						// Calculate factorisation so we have and upper triangular R
-	DenseVec tau(x_size*2);
-	int info = LAPACK::geqrf (A, tau);
-	if (info != 0)
-			filter_error ("Predict no QR factor");
+Bayes_base::Float
+ Information_root_filter::predict (Linear_predict_model& f)
+/* Linear Prediction: computes inverse model using inverse_Fx
+ */
+{
+						// Require inverse(Fx)
+	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
+	inverse_Fx (FxI, f.Fx);
 
-						// Extract the roots, junk in strict lower triangle
-	R = UpperTri( A.sub_matrix(x_size,x_size*2, x_size,x_size*2) );
-	r = A.sub_column(x_size,x_size*2, x_size*2);
-
-	return UCrcond(R);	// compute rcond of result
+	return predict (f, ColMatrix(FxI), true);
 }
 
 

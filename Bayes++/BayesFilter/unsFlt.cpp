@@ -9,15 +9,11 @@
 
 /*
  * Unscented Filter.
- *
- * TODO
- *	Update can be done directly in factorised form
  */
 #include "bayesFlt.hpp"
 #include "unsFlt.hpp"
 #include "models.hpp"
 #include <cmath>
-#include <boost/numeric/ublas/io.hpp>
 
 
 /* Filter namespace */
@@ -27,7 +23,7 @@ namespace Bayesian_filter
 
 
 Unscented_filter::Unscented_filter (size_t x_size, size_t z_initialsize) :
-		Extended_filter(x_size),
+		Linrz_filter(x_size),
 		XX(x_size, 2*x_size+1),
 		s(Empty), S(Empty), SI(Empty),
 		fXX(x_size, 2*x_size+1)
@@ -46,30 +42,29 @@ Unscented_filter& Unscented_filter::operator= (const Unscented_filter& a)
  * Precond: matrix size conformance
  */
 {
-	Extended_filter::operator=(a);
+	Linrz_filter::operator=(a);
 	XX = a.XX;
 	return *this;
 }
 
-void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& X, Float Scale)
+void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& X, Float scale)
 /*
  * Generate the unscented point representing a distribution
  * Fails if scale is negative
  */
 {
-	using namespace std;
 	UTriMatrix Sigma(x_size,x_size);
 
 						// Get a upper Cholesky factoriation
 	Float rcond = UCfactor(Sigma, X);
 	rclimit.check_PSD(rcond, "X not PSD");
-	Sigma *= sqrt(Scale);
+	Sigma *= std::sqrt(scale);
 
 						// Generate XX with the same sample Mean and Covar as before
 	column(XX,0) = x;
 
 	for (size_t c = 0; c < x_size; ++c) {
-		const ublas::matrix_column<UTriMatrix> SigmaCol = column(Sigma,c);
+		UTriMatrix::Column SigmaCol = column(Sigma,c);
 		column(XX,c+1).assign (x  + SigmaCol);
 		column(XX,x_size+c+1).assign (x - SigmaCol);
 	}
@@ -93,9 +88,12 @@ void Unscented_filter::init ()
 /*
  * Initialise unscented state
  *		Pre : x,X
- *		Post: x,X
+ *		Post: x,X is PSD
  */
 {
+						// Postconditions
+	if (!isPSD (X))
+		filter_error ("Initial X not PSD");
 }
 
 void Unscented_filter::update ()
@@ -139,8 +137,7 @@ namespace {
 			Unscented_predict_model(am.G.size1()),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
-			QGqG.clear();
-			mult_SPD (am.G, am.q, QGqG);
+			QGqG.assign (prod_SPD(am.G, am.q));
 		}
 		const Vec& f(const Vec& x) const
 		{
@@ -204,7 +201,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 						// Mean of predicted distribution: x
 	x.assign (column(fXX,0) * Kappa);
 	for (i = 1; i < XX_size; ++i) {
-		x.plus_assign (column(fXX,i) / 2.); // ISSUE uBlas may not be able to promote integer 2
+		x.plus_assign (column(fXX,i) / Float(2)); // ISSUE uBlas may not be able to promote integer 2
 	}
 	x /= x_Kappa;
 						// Covariance of distribution: X
@@ -213,11 +210,15 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 		column(fXX,i).minus_assign (x);
 	}
 							// Center point, premult here by 2 for efficency
-	X.assign (FM::outer_prod(column(fXX,0), column(fXX,0)));
-	X *= 2*Kappa;
+    {
+		ColMatrix::Column fXX0 = column(fXX,0);
+		X.assign (FM::outer_prod(fXX0, fXX0));
+		X *= 2*Kappa;
+	}
 							// Remaining unscented points
 	for (i = 1; i < XX_size; ++i) {
-		X.plus_assign (FM::outer_prod(column(fXX,i), column(fXX,i)));
+		ColMatrix::Column fXXi = column(fXX,i);
+		X.plus_assign (FM::outer_prod(fXXi, fXXi));
 	}
 	X /= 2*x_Kappa;
 						// Addative Noise Prediction, computed about center point
@@ -249,7 +250,7 @@ Bayes_base::Float Unscented_filter::observe (Uncorrelated_addative_observe_model
  *		Post: x,X represent the fused distribution
  *
  * Uncorrelated noise
- * ISSUE: Simplify implmenation using uncorrelated noise equations
+ * ISSUE: Simplified implemenation using uncorrelated noise equations
  */
 {
 	Adapted_Correlated_addative_observe_model hh(h);
@@ -264,7 +265,6 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
  *		Post: x,X represent the fused distribution
  */
 {
-	size_t i;
 	size_t z_size = z.size();
 	ColMatrix zXX (z_size, 2*x_size+1);
 	Vec zp(z_size);
@@ -282,51 +282,48 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 						// Predict points of XX using supplied observation model
 	{
 		Vec zXXi(z_size), zXX0(z_size);
-		for (i = 0; i < XX.size2(); ++i) {
+		column(zXX,0).assign ( zXX0 = h.h( column(XX,0) ) );
+		for (size_t i = 1; i < XX.size2(); ++i) {
 			zXXi = h.h( column(XX,i) );
-						// Normalise relative to zXX0 which is normalised to z
-			if (i > 0) {
-				h.normalise (zXXi, zXX0);
-			}
-			else {
-				h.normalise (zXXi, z);
-				zXX0 = zXXi;		// Normalise to zXX0
-			}
+						// Normalise relative to zXX0
+			h.normalise (zXXi, zXX0);
 			column(zXX,i).assign (zXXi);
 		}
 	}
 
 						// Mean of predicted distribution: zp
 	zp.assign (column(zXX,0) * Kappa);
-	for (i = 1; i < zXX.size2(); ++i) {
-		zp.plus_assign (column(zXX,i) / 2.); // ISSUE uBlas may not be able to promote integer 2
+	for (size_t i = 1; i < zXX.size2(); ++i) {
+		zp.plus_assign (column(zXX,i) / Float(2)); // ISSUE uBlas may not be able to promote integer 2
 	}
 	zp /= x_Kappa;
 
 						// Covariance of observation prediction: Xzz
 							// Subtract mean from each point in zX
-	for (i = 0; i < XX_size; ++i) {
+	for (size_t i = 0; i < XX_size; ++i) {
 		column(zXX,i).minus_assign (zp);
 	}
 							// Center point, premult here by 2 for efficency
 	{
-		const ublas::matrix_column<ColMatrix> tzXX0 = column(zXX,0);
-		Xzz.assign (FM::outer_prod(tzXX0, tzXX0));
+		ColMatrix::Column zXX0 = column(zXX,0);
+		Xzz.assign (FM::outer_prod(zXX0, zXX0));
 		Xzz *= 2*Kappa;
 	}
 							// Remaining unscented points
-	for (i = 1; i < zXX.size2(); ++i) {
-		const ublas::matrix_column<ColMatrix> tzXXi = column(zXX,i);
-		Xzz.plus_assign (FM::outer_prod(tzXXi, tzXXi));
+	for (size_t i = 1; i < zXX.size2(); ++i) {
+		ColMatrix::Column zXXi = column(zXX,i);
+		Xzz.plus_assign (FM::outer_prod(zXXi, zXXi));
 	}
 	Xzz /= 2*x_Kappa;
 
 						// Correlation of state with observation: Xxz
 							// Center point, premult here by 2 for efficency
-	Xxz.assign (FM::outer_prod(column(XX,0) - x, column(zXX,0)));
-	Xxz *= 2*Kappa;
+	{
+		Xxz.assign (FM::outer_prod(column(XX,0) - x, column(zXX,0)));
+		Xxz *= 2*Kappa;
+	}
 							// Remaining unscented points
-	for (i = 1; i < zXX.size2(); ++i) {
+	for (size_t i = 1; i < zXX.size2(); ++i) {
 		Xxz.plus_assign (FM::outer_prod(column(XX,i) - x, column(zXX,i)));
 	}
 	Xxz /= 2* (Float(x_size) + Kappa);
@@ -340,8 +337,11 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 						// Kalman gain
 	W.assign (prod(Xxz,SI));
 
+						// Normalised innovation
+	h.normalise(s = z, zp);
+	s.minus_assign (zp);
+
 						// Filter update
-	s = z; s.minus_assign (zp);
 	x.plus_assign (prod(W,s));
 	RowMatrix WStemp(W.size1(), S.size2());
 	X.minus_assign (prod_SPD(W,S, WStemp) );

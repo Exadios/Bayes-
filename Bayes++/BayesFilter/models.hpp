@@ -26,9 +26,9 @@ namespace Bayesian_filter
 class Simple_addative_predict_model : public Addative_predict_model
 // Addative predict model initialised from function and model matricies
 {
-	Function_model& ff;
+	Predict_function& ff;
 public:
-	Simple_addative_predict_model (Function_model& f_init, const FM::Matrix& G_init, const FM::Vec& q_init);
+	Simple_addative_predict_model (Predict_function& f_init, const FM::Matrix& G_init, const FM::Vec& q_init);
 	// Precondition: G, q are conformantly dimensioned (not checked)
 	// No default assignment operator
 
@@ -40,9 +40,9 @@ public:
 class Simple_linrz_predict_model : public Linrz_predict_model
 // Linrz predict model initialised from function and model matricies
 {
-	Function_model& ff;
+	Predict_function& ff;
 public:
-	Simple_linrz_predict_model (Function_model& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init);
+	Simple_linrz_predict_model (Predict_function& f_init, const FM::Matrix& Fx_init, const FM::Matrix& G_init, const FM::Vec& q_init);
 	// Precondition: Fx, G, q are conformantly dimensioned (not checked)
 	// No default assignment operator
 
@@ -63,28 +63,28 @@ public:
 class Simple_linrz_correlated_observe_model : public Linrz_correlated_observe_model
 // Linrz observe model initialised from function and model matricies
 {
-	Function_model& ff;
+	Observe_function &ff;
 public:
-	Simple_linrz_correlated_observe_model (Function_model& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init);
+	Simple_linrz_correlated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init);
 	// Precondition: Hx, Z are conformantly dimensioned (not checked)
 	// No default assignment operator
 
 	virtual const FM::Vec& h(const FM::Vec& x) const
-	{	return ff.fx(x);
+	{	return ff.h(x);
 	}
 };
 
 class Simple_linrz_uncorrelated_observe_model : public Linrz_uncorrelated_observe_model
 // Linrz observe model initialised from function and model matricies
 {
-	Function_model& ff;
+	Observe_function& ff;
 public:
-	Simple_linrz_uncorrelated_observe_model (Function_model& f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init);
+	Simple_linrz_uncorrelated_observe_model (Observe_function& f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init);
 	// Precondition: Hx, Zv are conformantly dimensioned (not checked)
 	// No default assignment operator
 
 	virtual const FM::Vec& h(const FM::Vec& x) const
-	{	return ff.fx(x);
+	{	return ff.h(x);
 	}
 };
 

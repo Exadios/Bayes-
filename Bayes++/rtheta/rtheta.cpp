@@ -1,4 +1,3 @@
-#include <exception>
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -27,9 +26,9 @@ using namespace Bayesian_filter_matrix;
 using namespace angleArith;
 
 
+const size_t NX = 2+1;			// State dimension (x,y) and some empty dummies so GqG' is singular
 const size_t NQ = 2;			// State dimension of noise
-const size_t NX = NQ+0;			// State dimension (x,y) and some empty dummies so things are semidefinate
-const size_t NZ = 2;			// Observation dimension
+const size_t NZ = 2+2;			// Observation dimension (r,a) and some empty dummies
 const size_t NS = 1000;			// Number of samples for a sampled representation
 
 const bool RA_MODEL = true;		// Use Range angle NON-linear model (requires normalising angle)
@@ -126,34 +125,22 @@ pred_model::pred_model () :
 	Fx(1,0) = Float(0.1);
 	Fx(1,1) = Float(0.9);
 
-	// Build q,G, Zero all except active partition
-	q.clear();
+	// Build q,G, Test addition parts using coupled unity noise
+	q = ublas::scalar_vector<Float>(NQ, 1);
 	q[0] = sqr(X_NOISE);
 	q[1] = sqr(Y_NOISE);
-	G.clear();
+	G = ublas::scalar_matrix<Float>(NX,NQ, 1);
 	G(0,0) = 1;
-	G(1,1) = 1;
 	G(0,1) = XY_NOISE_COUPLING;
 	G(1,0) = XY_NOISE_COUPLING;
+	G(1,1) = 1;
 
 	// Build inverse Fx, Identity all except active partition
-	FM::identity (inv.Fx);
-	inv.Fx(0,0) = 1.;
-	inv.Fx(0,1) = 0.;
-	inv.Fx(1,0) = Float(-1./9.);
-	inv.Fx(1,1) = Float(1./0.9);
+	Information_root_filter::inverse_Fx (inv.Fx, Fx);
 
-	// Build Inverse q, G, 1/0 all except active partition!!
-	inv.q.clear();
-	inv.q[0] = Float(1.) / sqr(X_NOISE);
-	inv.q[1] = Float(1.) / sqr(Y_NOISE);
-	
-	// No inverse for empty parts of G
-	inv.G.assign(ublas::scalar_matrix<Float>(inv.G.size1(),inv.G.size2(),
-			std::numeric_limits<Float>::infinity() ) );
-	Float Gdet = sqr(Float(1.)) - sqr(XY_NOISE_COUPLING);
-	inv.G(0,0) = inv.G(1,1) = Float(1.)/ Gdet;
-	inv.G(0,1) = inv.G(1,0) = -XY_NOISE_COUPLING / Gdet;
+	// Build Inverse q
+	for (size_t qi=0; qi < q.size(); ++qi)
+		inv.q[qi] = Float(1) / q[qi];
 }
 
 
@@ -191,6 +178,7 @@ uobs_model::uobs_model() :
 	z_pred(NZ)
 {
 	// Observation covariance uncorrelated
+	Zv = ublas::scalar_vector<Float>(Zv.size(), Float(1));
 	Zv[0] = sqr(RANGE_NOISE);
 	Zv[1] = (RA_MODEL ? sqr(ANGLE_NOISE): sqr(RANGE_NOISE));
 }
@@ -199,6 +187,7 @@ cobs_model::cobs_model(uobs_model& u) :
 	General_LzCoAd_observe_model(NX,NZ),
 	uobs(u)
 {
+	FM::identity (Z);
 	// Create the correlation in Z
 	Z(0,0) = uobs.Zv[0]; Z(1,1) = uobs.Zv[1];
 	Z(1,0) = Z(0,1) = sqrt(Z(0,0))*sqrt(Z(1,1))*Z_CORRELATION;
@@ -209,10 +198,10 @@ void uobs_model::state (const Vec& x)
 	Float dx = TARGET[0] - x[0];
 	Float dy = TARGET[1] - x[1];
 
+	Hx.clear();
 	if (RA_MODEL) {
 		Float distSq = dx*dx + dy*dy;
 		Float dist = sqrt (distSq);
-		Hx.clear();
 		Hx(0,0) = -dx / dist;
 		Hx(0,1) = -dy / dist;
 		Hx(1,0) = +dy / distSq;
@@ -242,10 +231,8 @@ const Vec& uobs_model::h (const Vec& x) const
 		Float distSq = dx*dx + dy*dy;
 		Float dist = sqrt (distSq);
 
-		z_pred.clear();
 		z_pred[0] = dist;
-		using namespace std;
-		z_pred[1] = atan2 (dy, dx);
+		z_pred[1] = std::atan2 (dy, dx);
 	}
 	else {
 		z_pred[0] = dx;
@@ -284,7 +271,7 @@ private:
 	Vec m_base;
 };
 
-walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), rootq(NX), m_base(NX)
+walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), rootq(NQ), m_base(NX)
 {
 	m_fixed = fixed;
 	m_base = start;
@@ -297,7 +284,7 @@ walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), rootq(NX), m
 void walk::predict ()
 {
 						// Correlated additive random noise
-	DenseVec n(x.size()), nc(x.size());
+	DenseVec n(rootq.size()), nc(x.size());
 	::Random.normal (n);		// independant zero mean normal
 								// multiply elements by std dev
 	for (DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
@@ -314,6 +301,21 @@ void walk::predict ()
 		x += nc;
 	}
 }
+
+
+// Special for Information filter using Linrz predict
+class Information_linrz_filter : public Information_filter
+{
+public:
+	Information_linrz_filter (size_t x_size, size_t z_initialsize = 0) :
+		Information_filter (x_size, z_initialsize)
+	{}
+	Float predict (Linrz_predict_model& f)
+	// Enforce use of Linrz predict
+	{
+		return Information_filter::predict (f);
+	}
+};
 
 /*
  * Filter under test. Initialised for state and covariance
@@ -545,24 +547,25 @@ int main()
 	X_init(1,0) = X_init(0,1) = INIT_X_NOISE*INIT_Y_NOISE*INIT_XY_NOISE_CORRELATION;
 
 	// Initialise and do the comparison
-	std::cout << "udfilter, irfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<UD_filter>, Filter<Information_root_filter> > test1(x_init, X_init, 4);
+	CCompare<Filter<UD_filter>, Filter<Unscented_filter> > test1(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<Covariance_filter>, Filter<Information_filter> > test2(x_init, X_init, 4);
+	CCompare<Filter<Covariance_filter>, Filter<Information_linrz_filter> > test2(x_init, X_init, 4);
 	std::cout << std::endl;
 
-	std::cout << "ufilter, ijfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	std::cout << "irfilter, ilfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<Unscented_filter>, Filter<Information_joseph_filter> > test3(x_init, X_init, 4);
+	CCompare<Filter<Information_root_filter>, Filter<Information_filter> > test3(x_init, X_init, 4);
 	std::cout << std::endl;
 
-	std::cout << "cifilter, sfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	std::cout << "sfilter, itfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<CI_filter>, Filter<SIR_kalman_filter> > test4(x_init, X_init, 4);
+//	CCompare<Filter<SIR_kalman_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
+//	CCompare<Filter<Covariance_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	return 0;

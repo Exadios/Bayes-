@@ -1,3 +1,4 @@
+
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2002 Michael Stevens, Australian Centre for Field Robotics
@@ -43,9 +44,9 @@ Covariance_filter& Covariance_filter::operator= (const Covariance_filter& a)
 
 void Covariance_filter::init ()
 {
-						// Preconditions
+						// Postconditions
 	if (!isPSD (X))
-		filter_error ("Xi not PSD");
+		filter_error ("Initial X not PSD");
 }
 
 void Covariance_filter::update ()
@@ -75,7 +76,7 @@ void Covariance_filter::observe_size (size_t z_size)
 
 		S.resize(z_size,z_size);
 		SI.resize(z_size,z_size);
-		W.resize(W.size1(),z_size);
+		W.resize(x.size(),z_size);
 	}
 }
 
@@ -90,20 +91,19 @@ Bayes_base::Float
 	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
-	Matrix temp(h.Hx.size1(), X.size2());
-	S = prod_SPD(h.Hx,X, temp) + h.Z;
+	Matrix temp_XZ (prod(X, trans(h.Hx)));
+	S.assign (prod(h.Hx, temp_XZ) + h.Z);
 
 						// Inverse innovation covariance
 	Float rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
-						// Kalman gain
-	W = prod(prod(X,trans(h.Hx)), SI);
+						// Kalman gain, X*Hx'*SI
+	W.assign (prod(temp_XZ, SI));
 
 						// State update
 	x += prod(W, s);
-	Matrix WStemp(W.size1(), S.size2());
-	X -= prod_SPD(W, S, WStemp);
+	X -= prod_SPD(W, S, temp_XZ);
 
 	assert_isPSD (X);
 	return rcond;
@@ -121,8 +121,8 @@ Bayes_base::Float
 	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
-	Matrix temp(h.Hx.size1(), X.size2());
-	S = prod_SPD(h.Hx,X, temp);
+	Matrix temp_XZ (prod(X, trans(h.Hx)));
+	S.assign (prod(h.Hx, temp_XZ));
 	for (size_t i = 0; i < h.Zv.size(); ++i)
 		S(i,i) += h.Zv[i];
 
@@ -130,13 +130,12 @@ Bayes_base::Float
 	Float rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
-						// Kalman gain
-	W = prod(prod(X,trans(h.Hx)), SI);
+						// Kalman gain, X*Hx'*SI
+	W.assign (prod(temp_XZ, SI));
 
 						// State update
 	x += prod(W, s);
-	Matrix WStemp(W.size1(), S.size2());
-	X -= prod_SPD(W,S, WStemp);
+	X -= prod_SPD(W,S, temp_XZ);
 
 	assert_isPSD (X);
 	return rcond;
