@@ -16,7 +16,7 @@
  *  Make rcond return overall conditioning not minium of each sequential
  */
 #include "matSup.h"
-#include <limits>
+#include <boost/limits.hpp>
 #include "UDFlt.h"
 
 /* Filter namespace */
