@@ -100,7 +100,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	if (fom.Hx.size1() != 1)
 		error (BF::Logic_exception("observation and model size inconsistent"));
 		
-		// make new filter with additional feature state
+		// make new filter with additional (uninitialized) feature state
 	if (feature >= nM)
 	{
 		nM = feature+1;	
@@ -121,18 +121,23 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	FM::Matrix Hb (fom.Hx.sub_matrix(0,1, nL,nL+z.size()) );
 	FM::Matrix tempHa (1,nL);
 	FM::Matrix tempHb (1,sz.size());
-		// feature state and variance
-	full->x[nL+feature] = fom.h(sz)[0];
-	full->X(nL+feature,nL+feature) = ( FM::prod_SPD(Ha,full->X.sub_matrix(0,nL, 0,nL),tempHa) +
-													  FM::prod_SPD(Hb,fom.Zv,tempHb)
-													 ) (0,0);
-		// feature covariance with existing location and features
-	//	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
+
+		// feature covariance with existing location and features - zero exisiting feature covariance
+			// ISSUE old uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, zero via upper symmetry
+	// zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
+	zero( full->X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
+	zero( full->X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full->X.size1()) );
+	// full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
 	{	// ISSUE old uBLAS has problems assigning to symmetric proxy as above, go element by element
 		const FM::Matrix cross (FM::prod(Ha, full->X.sub_matrix(0,nL, 0,nL+nM)) );
 		for (std::size_t i = 0; i != nL+nM-1; ++i)
 			full->X(nL+feature, i) = cross(0,i);
 	}
+		// feature state and variance
+	full->x[nL+feature] = fom.h(sz)[0];
+	full->X(nL+feature,nL+feature) = ( FM::prod_SPD(Ha,full->X.sub_matrix(0,nL, 0,nL),tempHa) +
+													  FM::prod_SPD(Hb,fom.Zv,tempHb)
+													 ) (0,0);
 		
 	full->init ();
 }
