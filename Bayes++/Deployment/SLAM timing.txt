@@ -1,5 +1,8 @@
 Shrew Pentium III (Katmai step 0) 450MHz
 
+2003-10-15 Boost_CVS
+GCC-3.3 1m4.993s release
+
 2003-09-29 Boost_CVS
 GCC-3.2 1m1.300s hardoptimize-release -march=pentium3 -msse
 GCC-3.2 1m2.420s hardoptimize-release 
