@@ -1,7 +1,11 @@
-2003-07-29 Boost 1_30_0
+Shrew Pentium III (Katmai step 0) 450MHz
 
-Shrew Pentium II (Katmai step 0) 450MHz
-GCC-3.2		1:09
+2003-09-29 Boost_CVS
+GCC-3.2 1m1.300s hardoptimize-release -march=pentium3 -msse
+GCC-3.2 1m2.420s hardoptimize-release 
+
+2003-07-29 Boost 1_30_0
+GCC-3.2 1:09
 GCC-2.95	1:09
 VC7 (wine)	1:13
 IntelC-71	2:30	-mp1 -O3 -Ob2
