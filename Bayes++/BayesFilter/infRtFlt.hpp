@@ -43,8 +43,9 @@ public:
 	Information_root_filter (size_t x_size, size_t z_initialsize = 0);
 
 	void init ();
-	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
 	void update ();
+	// Covariance form state interface
+
 	Float predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r);
 	/* Generialised form, using precomputed inverse of f.Fx */
 	Float predict (Linrz_predict_model& f);
@@ -70,15 +71,14 @@ public:
  * Augments Information_root_filter with y,Y in the interface
  */
 
-class Information_root_info_filter : public Information_root_filter
+class Information_root_info_filter : public Information_form_filter, public Information_root_filter
 {
 public:
-	FM::Vec y;				// Information state
-	FM::SymMatrix Y;		// Information
-
 	Information_root_info_filter (size_t x_size, size_t z_initialsize = 0);
 
-	void update ();
+	void init_yY ();
+	void update_yY ();
+	// Information form state interface
 };
 
 

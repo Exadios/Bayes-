@@ -141,7 +141,9 @@ pred_model::pred_model () :
 	G(1,1) = 1;
 
 	// Build inverse Fx, Identity all except active partition
-	Information_root_filter::inverse_Fx (inv.Fx, Fx);
+	DenseColMatrix denseinvFx (Fx.size1(), Fx.size2());
+	Information_root_filter::inverse_Fx (denseinvFx, Fx);
+	inv.Fx = denseinvFx;
 
 	// Build Inverse q
 	for (size_t qi=0; qi < q.size(); ++qi)
@@ -357,37 +359,6 @@ Filter<SIR_kalman_filter>::Filter (const Vec& x_init, const SymMatrix& X_init)
 {
 	init_kalman (x_init, X_init);
 }
-
-// Specialise for Iterated_covariance_filter
-template <>
-class Filter<Iterated_covariance_filter> : public Iterated_covariance_filter
-{
-public:
-	Filter (const Vec& x_init, const SymMatrix& X_init);
-	bool observe_iteration_end ();
-private:
-	unsigned limit, li;
-};
-
-Filter<Iterated_covariance_filter>::Filter (const Vec& x_init, const SymMatrix& X_init)
-	: Iterated_covariance_filter (x_init.size())
-{
-	li = limit = 10;
-	init_kalman (x_init, X_init);
-}
-
-bool Filter<Iterated_covariance_filter>::observe_iteration_end ()
-{
-	--li;
-	if (li == 0)
-	{
-		li = limit;
-		return true;
-	}
-	else
-		return false;
-}
-
 
 
 /*

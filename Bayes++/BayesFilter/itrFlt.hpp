@@ -29,6 +29,28 @@
 namespace Bayesian_filter
 {
 
+class Iterated_terminator : public Bayes_base
+/*
+ * Termination condition for filter Iteration
+ *  Used by iterated observe to parameterise termination condition
+ *
+ * Defaults to immidately terminating the iteration
+ *
+ * A more useful terminator can built by derivation.
+ * For example terminator constructed with a reference to the filter can
+ * detect convergence of x and/or X
+ */
+{
+public:
+	virtual void relinearize (const FM::Vec& x)
+	{}	// linearize observation model about new x
+	virtual bool term ()
+	{
+		return true;
+	}
+};
+
+
 class Iterated_covariance_filter : public Linrz_filter
 {
 public:
@@ -42,19 +64,22 @@ public:
 	void update ();
 	Float predict (Linrz_predict_model& f);
 
-	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
-	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
+	Float observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z);
+	Float observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z);
+	// Observe with iteration
+	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+	{	// Observe with default termination
+		Iterated_terminator term;
+		return observe (h, term, z);
+	}
+	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
+	{	// Observe with default termination
+		Iterated_terminator term;
+		return observe (h, term, z);
+	}
 
 public:						// Exposed Numerical Results
 	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
-
-protected:
-	//TODO This should be part of an augmented model.
-	virtual bool observe_iteration_end () = 0;
-	/* An algorithm must be supplied to signal end of observe iteration
-	 * Precond: x,X,s,S computed for the last iteration
-	 * Iteration count should be reset on construction and when true is returned
-	 */
 
 protected:					// allow fast operation if z_size remains constant
 	size_t last_z_size;

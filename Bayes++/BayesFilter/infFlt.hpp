@@ -60,6 +60,7 @@ public:
 	void update ();
 	void init_yY ();
 	void update_yY ();
+	// Covariance and information form state interface
 
 	Float predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b);
 	// Linear Prediction in information form as in Ref[2]

@@ -165,7 +165,7 @@ public:
 		q(q_size), G(x_size, q_size)
 	{}
 
-	FM::DenseVec q;		// Noise variance (always dense as Coupling used for sparseness)
+	FM::Vec q;		// Noise variance (always dense as Coupling used for sparseness)
 	FM::Matrix G;		// Noise Coupling
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
@@ -223,7 +223,7 @@ public:
 	public:
 		inverse_model (size_t x_size, size_t q_size);
 		FM::ColMatrix Fx;	// Model inverse (ColMatrix as usually transposed)
-		FM::DenseVec q;		// Noise variance inverse
+		FM::Vec q;			// Noise variance inverse
 	} inv;
 };
 
@@ -241,7 +241,7 @@ public:
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
-class Likelihood_observe_model : virtual public Bayes_base
+class Likelihood_observe_model : public Bayes_base
 /* Likelihood observe model L(z |x)
  *  The most fundamental Bayesian definition of an observation
  * Defines an Interface without data members
@@ -253,16 +253,16 @@ public:
 	virtual Float L(const FM::Vec& x) const = 0;
 	// Likelihood L(z | x)
 
-	virtual void Lz (const FM::DenseVec& zz)
+	virtual void Lz (const FM::Vec& zz)
 	// Set the observation zz about which to evaluate the Likelihood function
 	{
 		z = zz;
 	}
 protected:
-	FM::DenseVec z;			// z set by Lz
+	FM::Vec z;			// z set by Lz
 };
 
-class Functional_observe_model : virtual public Bayes_base, public Observe_function
+class Functional_observe_model : public Bayes_base, public Observe_function
 /* Functional (non-stochastic) observe model h
  *  z(k) = hx(x(k|k-1))
  * This is a seperate fundamental model and not derived from likelihood because
@@ -273,13 +273,13 @@ class Functional_observe_model : virtual public Bayes_base, public Observe_funct
 public:
 	Functional_observe_model(size_t /*z_size*/)
 	{}
-	const FM::DenseVec& operator()(const FM::Vec& x) const
+	const FM::Vec& operator()(const FM::Vec& x) const
 	{	return h(x);
 	}
 
 };
 
-class Parametised_observe_model : virtual public Bayes_base
+class Parametised_observe_model : public Bayes_base
 /* Observation model parametised with a fixed z size
  * Model is assume to have linear components
  */
@@ -287,7 +287,7 @@ class Parametised_observe_model : virtual public Bayes_base
 public:
 	Parametised_observe_model(size_t /*z_size*/)
 	{}
-	virtual void normalise (FM::DenseVec& /*z_denorm*/, const FM::DenseVec& /*z_from*/) const
+	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
 	/* Normalise one observation state (z_denorm) from another if observation model is discontinous.
 	    Default for continuous h
 	 */
@@ -304,32 +304,32 @@ public:
 	Uncorrelated_addative_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
-	FM::DenseVec Zv;			// Noise Variance
-	virtual const FM::DenseVec& h(const FM::Vec& x) const = 0;
+	FM::Vec Zv;			// Noise Variance
+	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
 	// Functional part of addative model
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
 class Correlated_addative_observe_model : public Parametised_observe_model
 /* Observation model, correlated addative observation noise
-	Z(k) = observe noise covariance
+    Z(k) = observe noise covariance
  */
 {
 public:
 	Correlated_addative_observe_model (size_t z_size) :
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
-	FM::SymMatrix Z;	// Noise Covariance (not necessarly dense=
+	FM::SymMatrix Z;	// Noise Covariance (not necessarly dense)
 
-	virtual const FM::DenseVec& h(const FM::Vec& x) const = 0;
+	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
 	// Functional part of addative model
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
-class Jacobian_observe_model
+class Jacobian_observe_model   // ISSUE could drive from Bayes_base but not polymorphic
 /* Linrz observation model Hx, h about state x (fixed size)
-	z(k) = h(x(k-1|k-1)
-	Hx(x(k|k-1) = Jacobian of h with respect to state x
+    z(k) = h(x(k-1|k-1)
+    Hx(x(k|k-1) = Jacobian of h with respect to state x
  */
 {
 protected:
@@ -342,9 +342,9 @@ protected:
 class Linrz_correlated_observe_model : public Correlated_addative_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with repespect to state x (fixed size)
     correlated observation noise
-	z(k) = h(x(k-1|k-1)
-	Hx(x(k|k-1) = Jacobian of f with respect to state x
-	Z(k) = observe noise covariance
+    z(k) = h(x(k-1|k-1)
+    Hx(x(k|k-1) = Jacobian of f with respect to state x
+    Z(k) = observe noise covariance
  */
 {
 public:
@@ -357,9 +357,9 @@ public:
 class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with repespect to state x (fixed size)
     uncorrelated observation noise
-	z(k) = h(x(k-1|k-1)
-	Hx(x(k|k-1) = Jacobian of f with respect to state x
-	Zv(k) = observe noise covariance
+    z(k) = h(x(k-1|k-1)
+    Hx(x(k|k-1) = Jacobian of f with respect to state x
+    Zv(k) = observe noise covariance
  */
 {
 public:
@@ -371,25 +371,27 @@ public:
 
 class Linear_correlated_observe_model : public Linrz_correlated_observe_model
 /* Linear observation model, correlated observation noise
-	z(k) = Hx(k) * x(k|k-1)
+    z(k) = Hx(k) * x(k|k-1)
+    Enforces linear model invariant. Careful when deriving!
  */
 {
 public:
 	Linear_correlated_observe_model (size_t x_size, size_t z_size) :
 		Linrz_correlated_observe_model(x_size, z_size), hx(z_size)
 	{}
-	const FM::DenseVec& h(const FM::Vec& x) const
+	const FM::Vec& h(const FM::Vec& x) const
 	{	// Provide a linear implementation of functional h assumes model is already Linrz for Hx
 		hx.assign (FM::prod(Hx,x));
 		return hx;
 	}
 private:
-	mutable FM::DenseVec hx;
+	mutable FM::Vec hx;
 };
 
 class Linear_uncorrelated_observe_model : public Linrz_uncorrelated_observe_model
 /* Linear observation model, uncorrelated observation noise
-	z(k) = Hx(k) * x(k|k-1)
+    z(k) = Hx(k) * x(k|k-1)
+    Enforces linear model invariant. Careful when deriving!
  */
 {
 public:

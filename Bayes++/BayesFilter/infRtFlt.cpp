@@ -28,20 +28,19 @@ Information_root_filter::Information_root_filter (size_t x_size, size_t /*z_init
 /*
  * Set the size of things we know about
  */
-{
-	// No temporaries to make use of z_initialsize
-}
+{}
 
 Information_root_info_filter::Information_root_info_filter (size_t x_size, size_t z_initialsize) :
-		Information_root_filter (x_size, z_initialsize),
-		y(x_size), Y(x_size,x_size)
+		Information_form_filter (x_size),
+		Information_root_filter (x_size, z_initialsize)
 {}
+
 
 void Information_root_filter::init ()
 /*
  * Inialise the filter from x,X
  * Predcondition:
- *		X
+ *		x,X
  * Postcondition:
  *		inv(R)*inv(R)' = X is PSD
  *		r = R*x
@@ -55,11 +54,13 @@ void Information_root_filter::init ()
 	r.assign (prod(R,x));
 }
 
-void Information_root_filter::init_information (const Vec& yi, const SymMatrix& Yi)
+void Information_root_info_filter::init_yY ()
 /*
  * Special Initialisation directly from Information form
+ * Predcondition:
+ *		y,Y
  * Postcondition:
- *		R'*R = Yi
+ *		R'*R = Y is PSD
  *		r = inv(R)'*y
  */
 {
@@ -67,8 +68,8 @@ void Information_root_filter::init_information (const Vec& yi, const SymMatrix& 
 	const size_t n = x.size();
 	LTriMatrix LC(n,n);
 					// Information Root
-	Float rcond = LdLfactor (LC, Yi);
-	rclimit.check_PSD(rcond, "Yi not PSD");
+	Float rcond = LdLfactor (LC, Y);
+	rclimit.check_PSD(rcond, "Initial Y not PSD");
 
 	{				// Lower triangular Choleksy factor of LdL'
 		size_t i,j;
@@ -90,7 +91,7 @@ void Information_root_filter::init_information (const Vec& yi, const SymMatrix& 
 	UTriMatrix RI(n,n);
 	RI = R;
 	(void)UTinverse(RI);
-	r.assign (prod(FM::trans(RI),yi));
+	r.assign (prod(FM::trans(RI),y));
 }
 
 void Information_root_filter::update ()
@@ -115,15 +116,13 @@ void Information_root_filter::update ()
 	assert_isPSD (X);
 }
 
-void Information_root_info_filter::update ()
+void Information_root_info_filter::update_yY ()
 /*
- * Recompute x,X y,Y from r,R
+ * Recompute y,Y from r,R
  * Precondition:
  *		r(k|k),R(k|k)
  * Postcondition:
  *		r(k|k),R(k|k)
- *		x = inv(R)*r
- *		X = inv(R)*inv(R)'
  *		Y = R'*R
  *		y = Y*x
  */

@@ -213,9 +213,9 @@ cflags=
 cppflags=
 cxxflags=\s-O0 -g3 -Wall
 ldadd=
-ldflags=\s                                                                                                    \s
+ldflags=\s                                                                                                      \s
 libtool_dir=
-path_to_bin_program=target/rtheta/bin/rtheta/gcc/debug/runtime-link-dynamic
+path_to_bin_program=/home/michael/Documents/MyProjects/Bayes++/target/rtheta/bin/rtheta/gcc/uBLAS-seperate-debug/runtime-link-dynamic
 
 [General]
 AMChanged=false
@@ -224,8 +224,8 @@ configure_args=\s--build=i386-linux --host=i386-linux --target=i386-linux\s
 dir_where_make_will_be_called=./rtheta/
 email=
 kdevprj_version=1.3
-lfv_open_groups=Headers,Sources
-make_options=\s-w -j1 ARGS="-d1 \\"-sBUILD=debug\\""
+lfv_open_groups=Sources
+make_options=\s-w -j1 ARGS="-d1 \\"-sBUILD=uBLAS-seperate-debug\\""
 makefiles=Makefile.am,kmake/Makefile.am,kmake/docs/Makefile.am,kmake/docs/en/Makefile.am,Simple/Makefile.am,PV/Makefile.am,QuadCalib/Makefile.am,BayesFilter/Makefile.am,BayesFilter/filters/Makefile.am,rtheta/Makefile.am
 modifyMakefiles=false
 project_name=Bayes++

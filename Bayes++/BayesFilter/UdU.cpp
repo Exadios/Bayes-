@@ -468,8 +468,8 @@ UTriMatrix::value_type UCfactor (UTriMatrix& UC, const SymMatrix& M)
  *    see in-place UCfactor
  */
 {
-	UC.assign (UTriMatrix(M));
-	UTriMatrix::value_type rcond = UCfactor (UC, M.size1());
+	UC.assign (UpperTri(M));
+	UTriMatrix::value_type rcond = UCfactor (UC, UC.size1());
 
 	return rcond;
 }

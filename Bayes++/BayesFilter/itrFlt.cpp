@@ -84,7 +84,7 @@ void Iterated_covariance_filter::observe_size (size_t z_size)
 }
 
 Bayes_base::Float
- Iterated_covariance_filter::observe (Linrz_uncorrelated_observe_model& h, const Vec& z)
+ Iterated_covariance_filter::observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const Vec& z)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -95,11 +95,11 @@ Bayes_base::Float
 {
 						// ISSUE: Implement simplified uncorrelated noise equations
 	Adapted_Linrz_correlated_observe_model hh(h);
-	return observe (hh, z);
+	return observe (hh, term, z);
 }
 
 Bayes_base::Float
- Iterated_covariance_filter::observe (Linrz_correlated_observe_model& h, const Vec& z)
+ Iterated_covariance_filter::observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const Vec& z)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -129,9 +129,12 @@ Bayes_base::Float
 	RowMatrix HxXtemp(h.Hx.size1(),X.size2());
 	RowMatrix temp1(x_size,x_size), temp2(x_size,z_size);
 	SymMatrix temp3(x_size,x_size);
-// Initialise Hx using iterated model here
+
 	do {
-		const Vec& zp = h.h(x);		// Observation model
+							// Observation model, linearize about new x
+		term.relinearize (x);
+		const Vec& zp = h.h(x);
+		
 		HxT.assign (trans(h.Hx));
 							// Innovation
 		h.normalise(s = z, zp);
@@ -146,14 +149,12 @@ Bayes_base::Float
 		temp3.assign (prod_SPD(HxT,SI, temp2));
 		temp1.assign (prod(Xpred,temp3));
 		X.assign (Xpred - prod(temp1,Xpred));
-//TODO X is wrong and somestimes even not PSD
-//TODO check maybe should be also at runtime
 		assert_isPSD (X);
 							// New state iteration
 		temp2.assign (prod(X,HxT));
 		temp1.assign (prod(X,XpredI));
 		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));
-	} while (!observe_iteration_end());
+	} while (!term.term());
 	return rcond;
 }
 
