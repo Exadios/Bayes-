@@ -111,7 +111,7 @@ void Unscented_scheme::init_XX ()
 						// Covariance of distribution: X
 							// Subtract mean from each point in fXX
 	for (size_t i = 0; i < XX_size; ++i) {
-		column(fXX,i).minus_assign (x);
+		noalias(column(fXX,i)) -= x;
 	}
 							// Center point, premult here by 2 for efficency
     {
@@ -309,7 +309,7 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	zp /= x_kappa;
 
 						// Covariance of observation prediction: Xzz
-							// Subtract mean from each point in zX
+							// Subtract mean from each point in zXX
 	for (size_t i = 0; i < XX_size; ++i) {
 		column(zXX,i).minus_assign (zp);
 	}
