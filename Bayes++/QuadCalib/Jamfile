@@ -12,5 +12,5 @@ exe quadcalib :
     :
      <include>$(BOOST_ROOT)
      <include>$(BAYES_ROOT)
-    : debug
+    : release
 ;

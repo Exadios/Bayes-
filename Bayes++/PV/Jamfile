@@ -12,5 +12,5 @@ exe PV :
     :
      <include>$(BOOST_ROOT)
      <include>$(BAYES_ROOT)
-    : debug
+    : release
 ;
