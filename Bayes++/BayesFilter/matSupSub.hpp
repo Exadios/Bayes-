@@ -91,4 +91,5 @@ typedef BaseDenseDiagMatrix BaseDiagMatrix;
 /*
  * Common type independant uBlas interface
  */
+#define BAYESFILTER_UBLAS_SLICE_OK
 #include "uBLASmatrix.hpp"

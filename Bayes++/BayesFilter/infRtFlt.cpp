@@ -21,6 +21,8 @@ namespace Bayesian_filter
 {
 	using namespace Bayesian_filter_matrix;
 
+typedef TriMatrix_adaptor<UTriMatrix, const DenseMatrix> UpperTri;
+
 
 Information_root_filter::Information_root_filter (size_t x_size, size_t /*z_initialsize*/) :
 		Extended_filter(x_size),
@@ -195,7 +197,7 @@ Bayes_base::Float
 	if (info != 0)
 			filter_error ("Predict no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(x_size,x_size*2, x_size,x_size*2);
+	R = UpperTri( A.sub_matrix(x_size,x_size*2, x_size,x_size*2) );
 					
 	r.assign (prod(R,f.f(x)));	// compute r using f(x)
 
@@ -244,7 +246,7 @@ Bayes_base::Float
 			filter_error ("Predict no QR factor");
 
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(x_size,x_size*2, x_size,x_size*2);
+	R = UpperTri( A.sub_matrix(x_size,x_size*2, x_size,x_size*2) );
 	r = A.sub_column(x_size,x_size*2, x_size*2);
 
 	return UCrcond(R);	// compute rcond of result
@@ -286,7 +288,7 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_
 	if (info != 0)
 			filter_error ("Observe no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(0,x_size, 0,x_size);
+	R = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
 	r = A.sub_column(0,x_size, x_size);
 
 	return UCrcond(R);	// compute rcond of result
@@ -332,7 +334,7 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_uncorrelate
 	if (info != 0)
 			filter_error ("Observe no QR factor");
 						// Extract the roots, junk in strict lower triangle
-	R = A.sub_matrix(0,x_size, 0,x_size);
+	R = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
 	r = A.sub_column(0,x_size, x_size);
 
 	return UCrcond(R);	// compute rcond of result

@@ -254,6 +254,19 @@ public:
 
 }//namespace detail
 
+
+/*
+ * Matrix Adaptors where types cannot be staticaly cast
+ */
+template <class TriMatrix, class SourceMatrix>
+class TriMatrix_adaptor : public ublas::triangular_adaptor<SourceMatrix, typename TriMatrix::functor1_type>
+{
+public:
+  TriMatrix_adaptor (SourceMatrix& M) : ublas::triangular_adaptor<SourceMatrix, typename TriMatrix::functor1_type>(M)
+  {}
+};
+
+
 /*
  * Define Filter Vector / Matrix types
  *  Finally the definitions !
@@ -310,71 +323,10 @@ void identity(FMMatrix<Base>& I)
 							// Set common diagonal elements
 	size_t common_size = std::min(I.size1(),I.size2());
 	typedef typename Base::value_type Base_value_type;
-	ublas::matrix_vector_range<Base>(I, ublas::range(0,common_size), ublas::range(0,common_size)) = 
+	ublas::matrix_vector_range<Base>(I, ublas::range(0,common_size), ublas::range(0,common_size)) =
 		ublas::scalar_vector<Base_value_type>(common_size, 1.);
 }
 
-// Sub matrix/vector helpers
-template <class Base>
-ublas::matrix_range<const FMMatrix<Base> >
-sub_matrix (const FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2, size_t e2)
-{
-	using namespace ublas;
-	return matrix_range<const FMMatrix<Base> > (m, range(s1,e1), range(s2,e2));
-}
-template <class Base>
-ublas::matrix_range<FMMatrix<Base> >
-sub_matrix (FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2, size_t e2)
-{
-	using namespace ublas;
-	return matrix_range<FMMatrix<Base> > (m, range(s1,e1), range(s2,e2));
-}
-
-		// ISSUE uBLAS currently has bugs when matrix_vector_slice is require to represent a sub column
-#ifndef BAYESFILTER_UBLAS_SLICE_OK
-		// Workaround using a vector_range of a matrix_column
-template <class MatrixBase>
-struct special_matrix_vector_slice : ublas::vector_range<ublas::matrix_column<MatrixBase> > 
-{
-	special_matrix_vector_slice(MatrixBase& mb, size_t s1, size_t e1, size_t s2) :
-			ublas::vector_range<ublas::matrix_column<MatrixBase> >(col,ublas::range(s1,e1)), col(mb, s2)
-	{}
-	ublas::matrix_column<MatrixBase> col;
-};
-
-template <class Base>
-const special_matrix_vector_slice<const FMMatrix<Base> >
-sub_column(const FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2)
-// Column vector s2 with rows [s1,e1)
-{
-	return special_matrix_vector_slice<const FMMatrix<Base> > (m, s1,e1, s2);
-}
-template <class Base>
-special_matrix_vector_slice<FMMatrix<Base> >
-sub_column(FMMatrix<Base>& m, size_t s1, size_t e1, size_t s2)
-// Column vector s2 with rows [s1,e1)
-{
-	return special_matrix_vector_slice<FMMatrix<Base> > (m, s1,e1, s2);
-}
-
-#else
-	// For this to work requires patched uBLAS for Bayes++
-	// Don't use project(column(*this,s2), range(s1,e1)) it will return a reference to the temporary column object
-ublas::matrix_vector_slice<const MatrixBase>
-sub_column(size_t s1, size_t e1, size_t s2) const
-// Column vector s2 with rows [s1,e1)
-{
-	using namespace ublas;
-	return matrix_vector_slice<const MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
-}
-ublas::matrix_vector_slice<MatrixBase>
-sub_column(size_t s1, size_t e1, size_t s2)
-// Column vector s2 with rows [s1,e1)
-{
-	using namespace ublas;
-	return matrix_vector_slice<MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
-}
-#endif
 
 
 /*
