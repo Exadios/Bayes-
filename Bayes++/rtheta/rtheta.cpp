@@ -482,6 +482,7 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 {
 	// Update the filter x,X representation
 	f1.update (); f2.update ();
+	z = ztrue = uh.h(truth.x);
 	dumpCompare();
 
 	for (unsigned i = 0; i < nIterations; i++ ) {
