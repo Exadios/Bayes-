@@ -39,7 +39,6 @@ UD_filter (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 		, UHx(FM::Empty)
 		, zdecol(FM::Empty)
 		, Gz(FM::Empty)
-
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -308,8 +307,6 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	size_t o, j;
-	const size_t x_size = x.size();
 	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
@@ -317,17 +314,12 @@ Bayes_base::Float
 	observe_size (z_size);
 								// Apply observations sequentialy as they are decorrelated
 	Float rcondmin = std::numeric_limits<Float>::max();
-	for (o = 0; o < z_size; ++o)
+	for (size_t o = 0; o < z_size; ++o)
 	{
-								// Observation prediction and model
-								// ISSUE inefficient need a observe_model for single z
-		zp = h.h(x);			// Observation model
+								// Observation prediction and model, extracted for a single z element
+		zp = h.h(x);
 		h.normalise(zp, z);
-		
-		for (j = 0; j < x_size; ++j)
-		{
-			h1[j] = h.Hx(o,j);
-		}
+		h1 = row(h.Hx,o);
 								// Check Z precondition
 		if (h.Zv[o] < 0.) 
 			filter_error("Zv not PSD in observe");
@@ -337,10 +329,7 @@ Bayes_base::Float
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using non-linear innovation
 		s = z[o]-zp[o];
-		for (j = 0; j < x_size; ++j)
-		{
-			x[j] += w[j] * s;
-		}
+		x += w * s;
 								// Copy s and Sd
 		UD_filter::s[o] = s;
 		UD_filter::Sd[o] = S;

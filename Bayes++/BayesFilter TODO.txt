@@ -1,6 +1,8 @@
 BayesFilter TODO List
 
 TODO
+	Replace UdU with as class using uBLAS row operations
+	  This should UD_filter to use qa new recompose for its update
 	Sharing state in filters: Provided constructors with state references
 	observe_model structure changed
 		Extened_filter observe_innovation parametrs is only Linear part of model

@@ -18,7 +18,6 @@
  *  Adapted: Adapt one model type into another
  */
 
-#include "compatibility.hpp"
 
 /* Filter namespace */
 namespace Bayesian_filter
@@ -108,7 +107,7 @@ public:
 
 /*
  * Generalise a addative predict model to sampled predict model
- *  To instantiate template sqrt is required (via compatibilty.h>
+ *  To instantiate template sqrt is required
  */
 struct General_sampled_predict_random
 /* Random number generators interface
@@ -164,14 +163,14 @@ public:
 		for (FM::Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
 			if (*qi < 0.)
 				throw Bayesian_filter::Bayes_filter_exception ("Negative q in init_GqG");
-			rootq[qi.index()] = Bayesian_filter::compatibility::sqrt(*qi);
+			rootq[qi.index()] = std::sqrt(*qi);
 		}
 	}
 private:
 	Random& genn;
 	mutable FM::Vec xp;
 	mutable FM::DenseVec n;
-	mutable FM::Vec rootq;		// Optimasation of sqrt(q) calculation, automatic on first use
+	mutable FM::Vec rootq;		// Optimisation of sqrt(q) calculation, automatic on first use
 	mutable bool first_init;	
 };
 

@@ -29,7 +29,7 @@ install_location=
 type=DATA
 
 [BayesFilter/Makefile.am]
-files=BayesFilter/allFilters.hpp,BayesFilter/bayesFlt.cpp,BayesFilter/bayesFlt.hpp,BayesFilter/bayesFltAlg.cpp,BayesFilter/CIFlt.cpp,BayesFilter/CIFlt.hpp,BayesFilter/compatibility.hpp,BayesFilter/covFlt.cpp,BayesFilter/covFlt.hpp,BayesFilter/infFlt.cpp,BayesFilter/infFlt.hpp,BayesFilter/infRtFlt.cpp,BayesFilter/infRtFlt.hpp,BayesFilter/itrFlt.cpp,BayesFilter/itrFlt.hpp,BayesFilter/matSup.cpp,BayesFilter/matSup.hpp,BayesFilter/unsFlt.hpp,BayesFilter/unsFlt.cpp,BayesFilter/uLAPACK.hpp,BayesFilter/UdU.cpp,BayesFilter/uBLASmatrix.hpp,BayesFilter/UDFlt.cpp,BayesFilter/SIRFlt.hpp,BayesFilter/SIRFlt.cpp,BayesFilter/schemeFlt.hpp,BayesFilter/matSupSub.hpp,BayesFilter/models.hpp,BayesFilter/UDFlt.hpp,BayesFilter/Jamfile
+files=BayesFilter/allFilters.hpp,BayesFilter/bayesFlt.cpp,BayesFilter/bayesFlt.hpp,BayesFilter/bayesFltAlg.cpp,BayesFilter/CIFlt.cpp,BayesFilter/CIFlt.hpp,BayesFilter/covFlt.cpp,BayesFilter/covFlt.hpp,BayesFilter/infFlt.cpp,BayesFilter/infFlt.hpp,BayesFilter/infRtFlt.cpp,BayesFilter/infRtFlt.hpp,BayesFilter/itrFlt.cpp,BayesFilter/itrFlt.hpp,BayesFilter/matSup.cpp,BayesFilter/matSup.hpp,BayesFilter/unsFlt.hpp,BayesFilter/unsFlt.cpp,BayesFilter/uLAPACK.hpp,BayesFilter/UdU.cpp,BayesFilter/uBLASmatrix.hpp,BayesFilter/UDFlt.cpp,BayesFilter/SIRFlt.hpp,BayesFilter/SIRFlt.cpp,BayesFilter/schemeFlt.hpp,BayesFilter/matSupSub.hpp,BayesFilter/models.hpp,BayesFilter/UDFlt.hpp,BayesFilter/Jamfile
 sub_dirs=filters
 type=static_library
 
@@ -86,12 +86,6 @@ dist=true
 install=false
 install_location=
 type=SOURCE
-
-[BayesFilter/compatibility.hpp]
-dist=true
-install=false
-install_location=
-type=HEADER
 
 [BayesFilter/covFlt.cpp]
 dist=true
@@ -219,19 +213,19 @@ cflags=
 cppflags=
 cxxflags=\s-O0 -g3 -Wall
 ldadd=
-ldflags=\s                                                                                    \s
+ldflags=\s                                                                                         \s
 libtool_dir=
-path_to_bin_program=/home/michael/Documents/MyProjects/Bayes++/target/rtheta/bin/rtheta/gcc/boost-CVS-debug/architecture-native/debug-symbols-on/inlining-off/instruction-set-default/optimization-off/profiling-off/rtti-on/runtime-link-dynamic/shared-linkable-false/threading-single/vtable-thunks-default
+path_to_bin_program=target/rtheta/bin/rtheta/gcc/boost-CVS-debug/runtime-link-dynamic
 
 [General]
 AMChanged=false
 author=Michael Stevems
 configure_args=\s--build=i386-linux --host=i386-linux --target=i386-linux\s
-dir_where_make_will_be_called=/home/michael/Documents/MyProjects/Bayes++/rtheta/
+dir_where_make_will_be_called=./rtheta/
 email=
 kdevprj_version=1.3
 lfv_open_groups=Headers,Sources
-make_options=\s-w -j1 ARGS="-d0 \\"-sBUILD=boost-CVS-debug\\""
+make_options=\s-w -j1 ARGS="-d1 \\"-sBUILD=boost-CVS-debug\\""
 makefiles=Makefile.am,kmake/Makefile.am,kmake/docs/Makefile.am,kmake/docs/en/Makefile.am,Simple/Makefile.am,PV/Makefile.am,QuadCalib/Makefile.am,BayesFilter/Makefile.am,BayesFilter/filters/Makefile.am,rtheta/Makefile.am
 modifyMakefiles=false
 project_name=Bayes++

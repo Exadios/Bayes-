@@ -37,7 +37,7 @@ public:
 	UD_sequential_observe_model (size_t x_size, size_t z_size) :
 		Linrz_uncorrelated_observe_model(x_size, z_size), Hx_o(x_size)
 	{}
-	virtual FM::Vec& ho (const FM::Vec& x, const size_t o) = 0;
+	virtual const FM::Vec& ho (const FM::Vec& x, const size_t o) = 0;
 	/* Supplied model (h) for observation using state x, z allows normalisation and model variation
 	   Fast model of a single element (o) in observation model
 	   Precondition: Hx_o is conformantly dimensioned
@@ -67,13 +67,15 @@ public:
 	void update ();
 	Float predict (Linrz_predict_model& f);
 
-	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
 	/* No solution for Correlated noise and Linrz model */
+	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
+	/* General observe */
 
 	Float observe (Linear_correlated_observe_model& h, const FM::Vec& z);
+	/* Special Linear observe for correlated Z, fast Z decorrelation */
 	Float observe (UD_sequential_observe_model& h, const FM::Vec& z);
-	/* Special observe using with sequential for fast uncorrelated Linrz operation */
+	/* Special Linrz observe using fast sequential model */
 
 protected:
 	Float predictGq (const FM::Matrix& Fx, const FM::Matrix& G, const FM::Vec& q);
