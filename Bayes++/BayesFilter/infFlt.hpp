@@ -52,8 +52,9 @@ public:
 		 FM::Matrix tempA;
 		 FM::SymMatrix A;
 		 FM::Matrix tempG;
-		 FM::SymMatrix B, invB;
+		 FM::SymMatrix B;
 		 FM::Matrix tempY;
+		 FM::Vec invq;
 	};
 
 	void init ();

@@ -188,10 +188,10 @@ void General_LzUnAd_observe_model::Lz (const FM::Vec& zz)
 	z = zz;
 	zset = true;
 					// Compute inverse of Zv and its reciprocal condition number
-	Float rcond = FM::rcond_vec(Zv);
+	Float rcond = FM::UdUrcond(Zv);
 	rclimit.check_PD(rcond, "Z not PD in observe");
 
-	Float detZ = 1.;
+	Float detZ = 1;
 	
 	for (FM::Vec::const_iterator zi = Zv.begin(), zi_end = Zv.end(); zi != zi_end; ++zi) {
 		detZ *= *zi;

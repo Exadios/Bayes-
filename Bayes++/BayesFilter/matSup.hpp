@@ -50,7 +50,7 @@ void forceSymmetric (Matrix &M, bool bUpperToLower = false);
  *  These values are documented for each algorithm and are important way to
  *  determine the validity of the results
  */
-Vec::value_type rcond_vec (const Vec& D);
+Vec::value_type UdUrcond (const Vec& d);
 RowMatrix::value_type UdUrcond (const RowMatrix& UD);
 RowMatrix::value_type UdUrcond (const RowMatrix& UD, size_t n);
 UTriMatrix::value_type UCrcond (const UTriMatrix& UC);
@@ -75,6 +75,7 @@ bool UdUinverse (RowMatrix& UD);
 bool UTinverse (UTriMatrix& U);
 void UdUrecompose_transpose (RowMatrix& M);
 void UdUrecompose (RowMatrix& M);
+void UdUrecompose (SymMatrix& X, const RowMatrix& M);
 void UdUfromUCholesky (RowMatrix& U);
 void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD);
 void Lzero (RowMatrix& M);
@@ -82,8 +83,9 @@ void Uzero (RowMatrix& M);
 
 /*
  * Functions using UdU factorisation:
- *  inverse of Positive Definate matrix retruning rcond
+ *  inverse of Positive Definate matrix returning rcond
  */
+SymMatrix::value_type UdUinversePDignoreInfinity (SymMatrix& M);
 SymMatrix::value_type UdUinversePD (SymMatrix& M);
 SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM);
 SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M);

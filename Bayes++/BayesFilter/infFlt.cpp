@@ -37,7 +37,8 @@ Information_filter::Linear_predict_byproducts::Linear_predict_byproducts (size_t
 /* Set size of by-products for linear predict
  */
 		 tempA(x_size,x_size), A(x_size,x_size), tempG(q_size,x_size),
-		 B(q_size,q_size), invB(q_size,q_size), tempY(x_size,x_size)
+		 B(q_size,q_size), tempY(x_size,x_size),
+		 invq(q_size)
 {}
 
 Information_filter& Information_filter::operator= (const Information_filter& a)
@@ -143,20 +144,32 @@ Float Information_filter::predict (Linear_invertable_predict_model& f, Linear_pr
  * Prediction is done completely on y,Y
  * Requires y(k|k), Y(k|k)
  * Predicts y(k+1|k), Y(k+1|k)
+ * 
+ * The numerical solution used is particularly flexible. It takes
+ * particular care to avoid invertibilty requirements for the noise and noise coupling g,Q
+ * Therefore both zero noises and zeros in the couplings can be used
  */
 {
-						// A = Y*invFx*Y' ,Inverse Predict covariance
+						// A = invFx'*Y*invFx ,Inverse Predict covariance
 	b.tempA.assign (prod(Y, f.inv.Fx));
 	b.A.assign (prod(trans(f.inv.Fx), b.tempA));
 						// B = G'*A*G+invQ , A in coupled additive noise space
 	b.tempG.assign (prod(trans(f.G), b.A));
 	b.B.assign (prod(b.tempG, f.G));
-	diag(b.B) += f.inv.q;
-						// invB ,Addative noise
-	Float rcond = UdUinversePD (b.invB, b.B);
-	rclimit.check_PD(rcond, "(G'Fx'.Y.Fx.G + invQ) not PD in predict");
+	for (size_t i = 0; i < f.q.size(); ++i)
+	{
+		if (f.q[i] < 0)	// allow PSD q, let infinity propogate into B
+			filter_error ("Predict q Not PSD");
+		b.invq[i] = Float(1) / f.q[i];
+	}
+	diag(b.B) += b.invq;
+	
+						// invert B ,Addative noise
+	Float rcond = UdUinversePDignoreInfinity (b.B);
+	rclimit.check_PD(rcond, "(G'invFx'.Y.invFx.G + invQ) not PD in predict");
+
 						// G*invB*G' ,in state space
-	b.tempG.assign (prod(b.invB,trans(f.G)));
+	b.tempG.assign (prod(b.B,trans(f.G)));
 	Y.assign (prod(f.G,b.tempG));
 						// I - A* G*invB*G', information gain
 	FM::identity(b.tempY);
@@ -228,7 +241,7 @@ Bayes_base::Float
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
 
 						// Observation Information
-	Float rcond = rcond_vec(h.Zv);
+	Float rcond = UdUrcond(h.Zv);
 	rclimit.check_PD(rcond, "Zv not PD in observe");
 
 	RowMatrix HxT (trans(h.Hx));      			// HxT = Hx'*inverse(Z)

@@ -55,7 +55,7 @@ Standard_resampler::Float
 {
 	assert (presamples.size() == w.size());
 						// Normalised cumulative sum of likelihood weights, find smallest weight
-	Float wcum = 0.;
+	Float wcum = 0;
 	Float wmin = std::numeric_limits<Float>::max();
 	DenseVec::iterator wi, wi_end = w.end();
 	for (wi = w.begin(); wi != wi_end; ++wi) {
@@ -64,9 +64,9 @@ Standard_resampler::Float
 		}
 		wcum = *wi = wcum + *wi;
 	}
-	if (wmin < 0.)		// Bad weights
+	if (wmin < 0)		// Bad weights
 		filter_error("negative weight");
-	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
+	if (wcum <= 0)		// Bad cumulative weights (previous check should actually prevent -ve
 		filter_error("zero cumulative weight sum");
 						// Any numerical failure should cascade into cummulative sum
 	if (wcum != wcum)	// Inequality due to NaN
@@ -76,7 +76,7 @@ Standard_resampler::Float
 	DenseVec ur(w.size());
 	r.uniform_01(ur);
 	std::sort (ur.begin(), ur.end());
-	assert(ur[0] >= 0. && ur[ur.size()-1] < 1.);		// Very bad if random is incorrect
+	assert(ur[0] >= 0 && ur[ur.size()-1] < 1);		// Very bad if random is incorrect
 						// Scale ur to cummulative sum
 	ur *= wcum;
 
@@ -129,7 +129,7 @@ Systematic_resampler::Float
 	size_t nParticles = presamples.size();
 	assert (nParticles == w.size());
 						// Normalised cumulative sum of likelihood weights, find smallest weight
-	Float wcum = 0.;
+	Float wcum = 0;
 	Float wmin = std::numeric_limits<Float>::max();
 	DenseVec::iterator wi, wi_end = w.end();
 	for (wi = w.begin(); wi != wi_end; ++wi) {
@@ -138,9 +138,9 @@ Systematic_resampler::Float
 		}
 		wcum = *wi = wcum + *wi;
 	}
-	if (wmin < 0.)		// Bad weights
+	if (wmin < 0)		// Bad weights
 		filter_error("negative weight");
-	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
+	if (wcum <= 0)		// Bad cumulative weights (previous check should actually prevent -ve
 		filter_error("total likelihood zero");
 						// Any numerical failure should cascade into cummulative sum
 	if (wcum != wcum)
@@ -151,7 +151,7 @@ Systematic_resampler::Float
 						
 	DenseVec ur(1);			// Single uniform for initialisation
 	r.uniform_01(ur);
-	assert(ur[0] >= 0. && ur[0] < 1.);		// Very bad if random is incorrect
+	assert(ur[0] >= 0 && ur[0] < 1);		// Very bad if random is incorrect
 
 						// Resamples based on cumulative weights
 	Importance_resampler::Resamples_t::iterator pri = presamples.begin();
@@ -184,7 +184,7 @@ Systematic_resampler::Float
 /*
  * SIR filter implementation
  */
-const SIR_filter::Float SIR_filter::rougheningKinit = 1.;
+const SIR_filter::Float SIR_filter::rougheningKinit = 1;
 		// use 1 std.dev. per sample as default roughening
 
 SIR_filter::SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
@@ -238,11 +238,11 @@ SIR_filter::Float
  *		unchanged: S, stochastic_samples
  * Return
  *		lcond, Smallest normalised weight, represents conditioning of resampling solution
- *		lcond == 1. if no resampling preformed
+ *		lcond == 1 if no resampling preformed
  *		This should by multipled by the number of samples to get the Likelihood function conditioning
  */
 {
-	Float lcond = 1.;
+	Float lcond = 1;
 	if (wir_update)		// Resampleing only required if weights have been updated
 	{
 		// Resample based on likelihood weights

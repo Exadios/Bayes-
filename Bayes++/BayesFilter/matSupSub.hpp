@@ -31,7 +31,7 @@
 #endif
 
 // Element proxies have a colourful history! They are not required by Bayes++
-// As of Boost1.30.0 they do not allow mixed assignment of elements, and must be disabled
+// As of Boost 1.30.0 they do not allow mixed assignment of elements, and must be disabled
 #define BOOST_UBLAS_NO_ELEMENT_PROXIES
 
 #include <boost/numeric/ublas/vector.hpp>

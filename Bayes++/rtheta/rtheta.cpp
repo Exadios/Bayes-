@@ -46,6 +46,9 @@ const Float Z_CORRELATION = Float(0e-1);	// (Un)Correlated observation model
 const Float X_NOISE = Float(0.05);		// Prediction model
 const Float Y_NOISE = Float(0.09);
 const Float XY_NOISE_COUPLING = Float(0.05);
+const Float Q_NOISE = Float(1.0);		// Noise in addition Q terms
+const Float G_COUPLING = Float(1.0);	// Coupling in addition G terms
+
 const Float INIT_X_NOISE = Float(0.07);
 const Float INIT_Y_NOISE = Float(0.10);
 const Float INIT_XY_NOISE_CORRELATION = Float(0.4);
@@ -130,11 +133,11 @@ pred_model::pred_model () :
 	Fx(1,0) = Float(0.1);
 	Fx(1,1) = Float(0.9);
 
-	// Build q,G, Test addition parts using coupled unity noise
-	q = ublas::scalar_vector<Float>(NQ, 1);
+	// Build q,G, Test addition parts using coupled noise
+	q = ublas::scalar_vector<Float>(NQ, Q_NOISE);
 	q[0] = sqr(X_NOISE);
 	q[1] = sqr(Y_NOISE);
-	G = ublas::scalar_matrix<Float>(NX,NQ, 1);
+	G = ublas::scalar_matrix<Float>(NX,NQ, G_COUPLING);
 	G(0,0) = 1;
 	G(0,1) = XY_NOISE_COUPLING;
 	G(1,0) = XY_NOISE_COUPLING;
@@ -144,10 +147,6 @@ pred_model::pred_model () :
 	DenseColMatrix denseinvFx (Fx.size1(), Fx.size2());
 	Information_root_filter::inverse_Fx (denseinvFx, Fx);
 	inv.Fx = denseinvFx;
-
-	// Build Inverse q
-	for (size_t qi=0; qi < q.size(); ++qi)
-		inv.q[qi] = Float(1) / q[qi];
 }
 
 

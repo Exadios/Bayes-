@@ -71,7 +71,7 @@ int main()
 	Unscented_filter my_filter(1);
 
 	// Setup the initial state and covariance
-	Vec x_init (1);	SymMatrix X_init (1, 1);
+	Vec x_init (1); SymMatrix X_init (1, 1);
 	x_init[0] = 10.;		// Start at 10 with no uncertainty
 	X_init(0,0) = 0.;
 	my_filter.init_kalman (x_init, X_init);
@@ -86,7 +86,7 @@ int main()
 
 	// Make an observation
 	Vec z(1);
-	z[0] = 11.;			// Observe that we should be at 11
+	z[0] = 11.;				// Observe that we should be at 11
 	my_filter.observe (my_observe, z);
 	my_filter.update();		// Update the filter to state and covariance are available
 

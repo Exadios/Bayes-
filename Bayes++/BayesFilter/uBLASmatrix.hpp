@@ -312,11 +312,14 @@ const ublas::triangular_adaptor<const M, typename LTriMatrix::functor1_type>
  * Matrix Support Operations
  */
 template <class BaseL, class BaseR>
-void subcopy (const FMMatrix<BaseL>& L, FMMatrix<BaseR>& R)
-{	// Copy L into top left block of R
+void subassign (FMMatrix<BaseL>& L, const FMMatrix<BaseR>& R)
+{	// Assign elements of common top left block of R into L
 	using namespace ublas;
-	matrix_range<BaseR> Rtopleft(R, range(0,L.size1()), range(0,L.size2()));
-	Rtopleft = L;
+	size_t top = std::min(L.size1(), R.size1());
+	size_t left = std::min(L.size2(), R.size2());
+	matrix_range<BaseL> Ltopleft(L, range(0,top), range(0,left));
+	matrix_range<const BaseR> Rtopleft(R, range(0,top), range(0,left));
+	Ltopleft.assign (Rtopleft);
 }
 
 template <class Base>
@@ -390,7 +393,7 @@ void mult_SPD (const MatrixX& X, const Vec& s, SymMatrix& P)
 		{
 			SymMatrix::value_type p = 0;	// Tripple vector inner product
 			typename MatrixX::const_Row Xbv = MatrixX::rowi(Xb);
-			for (si = s.begin(); si != send; ++si) {	// TODO: use iterator on Xav and Xbv
+			for (si = s.begin(); si != send; ++si) {
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
 			}
@@ -419,7 +422,7 @@ void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
 		{									// Tripple vector inner product
 			SymMatrix::value_type p = 0;
 			typename MatrixX::const_Column Xbv = MatrixX::columni(Xb);
-			for (si = s.begin(); si != send; ++si) {	// TODO: use iterator on Xav and Xbv
+			for (si = s.begin(); si != send; ++si) {
 				Vec::size_type i = si.index();
 				p += Xav[i] * (*si) * Xbv[i];
 			}

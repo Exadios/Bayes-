@@ -1,15 +1,18 @@
 BayesFilter TODO List
 
+FOR RELEASE
+	Check if can use inplace_solve for UTinverse
+	Check what UBLAS macros are needed
+		For execeptions/errors
+		For storage
+		Run with sparse
+		Run Simple, PV, QuadCalib
+
 TODO
 	FIX Iterated filter: Require iterated model
-	Information_root_filter does quite work for large Q values
 	
-	Replace UdU with as class using uBLAS row operations
-	  This should UD_filter to use qa new recompose for its update
-	Sharing state in filters: Provided constructors with state references
-	observe_model structure changed
-		Extened_filter observe_innovation parametrs is only Linear part of model as h() not used
-	replace General_ with a form that works with functional forms
+	Replace General_ with a form that works with functional forms
+	Replace UdU function with UdU class
 
 	Unscented_filter
 		make XX public, requires specification of postcond on XX
@@ -17,7 +20,6 @@ TODO
 	UD_filter
 		observeUD : return 0 for semi-definate (or zero)
 
-	add a common base of h() in observe
 	By products: add observe paramterisation for by products and temps
 
 NEW FILTERS
@@ -28,10 +30,11 @@ NEW FILTERS
 	 This make a big difference to speed. Hard for prod(L,R) need to have oposite orienation
 
 TO REVIEW
+	Sharing state in filters: Provided constructors with state references
 	Check consistency of model to filter
 		Validate (z to h.Z) model sizes in predict and observe
 	UDpredict catching Negative matrices in observe
-	Check normalisation: Standard for is to normalise z. It is nice to have zp consistent with itself i.e. Hx
+	Check normalisation: Standard form should be to normalise z. It is nice to have zp consistent with itself i.e. Hx
 	Check when numerics fail for both state and obs semidefinate
 
 ISSUES
@@ -47,8 +50,8 @@ CODE RULES
 		use Vec/Matrix x.assign (prod(a,b)); avoiding copy overhead
 
 TESTING
-	q_size > x_size
-		Unscented_filter Don`t forget more noise injected for nonlinear model => different observe result!
+	Unscented_filter
+		for q_size > x_size  Don´t forget more noise is injected into nonlinear model => different observe result!
 
 DOCUMENTATION
 	Describe generic schemes

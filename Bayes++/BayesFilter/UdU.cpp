@@ -36,16 +36,18 @@ namespace Bayesian_filter_matrix
 template <class V>
 inline typename V::value_type rcond_internal (const V& D)
 /*
- * Estimate the reciprocal condition number of the diagonal vector D
+ * Estimate the reciprocal condition number of a Diagonal Matrix for inversion.
+ * D is a diagonal matrix, the parameter is actually a vector
  *
  * The Condition Number is defined from a matrix norm.
  *  Choose max element of D as the norm of the original matrix.
  *  Assume this norm for inverse matrix is min element D.
- * Using the D factor is fast and simple and avoids computing any squares.
+ *  Therefore rcond = min/max
  *
  * Note:
  *  Defined to be 0 for semi-definate or zero or empty matrix
  *  Defined to be <0 for negative matrix (D element a value  < 0)
+ *  Defined to be <0 for any NaN conditioning
  *
  *  A negative matrix may also be due to errors in the original matrix resulting in
  *   a factorisation producing special values in D (e.g. -infinity,NaN etc)
@@ -61,38 +63,92 @@ inline typename V::value_type rcond_internal (const V& D)
 
 	for (size_t i = 0; i < n; ++i)	{
 		Vec::value_type d = D[i];
+		if (d != d)				// NaN
+			return -1;
 		if (d < mind) mind = d;
 		if (d > maxd) maxd = d;
 	}
-	// mind is NaN, define as negative matrix
-	if (!(mind <= maxd))
-		return -1;
 
-	if (maxd == 0)	{	// avoid division by zero, for zero or negative matrix
-		rcond = mind;	// mind may be zero of less  depending on D
-	}
-	else {
-		// Rcond from min/max norm
-		rcond = mind / maxd;
-	}
-	assert (rcond <= 1.);
+	if (mind < 0)				// matrix is negative
+		return -1;
+	assert (mind <= maxd);		// check sanity
+								// ISSUE mind may still be -0, this is progated into rcond
+	
+	rcond = mind / maxd; 		// rcond from min/max norm
+	if (rcond != rcond)			// NaN, singular due to (mind == maxd) == (zero or infinity)
+		return 0;
+	assert (rcond <= 1);
 	return rcond;
 }
 
-Vec::value_type rcond_vec (const Vec& D)
+template <class V>
+inline typename V::value_type rcond_ignore_infinity_internal (const V& D)
 /*
- * Estimate the reciprocal condition number of the diagonal vector D
- * Note: diagonal(D) == UD_factor(diagonal(D)) so this rcond of both an original D and it factor
- * Equivilent to UdUrcond(diagonal(D))
+ * Estimate the reciprocal condition number of a Diagonal Matrix for inversion.
+ * D is a diagonal matrix, the parameter is actually a vector
+ *
+ * The Condition Number is defined from a matrix norm.
+ *  Choose max element of D as the norm of the original matrix.
+ *  Assume this norm for inverse matrix is min element D.
+ *  Therefore rcond = min/max
+ *
+ * Note:
+ *  Defined to be 0 for semi-definate or zero or empty matrix
+ *  Defined to be <0 for negative matrix (D element a value  < 0)
+ *  Defined to be <0 for any NaN conditioning
+ *
+ *  A negative matrix may also be due to errors in the original matrix resulting in
+ *   a factorisation producing special values in D (e.g. -infinity,NaN etc)
+ *  By definition rcond <= 1 as min<=max
  */
 {
-	return rcond_internal (D);
+	// Special case an empty vector
+	const size_t n = D.size();
+	if (n == 0)
+		return 1;
+
+	Vec::value_type rcond, mind = D[0], maxd = 0;
+
+	for (size_t i = 0; i < n; ++i)	{
+		Vec::value_type d = D[i];
+		if (d != d)				// NaN
+			return -1;
+		if (d < mind) mind = d;
+		if (d > maxd && 1/d != 0)	// ignore infinity for maxd
+			maxd = d;
+	}
+
+	if (mind < 0)				// matrix is negative
+		return -1;
+	assert (mind <= maxd);		// check sanity
+								// ISSUE mind may still be -0, this is progated into rcond
+
+    if (maxd == 0)				// singular due to (mind == maxd) == zero
+		return 0;
+	rcond = mind / maxd; 		// rcond from min/max norm
+	if (rcond != rcond)			// NaN, singular due to (mind == maxd) == infinity
+		return 1;
+	assert (rcond <= 1);
+	return rcond;
+}
+
+Vec::value_type UdUrcond (const Vec& d)
+/*
+ * Estimate the reciprocal condition number for inversion of the original PSD
+ * matrix for which d is the factor UdU' or LdL'.
+ * The original matrix must therefore be diagonal
+ */
+{
+	return rcond_internal (d);
 }
 
 RowMatrix::value_type UdUrcond (const RowMatrix& UD)
 /*
- * Estimate the reciprocal condition number of the original PSD
+ * Estimate the reciprocal condition number for inversion of the original PSD
  * matrix for which UD is the factor UdU' or LdL'
+ *
+ * The rcond of the original matrix is simply the rcond of its d factor
+ * Using the d factor is fast and simple, and avoids computing any squares.
  */
 {
 	assert (UD.size1() == UD.size2());
@@ -109,10 +165,10 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD, size_t n)
 
 UTriMatrix::value_type UCrcond (const UTriMatrix& UC)
 /*
- * Estimate the reciprocal condition number of the original PSD
+ * Estimate the reciprocal condition number for inversion of the original PSD
  * matrix for which U is the factor UU'
  *
- * See UdUrcond(RowMatrix) for definition and return value
+ * The rcond of the original matrix is simply the square of the rcond of diagonal(UC)
  */
 {
 	assert (UC.size1() == UC.size2());
@@ -148,7 +204,7 @@ RowMatrix::value_type UdUdet (const RowMatrix& UD)
 {
 	const size_t n = UD.size1();
 	assert (n == UD.size2());
-	RowMatrix::value_type det = 1.;
+	RowMatrix::value_type det = 1;
 	for (size_t i = 0; i < n; ++i)	{
 		det *= UD(i,i);
 	}
@@ -162,6 +218,9 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.218 Upper cholesky algorithm modified for UdU'
  *  Numerical stability may not be as good as M(k,i) is updated from previous results
+ *  Algorithm has poor locality of reference and avoided for large matrices
+ *  Infinity values on the diagonal can be factorised
+ *
  * Strict lower triangle of M is ignored in computation
  *
  * Input: M, n=last size_t to be included in factorisation
@@ -217,7 +276,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
 	return rcond_internal (diag(M,n));
 
 Negative:
-   return -1.;
+   return -1;
 }
 
 
@@ -226,6 +285,9 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
  * Reference: A+G p.219 right side of table
+ *  Algorithm has good locality of reference and preferable for large matrices
+ *  Infinity values on the diagonal cannot be factorised
+ *
  * Strict lower triangle of M is ignored in computation
  *
  * Input: M, n=last size_t to be included in factorisation
@@ -286,7 +348,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
 	return rcond_internal (diag(M,n));
 
 Negative:
-   return -1.;
+   return -1;
 }
 
 
@@ -349,7 +411,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 	return rcond_internal (diag(M,n));
 
 Negative:
-	return -1.;
+	return -1;
 }
 
 
@@ -517,7 +579,7 @@ bool UdUinverse (RowMatrix& UD)
 	{
 		// Detect singular element
 		if (UD(i,i) != 0)
-			UD(i,i) = 1 / UD(i,i);
+			UD(i,i) = Float(1) / UD(i,i);
 		else
 			singular = true;
 	}
@@ -579,7 +641,7 @@ bool UTinverse (UTriMatrix& U)
 
 void UdUrecompose_transpose (RowMatrix& M)
 /*
- * In-place recomposition of Symetric matrix from U'dU factor store in UD format
+ * In-place recomposition of Symmetric matrix from U'dU factor store in UD format
  *  Generally used for recomposing result of UdUinverse
  * Note definateness of result depends purely on diagonal(M)
  *  i.e. if d is positive definate (>0) then result is positive definate
@@ -591,7 +653,7 @@ void UdUrecompose_transpose (RowMatrix& M)
  * Input:
  *    M - U'dU factorisation (UD format)
  * Output:
- *    M - U'dU recomposition (symetric)
+ *    M - U'dU recomposition (symmetric)
  */
 {
 	size_t i,j,k;
@@ -625,12 +687,12 @@ void UdUrecompose_transpose (RowMatrix& M)
 
 void UdUrecompose (RowMatrix& M)
 /*
- * In-place recomposition of Symetric matrix from UdU' factor store in UD format
+ * In-place recomposition of Symmetric matrix from UdU' factor store in UD format
  *  See UdUrecompose_transpose()
  * Input:
  *    M - UdU' factorisation (UD format)
  * Output:
- *    M - UdU' recomposition (symetric)
+ *    M - UdU' recomposition (symmetric)
  */
 {
 	size_t i,j,k;
@@ -747,7 +809,7 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
 					// Extract d and set diagonal to 1
 		d[j] = UD(j,j);
 		RowMatrix::Row Uj(U,j);
-		Uj[j] = 1.;
+		Uj[j] = 1;
 		for (i = 0; i < j; ++i)
 		{
 			U(i,j) = UD(i,j);
@@ -757,15 +819,26 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
 	}
 }
 
+
 /*
  * Function built using UdU factorisation
  */
 
-SymMatrix::value_type UdUinversePD (SymMatrix& M)
+void UdUrecompose (SymMatrix& X, const RowMatrix& M)
+{
+						// Abuse X as a RowMatrix
+	RowMatrix& X_matrix = X.asRowMatrix();
+	subassign (X_matrix, M);
+
+	UdUrecompose (X_matrix);
+}
+
+SymMatrix::value_type UdUinversePDignoreInfinity (SymMatrix& M)
 /*
  * inverse of Positive Definate matrix
+ * The inverse is able to deal with infinities on the leading diagonal
  * Input:
- *     M is a symetric matrix
+ *     M is a symmetric matrix
  * Output:
  *     M inverse of M, only updated if return value >0
  * Return:
@@ -773,12 +846,40 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
  */
 {
 					// Abuse as a RowMatrix
-	RowMatrix& M_Matrix = M.asRowMatrix();
-	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
+	RowMatrix& M_matrix = M.asRowMatrix();					// Must use variant1, variant2 cannot deal with infinity
+	SymMatrix::value_type orig_rcond = UdUfactor_variant1 (M_matrix, M_matrix.size1());
+					// Ignore the normal rcond and recompute ingnoring infinites
+	SymMatrix::value_type rcond = rcond_ignore_infinity_internal (diag(M_matrix));
+	assert (rcond == orig_rcond || orig_rcond == 0); (void)orig_rcond;
+
 	// Only invert and recompose if PD
 	if (rcond > 0) {
-		(void)UdUinverse (M_Matrix);
-		UdUrecompose_transpose (M_Matrix);
+		bool singular = UdUinverse (M_matrix);
+		assert (!singular); (void)singular;
+		UdUrecompose_transpose (M_matrix);
+	}
+	return rcond;
+}
+
+SymMatrix::value_type UdUinversePD (SymMatrix& M)
+/*
+ * inverse of Positive Definate matrix
+ * Input:
+ *     M is a symmetric matrix
+ * Output:
+ *     M inverse of M, only updated if return value >0
+ * Return:
+ *     reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ */
+{
+					// Abuse as a RowMatrix
+	RowMatrix& M_matrix = M.asRowMatrix();
+	SymMatrix::value_type rcond = UdUfactor (M_matrix, M_matrix.size1());
+	// Only invert and recompose if PD
+	if (rcond > 0) {
+		bool singular = UdUinverse (M_matrix);
+		assert (!singular); (void)singular;
+		UdUrecompose_transpose (M_matrix);
 	}
 	return rcond;
 }
@@ -789,13 +890,14 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM)
  */
 {
 					// Abuse as a RowMatrix
-	RowMatrix& M_Matrix = M.asRowMatrix();
-	SymMatrix::value_type rcond = UdUfactor (M_Matrix, M.size1());
+	RowMatrix& M_matrix = M.asRowMatrix();
+	SymMatrix::value_type rcond = UdUfactor (M_matrix, M_matrix.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
-		detM = UdUdet(M_Matrix);
-		(void)UdUinverse (M_Matrix);
-		UdUrecompose_transpose (M_Matrix);
+		detM = UdUdet(M_matrix);
+		bool singular = UdUinverse (M_matrix);
+		assert (!singular); (void)singular;
+		UdUrecompose_transpose (M_matrix);
 	}
 	return rcond;
 }
@@ -805,7 +907,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 /*
  * inverse of Positive Definate matrix
  * Input:
- *    M is a symetric matrix
+ *    M is a symmetric matrix
  * Output:
  *    MI inverse of M, only valid if return value >0
  * Return:
@@ -814,12 +916,13 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	RowMatrix& MI_Matrix = MI.asRowMatrix();
-	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
+	RowMatrix& MI_matrix = MI.asRowMatrix();
+	SymMatrix::value_type rcond = UdUfactor (MI_matrix, MI_matrix.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
-		(void)UdUinverse (MI_Matrix);
-		UdUrecompose_transpose (MI_Matrix);
+		bool singular = UdUinverse (MI_matrix);
+		assert (!singular); (void)singular;
+		UdUrecompose_transpose (MI_matrix);
 	}
 	return rcond;
 }
@@ -831,14 +934,15 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, SymMatrix::value_type& detM, 
 {
 	MI = M;
 					// Abuse as a RowMatrix
-	const RowMatrix& M_Matrix = M.asRowMatrix();
-	RowMatrix& MI_Matrix = MI.asRowMatrix();
-	SymMatrix::value_type rcond = UdUfactor (MI_Matrix, MI.size1());
+	const RowMatrix& M_matrix = M.asRowMatrix();
+	RowMatrix& MI_matrix = MI.asRowMatrix();
+	SymMatrix::value_type rcond = UdUfactor (MI_matrix, MI_matrix.size1());
 	// Only invert and recompose if PD
 	if (rcond > 0) {
-		detM = UdUdet(M_Matrix);
-		(void)UdUinverse (MI_Matrix);
-		UdUrecompose_transpose (MI_Matrix);
+		detM = UdUdet(M_matrix);
+		bool singular = UdUinverse (MI_matrix);
+		assert (!singular); (void)singular;
+		UdUrecompose_transpose (MI_matrix);
 	}
 	return rcond;
 }

@@ -71,7 +71,7 @@ void
  */
 {
 					// Factorise X into left partition of UD
-	FM::subcopy(X, UD);
+	FM::subassign (UD, X);
 	Float rcond = FM::UdUfactor (UD, UD.size1());
 	rclimit.check_PSD(rcond, "Initial X not PSD");
 }
@@ -87,31 +87,8 @@ void
  *		X is PSD
  */
 {
-	size_t i,j,k;
-	const size_t n = UD.size1();
-						// Build X as lower tri (DU')'
-	for (i = 0; i < n; ++i)				// 0..n-1
-	{
-		FM::SymMatrix::Row Xi(X,i);
-		Float d = UD(i,i);
-		Xi[i] = d;
-		for (j = 0; j < i; ++j)			// 0..i-1
-		{
-			Xi[j] = UD(j,i)*d;
-		}
-	}
-						// In place U *(DU') working down lower triangle of X */
-	for (i = 0; i < n; ++i)				// 0..n-1
-	{
-		for (j = 0; j <= i; ++j)		// 0..i
-		{
-			FM::Matrix::Row UDi(UD,i);
-			Float s = X(i,j);
-			for (k = i+1; k < n; ++k)
-				s += UDi[k] * X(k,j);
-			X(j,i) = X(i,j) = s;
-		}
-	}
+	FM::UdUrecompose (X, UD);
+	FM::assert_isPSD (X);
 }
 
 
@@ -146,7 +123,7 @@ UD_filter::Float
  *		UdU' is PSD (see return value)
  *
  * Return:
- *		reciprocal condition number, -1. if negative, 0. if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -234,7 +211,7 @@ UD_filter::Float
 				// Possibly Semidefinate, check not negative
 				UDj[j] = e;
 
-				// 1. / e is infinite
+				// 1 / e is infinite
 				for (k = 0; k < j; ++k)	// 0..j-1
 				{
 					FM::Matrix::Row UDk(UD,k);
@@ -271,7 +248,7 @@ UD_filter::Float
 	return FM::UdUrcond(UD,n);
 
 Negative:
-	return -1.;
+	return -1;
 }
 
 
@@ -518,7 +495,7 @@ UD_filter::Float
  * Postcondition:
  *    UdU' is PD (see return value)
  * Return:
- *    reciprocal condition number, -1. if negative or semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative or semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -571,7 +548,7 @@ UD_filter::Float
 	return FM::UdUrcond(UD,n);
 
 NotPD:
-	return -1.;
+	return -1;
 }
 
 }//namespace

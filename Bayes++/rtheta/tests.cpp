@@ -115,6 +115,24 @@ void test_inverse()
 	std::cout << XII << std::endl;
 };
 
+void test_small_inverse ()
+{
+	SymMatrix X(1,1);
+	SymMatrix XI(X.size1(), X.size2());
+
+	Float a = 0;
+	Float rcond;
+	X(0,0) = a;
+	std::cout << X << std::endl;
+	rcond = UdUinversePD (XI, X);
+	std::cout << rcond << XI << std::endl;
+
+	X(0,0) = 1./a;
+	std::cout << X << std::endl;
+	rcond = UdUinversePD (XI, X);
+	std::cout << rcond << XI << std::endl;
+}
+
 void test_SPD()
 {
 	SymMatrix S(1,1);
@@ -249,10 +267,30 @@ void test_unique()
 	std::cout << sf.unique_samples() <<',' << sf.stochastic_samples << std::endl;
 }
 
+void numeric_tested()
+{
+	float a = 0;
+	float b = 1.f/a;
+	float c = 1.f/b;
+	float d = -1.f/b;
+	std::cout << a <<','<< b <<','<<c <<','<< d <<std::endl;
+	std::cout << a*1.f <<','<< b*1.f <<','<<c*1.f <<','<< d*1.f <<std::endl;
+	std::cout << (c==0) <<','<< (c!=0) << std::endl;
+	std::cout << (c<0) <<','<< (c>0) << std::endl;
+	std::cout << (c>=0) <<','<< (c<=0) << std::endl;
+
+	std::cout << (d==0) <<','<< (d!=0) << std::endl;
+	std::cout << (d<0) <<','<< (d>0) << std::endl;
+	std::cout << (d>=0) <<','<< (d<=0) << std::endl;
+}
+
 
 void other_tests()
 {
-//	test_SPD();
+	// Other things I might want to benchmark
+	extern void other_bench();
+//	other_bench();
+//	test_small_inverse();
 }
 
 

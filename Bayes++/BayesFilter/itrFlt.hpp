@@ -44,11 +44,28 @@ class Iterated_terminator : public Bayes_base
 public:
 	virtual void relinearize (const FM::Vec& x)
 	{}	// linearize observation model about new x
-	virtual bool term ()
+	virtual bool term_or_relinearize ()
 	{
 		return true;
 	}
 };
+
+class Counted_iterated_terminator : public Bayes_base
+/*
+ * Termination condition for filter Iteration
+ *  Used by iterated observe to parameterise termination condition
+ *
+ */
+{
+public:
+	virtual void relinearize (const FM::Vec& x)
+	{}	// linearize observation model about new x
+	virtual bool term_or_relinearize ()
+	{
+		return true;
+	}
+};
+
 
 
 class Iterated_covariance_filter : public Linrz_filter

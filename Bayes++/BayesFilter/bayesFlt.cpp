@@ -69,8 +69,7 @@ Linear_invertable_predict_model::Linear_invertable_predict_model (size_t x_size,
 }
 
 Linear_invertable_predict_model::inverse_model::inverse_model (size_t x_size, size_t q_size) :
-		Fx(x_size,x_size),
-		q(q_size)
+		Fx(x_size,x_size)
 {
 }
 

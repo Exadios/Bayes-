@@ -205,7 +205,7 @@ public:
 	// Zv is also fixed
 
 private:
-	FM::Vec Zv_inv;		// Inverse Noise Covariance given zz
+	FM::Vec Zv_inv;			// Inverse Noise Covariance given zz
 	Float logdetZ;			// log(det(Z))
 	mutable bool zset;	
 };

@@ -49,7 +49,7 @@ void Information_root_filter::init ()
 						// Information Root
 	Float rcond = UCfactor (R, X);
 	rclimit.check_PSD(rcond, "Initial X not PSD");
-	(void)UTinverse(R);
+	(void)UTinverse (R);
 						// Information Root state r=R*x
 	r.assign (prod(R,x));
 }
@@ -106,7 +106,7 @@ void Information_root_filter::update ()
  */
 {
 	UTriMatrix RI (R);	// Invert Cholesky factor
-	bool singular = UTinverse(RI);
+	bool singular = UTinverse (RI);
 	if (singular)
 		filter_error ("R not PD");
 
@@ -178,8 +178,8 @@ Bayes_base::Float
 	Matrix Gqr (f.G);
 	for (Vec::const_iterator qi = f.q.begin(); qi != f.q.end(); ++qi)
 	{
-		if (*qi < 0.)
-			filter_error ("Predict with negative q");
+		if (*qi < 0)
+			filter_error ("Predict q Not PSD");
 		column(Gqr, qi.index()) *= std::sqrt(*qi);
 	}
 						// Form Augmented matrix for factorisation
@@ -258,7 +258,7 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_
 	UTriMatrix Zir(z_size,z_size);
 	Float rcond = UCfactor (Zir, h.Z);
 	rclimit.check_PSD(rcond, "Z not PSD");
-	UTinverse(Zir);
+	UTinverse (Zir);
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
 	A.sub_matrix(0,x_size, 0,x_size).assign (R);

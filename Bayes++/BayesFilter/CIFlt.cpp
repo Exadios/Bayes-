@@ -64,7 +64,7 @@ Bayes_base::Float
 	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
 
 	assert_isPSD (X);
-	return 1.;
+	return 1;
 }
 
 void CI_filter::observe_size (size_t z_size)

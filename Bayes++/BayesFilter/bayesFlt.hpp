@@ -84,9 +84,9 @@ public:
 	inline void check_PSD (Float rcond, const char* error_description) const
 	/* Checks a the reciprocal condition number
 	 * Generates a Bayes_filter_exception if value represents a NON PSD matrix
-	 * The rcond != rcond provides a test for IEC 559 NaN values
+	 * Inverting condition provides a test for IEC 559 NaN values
 	 */
-	{	if (rcond < 0 || rcond != rcond)
+	{	if (!(rcond >= 0))
 			throw Bayes_filter_exception (error_description);
 	}
 
@@ -94,9 +94,9 @@ public:
 	/* Checks a reciprocal condition number
 	 * Generates a Bayes_filter_exception if value represents a NON PD matrix
 	 * I.e. rcond is bellow given conditioning limit
-	 * The rcond != rcond provides a test for IEC 559 NaN values
+	 * Inverting condition provides a test for IEC 559 NaN values
 	 */
-	{	if (rcond < limit_PD || rcond != rcond)
+	{	if (!(rcond >= limit_PD))
 			throw Bayes_filter_exception (error_description);
 	}
 private:
@@ -217,13 +217,11 @@ public:
 	Linear_invertable_predict_model (size_t x_size, size_t q_size);
 	/* The inverse model: x(k-1|k-1) = f(x(k|k-1) with
 	   inv.Fx = inverse(Fx)
-	   inv.q = inverse(q)
 	*/
 	class inverse_model {
 	public:
 		inverse_model (size_t x_size, size_t q_size);
 		FM::ColMatrix Fx;	// Model inverse (ColMatrix as usually transposed)
-		FM::Vec q;			// Noise variance inverse
 	} inv;
 };
 
@@ -271,8 +269,8 @@ protected:
 class Functional_observe_model : virtual public Observe_model_base, public Observe_function
 /* Functional (non-stochastic) observe model h
  *  z(k) = hx(x(k|k-1))
- * This is a seperate fundamental model and not derived from likelihood because
- * L is a delta function which isn't much use for numerical systems
+ * This is a seperate fundamental model and not derived from likelihood because:
+ *  L is a delta function which isn't much use for numerical systems
  * Defines an Interface without data members
  */
 {
@@ -285,20 +283,26 @@ public:
 
 };
 
-class Parametised_observe_model : virtual public Observe_model_base
+class Parametised_observe_model : virtual public Observe_model_base, public Observe_function
 /* Observation model parametised with a fixed z size
- * Model is assume to have linear components
+ *  Includes the functional part of a noise model
+ *  Model is assume to have linear and non-linear components
+ *  Linear components need to be checked for conditioning
+ *  Non-linear components may be discontinous and need normalisation
  */
 {
 public:
 	Parametised_observe_model(size_t /*z_size*/)
 	{}
+	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
+	// Functional part of addative model
 	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
-	/* Normalise one observation state (z_denorm) from another if observation model is discontinous.
-	    Default for continuous h
-	 */
+	// Discontinous h. Normalise one observation (z_denorm) from another
+	//  Default normalistion does not change z_denorm
 	{}
+	
 	Numerical_rcond rclimit;
+	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
 class Uncorrelated_addative_observe_model : public Parametised_observe_model
@@ -311,9 +315,6 @@ public:
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
 	FM::Vec Zv;			// Noise Variance
-	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
-	// Functional part of addative model
-	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
 class Correlated_addative_observe_model : public Parametised_observe_model
@@ -326,19 +327,14 @@ public:
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
 	FM::SymMatrix Z;	// Noise Covariance (not necessarly dense)
-
-	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
-	// Functional part of addative model
-	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 };
 
 class Jacobian_observe_model : virtual public Observe_model_base
 /* Linrz observation model Hx, h about state x (fixed size)
-    z(k) = h(x(k-1|k-1)
     Hx(x(k|k-1) = Jacobian of h with respect to state x
  */
 {
-protected:
+protected: // Jacobian model is not sufficient, it is used to build Linrz observe model's
 	Jacobian_observe_model (size_t x_size, size_t z_size) :
 		Hx(z_size, x_size)
 	{}

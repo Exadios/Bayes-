@@ -64,7 +64,7 @@ Bayes_base::Float
 	X = prod_SPD(f.Fx,X, temp_FxX) + prod_SPD(f.G,f.q);
 
 	assert_isPSD (X);
-	return 1.;
+	return 1;
 }
 
 
@@ -154,7 +154,7 @@ Bayes_base::Float
 		temp2.assign (prod(X,HxT));
 		temp1.assign (prod(X,XpredI));
 		x += prod(temp2,prod(ZI,s)) - prod(temp1, (x - xpred));
-	} while (!term.term());
+	} while (!term.term_or_relinearize());
 	return rcond;
 }
 
