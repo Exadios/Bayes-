@@ -25,7 +25,7 @@ namespace Bayesian_filter
 {
 
 
-class Filter_exception : public std::exception
+class Filter_exception : virtual public std::exception
 /*
  *	Base class for all exception produced by filter heirachy
  */
@@ -42,7 +42,7 @@ private:
 	const char* error_description;
 };
 
-class Logic_exception : public Filter_exception
+class Logic_exception : virtual public Filter_exception
 /*
  * Logic Exception
  */
@@ -53,7 +53,7 @@ public:
 	{};
 };
 
-class Numeric_exception : public Filter_exception
+class Numeric_exception : virtual public Filter_exception
 /*
  * Numeric Exception
  */
