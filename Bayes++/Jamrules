@@ -21,7 +21,5 @@ variant uBLAS-seperate-debug : <include>"../../uBLAS" debug ;
 variant uBLAS-seperate-release : <include>"../../uBLAS" release ;
 
 # Build variant to allow testing with a local boost_CVS version
-variant boost-CVS-debug : <include>"../../boost_CVS"
-     <define>BAYES_FILTER_SPARSE
-	 debug ;
+variant boost-CVS-debug : <include>"../../boost_CVS" debug ;
 variant boost-CVS-release : <include>"../../boost_CVS" release ;

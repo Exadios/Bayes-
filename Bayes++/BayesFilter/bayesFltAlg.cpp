@@ -347,7 +347,7 @@ size_t Sample_filter::unique_samples () const
 	++ssi;
 	while (ssi < sortR.end())
 	{
-		if ((*ssp).col != (*ssi).col)
+		if (ColProxy::less(*ssp, *ssi))
 			++u;
 		ssp = ssi;
 		++ssi;

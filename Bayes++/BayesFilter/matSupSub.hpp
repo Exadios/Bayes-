@@ -17,16 +17,21 @@
  */
 
 /*
- * uBLAS version
+ * Boost uBLAS version
  * Implemented using boost::numeric::ublas uBLAS Basic Linear Algebra library
  *  Provides predefined types Vec and a variety of Matrix types
- * Requires Boost 1.30.0 or later
  *
  * Sparse support: The macro BAYES_FILTER_SPARSE controls experimental sparse matrix support
  * This simply replaces the default storage types with their sparse eqivilents
  */
 
-/* Element proxies have a colourful spectrum of problems. In particular mixed assignment of elements is not supported */
+#include <boost/version.hpp>
+#if !(BOOST_VERSION >= 103000)
+#error Requires Boost 1.30.0 or later
+#endif
+
+// Element proxies have a colourful history! They are not required by Bayes++
+// As of Boost1.30.0 they do not allow mixed assignment of elements, and must be disabled
 #define BOOST_UBLAS_NO_ELEMENT_PROXIES
 
 #include <boost/numeric/ublas/vector.hpp>
@@ -108,5 +113,4 @@ typedef BaseDenseDiagMatrix BaseDiagMatrix;
 /*
  * Common type independant uBlas interface
  */
-#define BAYESFILTER_UBLAS_SLICE_OK
 #include "uBLASmatrix.hpp"

@@ -241,7 +241,23 @@ void test_unique()
 	SIR_kalman_filter sf(2, 100, r);
 	sf.init_kalman (x,X);
 
-	std::cout << sf.unique_samples() << std::endl;
+	std::cout << sf.unique_samples() <<',' << sf.stochastic_samples << std::endl;
+
+	General_LiUnAd_observe_model obs(2,1);
+	obs.Hx(0,0) = 1;
+	obs.Hx(0,1) = 1;
+	obs.Zv[0] = 1;
+	Vec z(1);
+	z[0] = 12.5;
+
+	sf.observe (obs,z);
+	sf.update();
+	std::cout << sf.unique_samples() <<',' << sf.stochastic_samples << std::endl;
+
+	sf.rougheningK = 0;
+	sf.observe (obs,z);
+	sf.update();
+	std::cout << sf.unique_samples() <<',' << sf.stochastic_samples << std::endl;
 }
 
 

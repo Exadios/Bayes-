@@ -165,7 +165,7 @@ private:
 
 class Kalman_filter_init : public Kalman_filter
 /* Rename init to init_from_kalman
- * Required for GCC which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
+ * Required for GCC2.95 which cannot define virtual function 'Kalman_filter::init()' in the SIR_kalman_filter class
  */
 {
 protected:
@@ -195,10 +195,10 @@ public:
 private:
 	void init_from_kalman();
 	// Initialisation from kalman statistics
-public:
 
+public:
 	virtual void update ()
-	// Implement Default Kalman_filter update
+	// Implement Kalman_filter::update identically to SIR_filter
 	{
 		(void)SIR_filter::update_resample();
 	}

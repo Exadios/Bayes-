@@ -148,27 +148,7 @@ public:
 		return matrix_range<MatrixBase> (*this, range(s1,e1), range(s2,e2));
 	}
 
-		// ISSUE uBLAS currently has bugs when matrix_vector_slice is require to represent a sub column
-#ifndef BAYESFILTER_UBLAS_SLICE_OK
-		// Workaround using a vector_range of a matrix_column
-private:
-	typedef ublas::vector_range<ublas::matrix_column<MatrixBase> > special_matrix_vector_slice_base;
-	struct special_matrix_vector_slice : special_matrix_vector_slice_base {
-		special_matrix_vector_slice(MatrixBase& mb, size_t s1, size_t e1, size_t s2) :
-			special_matrix_vector_slice_base(col,ublas::range(s1,e1)), col(mb, s2)
-		{}
-		ublas::matrix_column<MatrixBase> col;
-	};
-public:
-	special_matrix_vector_slice
-	sub_column(size_t s1, size_t e1, size_t s2)
-	// Column vector s2 with rows [s1,e1)
-	{
-		return special_matrix_vector_slice(*this, s1,e1, s2);
-	}
-#else
-		// For this to work requires patched uBLAS for Bayes++
-		// Don't use project(column(*this,s2), range(s1,e1)) it will return a reference to the temporary column object
+	// Requires boost_1.30.0 which has a generalised matrix_vector_slice
 	ublas::matrix_vector_slice<const MatrixBase>
 	sub_column(size_t s1, size_t e1, size_t s2) const 
 	// Column vector s2 with rows [s1,e1)
@@ -183,7 +163,6 @@ public:
 		using namespace ublas;
 		return matrix_vector_slice<MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
 	}
-#endif
 };
 
 
