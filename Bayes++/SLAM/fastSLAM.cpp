@@ -74,18 +74,18 @@ void Fast_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fo
 	M.insert (std::make_pair(feature, fmap));
 }
 
-void Fast_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T )
+void Fast_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::Float& T )
 /*
  * SLAM New observation directly of state statistics (overwrite)
  */
 {
 	assert(t.size() == 1);		// Only single state observation supported
 	const size_t nparticles = L.S.size2();
-	Feature_1 m1;				// single map feature
+	Feature_1 m1;  				// single map feature
 	FeatureCondMap fmap(nparticles);
 
-	m1.x = t[0];				// Initial Particle conditional map is sample
-	m1.X = T[0];				// independant
+	m1.x = t;			   // Initial particle conditional map is sample
+	m1.X = T;		    // independant
 	std::fill(fmap.begin(),fmap.end(), m1);
 	M.insert (std::make_pair(feature, fmap));
 }
@@ -132,7 +132,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 		const Float q = m1.x;
 		const Float Q = m1.X;
 											// Multiplicative fussion of observation weights
- 		wir[pi] *= exp(Float(-0.5) *sqr(p-q) / (P+Q)) / sqrt(P+Q);		// Integrate(g(p,P)*g(q,Q)
+ 		wir[pi] *= exp(Float(-0.5) *sqr(p-q) / (P+Q)) / sqrt(P+Q);		// Integral( g(p,P)*g(q,Q) )
 	}
 	wir_update = true;			// Weights have been updated requiring a resampling
 

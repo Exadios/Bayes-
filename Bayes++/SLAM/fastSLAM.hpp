@@ -35,7 +35,7 @@ public:
 									// Single Feature observations (single element vectors)
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );
 	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z );
-	void observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T );
+	void observe_new( unsigned feature, const FM::Float& t, const FM::Float& T );
 
 	void forget( unsigned feature, bool must_exist = true );
 

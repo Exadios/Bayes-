@@ -112,7 +112,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 	full->X(nL+feature,nL+feature) = fom.Zv[0];
 }
 
-void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T )
+void Kalman_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::Float& T )
 {
 		// Make space in scheme for feature, requires the scheme can deal with resized state
 	if (feature >= nM)
@@ -122,16 +122,16 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec
 		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
 		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
 
-		nf->x[nL+feature] = t[0];
-		nf->X(nL+feature,nL+feature) = T[0];
+		nf->x[nL+feature] = t;
+		nf->X(nL+feature,nL+feature) = T;
 		nf->init ();
 		fgenerator.dispose(full);
 		full = nf;
 	}
 	else
 	{
-		full->x[nL+feature] = t[0];
-		full->X(nL+feature,nL+feature) = T[0];
+		full->x[nL+feature] = t;
+		full->X(nL+feature,nL+feature) = T;
 		full->init ();
 	}
 }
