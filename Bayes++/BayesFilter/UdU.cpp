@@ -173,7 +173,7 @@ RowMatrix::value_type UdUdet (const RowMatrix& UD)
 }
 
 
-RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, size_t n)
+RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
@@ -238,7 +238,7 @@ Negative:
 }
 
 
-RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n)
+RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
  *  Positive definate or semi-definate matrix M
@@ -277,8 +277,7 @@ RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n)
 						e -= Mi[k]*M(k,k)*Mj[k];
 					}
 					if (i == j) {
-						Mi[j] = e;		// Diagonal element
-						d = e;
+						Mi[j] = d = e;		// Diagonal element
 					}
 					else {
 						Mi[j] = e / d;

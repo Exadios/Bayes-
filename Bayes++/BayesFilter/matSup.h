@@ -53,18 +53,21 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U);
 Vec::value_type UdUrcond_vec (const Vec& D);
 SymMatrix::value_type UdUdet (const SymMatrix& UD);
 
-RowMatrix::value_type UdUfactor_varient1 (RowMatrix& M, size_t n);
-RowMatrix::value_type UdUfactor_varient2 (RowMatrix& M, size_t n);
+// In-place factorisations
+RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n);
+RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n);
 inline RowMatrix::value_type UdUfactor (RowMatrix& M, size_t n)
-{	return UdUfactor_varient2(M,n);
+{	return UdUfactor_variant2(M,n);
 }
 LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n);
 UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n);
 
+// Copy factorisations
 RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M);
 LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M);
 UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M);
 
+// Factor manipulations
 bool UdUinverse (RowMatrix& UD);
 bool UTinverse (UTriMatrix& U);
 void UdUrecompose_transpose (RowMatrix& M);
@@ -110,13 +113,14 @@ void identity(FMMatrix<Base>& I)
 
 /*
  * Symmetric Positive (Semi) Definate multiply:	X*S*X'
+ *  Optimised product for dense matrices
+*   Exploits the symmetry of the computation of X * X' and symmetry of result
  *  Couldn't find a better name for this operation. Result is actually only PD if S is
  */
 
 inline Vec::value_type mult_SPD (const Vec& x, const SymMatrix& S)
 /*
  * Symmetric Positive (Semi) Definate multiply:	p = x*S*x'
- * Optimised to exploit the symmetry of the computation of x * x' and result p
  * S must be Symetric (SPD -> p is SPD)
  */
 {
@@ -148,7 +152,6 @@ template <class MatrixX>
 void mult_SPD (const MatrixX& X, const Vec& s, SymMatrix& P)
 /*
  * Symmetric Positive (Semi) Definate multiply:	P += X*diag_matrix(s)*X'
- * Optimised to exploit the symmetry of the computation of X * X' and symmetry of result P
  */
 {
 	Vec::const_iterator si, send = s.end();
@@ -179,7 +182,6 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
 /*
  * Symmetric Positive (Semi) Definate multiply:	P += X*X'
  *  Result is always PD
- * Optimised to exploit the symmetry of the computation of X * X' and symmetry of result P
  */
 {
 	SymMatrix::iterator1 Pa = P.begin1();
@@ -206,7 +208,6 @@ void mult_SPD (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 /*
  * Symmetric Positive (Semi) Definate multiply: P += X*S*X'
  *  A temporary Vec is required of same size as S
- * Optimised to exploit the symmetry of the computation of X * X' and symmetry of result P
  * S must be Symetric (SPD -> P remains SPD)
  */
 {
@@ -237,7 +238,6 @@ void mult_SPDT (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 /*
  * Symmetric Positive (Semi) Definate multiply: P += X'*S*X
  *  A temporary Vec is required of same size as S
- * Optimised to exploit the symmetry of the computation of X' * X and symmetry of result P
  * S must be Symetric (SPD -> P remains SPD)
  */
 {
@@ -266,7 +266,6 @@ template <class MatrixX>
 void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
 /*
  * Symmetric Positive (Semi) Definate multiply:	P += X'*diag_matrix(s)*X
- * Optimised to exploit the symmetry of the computation of X' * X and symmetry of result P
  */
 {
 	Vec::const_iterator si, send = s.end();
@@ -297,7 +296,6 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
 /*
  * Symmetric Positive (Semi) Definate multiply:	P += X'*X
  *  Result is always PD
- * Optimised to exploit the symmetry of the computation of X' * X and symmetry of result P
  */
 {
 	SymMatrix::iterator1 Pa = P.begin1();
