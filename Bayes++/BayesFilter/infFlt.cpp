@@ -204,7 +204,7 @@ Bayes_base::Float
 		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());// Dynamic sizing
 
-	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
+	Vec zz(s + prod(h.Hx,x));		// Strange EIF observation object
 
 						// Observation Information
 	Float rcond = UdUinversePD (ZI, h.Z);
@@ -234,7 +234,7 @@ Bayes_base::Float
 		error (Logic_exception("observation and model size inconsistent"));
 	observe_size (s.size());// Dynamic sizing
 
-	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
+	Vec zz(s + prod(h.Hx,x));		// Strange EIF observation object
 
 						// Observation Information
 	Float rcond = UdUrcond(h.Zv);
