@@ -125,16 +125,8 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 		// feature covariance with existing location and features
         // X+ = [0 Ha] X [0 Ha]' + Hb Z Hb'
         // - zero exisiting feature covariance
-			// ISSUE old uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, zero via upper symmetry
-	// zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
-	zero( full->X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
-	zero( full->X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full->X.size1()) );
-	// full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
-	{	// ISSUE old uBLAS has problems assigning to symmetric proxy as above, go element by element
-		const FM::Matrix cross (FM::prod(Ha, full->X.sub_matrix(0,nL, 0,nL+nM)) );
-		for (std::size_t i = 0; i != nL+nM-1; ++i)
-			full->X(nL+feature, i) = cross(0,i);
-	}
+	zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
+	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
 		// feature state and variance
 	full->x[nL+feature] = fom.h(sz)[0];
 	full->X(nL+feature,nL+feature) = ( FM::prod_SPD(Ha,full->X.sub_matrix(0,nL, 0,nL),tempHa) +
@@ -154,6 +146,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::F
 		Kalman_filter_generator::Filter_type* nf = fgenerator.generate(nL+nM);
 		FM::noalias(nf->x.sub_range(0,full->x.size())) = full->x;
 		FM::noalias(nf->X.sub_matrix(0,full->x.size(),0,full->x.size())) = full->X;
+		zero( nf->X.sub_matrix(0,nf->X.size1(), nL+nM,nf->X.size2()) );
 
 		fgenerator.dispose(full);
 		full = nf;
@@ -169,10 +162,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::F
 void Kalman_SLAM::forget( unsigned feature, bool must_exist )
 {
 	full->x[nL+feature] = 0.;
-			// ISSUE old uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, zero via upper symmetry
-	// zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
-	zero( full->X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
-	zero( full->X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full->X.size1()) );
+	zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
 	full->init();
 }
 
