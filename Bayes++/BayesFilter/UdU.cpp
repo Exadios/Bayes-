@@ -605,33 +605,12 @@ bool UTinverse (UTriMatrix& U)
 	UTriMatrix UI(size,size);	// ISSUE Temporay matrix
 	identity(UI);
 
-	// ISSUE Cannot use ublas::inplace_solve (U, UI, ublas::upper_tag());
-	// It only checks for singularity in debug build
-	// Reimplement the general algorithm with a few tweaks
-
-	for (UTriMatrix::difference_type n = size - 1; n >= 0; -- n) {
-		UTriMatrix::value_type d = U(n, n);
-		if (d == 0) {
-			singular = true;
-			break;
-		}
-		for (UTriMatrix::difference_type l = size - 1; l >= 0; -- l) {
-			UTriMatrix::value_type t;
-			if (n <= l)		// ISSUE uBLAS may not support indexing a 0 element
-				t = UI(n, l) / d;
-			else
-				t = 0;
-			if (t != 0)		// Optimises for zeros in UI and prevents assignments to 0 elements of packed matrices
-			{
-				UI(n, l) = t;
-				UTriMatrix::const_reverse_iterator1 it1e1 (U.find_first1 (1, n, n));
-				UTriMatrix::const_reverse_iterator1 it1e1_rend (U.find_first1 (1, 0, n));
-				while (it1e1 != it1e1_rend) {
-					UI(it1e1.index1 (), l) -= *it1e1 * t;
-					++ it1e1;
-				}
-			}
-		}
+	// Thanks to Joerg boost 1.30.0 has a very nice inplace_solve
+	try {
+		ublas::inplace_solve (U, UI, ublas::upper_tag());
+	}
+	catch (ublas::singular) {
+		singular = true;
 	}
 
 	U = UI;

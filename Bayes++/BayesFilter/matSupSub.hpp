@@ -17,12 +17,14 @@
  */
 
 /*
- * Boost uBLAS version
- * Implemented using boost::numeric::ublas uBLAS Basic Linear Algebra library
- *  Provides predefined types Vec and a variety of Matrix types
+ * Use the Boost uBLAS Basic Linear Algebra library
+ * That is boost::numeric::ublas
+ *  Thanks to  Joerg Walter, Mathias Koch for an excellent C++ library
  *
- * Sparse support: The macro BAYES_FILTER_SPARSE controls experimental sparse matrix support
- * This simply replaces the default storage types with their sparse eqivilents
+ * Provides predefined types Vec and a variety of Matrix types
+ *
+ * Sparse support: The macros BAYES_FILTER_(SPARSE/COMPRESSED/COORDINATE) control experimental sparse matrix support
+ * These simply replace the default storage types with their sparse equivilents
  */
 
 #include <boost/version.hpp>
@@ -33,6 +35,13 @@
 // Element proxies have a colourful history! They are not required by Bayes++
 // As of Boost 1.30.0 they do not allow mixed assignment of elements, and must be disabled
 #define BOOST_UBLAS_NO_ELEMENT_PROXIES
+
+// Required to allow all members of trinangular matrices to be accessed
+#define BOOST_UBLAS_REFERENCE_CONST_MEMBER
+
+// Singularity is a numerical issue. Thanks to Joerg we can enable runtime exceptions
+#define BOOST_UBLAS_USE_EXCEPTIONS
+#define BOOST_UBLAS_SINGULAR_CHECK
 
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/matrix.hpp>

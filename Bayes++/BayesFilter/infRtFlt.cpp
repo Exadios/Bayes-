@@ -48,8 +48,9 @@ void Information_root_filter::init ()
 {
 						// Information Root
 	Float rcond = UCfactor (R, X);
-	rclimit.check_PSD(rcond, "Initial X not PSD");
-	(void)UTinverse (R);
+	rclimit.check_PD(rcond, "Initial X not PD");
+	bool singular = UTinverse (R);
+	assert (!singular); (void)singular;
 						// Information Root state r=R*x
 	r.assign (prod(R,x));
 }
@@ -69,7 +70,7 @@ void Information_root_info_filter::init_yY ()
 	LTriMatrix LC(n,n);
 					// Information Root
 	Float rcond = LdLfactor (LC, Y);
-	rclimit.check_PSD(rcond, "Initial Y not PSD");
+	rclimit.check_PD(rcond, "Initial Y not PD");
 
 	{				// Lower triangular Choleksy factor of LdL'
 		size_t i,j;
@@ -90,7 +91,8 @@ void Information_root_info_filter::init_yY ()
 
 	UTriMatrix RI(n,n);
 	RI = R;
-	(void)UTinverse(RI);
+	bool singular = UTinverse(RI);
+	assert (!singular); (void)singular;
 	r.assign (prod(FM::trans(RI),y));
 }
 
@@ -257,8 +259,9 @@ Bayes_base::Float Information_root_filter::observe_innovation (Linrz_correlated_
 						// Require Inverse of Root of uncorrelated observe noise
 	UTriMatrix Zir(z_size,z_size);
 	Float rcond = UCfactor (Zir, h.Z);
-	rclimit.check_PSD(rcond, "Z not PSD");
-	UTinverse (Zir);
+	rclimit.check_PD(rcond, "Z not PD");
+	bool singular = UTinverse (Zir);
+	assert (!singular); (void)singular;
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
 	A.sub_matrix(0,x_size, 0,x_size).assign (R);

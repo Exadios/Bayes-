@@ -213,9 +213,9 @@ cflags=
 cppflags=
 cxxflags=\s-O0 -g3 -Wall
 ldadd=
-ldflags=\s                                                                                                        \s
+ldflags=\s                                                                                                          \s
 libtool_dir=
-path_to_bin_program=/home/michael/Documents/MyProjects/Bayes++/target/rtheta/bin/rtheta/gcc/debug/runtime-link-dynamic
+path_to_bin_program=target/rtheta/bin/rtheta/gcc/debug/runtime-link-dynamic
 
 [General]
 AMChanged=false

@@ -141,14 +141,12 @@ public:
 	ublas::matrix_range<const MatrixBase>
 	sub_matrix(size_t s1, size_t e1, size_t s2, size_t e2) const
 	{
-		using namespace ublas;
-		return matrix_range<const MatrixBase> (*this, range(s1,e1), range(s2,e2));
+		return ublas::matrix_range<const MatrixBase> (*this, ublas::range(s1,e1), ublas::range(s2,e2));
 	}
 	ublas::matrix_range<MatrixBase>
 	sub_matrix(size_t s1, size_t e1, size_t s2, size_t e2)
 	{
-		using namespace ublas;
-		return matrix_range<MatrixBase> (*this, range(s1,e1), range(s2,e2));
+		return ublas::matrix_range<MatrixBase> (*this, ublas::range(s1,e1), ublas::range(s2,e2));
 	}
 
 	// Requires boost_1.30.0 which has a generalised matrix_vector_slice
@@ -156,15 +154,13 @@ public:
 	sub_column(size_t s1, size_t e1, size_t s2) const 
 	// Column vector s2 with rows [s1,e1)
 	{
-		using namespace ublas;
-		return matrix_vector_slice<const MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
+		return ublas::matrix_vector_slice<const MatrixBase> (*this, ublas::slice(s1,1,e1-s1), ublas::slice(s2,0,e1-s1));
 	}
 	ublas::matrix_vector_slice<MatrixBase>
 	sub_column(size_t s1, size_t e1, size_t s2)
 	// Column vector s2 with rows [s1,e1)
 	{
-		using namespace ublas;
-		return matrix_vector_slice<MatrixBase> (*this, slice(s1,1,e1-s1), slice(s2,0,e1-s1));
+		return ublas::matrix_vector_slice<MatrixBase> (*this, ublas::slice(s1,1,e1-s1), ublas::slice(s2,0,e1-s1));
 	}
 };
 
