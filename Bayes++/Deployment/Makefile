@@ -2,10 +2,10 @@
 # Provides interface project development and sourceforge maintance
 # Use bjam to compile and build Bayes++
 
-RELEASE=2003.8-1
+RELEASE=2003.x1
 
 help:
-	echo Usage: make [uploaddoc] [uploadstyle]
+	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
 
 SFWEBLIST = *.htm Simple/simpleExample.cpp "ClassDocumentation"
 uploaddoc:
@@ -23,4 +23,6 @@ archivesrc:
 	cd ../..; zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.htm "Bayes++/Bayesian Filtering Classes.htm"
 
 buildallCVS :
-	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gccms-3.4 gccms-2.95 intellinux-70 msvcms . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gccms-3.4 intellinux-70 msvcms . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gccms-2.95 .
+	
