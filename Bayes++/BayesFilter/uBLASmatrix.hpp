@@ -31,52 +31,9 @@ using ublas::trans;
 using ublas::prod;		// These do not apply to the templated prod<temp> funtions
 using ublas::inner_prod;
 using ublas::outer_prod;
+using ublas::noalias;
 
 enum EmptyTag {Empty};	// Tag type used for empty matrix constructor
-
-#if (BOOST_VERSION >= 103100)
-using ublas::noalias;
-#else
-namespace detail
-{
-/*
- * Improve syntax of effcient assignment where no aliases of LHS appear on the RHS
- *  noalias(lhs) = rhs_expression
- */
-template <class C>
-struct NoAliasAssign
-{	
-	NoAliasAssign (C& lval) : lval_(lval)
-	{}
-	template <class E>
-	void operator= (const E& e)
-	{	lval_.assign (e);
-	}
-	template <class E>
-	void operator+= (const E& e)
-	{	lval_.plus_assign (e);
-	}
-	template <class E>
-	void operator-= (const E& e)
-	{	lval_.minus_assign (e);
-	}
-	private:
-	    C& lval_;
-}; 
-}//namespace detail
-
-template <class E>
-detail::NoAliasAssign<E> noalias(ublas::matrix_expression<E>& lvalue)
-{
-	return detail::NoAliasAssign<E> (lvalue() );
-}
-template <class E>
-detail::NoAliasAssign<E> noalias(ublas::vector_expression<E>& lvalue)
-{
-	return detail::NoAliasAssign<E> (lvalue() );
-}
-
-#endif
 
 
 namespace detail		// Lots of implementation detail
@@ -244,22 +201,22 @@ class SymMatrixWrapper :
 	public ublas::symmetric_adaptor<MatrixBase, ublas::upper>
 {
 	typedef BaseFromMember<MatrixBase> matrix_type;
-	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> adaptor_type;
+	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> symadaptor_type;
 public:
-	SymMatrixWrapper () : matrix_type(), adaptor_type(this->member)
+	SymMatrixWrapper () : matrix_type(), symadaptor_type(this->member)
 	{}
-	SymMatrixWrapper (size_t size1, size_t size2) : matrix_type(size1,size2), adaptor_type(this->member)
+	SymMatrixWrapper (size_t size1, size_t size2) : matrix_type(size1,size2), symadaptor_type(this->member)
 	{}	// Normal sized constructor
-	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), adaptor_type(this->member)
+	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), symadaptor_type(this->member)
 	{}	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
 	template <class E>
-	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), adaptor_type(this->member)
+	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), symadaptor_type(this->member)
 	{}	// Explict matrix_expression conversion constructor
 
 	template <class E>
 	SymMatrixWrapper& operator=(const ublas::matrix_expression<E>& r)
 	{
-		adaptor_type::operator=(r);
+		symadaptor_type::operator=(r);
 		return *this;
 	}
 
