@@ -1,121 +1,115 @@
+
+B {
+    font-weight: bold;
+  }
+
+BIG {
+    font-family: Verdana, Sans-Serif;
+    font-size: 18px;
+    color: #330099;
+    font-weight: bold;
+  }
+
 BODY {
     background-image: url(paper.png);
-}
+  }
+
+CODE {
+    font-family: Courier New, Serif;
+    font-size: 12px;
+  }
 
 H1 {
-    font-family: Andale Mono,  Sans-Serif;
+    font-family: Andale Mono, Sans-Serif;
     font-size: 28px;
     color: #330099;
     font-weight: bold;
     text-align: center;
-}
+  }
 
 H2 {
-    font-family: Andale Mono, Sans-Serif;
-    font-size: 20px;
-    color: #330099;
-    font-weight: bold;
+    font :  bold  20px  Andale Mono, Sans-Serif;
+    color : #330099;
+    text-decoration : underline;
 }
 
 H3 {
-    font-family: Verdana, Arial, Sans-Serif;
-    font-size: 16px;
+    font : bold 16px  Verdana, Sans-Serif;
     color: #330099;
-    font-weight: bold;
-}
+  }
 
 H4 {
-    font-family: Verdana, Arial, Sans-Serif;
-    font-size: 14px;
+    font: bold 14px Verdana, Sans-Serif;
     color: #330099;
-    font-weight: bold;
-}
+  }
 
-H5 {
-    font-family: Verdana, Arial, Sans-Serif;
+LI {
+    font-family: Verdana, Sans-Serif;
     font-size: 12px;
-    color: #330099;
-    font-weight: bold;
-}
-
-H6 {
-    font-family: Verdana, Arial, Sans-Serif;
-    font-size: 10px;
-    color: #330099;
-    font-weight: bold;
-}
-
-BIG {
-    font-family: Verdana, Arial, Sans-Serif;
-    font-size: 18px;
-    color: #330099;
-    font-weight: bold;
-}
+    font-weight: 400;
+  }
 
 P {
-    font-family: Verdana, Arial, Sans-Serif;
+    font-family: Verdana, Sans-Serif;
     font-size: 14px;
     font-weight: 400;
-}
+  }
+
+PRE {
+    font-family: Verdana, Sans-Serif;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+SMALL {
+    font-family: Verdana, Sans-Serif;
+    font-size: 10px;
+  }
+
+SPAN {
+    font-family: Verdana, Sans-Serif;
+    font-size: 12px;
+    font-weight: 400;
+  }
 
 STRONG {
     font-weight: bold;
-}
-
-B {
-    font-weight: bold;
-}
-
-PRE {
-     font-family: Verdana, Arial, Sans-Serif;
-     font-size: 12px;
-     font-weight: 400;
-
-}
-
-CODE{
-    font-family: Courier New, Serif;
-    font-size: 12px;
-}
-
-LI {
-     font-family: Verdana, Arial, Sans-Serif;
-     font-size: 12px;
-     font-weight: 400;
-
-}
-
-UL {
-    font-family: Verdana, Arial, Sans-Serif;
-    font-size: 12px;
-    font-weight: 400;
-}
-
-SMALL {
-    font-family: Verdana, Arial, Sans-Serif;
-    font-size: 10px;
-
-}
+  }
 
 TABLE {
-    font-family: Verdana, Arial, Sans-serif;
+    font-family: Verdana, Sans-serif;
     font-size: 12px;
     font-weight: 400;
     font-style: normal;
     text-decoration: none;
     text-transform: none;
     font-variant: normal;
-}
+  }
 
 TD {
-    font-family: Verdana, Arial, Sans-Serif;
+    font-family: Verdana, Sans-Serif;
     font-size: 14px;
     font-weight: 400;
-}
+  }
 
 TR {
     font-family: Verdana, Arial, Sans-Serif;
     font-size: 14px;
     font-weight: 400;
-}
+  }
+
+UL {
+    font-family: Verdana, Sans-Serif;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+A:active {
+  }
+
+A:link {
+  }
+
+A:visited {
+  }
 
