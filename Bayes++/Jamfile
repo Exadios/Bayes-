@@ -9,3 +9,11 @@ subinclude BayesFilter ;
 subinclude Simple ;
 subinclude PV ;
 subinclude QuadCalib ;
+
+
+# Produce the BayesFilter static libraries in a convenient target location named "lib"
+#   The debug build is given a "d" suffix
+stage lib  :  <lib>BayesFilter/BayesFilter
+    : <tag><debug>"d"
+    : debug release
+;
