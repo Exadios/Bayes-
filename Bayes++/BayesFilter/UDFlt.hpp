@@ -87,10 +87,10 @@ protected:
 	size_t last_z_size;
 	FM::Vec h1;				// Single Observation model
 	FM::Vec w;				// Single Gain
-	FM::Vec zp;				// prediction
-	FM::Matrix UHx;			// Modified Model for linear decorrelation
-	FM::Vec zdecol;			// Decorrelated
-	FM::Matrix Gz;
+	FM::Vec znorm;			// Normalised innovation
+	FM::Vec zpdecol;		// Decorrelated zp
+	FM::Matrix Gz;			// Z coupling
+	FM::Matrix GIHx;		// Modified Model for linear decorrelation
 };
 
 

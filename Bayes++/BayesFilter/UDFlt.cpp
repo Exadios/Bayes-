@@ -33,10 +33,10 @@ UD_scheme (size_t x_size, size_t q_maxsize, size_t z_initialsize) :
 		d(x_size+q_max), dv(x_size+q_max), v(x_size+q_max),
 		a(x_size), b(x_size),
 		h1(x_size), w(x_size),
-		zp(FM::Empty),
-		UHx(FM::Empty),
-		zdecol(FM::Empty),
-		Gz(FM::Empty)
+		znorm(FM::Empty),
+		zpdecol(FM::Empty),
+		Gz(FM::Empty),
+		GIHx(FM::Empty)
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -263,7 +263,7 @@ void
 
 		s.resize(z_size);
 		Sd.resize(z_size);
-		zp.resize(z_size);
+		znorm.resize(z_size);
 	}
 }
 
@@ -292,9 +292,9 @@ Bayes_base::Float
 	Float rcondmin = std::numeric_limits<Float>::max();
 	for (size_t o = 0; o < z_size; ++o)
 	{
-								// Observation prediction and model, extracted for a single z element
-		zp = h.h(x);
-		h.normalise(zp, z);
+								// Observation model, extracted for a single z element
+		const FM::Vec& zp = h.h(x);
+		h.normalise(znorm = z, zp);
 		h1 = FM::row(h.Hx,o);
 								// Check Z precondition
 		if (h.Zv[o] < 0.)
@@ -303,9 +303,9 @@ Bayes_base::Float
 		Float rcond = observeUD (w, S, h1, h.Zv[o]);
 		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
-								// State update using non-linear innovation
-		s = z[o]-zp[o];
-		x += w * s;
+								// State update using normalised non-linear innovation
+		s = znorm[o] - zp[o];
+		FM::noalias(x) += w * s;
 								// Copy s and Sd
 		UD_scheme::s[o] = s;
 		UD_scheme::Sd[o] = S;
@@ -336,87 +336,65 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	size_t o, i, j, k;
+	size_t i, j, k;
 	const size_t x_size = x.size();
 	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
 					// Dynamic sizing
-	if (z_size != last_z_size) {
-		zdecol.resize(z_size);
-		Gz.resize(z_size,z_size);
-		UHx.resize(z_size, x_size);
-	}
 	observe_size (z_size);
+	if (z_size != zpdecol.size()) {
+		zpdecol.resize(z_size);
+		Gz.resize(z_size,z_size);
+		GIHx.resize(z_size, x_size);
+	}
 
 					// Factorise process noise as GzG'
 	{	Float rcond = FM::UdUfactor (Gz, h.Z);
 		rclimit.check_PSD(rcond, "Z not PSD in observe");
 	}
 
-								// Observation prediction and model
-	zp = h.h(x);
-	h.normalise(zp, z);
-								// Solve UHx~= Hx
+								// Observation prediction and normalised observation
+	const FM::Vec& zp = h.h(x);
+	h.normalise(znorm = z, zp);
+	
 	if (z_size > 0)
-	{
-
-		UHx = h.Hx;
+	{							// Solve G* GIHx = Hx for GIHx in-place
+		GIHx = h.Hx;
 		for (j = 0; j < x_size; ++j)
 		{
 			i = z_size-1;
 			do {
 				for (k = i+1; k < z_size; ++k)
 				{
-					if (i != k)
-					{
-						UHx(i,j) -= Gz(i,k) * UHx(k,j);
-					}
-					else
-					{				// Unit part of U
-						UHx(i,j) -= UHx(k,j);
-					}
+					GIHx(i,j) -= Gz(i,k) * GIHx(k,j);
 				}
 			} while (i-- > 0);
 		}
-								// Uz~=z, Yzp~=zp  zp is in place
-		zdecol.clear();
+					
+		zpdecol = zp;			// Solve G zp~ = z, G z~ = z  for zp~,z~ in-place
 		i = z_size-1;
 		do {
 			for (k = i+1; k < z_size; ++k)
 			{
-				if (i != k)
-				{
-					zdecol[i] -= Gz(i,k) * z[k];
-					zp[i] -= Gz(i,k) * zp[k];
-				}
-				else
-				{				// Unit part of U
-					zdecol[i] -= z[k];
-					zp[i] -= zp[k];
-				}
+				znorm[i] -= Gz(i,k) * znorm[k];
+				zpdecol[i] -= Gz(i,k) * zpdecol[k];
 			}
 		} while (i-- > 0);
 	}//if (z_size>0)
 
 								// Apply observations sequentialy as they are decorrelated
 	Float rcondmin = std::numeric_limits<Float>::max();
-	for (o = 0; o < z_size; ++o)
+	for (size_t o = 0; o < z_size; ++o)
 	{
-		for (j = 0; j < x_size; ++j)
-		{
-			h1[j] = UHx(o,j);
-		}
+		h1 = FM::row(GIHx,o);
 								// Update UD and extract gain
 		Float rcond = observeUD (w, S, h1, Gz(o,o));
 		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using linear innovation
-		s = zdecol[o]-zp[o];
-		for (j = 0; j < x_size; ++j)
-		{
-			x[j] += w[j] * s;
-		}
+		s = znorm[o]-zpdecol[o];
+		FM::noalias(x) += w * s;
 								// Copy s and Sd
 		UD_scheme::s[o] = s;
 		UD_scheme::Sd[o] = S;
@@ -439,8 +417,7 @@ Bayes_base::Float
  * Return: Minimum rcond of all squential observe
  */
 {
-	size_t o, j;
-	const size_t x_size = x.size();
+	size_t o;
 	const size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
@@ -451,8 +428,8 @@ Bayes_base::Float
 	for (o = 0; o < z_size; ++o)
 	{
 								// Observation prediction and model
-		zp = h.ho(x, o);
-		h.normalise(zp, z);
+		const FM::Vec& zp = h.ho(x, o);
+		h.normalise(znorm = z, zp);
 								// Check Z precondition
 		if (h.Zv[o] < 0.)
 			error (Numeric_exception("Zv not PSD in observe"));
@@ -461,11 +438,8 @@ Bayes_base::Float
 		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using non-linear innovation
-		s = z[o]-zp[o];
-		for (j = 0; j < x_size; ++j)
-		{
-			x[j] += w[j] * s;
-		}
+		s = znorm[o]-zp[o];
+		FM::noalias(x) += w * s;
 								// Copy s and Sd
 		UD_scheme::s[o] = s;
 		UD_scheme::Sd[o] = S;
