@@ -9,6 +9,7 @@ FOR RELEASE
 		Run Simple, PV, QuadCalib
 
 TODO
+	unit test rcond_ignore_infinity_internal . rcond!=rcond was changed. Still OK?
 	asset_isPSD in covFlt will fail if NaN input (should the asserts go)
 	By products: add observe parameterisation for by products and temps
 
