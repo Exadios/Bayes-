@@ -417,8 +417,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
  * SIR implementation of a Kalman filter
  */
 SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
-	SIR_scheme (x_size, s_size, random_helper),
 	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size),
+	SIR_scheme (x_size, s_size, random_helper),
 	roughen_model (x_size,x_size, random_helper)
 {
 }
