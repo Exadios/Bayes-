@@ -23,6 +23,6 @@ archivesrc:
 	cd ../..; zip -r Bayes++/bf-C++source-$(RELEASE).zip Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.htm "Bayes++/Bayesian Filtering Classes.htm"
 
 buildallCVS :
-	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gccms-3.4 intellinux-70 msvcms . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gccms-2.95 .
+	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gcc-3.4 intellinux-70 msvc-7 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../boost/boost_CVS debug release compress_debug compress_release gcc-2.95 .
 	
