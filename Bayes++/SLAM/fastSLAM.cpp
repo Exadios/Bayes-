@@ -196,7 +196,7 @@ Fast_SLAM::Float
 void Fast_SLAM::forget( unsigned feature, bool must_exist )
 // Forget all feature information, feature no can be reused for a new feature
 {
-	AllFeature::std::size_type n = M.erase(feature);
+	AllFeature::size_type n = M.erase(feature);
 	if (n==0 && must_exist)
 		error (BF::Logic_exception("Forget non existing feature"));
 }
