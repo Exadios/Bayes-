@@ -46,11 +46,15 @@ template <class VecBase>
 class FMVec : public VecBase
 {
 public:
+	typedef typename VecBase::value_type value_type;
+
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMVec(EmptyTag) : VecBase()
 	{}	// Empty constructor
 	explicit FMVec(typename VecBase::size_type size) : VecBase(size)
-	{}	// Normal sized constructor
+	{	// Sized constructor
+		assign (ublas::scalar_vector<value_type>(size, std::numeric_limits<value_type>::signaling_NaN()));
+	}
 	FMVec(const FMVec& c) : VecBase(static_cast<const VecBase&>(c))
 	{}	// Copy constructor
 	template <class E>
@@ -68,7 +72,7 @@ public:
 	}
 	FMVec& operator= (const FMVec& r)
 	{	// Vector assignment; independant
-		assign(r);
+		VecBase::operator=(static_cast<const VecBase&>(r));
 		return *this;
 	}
 
@@ -97,7 +101,9 @@ public:
 	explicit FMMatrix(EmptyTag) : MatrixBase()
 	{}	// Empty constructor
 	FMMatrix(typename MatrixBase::size_type size1, typename MatrixBase::size_type size2) : MatrixBase(size1,size2)
-	{}	// Normal sized constructor
+	{	// Sized constructor
+		assign (ublas::scalar_matrix<value_type>(size1, size2, std::numeric_limits<value_type>::signaling_NaN()));
+	}
 	FMMatrix(const FMMatrix& c) : MatrixBase(static_cast<const MatrixBase&>(c))
 	{}	// Copy constructor
 	template <class E>
@@ -112,7 +118,7 @@ public:
 	}
 	FMMatrix& operator= (const FMMatrix& r)
 	{	// Matrix assignment; independant
-		assign (r);
+		MatrixBase::operator=(static_cast<const MatrixBase&>(r));
 		return *this;
 	}
 
