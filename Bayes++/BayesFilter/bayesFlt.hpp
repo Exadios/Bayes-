@@ -330,11 +330,12 @@ class Jacobian_observe_model : virtual public Observe_model_base
     Hx(x(k|k-1) = Jacobian of h with respect to state x
  */
 {
+public:
+	FM::Matrix Hx;		// Model
 protected: // Jacobian model is not sufficient, it is used to build Linrz observe model's
 	Jacobian_observe_model (size_t x_size, size_t z_size) :
 		Hx(z_size, x_size)
 	{}
-	FM::Matrix Hx;		// Model
 };
 
 class Linrz_correlated_observe_model : public Correlated_addative_observe_model, public Jacobian_observe_model
@@ -349,7 +350,6 @@ public:
 	Linrz_correlated_observe_model (size_t x_size, size_t z_size) :
 		Correlated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
-	using Jacobian_observe_model::Hx;
 };
 
 class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_model, public Jacobian_observe_model
@@ -364,7 +364,6 @@ public:
 	Linrz_uncorrelated_observe_model (size_t x_size, size_t z_size) :
 		Uncorrelated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
-	using Jacobian_observe_model::Hx;
 };
 
 class Linear_correlated_observe_model : public Linrz_correlated_observe_model
@@ -435,6 +434,8 @@ public:
  * Functional Filter - Abstract filtering property
  * Represents only filter prediction by a simple functional
  * (non-stochastic) model
+ * 
+ * A similar functional observe is not generally useful. The inverse of h is needed for observe!
  */
 class Functional_filter : virtual public Bayes_filter_base
 {
@@ -446,13 +447,6 @@ public:
 	    Requires x(k|k), X(k|k) or internal equivilent
 	    Predicts x(k+1|k), X(k+1|k), using predict model
 	*/
-private:
-	virtual void observe (Functional_observe_model& /*h*/, const FM::Vec& /*z*/)
-	/* Observation z(k) with functional no noise model
-	    Requires x(k|k), X(k|k)
-	   PREVENTS use of this model as h needs to be invertable!
-	*/
-	{}
 };
 
 /*
@@ -488,9 +482,8 @@ public:
  * State (x) sizes is assumed to remain constant.
  * The state and state covariance are public so they can be directly manipulated.
  *  init: Should be called if x or X are altered
- *  update: Guarantees that any internal changes made by predict or observe are
- *  reflected in x,X. This allows considerable flexibility so filter implemtations can
- *  use different numerical representations
+ *  update: Guarantees that any internal changes made filter are reflected in x,X.
+ *  This allows considerable flexibility so filter implemtations can use different numerical representations
  *
  * Derived filters supply definititions for the abstract functions and determine the algorithm used
  * to implement the filter.
@@ -648,36 +641,29 @@ public:
 
 
 /*
- * Sample Filter: Bayes filter using
+ * Sample State Filter - Abstract filtering property
  *
  * Probability distributions are represted by a finite sampling
  *
  * State (x_size) size and its sampling (s_size) are assumed to remain constant.
  * The state sampling public so they can be directly manipulated.
  *  init: Should be used if they to be altered
- *
- * The filter is operated by performing a
- * 	predict, observe
- * cycle derived from the bayes_filter. observe Likelihoods are merged into a single combined weight.
- *   update: MUST be used to complete a explict resampling of the particles using merged weights
- *
- * Derived filters supply definititions for the abstract functions and determine the algorithm used
- * to implement the filter.
+ *  update: Guarantees that any internal changes made filter are reflected in sampling S.
  */
 
-class Sample_filter : public Likelihood_filter, public Functional_filter
+class Sample_state_filter : virtual public Bayes_filter_base
 {
 public:
 	FM::ColMatrix S;		// state sampleing (x_size,s_size)
 
-	Sample_filter (size_t x_size, size_t s_size);
+	Sample_state_filter (size_t x_size, size_t s_size);
 	/* Initialise filter and set constant sizes for
 	    x_size of the state vector
 	    s_size sample size
 	    Exceptions:
 	     bayes_filter_exception is s_size < 1
 	*/
-	~Sample_filter() = 0;	// Provide unambigues distructor incase S is not distructable
+	~Sample_state_filter() = 0;	// ISSUE Provide unambigues distructor incase S is not distructable
 
 	/* Virtual functions for filter algorithm */
 
@@ -700,11 +686,39 @@ public:
 	            This should by multipled by the number of samples to get the Likelihood function conditioning
 	 */
 
-	virtual void update ()
-	// Default update, simple resample
-	{
-		(void)update_resample ();
-	}
+	size_t unique_samples () const;
+	/* Count number of unique (unequal value) samples in S
+	    Implementation requires std::sort on sample column references
+	*/
+};
+
+
+/*
+ * Sample Filter: Bayes filter using
+ *
+ * Probability distributions are represted by a finite sampling
+ *
+ * The filter is operated by performing a
+ * 	predict, observe
+ * cycle derived from the bayes_filter. observe Likelihoods are merged into a single combined weight.
+ *   update: MUST be used to complete a explict resampling of the particles using merged weights
+ *
+ * Derived filters supply definititions for the abstract functions and determine the algorithm used
+ * to implement the filter.
+ */
+
+class Sample_filter : public Likelihood_filter, public Functional_filter, virtual public Sample_state_filter
+{
+public:
+	Sample_filter (size_t x_size, size_t s_size);
+	/* Initialise filter and set constant sizes for
+	    x_size of the state vector
+	    s_size sample size
+	    Exceptions:
+	     bayes_filter_exception is s_size < 1
+	*/
+
+	/* Virtual functions for filter algorithm */
 
 	virtual void predict (Functional_predict_model& f);
 	/* Predict state posterior with functional no noise model
@@ -721,11 +735,6 @@ public:
 	virtual void observe_likelihood (const FM::Vec& lw) = 0;
 	/* Observation fusion directly from likelihood weights
 	    lw may be smaller then the state sampling. Weights for additional particles are assumed to be 1
-	*/
-
-	size_t unique_samples () const;
-	/* Count number of unique (unequal value) samples in S
-	    Implementation requires std::sort on sample column references
 	*/
 };
 
