@@ -267,11 +267,8 @@ private:
 	Vec m_base;
 };
 
-walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), rootq(NQ), m_base(NX)
+walk::walk (const Vec start, const bool fixed) : x(start), x_pred(NX), rootq(NQ), m_fixed(fixed), m_base(start)
 {
-	m_fixed = fixed;
-	m_base = start;
-	x = m_base;
 	for (Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
 		rootq[qi.index()] = std::sqrt(*qi);
 	}
@@ -292,7 +289,7 @@ void walk::predict ()
 		x = m_base + nc;
 	}
 	else {
-		x_pred = f(x);
+		noalias(x_pred) = f(x);
 		x = x_pred;
 		noalias(x) += nc;
 	}
@@ -537,7 +534,7 @@ bool CCompare::tolerably_equal ()
 template<class Tf1, class Tf2>
 void CCompare::compare ()
 {
-	// Construct trhuth model
+	// Construct truth model
 	walk truth (x_init, TRUTH_STATIONARY);
 	
 	// Construct filter to compare with initial true state
