@@ -61,10 +61,10 @@ public:
 
 protected:
 	Kalman_filter_generator& fgenerator;
-	// Full Kalman representation of state
-	Kalman_filter_generator::Filter_type* full;
 	// Location filter for prediction
 	Kalman_filter_generator::Filter_type* loc;
+	// Full Kalman representation of state
+	Kalman_filter_generator::Filter_type* full;
 
 private:
 	unsigned nL;		// No of location states
