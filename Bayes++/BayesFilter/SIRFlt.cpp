@@ -293,7 +293,7 @@ void
 						// Weight Particles. Fused with previous weight
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		wir[i] *= h.L(FM::column(S,i));
+		wir[i] *= h.L( FM::column(S,i) );
 	}
 	wir_update = true;
 }

@@ -114,9 +114,9 @@ Bayes_base::Float
 	Float rcond = UdUinversePD (invZ, h.Z);
 	rclimit.check_PSD(rcond, "Z not PSD in observe");
 
-	Matrix HTran = trans(h.Hx);
-	Matrix HTranInvR = prod(HTran, invZ);
-	SymMatrix HTinvRH = prod(HTranInvR, h.Hx);
+	Matrix HTran (trans(h.Hx));
+	Matrix HTranInvR (prod(HTran, invZ));
+	SymMatrix HTinvRH (prod(HTranInvR, h.Hx));
 
 	SymMatrix invX(X.size1(),X.size2());
 	rcond = UdUinversePD (invX, X);
@@ -127,10 +127,10 @@ Bayes_base::Float
 	const Float one = 1.;	// Correctly typed constant
 
 	/* calculate predicted innovation */
-	Matrix PHTran = prod(X, HTran);
-	Matrix HPHTran = prod(h.Hx, PHTran);
-	Matrix oHPHTran = HPHTran * (one-omega);
-	SymMatrix oR = h.Z * omega;
+	Matrix PHTran (prod(X, HTran));
+	Matrix HPHTran (prod(h.Hx, PHTran));
+	Matrix oHPHTran (HPHTran * (one-omega));
+	SymMatrix oR (h.Z * omega);
 
 	S = oHPHTran + oR;
 
@@ -141,14 +141,14 @@ Bayes_base::Float
 	rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
-	Matrix oPHTran = PHTran*(one-omega);
-	Matrix K = prod(oPHTran, SI);
+	Matrix oPHTran (PHTran*(one-omega));
+	Matrix K (prod(oPHTran, SI));
 
 	// State update
 	x += prod(K, s);
 	// Invserse covariance
-	SymMatrix oInvCov = invX * omega;
-	SymMatrix oHTinvRH = HTinvRH*(one-omega);
+	SymMatrix oInvCov (invX * omega);
+	SymMatrix oHTinvRH (HTinvRH*(one-omega));
 	invX = oInvCov +oHTinvRH;
 	// Covariance
 	rcond = UdUinversePD (X, invX);

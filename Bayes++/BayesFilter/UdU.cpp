@@ -486,7 +486,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M)
  *		see in-place UCfactor
  */
 {
-	U.assign (TriMatrix_adaptor<UTriMatrix,const SymMatrix>(M) );
+	U.assign (UTriMatrix(M));
 	UTriMatrix::value_type rcond = UCfactor (U, M.size1());
 
 	return rcond;

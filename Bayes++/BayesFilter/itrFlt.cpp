@@ -144,7 +144,7 @@ Bayes_base::Float
 
 							// Iterative observe
 		RowMatrix temp1(Xpred.size1(), HxT.size1()), temp2(HxT.size1(), SI.size2());
-		X = Xpred - prod_SPD (Xpred, prod_SPD(HxT,SI, temp2), temp1);
+		X = Xpred - prod_SPD (Xpred, SymMatrix(prod_SPD(HxT,SI, temp2)), temp1);
 		// TODO: Remove check once proved
 		assert_isPSD (X);
 		x += prod(prod(X,HxT),prod(ZI,s)) - prod(prod(X,XpredI), (x - xpred));

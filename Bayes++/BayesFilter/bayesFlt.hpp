@@ -15,7 +15,7 @@
 
 // Common headers required for declerations
 #include <exception>
-#include "matSupSub.hpp"	// Expect to find the actual matrix support headers elsewhere
+#include "matSupSub.hpp"	// matrix filter support subsystem
 
 /* Filter namespace */
 namespace Bayesian_filter
@@ -37,7 +37,7 @@ public:
 	// Type used thoughout as a number representation for state etc
 
 	virtual ~Bayes_base() = 0;
-	// Provide abstract destruction
+	// Polymorphic
 protected:
 	void filter_error (const char* error_description) const;
 	// Report a filter error, throw a Bayes_filter_exception
@@ -216,9 +216,9 @@ public:
 	class inverse_model {
 	public:
 		inverse_model (size_t x_size, size_t q_size);
-		FM::Matrix Fx;		// Model
+		FM::ColMatrix Fx;	// Model (ColMatrix as usually transposed)
 		FM::Vec q;			// Noise Covariance
-		FM::Matrix G;		// Noise Coupling
+		FM::ColMatrix G;	// Noise Coupling (ColMatrix as usually transposed)
 	} inv;
 };
 

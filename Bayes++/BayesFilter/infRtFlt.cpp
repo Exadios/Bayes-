@@ -21,8 +21,6 @@ namespace Bayesian_filter
 {
 	using namespace Bayesian_filter_matrix;
 
-typedef TriMatrix_adaptor<UTriMatrix, const DenseMatrix> UpperTri;
-
 
 Information_root_filter::Information_root_filter (size_t x_size, size_t /*z_initialsize*/) :
 		Extended_filter(x_size),
@@ -112,8 +110,7 @@ void Information_root_filter::update ()
 	if (singular)
 		filter_error ("R not PD");
 
-	X.clear();
-	mult_SPDi(RI, X);		// X = RI*RI'
+	X.assign (prod_SPD(RI));		// X = RI*RI'
 	x.assign (prod(RI,r));
 
 	assert_isPSD (X);
@@ -133,8 +130,7 @@ void Information_root_info_filter::update ()
  */
 {
 	Information_root_filter::update();
-	Y.clear();
-	mult_SPDTi(R, Y);
+	Y.assign (prod(trans(R),R));		// Y = R'*R
 	y.assign (prod(Y,x));
 }
 

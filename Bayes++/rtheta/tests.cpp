@@ -94,7 +94,7 @@ void test_inverse()
 	*/
 	std::cout << U << std::endl;
 
-	Matrix X(U.size1(),U.size2());
+	SymMatrix X(U.size1(),U.size2());
 	X = prod(U, trans(U));
 	std::cout << X << std::endl;
 	
@@ -126,25 +126,14 @@ void test_SPD()
 	R(0,0) = 1.;
 	R(1,0) = 2.;
 
-	// Try mult_SPD
-	P.clear();
-	mult_SPD(R,S,P,Stemp);
-	std::cout << P << std::endl;
-
 	// Try prod_SPD
 	RowMatrix RStemp(R.size1(), S.size2());
 	P.assign( prod_SPD(R,S, RStemp) );
 	std::cout << P << std::endl;
 
-	// Try mult_SPDT
-	RowMatrix RT(1,2);
-	RT(0,0) = 1.;
-	RT(0,1) = 2.;
-	std::cout << RT << std::endl;
-
-	P.clear();
-	mult_SPDT(RT,S,P,Stemp);
-	std::cout << P << std::endl;
+	// Try prod_SPD
+	ColMatrix RT(1,2);
+	P.assign (prod_SPDT (RT, Stemp));
 }
 
 void test_SPD_all()
@@ -166,7 +155,7 @@ void test_SPD_all()
 void test_temp_prod()
 {
 	Matrix A(2,2);
-	Matrix R = prod( ublas::prod<Matrix>(A,A), ublas::prod<Matrix>(A,A));
+	Matrix R (prod( ublas::prod<Matrix>(A,A), ublas::prod<Matrix>(A,A)));
 }
 
 
@@ -263,7 +252,7 @@ void test_unique()
 
 void other_tests()
 {
-	test_unique();
+	test_SPD();
 }
 
 

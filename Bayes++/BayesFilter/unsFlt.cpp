@@ -198,7 +198,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 						// Predict points of XX using supplied predict model
 							// State covariance
 	for (i = 0; i < XX_size; ++i) {
-		column(fXX,i).assign (f.f(column(XX,i)));
+		column(fXX,i).assign (f.f( column(XX,i) ));
 	}
 						
 						// Mean of predicted distribution: x
@@ -221,7 +221,7 @@ void Unscented_filter::predict (Unscented_predict_model& f)
 	}
 	X /= 2*x_Kappa;
 						// Addative Noise Prediction, computed about center point
-	X.plus_assign (f.Q(column(fXX,0)));
+	X.plus_assign (f.Q( column(fXX,0) ));
 
 	assert_isPSD (X);
 }
@@ -283,7 +283,7 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 	{
 		Vec zXXi(z_size), zXX0(z_size);
 		for (i = 0; i < XX.size2(); ++i) {
-			zXXi = h.h(column(XX,i));
+			zXXi = h.h( column(XX,i) );
 						// Normalise relative to zXX0 which is normalised to z
 			if (i > 0) {
 				h.normalise (zXXi, zXX0);

@@ -98,7 +98,7 @@ protected:			   		// Permenantly allocated temps
 		friend class Information_joseph_filter;
 		FM::SymMatrix inv_Q, A, inv_AQ;
 		FM::Matrix Chi, IChi;
-		FM::Vec Ywork;
+		FM::Matrix Ywork;
 	public:
 		Predict_temp (size_t x_size);
 	} t;

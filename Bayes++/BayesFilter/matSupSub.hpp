@@ -46,6 +46,7 @@
 #define BAYES_FILTER_GAPPY
 #endif
 
+
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
 {
@@ -60,9 +61,7 @@ typedef double Float;
 
 /*
  * uBlas base types - these will be wrapper to provide the actual vector and matrix types
- *  We require static type conversion between RowMatrix and SymMatrix
- *  This requires they both use the same dense represenation. Therefore
- *  we use a symmetric_adaptor to provide the base for symmetric matrices.
+ *  Symmetric types don't appear. They are defined later by adapting these base types
  */
 namespace detail {
 							// Dense types

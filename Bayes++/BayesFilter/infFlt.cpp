@@ -141,7 +141,7 @@ Bayes_base::Float
 		filter_error("observation and model size inconsistent");
 	observe_size (s.size());// Dynamic sizing
 
-	Vec zz = s + prod(h.Hx,x);		// Strange EIF obsevation object object
+	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
 
 						// Observation Information
 	Float rcond = UdUinversePD (ZI, h.Z);
@@ -149,7 +149,7 @@ Bayes_base::Float
 												// Calculate EIF i
 	i = prod(trans(h.Hx), prod(ZI,zz));
 												// Calculate EIF I
-	RowMatrix temp = prod(ZI, h.Hx);
+	RowMatrix temp(prod(ZI, h.Hx));
 	I = prod(trans(h.Hx), temp );
 
 	y += i;
@@ -170,7 +170,7 @@ Bayes_base::Float
 		filter_error("observation and model size inconsistent");
 	observe_size (s.size());// Dynamic sizing
 
-	Vec zz = s + prod(h.Hx,x);		// Strange EIF obsevation object object
+	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
 
 						// Observation Information
 	Float rcond = UdUrcond_vec(h.Zv);
@@ -181,7 +181,7 @@ Bayes_base::Float
 												// Calculate EIF i
 	i = prod(trans(h.Hx), prod(ZI,zz));						// ISSUE: Efficiency ZI is diagonal
 												// Calculate EIF I
-	RowMatrix temp = prod(ZI, h.Hx);
+	RowMatrix temp(prod(ZI, h.Hx));
 	I = prod(trans(h.Hx), temp );
 
 	y += i;
@@ -210,7 +210,7 @@ Information_joseph_filter::Predict_temp::Predict_temp (size_t x_size) :
 	inv_AQ(x_size, x_size),
 	Chi(x_size, x_size),
 	IChi(x_size, x_size),
-	Ywork(x_size)
+	Ywork(x_size, x_size)
 {
 }	
 
@@ -225,21 +225,20 @@ void Information_joseph_filter::predict (Linear_invertable_predict_model& f)
  */
 {
 						// Inverse Prediction noise
-	t.inv_Q.clear();
-	mult_SPDT (f.inv.G, f.inv.q, t.inv_Q);
+	t.inv_Q.assign (prod_SPDT(f.inv.G, f.inv.q));
 	
 						// Joseph Information update using, f.inv.Fx
-	t.A.clear();
-	mult_SPDT (f.inv.Fx, Y, t.A, t.Ywork);
+	t.Ywork.assign (prod(Y, f.inv.Fx));
+	t.A.assign (prod(trans(f.inv.Fx), t.Ywork));
 
-	Float rcond = UdUinversePD (t.inv_AQ, t.A+t.inv_Q);
+	Float rcond = UdUinversePD (t.inv_AQ, SymMatrix(t.A+t.inv_Q));
 	rclimit.check_PD(rcond, "(Fx'.Y.Fx+inv_Q) not PD in predict");
 
 	t.Chi.assign (prod(t.A,t.inv_AQ));
 	FM::identity(t.IChi); t.IChi -= t.Chi;
 
 	RowMatrix temp1(t.IChi.size1(), t.A.size2()), temp2(t.Chi.size1(), t.inv_Q.size2());
-	Y = prod_SPD(t.IChi,t.A, temp1) + prod_SPD(t.Chi, t.inv_Q, temp2);
+	Y.assign (prod_SPD(t.IChi,t.A, temp1) + prod_SPD(t.Chi, t.inv_Q, temp2));
 						// Information state
 	y = prod(prod(t.IChi,trans(f.inv.Fx)), y);
 
