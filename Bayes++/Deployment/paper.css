@@ -11,27 +11,27 @@ ADDRESS {
 }
 
 BODY {
-    background-image: url(/style/paper.png);
+    background-image: url(paper.png);
 }
 
 H1 {
-    font-family: Book Antiqua, Times New Roman, Serif;
-    font-size: 34px;
+    font-family: Andale Mono,  Sans-Serif;
+    font-size: 28px;
     color: #330099;
     font-weight: bold;
     text-align: center;
 }
 
 H2 {
-    font-family: Book Antiqua, Times New Roman, Serif;
-    font-size: 28px;
+    font-family: Andale Mono, Sans-Serif;
+    font-size: 20px;
     color: #330099;
     font-weight: bold;
 }
 
 H3 {
     font-family: Verdana, Arial, Sans-Serif;
-    font-size: 18px;
+    font-size: 16px;
     color: #330099;
     font-weight: bold;
 }
@@ -39,14 +39,16 @@ H3 {
 H4 {
     font-family: Verdana, Arial, Sans-Serif;
     font-size: 14px;
+    color: #330099;
     font-weight: bold;
 }
 
 BIG {
     font-family: Verdana, Arial, Sans-Serif;
     font-size: 18px;
+    color: #330099;
     font-weight: bold;
-    font-color: #330099;
+}
 
 P {
     font-family: Verdana, Arial, Sans-Serif;
@@ -121,7 +123,3 @@ TR {
     font-size: 14px;
     font-weight: 400;
 }
-
-
-
-

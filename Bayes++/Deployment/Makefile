@@ -7,13 +7,13 @@ RELEASE=2003.x.1
 help:
 	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
 
-SFWEBLIST = *.htm Simple/simpleExample.cpp "ClassDocumentation"
+SFWEBLIST = *.html Simple/simpleExample.cpp "ClassDocumentation"
 uploaddoc:
 	cd ..; rsync --verbose --recursive --relative --compress --times --rsh=ssh $(SFWEBLIST)  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs
 
-
 uploadstyle:
 	rsync --verbose --relative --compress --times --rsh=ssh paper.css paper.png  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs/Deployment
+
 
 archivedoc:
 	cd ..; tar --create --file=bf-classdocumentation-$(RELEASE).tar.bz2 --use-compress-program=bzip2 ClassDocumentation/*
