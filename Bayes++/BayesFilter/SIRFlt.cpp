@@ -188,8 +188,8 @@ const SIR_scheme::Float SIR_scheme::rougheningKinit = 1;
 		// use 1 std.dev. per sample as default roughening
 
 SIR_scheme::SIR_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
-		Sample_filter (x_size, s_size),
 		Sample_state_filter (x_size, s_size),
+		Sample_filter (x_size, s_size),
 		random (random_helper),
 		resamples (s_size), wir (s_size)
 /*
