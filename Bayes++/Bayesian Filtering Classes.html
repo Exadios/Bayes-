@@ -1,41 +1,29 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-15">
 	<TITLE>Bayesian Filtering Classes</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.0  (Linux)">
-	<META NAME="CREATED" CONTENT="20040217;13570800">
-	<META NAME="CHANGED" CONTENT="20040217;15120400">
 	<LINK REL="stylesheet" HREF="Deployment/paper.css" TYPE="text/css">
 </HEAD>
-<BODY LANG="en-US" DIR="LTR">
+<BODY>
 <H1 ALIGN=CENTER><U>Bayesian Filtering Classes</U></H1>
-<H1>Introduction</H1>
-<P>Bayesian Filtering is a probabilistic technique for data fusion.
-The technique combines a concise mathematical formulation of a
-system, with observations of that system. Probabilities are used to
-represent the state of a system, likelihood functions to represent
-their relationships. In this form Bayesian inference can be applied
-and further related probabilities deduced. See <A HREF="http://www.wikipedia.org/">Wikipedia</A>
-for information on <A HREF="http://www.wikipedia.org/wiki/Probability_theory">Probability
+<H1> Introduction</H1>
+<P ALIGN=LEFT>
+      Bayesian Filtering is a probabilistic technique for data fusion. The technique combines a concise mathematical formulation of a system with observations of that system. Probabilities are used to represent the state of a system, likelihood functions to represent their relationships. In this form Bayesian inference can be applied and further related probabilities deduced. See <A HREF="http://www.wikipedia.org/">Wikipedia</A> for information on <A HREF="http://www.wikipedia.org/wiki/Probability_theory">Probability
 theory</A>, <A HREF="http://www.wikipedia.org/wiki/Bayes'_theorem">Bayes
 theorem</A>, <A HREF="http://www.wikipedia.org/wiki/Bayesian_inference">Bayesian
 Inference</A>.</P>
-<P>For <U>discrete</U> systems the Bayesian formulation results in a
-naturally iterative data fusion solution. For <U>dynamic</U> systems
-there is a class of solutions, discrete <U>filters</U>, that combine
-observed inputs to the system with the dynamic model. A filter that
-iteratively incorporates new information is an <U>estimator</U>. For
-linear dynamic systems, discrete solutions such as the Kalman filter
-apply.</P>
-<H2><A HREF="Bayes++.html">Bayes++ Overview</A></H2>
-<P>The Bayesian filtering classes are implemented as part of Bayes++;
-the open source C++ release of the library. These classes represent
-and implement a wide variety of numerical algorithms for Bayesian
-Filtering of discrete systems. The classes provide tested and
-consistent numerical methods and the class hierarchy explicitly
-represents the variety of filtering algorithms and system model
-types.</P>
+<P ALIGN=LEFT>For <U>discrete</U> systems the Bayesian formulation
+results in a naturally iterative data fusion solution. For <U>dynamic</U>
+systems there is a class of solutions, discrete <U>filters</U>, that combine observed outputs of the system with the system's dynamic model. An <U>estimator</U> computes a estimate of the systems state with each observation
+of the system. Linear estimators such as the Kalman Filter are commonly applied.</P>
+<P>Bayes++ is an open source library of C++ classes. These
+classes represent and implement a wide variety of numerical
+algorithms for Bayesian Filtering of discrete systems. The classes
+provide tested and consistent numerical methods and the class
+hierarchy explicitly represents the variety of filtering algorithms
+and system model types</P>
+
 <P>The following documentation summaries the classes available and
 provides some general comments on their use. Each class's <B>.hpp</B>
 file provides a complete interface specification and the numerical
@@ -52,173 +40,140 @@ Scheme is implemented as a class. Each scheme implements the
 algorithms required by a filter's particular numerical form. The
 schemes provide a common interface that allows:</P>
 <DL>
-	<DL>
-		<DD STYLE="margin-bottom: 0.5cm">i. initialization and update of
-		the state, and</DD><DD STYLE="margin-bottom: 0.5cm">
-		ii. predict and observe functions with parameterized models</DD></DL>
+	<DD>i. initialization and update of the state, and</DD>
+	<DD>ii. predict and observe functions with parameterized models</DD>
 </DL>
-<P>
-Each Scheme has both advantages and disadvantages. The numerical
+<P>Each Scheme has both advantages and disadvantages. The numerical
 complexity and efficiency varies, as does the numerical stability.
 The table below lists all Schemes together with any requirement on
 the representation associated with the algorithm.</P>
 <TABLE WIDTH=725 BORDER=5 CELLPADDING=0 CELLSPACING=0>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
-			<H3>Scheme 
-			</H3>
+			<P><B><FONT FACE="Verdana" SIZE=5>Scheme</FONT></B>
 		</TD>
 		<TD WIDTH=43%>
-			<H3>Formulation and<BR>Algorithm used 
-			</H3>
+			<P><B><FONT FACE="Verdana" SIZE=4>Formulation and<BR>Algorithm
+			used</FONT></B>
 		</TD>
 		<TD WIDTH=25%>
-			<H3>Representation Requirements 
-			</H3>
+			<P><B><FONT FACE="Verdana" SIZE=4>Representation
+			Requirements</FONT></B>
 		</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>Covariance_scheme</H4>
 			<P>Extended Kalman Filter (EKF)</P>
-			<P><A HREF="#References">See Reference[6]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[6]</A></TD>
 		<TD WIDTH=43%>
 			<P>Classic 2nd order filter with state mean and covariance
 			representation. Non-linear models require a gradient linearisation
-			(Jacobian). Uses the common innovation update formulation.</P>
-		</TD>
+			(Jacobian). Uses the common innovation update formulation.</TD>
 		<TD WIDTH=25%>
-			<P>Innovation covariance invertible</P>
-		</TD>
+			<P>Innovation covariance invertible</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>Unscented_scheme</H4>
 			<P>Kalman filter using unscented non-linear approximations</P>
-			<P><A HREF="#References">See Reference[1]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[1]</A></TD>
 		<TD WIDTH=43%>
 			<P>Unscented non-linear transformations replace the Jacobians used
-			in the EKF- reducing linearisation errors in all cases.</P>
-		</TD>
+			in the EKF- reducing linearisation errors in all cases.</TD>
 		<TD WIDTH=25%>
-			<P>Innovation covariance invertible</P>
-		</TD>
+			<P>Innovation covariance invertible</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>Iterated_covariance_scheme</H4>
 			<P>Modified EKF update</P>
-			<P><A HREF="#References">See Reference[6]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[6]</A></TD>
 		<TD WIDTH=43%>
 			<P>Kalman filter for highly non-linear observation models.
-			Observation update is iterated using an Euler approximation.</P>
-		</TD>
+			Observation update is iterated using an Euler approximation.</TD>
 		<TD WIDTH=25%>
-			<P>State, observation and innovation covariance invertible</P>
-		</TD>
+			<P>State, observation and innovation covariance invertible</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>Information_scheme</H4>
 			<P>Extended Information Filter (EIF)</P>
-			<P><A HREF="#References">See Reference[7]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[7]</A></TD>
 		<TD WIDTH=43%>
 			<P>Information (inverse covariance) filter.</P>
 			<P>Invertible linear model allows direct information form
 			prediction.<BR>Non-linear prediction requires conversion back to
 			state representation.<BR>Observe with modified innovation
-			formulation equivalent to EKF.</P>
-		</TD>
+			formulation equivalent to EKF.</TD>
 		<TD WIDTH=25%>
-			<P>State, observation and innovation covariance invertible</P>
-		</TD>
+			<P>State, observation and innovation covariance invertible</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>Information_root_scheme</H4>
 			<P>Square root information filter (SRIF)</P>
-			<P><A HREF="#References">See Reference[4]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[4]</A></TD>
 		<TD WIDTH=43%>
 			<P>Numerically stable solution using factorization of inverse
-			covariance as R'R</P>
-		</TD>
+			covariance as R'R</TD>
 		<TD WIDTH=25%>
 			<P>Invertible prediction model. Prediction and observation
-			covariance invertible</P>
-		</TD>
+			covariance invertible</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>UD_scheme</H4>
 			<P>Square root covariance filter</P>
-			<P><A HREF="#References">See Reference[2]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[2]</A></TD>
 		<TD WIDTH=43%>
 			<P>Numerically stable solution using UdU' factorization of
-			covariance.</P>
-		</TD>
+			covariance.</TD>
 		<TD WIDTH=25%>
 			<P>Innovation covariance invertible. Linearized observation
-			requires uncorrelated noise</P>
-		</TD>
+			requires uncorrelated noise</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD>
-			<H4>CI_scheme</H4>
-			<P>Covariance intersect filter</P>
-			<P><A HREF="#References">See Reference[8]</A></P>
-		</TD>
+			<P><B>CI_scheme<BR><BR></B>Covariance intersect filter
+			</P>
+			<P><A HREF="#References">See Reference[8]</A></TD>
 		<TD>
 			<P>CI is interesting as it provides a weaker but more robust
 			fusion then traditional covariance based method such as the Kalman
 			filter. It estimates state and an upper bound of what its
-			covariance could be.</P>
-		</TD>
+			covariance could be.</TD>
 		<TD>
-			<P>No solution if covariances don't intersect.</P>
-		</TD>
+			<P>No solution if covariances don't intersect.</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>SIR_scheme</H4>
 			<P>Sequential Importance Re-sampling filter</P>
-			<P><A HREF="#References">See Reference[5]</A></P>
-		</TD>
+			<P><A HREF="#References">See Reference[5]</A></TD>
 		<TD WIDTH=43%>
-			<P>A bootstrap representation of the state distribution – no
+			<P>A bootstrap representation of the state distribution &ndash; no
 			linear or Gaussian assumptions required.</P>
-			<P>Uncorrelated linear roughening of samples.</P>
-		</TD>
+			<P>Uncorrelated linear roughening of samples.</TD>
 		<TD WIDTH=25%>
 			<P>Bootstrap samples collapse to a degenerate from with fewer
-			samples then states.</P>
-		</TD>
+			samples then states.</TD>
 	</TR>
 	<TR VALIGN=TOP>
 		<TD WIDTH=30%>
 			<H4>SIR_kalman_scheme</H4>
-			<P>Sequential Importance Re-sampling filter</P>
-		</TD>
+			<P>Sequential Importance Re-sampling filter</TD>
 		<TD WIDTH=43%>
-			<P>A bootstrap representation of the state distribution – no
+			<P>A bootstrap representation of the state distribution &ndash; no
 			linear or Gaussian assumptions required.</P>
 			<P>Additional computes state mean and covariance. Correlated
-			linear roughening of samples.</P>
-		</TD>
+			linear roughening of samples.</TD>
 		<TD WIDTH=25%>
-			<P>As above. Correlation non-computable from degenerate samples.</P>
-		</TD>
+			As above. Correlation non-computable from degenerate samples.</TD>
 	</TR>
 </TABLE>
-<P><BR><BR>
-</P>
 <H1>Three Examples</H1>
-<H2>Simple Example (Initialize – Predict – Observe)</H2>
+<H2>Simple Example (Initialize &ndash; Predict &ndash; Observe)</H2>
 <P>This is very simple example for those who have never used the
 Bayesian Filtering Classes before. The example shows how two classes
 are built. The first is the prediction model, the second the
@@ -226,32 +181,30 @@ observation model. In this example they represent a simple linear
 problem with only one state variable and constant model noises.</P>
 <P>The example then constructs a filter. The <B>Unscented</B> filter
 scheme is chosen to illustrate how this works, even on a simple
-linear problem. After construction the filter is given the problem’s
+linear problem. After construction the filter is given the problem&rsquo;s
 initial conditions. A prediction using the predefine prediction model
 is then made. This prediction is then fused with an external
 observation given by the example and the defined observation model.
-At each stage, the filter’s state estimate and variance estimate
-are printed.</P>
+At each stage, the filter&rsquo;s state estimate and variance
+estimate are printed.</P>
 <H2>Position and Velocity</H2>
 <P>This example solves a simple position and velocity observation
 problem using the Bayesian filter classes. The system has two states,
 position and velocity, and a noisy position observation is simulated.
 Two variants:</P>
 <DL>
-	<DL>
-		<DD STYLE="margin-bottom: 0.5cm">1) direct filter</DD><DD STYLE="margin-bottom: 0.5cm">
-		2) indirect filter where the filter is preformed on error and state
-		is estimated indirectly</DD></DL>
+		<DD>1) direct filter</DD>
+		<DD>2) indirect filter where the filter is preformed on error
+		and state is estimated indirectly</DD>
 </DL>
-<P>
-are demonstrated using a specified numerical scheme. The example
+<P>are demonstrated using a specified numerical scheme. The example
 shows how to build <U>linear</U> prediction and observation models
 and to cycle the filter to produce state estimates.</P>
 <H2>Quadratic Calibration</H2>
-<P>This example implements a “Quadratic Calibration” filter. The
-observer is trying to estimate the state of a system as well as the
-systems scale factor and bias. A simple system is simulated where the
-state is affected by a known perturbation.</P>
+<P>This example implements a &ldquo;Quadratic Calibration&rdquo;
+filter. The observer is trying to estimate the state of a system as
+well as the systems scale factor and bias. A simple system is
+simulated where the state is affected by a known perturbation.</P>
 <P>The example shows how to build <U>linearized</U> prediction and
 observation model and cycle a filter to produce state estimates.</P>
 <H1>Dual Abstraction</H1>
@@ -274,298 +227,165 @@ numerical schemes.</P>
 <H2>Filter Hierarchy</H2>
 <P>The table below lists a few of the key abstract filter classes
 upon which filter Schemes are build. The C++ class hierarchy
-documentation gives the complete structure including their
-inheritance relationships.</P>
-<P>The classes are split into three groups corresponding to their
-structure and usage. The first group provides a base class for all
-filter classes and interfaces for fundamental (simple) models.</P>
-<P>The second group is fundamental to the Bayesian filtering process.
-They introduce state representation properties. These properties can
-be thought of as state statistics or <A HREF="#Probabilistic representation of state|outline">state
-probability distributions</A>.  The state representation classes are
-designed to be <A HREF="#Sharing schemes state representation|outline">shared</A>.
-It is reasonable to have more then one state representation but each
-representation should on appear once. Therefore these classes should
-be virtually derived.</P>
-<P>A specific filter scheme will derive its interface and properties
-from one or more of the filter classes. The third group of classes
-simply this and to provide a common structure. They predefine
-standard filter types and define their state representation and
-interface. Filter schemes are normal derived directly from one of
-these classes.</P>
+documentation gives the complete structure.</P>
 <DL>
-	<DL>
-		<DD>
-		<TABLE WIDTH=690 BORDER=3 CELLPADDING=2 CELLSPACING=0 STYLE="page-break-before: always">
-			<COL WIDTH=172>
-			<COL WIDTH=163>
-			<COL WIDTH=337>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P> <FONT FACE="Arial Black">Class</FONT></P>
-				</TD>
-				<TD WIDTH=163>
-					<P><FONT FACE="Arial Black">Properties and<BR><I>Interface</I></FONT></P>
-				</TD>
-				<TD WIDTH=337>
-					<P><FONT FACE="Arial Black">Description</FONT></P>
-				</TD>
-			</TR>
-			<TR></TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>Bayes_filter_base</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P>Empty</P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Base class for everything<BR>(contains no data) 
-					</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>Likelihood_filter</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P><SPAN STYLE="font-style: normal">No state</SPAN><I><BR>observe</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Represents only the Bayesian Likelihood of a state
-					observation</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>Functional_filter</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P><SPAN STYLE="font-style: normal">No state</SPAN><I><BR>predict</I>
-										</P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Represents only the filter prediction by a simple functional
-					(non-stochastic) model</P>
-				</TD>
-			</TR>
-			<TR></TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>State_filter</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P>State as x<BR><I>update</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Represents only the filter state and an update on that state</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>Kalman_state_filter</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P>State as x,X<BR><I>init, update</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Kalman representation of state statistics.<BR>Represents a
-					state vector and a covariance matrix. That is the 1st (mean) and
-					2nd (covariance) moments of a distribution.</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><B>Information_state_filter</B></P>
-				</TD>
-				<TD WIDTH=163>
-					<P STYLE="font-weight: medium">State as y,Y<BR><I>init_yY,
-					update_yY</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Information representation of state statistics.<BR>Effectively
-					the inverse of the Kalman_state_filter representation.</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><B>Sample_state_filter</B></P>
-				</TD>
-				<TD WIDTH=163>
-					<P STYLE="font-weight: medium">State<BR>i<I>nit_S, update_
-					resample</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Finite sampling representation of the state statistics.</P>
-				</TD>
-			</TR>
-			<TR></TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>Linrz_filter</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P STYLE="font-weight: medium"><I>predict, observe</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Base for linear or gradient linearized Kalman filters
-					scheme.<BR>Filter operation is specified using predict and
-					observe functions</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><B>Extended_kalman_filter</B></P>
-				</TD>
-				<TD WIDTH=163>
-					<P STYLE="font-weight: medium"><I>observe, observe_innovation</I>
-										</P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Base for an Extended Kalman Scheme where observe is
-					implemented directly from observation innovations.</P>
-				</TD>
-			</TR>
-			<TR VALIGN=TOP>
-				<TD WIDTH=172>
-					<P><STRONG>Sample_filter</STRONG></P>
-				</TD>
-				<TD WIDTH=163>
-					<P><I>Predict, observe, observe_likelihood</I></P>
-				</TD>
-				<TD WIDTH=337>
-					<P>Base for a Scheme representing state probability distribution
-					by a discrete sampling</P>
-				</TD>
-			</TR>
-		</TABLE>
-	</DL>
+	<DD>
+				<TABLE WIDTH=566 BORDER=3 CELLPADDING=2 CELLSPACING=0>
+					<COL WIDTH=210>
+					<COL WIDTH=342>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>Bayes_filter</STRONG>
+						</TD>
+						<TD WIDTH=342>
+							<P>Base class for everything<BR>(contains no data)
+						</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>Likelihood_filter</STRONG></TD>
+						<TD WIDTH=342>
+							<P>Represents only the Bayesian Likelihood of a state
+							observation</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>Functional_filter</STRONG></TD>
+						<TD WIDTH=342>
+							<P>Represents only the filter prediction by a simple
+							functional (non-stochastic) model</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>State_filter</STRONG></TD>
+						<TD WIDTH=342>
+							<P>Represents only the filter state and an update on that
+							state</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>Kalman_state_filter</STRONG></TD>
+						<TD WIDTH=342>
+							<P>Kalman representation of state statistics.<BR>Represents a
+							state vector and a covariance matrix. That is the 1st (mean)
+							and 2nd (covariance) moments of a distribution.</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><B>Information_state_filter</B></TD>
+						<TD WIDTH=342>
+							<P>Information representation of state statistics.<BR>Effectively
+							the inverse of the Kalman_state_filter representation.</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>Linrz_filter</STRONG></TD>
+						<TD WIDTH=342>
+							<P>Model interface for a linear or gradient linearized Kalman
+							filters.<BR>Specifies filter operation using predict and
+							observe functions</TD>
+					</TR>
+					<TR VALIGN=TOP>
+						<TD WIDTH=210>
+							<P><STRONG>Sample_filter</STRONG></TD>
+						<TD WIDTH=342>
+							<P>Discreate reprensation of state statistic.<BR>Base class
+							for filters representing state probability distribution by a
+							discrete sampling</TD>
+					</TR>
+				</TABLE>
+	</DD>
 </DL>
 <H2 ALIGN=LEFT>Model Hierarchy</H2>
 <P ALIGN=LEFT>These two tables show some of the classes in the
-hierarchy upon which models are built.</P><A NAME="Table1"></A><DL>
-	<DL>
-		<DL>
-			<DL>
-				<DL>
-					<DD>
+hierarchy upon which models are built.</P><A NAME="predict models"></A>
+<DL>
+	<DD>
 					<TABLE WIDTH=561 BORDER=3 CELLPADDING=2 CELLSPACING=0>
 						<COL WIDTH=223>
 						<COL WIDTH=324>
 						<TR VALIGN=TOP>
 							<TD WIDTH=223>
-								<P><STRONG>Sampled_predict_model</STRONG></P>
+								<P><STRONG>Sampled_predict_model</STRONG></TD>
+							<TD WIDTH=324>
+								<P>Sampled stochastic prediction model</TD>
+						</TR>
+						<TR VALIGN=TOP>
+							<TD WIDTH=223>
+								<P><STRONG>Functional_predict_model</STRONG>
 							</TD>
 							<TD WIDTH=324>
-								<P>Sampled stochastic prediction model</P>
+								<P>Functional (non-stochastic) prediction model
 							</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=223>
-								<P><STRONG>Functional_predict_model</STRONG> 
-								</P>
-							</TD>
-							<TD WIDTH=324>
-								<P>Functional (non-stochastic) prediction model 
-								</P>
-							</TD>
-						</TR>
-						<TR VALIGN=TOP>
-							<TD WIDTH=223>
-								<P><STRONG>Additive_predict_model</STRONG></P>
-							</TD>
+								<P><STRONG>Addative_predict_model</STRONG></TD>
 							<TD WIDTH=324>
 								<P>Additive Gaussian noise prediction model.<BR>This
 								fundamental model for linear/linearized filtering, with noise
-								added to a functional prediction</P>
-							</TD>
+								added to a functional prediction</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=223>
-								<P><STRONG>Linrz_predict_model</STRONG></P>
-							</TD>
+								<P><STRONG>Linrz_predict_model</STRONG></TD>
 							<TD WIDTH=324>
 								<P>Linearized prediction model with Jacobian of non-linear
-								functional part</P>
-							</TD>
+								functional part</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=223>
-								<P><STRONG>Linear_predict_model</STRONG></P>
-							</TD>
+								<P><STRONG>Linear_predict_model</STRONG></TD>
 							<TD WIDTH=324>
-								<P>Linear prediction model</P>
-							</TD>
+								<P>Linear prediction model</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=223>
-								<P><STRONG>Linear_invertable_predict_model</STRONG></P>
-							</TD>
+								<P><STRONG>Linear_invertable_predict_model</STRONG></TD>
 							<TD WIDTH=324>
-								<P>Linear prediction model which is invertible</P>
-							</TD>
+								<P>Linear prediction model which is invertible</TD>
 						</TR>
 					</TABLE>
-				</DL>
-			</DL>
-		</DL>
-	</DL>
+	</DD>
 </DL>
-<P>&nbsp;</P><A NAME="Table2"></A><DL>
-	<DL>
-		<DL>
-			<DL>
-				<DL>
-					<DD>
+<P>&nbsp;</P><A NAME="observe models"></A>
+<DL>
+	<DD>
 					<TABLE WIDTH=558 BORDER=3 CELLPADDING=2 CELLSPACING=0>
 						<COL WIDTH=222>
 						<COL WIDTH=322>
 						<TR VALIGN=TOP>
 							<TD WIDTH=222 HEIGHT=39>
-								<P><STRONG>Likelihood_observe_model</STRONG> 
-								</P>
+								<P><STRONG>Likelihood_observe_model</STRONG>
 							</TD>
 							<TD WIDTH=322>
 								<P>Likelihood observation model<BR>The most fundamental
-								Bayesian definition of an observation</P>
-							</TD>
+								Bayesian definition of an observation</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=222>
-								<P><STRONG>Functional_observe_model</STRONG></P>
-							</TD>
+								<P><STRONG>Functional_observe_model</STRONG></TD>
 							<TD WIDTH=322>
-								<P>Functional (non-stochastic) observation model</P>
-							</TD>
+								<P>Functional (non-stochastic) observation model</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=222>
-								<P><STRONG>Linrz_uncorrelated_observe_model</STRONG></P>
-							</TD>
+								<P><STRONG>Linrz_uncorrelated_observe_model</STRONG></TD>
 							<TD WIDTH=322>
 								<P>Linearized observation model with Jacobian of non-linear
-								functional part and additive uncorrelated noise</P>
-							</TD>
+								functional part and additive uncorrelated noise</TD>
 						</TR>
 						<TR VALIGN=TOP>
 							<TD WIDTH=222 HEIGHT=23>
-								<P><STRONG>Linrz_correlated_observe_model</STRONG></P>
-							</TD>
+								<P><STRONG>Linrz_correlated_observe_model</STRONG></TD>
 							<TD WIDTH=322>
-								<P>as above, but with additive correlated noise</P>
-							</TD>
+								<P>as above, but with additive correlated noise</TD>
 						</TR>
 					</TABLE>
-				</DL>
-			</DL>
-		</DL>
-	</DL>
+	</DD>
 </DL>
-<P><BR><BR>
-</P>
 <H1>Capabilities</H1>
-<H2><A NAME="Probabilistic representation of state|outline"></A>Probabilistic
-representation of state</H2>
+<H2>Probabilistic representation of state</H2>
 <P>Bayes rule is usually defined in term of Probability Density
 Functions. However PDFs never appear in Bayes++. They are always
 represented by their statistics.</P>
@@ -619,7 +439,7 @@ parameter list.</P>
 <H3>Open interface</H3>
 <P>The design of the class hierarchy is deliberately open. Many of
 the variables associated with schemes are exposed as <I>public
-members</I>. For example the covariance filter’s innovation
+members</I>. For example the covariance filter&rsquo;s innovation
 covariance is public. This is to allow efficient algorithms to be
 implemented using the classes. In particular it is often the case
 that subsequent computations reuse the values that have already been
@@ -630,26 +450,25 @@ derived classes to modify a scheme without requiring any additional
 overhead to allocate its own temporaries.</P>
 <P>Open interfaces are potentially hazardous. The danger is that
 abuse could result in unnecessary dependencies on particular
-implementation characteristics. 
+implementation characteristics.
 </P>
 <H4>Public state representation Initialization and Update</H4>
 <P>The two functions <B>init</B> and <B>update</B> are defined in the
 filter class hierarchy for classes with names ending <B>_state_filter</B>.
 They are very important in allowing the <I>public state
 representation</I> to be managed.</P>
-<BLOCKQUOTE><U>After</U> the public representation of a scheme is
+<BLOCKQUOTE><P><U>After</U> the public representation of a scheme is
 changed (externally) the filter should be <I>initialized</I> with an
 <B>init</B> function. The scheme may define additional init functions
 that allow it to be initialized from alternative representations.
 <B>init()</B> is defined for schemes derived from
-<B>Kalman_state_filter</B>.</BLOCKQUOTE>
-<BLOCKQUOTE><U>Before</U> the public representation of a scheme is
+<B>Kalman_state_filter</B>.</P></BLOCKQUOTE>
+<BLOCKQUOTE><P><U>Before</U> the public representation of a scheme is
 used the filter should be <I>updated</I> with an <B>update</B>
 function. The scheme may define additional update functions that
 allow it to update alternative representations. <B>update()</B> is
-defined for schemes derived from <B>Kalman_state_filter</B>.</BLOCKQUOTE>
-<H4><A NAME="Sharing schemes state representation|outline"></A>Sharing
-schemes state representation</H4>
+defined for schemes derived from <B>Kalman_state_filter</B>.</P></BLOCKQUOTE>
+<H4>Sharing schemes state representation</H4>
 <P>The filter hierarchy has been specifically designed to allow state
 representation to be shared. Schemes state representations are
 inherited using one or more <B>_state_filter</B> 's as virtual base
@@ -725,16 +544,16 @@ the post-conditions of update are guaranteed. The post-conditions of
 covariance matrix is PSD. Many application specific tests may also be
 required. Just being PSD doesn't say much about X. It could even have
 <EM>Infinity</EM> values on the diagonal! Conditioning, trace,
-determinate, and variance bounds can all be applied at his point. 
+determinate, and variance bounds can all be applied at his point.
 </P>
 <H1>Polymorphic design</H1>
 <P>Why are models and filter Schemes <STRONG>polymorphic</STRONG> ?
 OR Why are they implemented with virtual functions?</P>
-<BLOCKQUOTE>One alternative would be to use <STRONG>generic</STRONG>
+<BLOCKQUOTE><P>One alternative would be to use <STRONG>generic</STRONG>
 instead of <STRONG>polymorphic</STRONG> Schemes. This would implement
 Schemes as templates. If the sizes of matrix operations could be
 fixed generic models and schemes would directly manipulate matrices
-for predefined size.</BLOCKQUOTE>
+for predefined size.</P></BLOCKQUOTE>
 <P>Bayes++ relies on a <STRONG>dual abstraction</STRONG>, separating
 numerical schemes from model structure. To represent these, a
 <STRONG>polymorphic design </STRONG>was a very important part of
@@ -770,7 +589,7 @@ these requirements. It an excellent basic linear algebra library. The
 interface and syntax are easy to use.</P>
 <P>Previous versions of the filters were implemented with the <A HREF="http://www.osl.iu.edu/research/mtl/" TARGET="_top">Matrix
 Template Library</A>, <I>MPP</I> and <I>TNT</I>. Public releases
-using MTL are still available. 
+using MTL are still available.
 </P>
 <P>The Bayes++ implementation uses a set of adapter classes in the
 namespace <I>Bayesian_filter_matrix</I> (FM for short) for matrix
@@ -792,13 +611,13 @@ dynamic memory allocation which is very slow. For small matrices this
 dominates compared to the cost of simple operations such as addition
 and multiplication.</P>
 <P>There are three ways out of this problem.</P>
-<BLOCKQUOTE>1. Use fixed size matrices; they can (nearly) always be
-efficiently allocated on the stack.<BR>2. Use stack based dynamic
+<BLOCKQUOTE><P>1. Use fixed size matrices; they can (nearly) always
+be efficiently allocated on the stack.<BR>2. Use stack based dynamic
 allocators (such as C99's dynamic arrays or alloca) for
 temporaries.<BR>3. Don't create temporaries. This is achievable with
 a combination of hard coding in the algorithms (pre-allocation) and
 by using a Matrix library with expression templates to avoid creating
-temporaries for return values.</BLOCKQUOTE>
+temporaries for return values.</P></BLOCKQUOTE>
 <P>Bayes++ is implemented to avoid creating temporaries. At present
 my solution is somewhat of a compromise. MTL is only moderately
 efficient on most C++ compilers. On release code this results in a
@@ -884,17 +703,17 @@ its numerical solution. Mostly what is needed is Cholesky and QR
 decomposition and these have good sparse solutions. Obviously there
 would be a runtime overhead for this but it would be great for
 Simultaneous Location and Mapping problems!</P>
-<H1 ALIGN=LEFT>Copyright</H1>
-<P ALIGN=LEFT>Copyright (c) 2003,2004 Michael Stevens. This document
-is part of the Bayes++ library - see Bayes++.html for copyright
-license details.</P>
+<H1 ALIGN=LEFT></A>Copyright</H1>
+<P ALIGN=LEFT>Copyright (c) 2003,2004,2005 Michael Stevens. This document is
+part of the Bayes++ library - see Bayes++.html for copyright license
+details.</P>
 <H1><A NAME="References"></A>References</H1>
 <P>[1] &quot;A New Approach for Filtering Nonlinear Systems&quot;, SJ
 Julier JK Uhlmann HF Durrant-Whyte, American Control Conference 1995</P>
 <P>[2] &quot;Factorisation Methods for Discrete Sequential
 Estimation&quot;, Gerald J. Bierman, ISBN 0-12-097350-2</P>
-<P>[3] &quot;Kalman Filtering : theory and practice&quot;, Mohinder
-S. Grewal, Angus P. Andrews, ISBN 0-13-211335-X</P>
+<P>[3] &quot;Real time Kalman Filter Application&quot;, Mohinder S.
+Grewal, Angus P. Andrews, ISBN 0-13-211335-X</P>
 <P>[4] &quot;Extension of Square-Root Filtering to Include Process
 Noise&quot;, P. Dyer and S. McReynolds, Journal of Optimization
 Theory and Applications, Vol.3 No.6 1969</P>
@@ -906,8 +725,8 @@ Fortmann, Academic Press, ISBN 0-12-079760-7</P>
 <P>[7] &quot;Stochastic Models, Estimation, and Control&quot;, Peter
 S Maybeck, Academic Press, ISBN 0-12-480701-1</P>
 <P>[8] &quot;A non-divergent Estimation Algorithm in th Presence of
-Unknown Correlation&quot;, SJ Julier, JK Uhlmann, Proc. American
-Control Conference 6/1997 
+Unknown Correlaltion&quot;, SJ Julier, JK Uhlmann, Proc. American
+Control Conference 6/1997
 </P>
 <P>[9] &quot;Exception-Safety in Generic Components&quot;, David
 Abrahams, Proc. of a Dagstuhl Seminar 'Generic Programming', Lecture
