@@ -25,7 +25,5 @@
 #include "itrFlt.hpp"
 #include "SIRFlt.hpp"
 #include "models.hpp"
-#include "schemeFlt.hpp"
-#include "matSup.hpp"
 
 #endif
