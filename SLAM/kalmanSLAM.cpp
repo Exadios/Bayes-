@@ -25,7 +25,7 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 // Zero a matrix_range
 {	// Note A cannot be a reference
 	typedef typename Base::value_type Base_value_type;
-	noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type());
+	FM::noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type());
 }
 
 Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& location_filter, Full_filter& filter_generator ) :
