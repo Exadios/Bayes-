@@ -1,7 +1,7 @@
 BayesFilter TODO List
 
 FOR RELEASE
-		Build GCC2.95.3
+		Build GCC2.95.3 and VC7
 	Check what UBLAS macros are needed
 		For execeptions/errors
 		For storage
@@ -10,6 +10,7 @@ FOR RELEASE
 
 TODO
 	Use f() to represent normal models parametised at state x
+		Rejected current model are parameterised as state
 	Extended update managment helper
 	Replace General_ with a form that works with functional forms
 	Replace UdU function with UdU class
