@@ -371,8 +371,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 	Float SigmaScale = K * pow (Float(P.size2()), -1/Float(x_size));
 
 						// Find min and max states in all P, precond P not empty
-	Vec xmin(x_size); xmin .noA()= column(P,0);
-	Vec xmax(x_size); xmax .noA()= xmin;
+	Vec xmin(x_size); noalias(xmin) = column(P,0);
+	Vec xmax(x_size); noalias(xmax) = xmin;
 	ColMatrix::iterator2 pi = P.begin2();
 	while (pi != P.end2())		// Loop includes 0 to simplify code
 	{
@@ -391,7 +391,7 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
    						// Roughening st.dev max-min
 	Vec rootq(x_size);
 	rootq = xmax;
-	rootq .noA()-= xmin;
+	noalias(rootq) -= xmin;
 	rootq *= SigmaScale;
    						// Apply roughening prediction based on scaled variance
 	DenseVec n(x_size);
@@ -402,7 +402,7 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 			*ni *= rootq[ni.index()];
 		}
 		FM::ColMatrix::Column Pi(P,pi.index2());
-		n .noA()+= Pi;			// add to P
+		noalias(n) += Pi;			// add to P
 		Pi = n;
 	}
 }

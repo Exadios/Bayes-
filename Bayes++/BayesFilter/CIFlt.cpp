@@ -139,10 +139,10 @@ Bayes_base::Float
 	Matrix K (prod(XHT*(one-omega), SI));
 
 						// state update
-	x .noA()+= prod(K, s);
+	noalias(x) += prod(K, s);
 						// inverse covariance
 	invX *= omega;						
-	invX .noA()+= HTinvZH*(one-omega);
+	noalias(invX) += HTinvZH*(one-omega);
 						// covariance
 	rcond = UdUinversePD (X, invX);
 	rclimit.check_PD(rcond, "inverse covariance not PD in observe");

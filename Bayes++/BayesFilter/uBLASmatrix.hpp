@@ -68,43 +68,14 @@ public:
 		assign(r);
 		return *this;
 	}
-private:
-	template <class B>
-	struct NoAliasAssign
-	{
-		NoAliasAssign (B& b) : b_(b)
-		{}
-		template <class E>
-		void operator= (const E& e)
-		{	
-			b_ .assign (e);
-		}
-		template <class E>
-		void operator+= (const E& e)
-		{	
-			b_ .plus_assign (e);
-		}
-		template <class E>
-		void operator-= (const E& e)
-		{	
-			b_ .minus_assign (e);
-		}
-	    private:
-	        B& b_;
-	}; 
-public:
-	NoAliasAssign<FMVec> noA()
-	{	// Return a no alias assignment proxy
-		return NoAliasAssign<FMVec>(*this);
-	}
 
-
+	// Range selection operators
 	const ublas::vector_range<const VecBase> operator()(size_t b, size_t e) const
-	{	// Range selection operator
+	{
 		return ublas::vector_range<const VecBase>(*this, ublas::range(b,e));
 	}
 	ublas::vector_range<VecBase> operator()(size_t b, size_t e)
-	{	// Range selection operator
+	{
 		return ublas::vector_range<VecBase>(*this, ublas::range(b,e));
 	}
 };
@@ -140,35 +111,6 @@ public:
 	{	// Matrix assignment; independant
 		assign (r);
 		return *this;
-	}
-private:
-	template <class B>
-	struct NoAliasAssign
-	{
-		NoAliasAssign (B& b) : b_(b)
-		{}
-		template <class E>
-		void operator= (const E& e)
-		{	
-			b_ .assign (e);
-		}
-		template <class E>
-		void operator+= (const E& e)
-		{	
-			b_ .plus_assign (e);
-		}
-		template <class E>
-		void operator-= (const E& e)
-		{	
-			b_ .minus_assign (e);
-		}
-	    private:
-	        B& b_;
-	}; 
-public:
-	NoAliasAssign<FMMatrix> noA()
-	{	// Return a no alias assignment proxy
-		return NoAliasAssign<FMMatrix>(*this);
 	}
 
 	// Row,Column vector proxies
@@ -228,20 +170,20 @@ public:
  * Helper template to allow member construction before base class
  *  Boost version does not work as it passes by value
  */
-template < typename MemberType>
-class base_from_member
+template <typename MemberType>
+class BaseFromMember
 {
 protected:
-	MemberType  member;
-	explicit  base_from_member() : member()
+	MemberType member;
+	explicit BaseFromMember() : member()
 	{}
 
-	template< typename T1 >
-	explicit base_from_member( const T1& x1 ) : member( x1 )
+	template <typename T1>
+	explicit BaseFromMember( const T1& x1 ) : member( x1 )
 	{}
 
-	template< typename T1, typename T2>
-	explicit base_from_member( const T1& x1, const T2& x2 ) : member( x1, x2 )
+	template <typename T1, typename T2>
+	explicit BaseFromMember( const T1& x1, const T2& x2 ) : member( x1, x2 )
 	{}
 };
 
@@ -253,10 +195,10 @@ protected:
  */
 template <class MatrixBase>
 class SymMatrixWrapper :
-	private base_from_member<MatrixBase>,  // allow construction of rm before symmertic_adaptor
+	private BaseFromMember<MatrixBase>,  // allow construction of rm before symmertic_adaptor
 	public ublas::symmetric_adaptor<MatrixBase, ublas::upper>
 {
-	typedef base_from_member<MatrixBase> matrix_type;
+	typedef BaseFromMember<MatrixBase> matrix_type;
 	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> adaptor_type;
 public:
 	SymMatrixWrapper () : matrix_type(), adaptor_type(member)
@@ -298,11 +240,56 @@ public:
 	}
 };
 
+/*
+ * No Alias assignment proxy
+ */
+template <class C>
+struct NoAliasAssign
+{	
+	NoAliasAssign (C& lval) : lval_(lval)
+	{}
+	template <class E>
+	void operator= (const E& e)
+	{	
+		lval_.assign (e);
+	}
+	template <class E>
+	void operator+= (const E& e)
+	{	
+		lval_.plus_assign (e);
+	}
+	template <class E>
+	void operator-= (const E& e)
+	{	
+		lval_.minus_assign (e);
+	}
+	private:
+	    C& lval_;
+}; 
+
 }//namespace detail
 
 
 /*
- * Filter Vector / Matrix types
+ * Improve syntax of effcient assignment where no aliases of LHS appear on the RHS
+ *  noalias(lhs) = rhs_expression
+ */
+template <class VecBase>
+detail::NoAliasAssign<detail::FMVec<VecBase> >
+ noalias(detail::FMVec<VecBase>& lvalue)
+{
+	return detail::NoAliasAssign<detail::FMVec<VecBase> > (lvalue);
+}
+template <class MatrixBase>
+detail::NoAliasAssign<detail::FMMatrix<MatrixBase> >
+ noalias(detail::FMMatrix<MatrixBase>& lvalue)
+{
+	return detail::NoAliasAssign<detail::FMMatrix<MatrixBase> > (lvalue);
+}
+
+
+/*
+ * Vector / Matrix types
  *  Finally the definitions !
  */
 using detail::FMVec;		// Template class for template parameter matching
@@ -339,7 +326,7 @@ typedef FMMatrix<detail::SymMatrixWrapper<detail::BaseSparseRowMatrix> > SparseS
 
 
 /*
- * Filter Matrix Adaptors, simply hide the uBLAS details
+ * Matrix Adaptors, simply hide the uBLAS details
  */
 template <class M>
 const ublas::triangular_adaptor<const M, ublas::upper>

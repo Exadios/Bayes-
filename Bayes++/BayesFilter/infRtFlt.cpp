@@ -52,7 +52,7 @@ void Information_root_scheme::init ()
 	bool singular = UTinverse (R);
 	assert (!singular); (void)singular;
 						// Information Root state r=R*x
-	r .noA()= prod(R,x);
+	noalias(r) = prod(R,x);
 }
 
 void Information_root_info_scheme::init_yY ()
@@ -93,7 +93,7 @@ void Information_root_info_scheme::init_yY ()
 	RI = R;
 	bool singular = UTinverse(RI);
 	assert (!singular); (void)singular;
-	r .noA()= prod(FM::trans(RI),y);
+	noalias(r) = prod(FM::trans(RI),y);
 }
 
 void Information_root_scheme::update ()
@@ -112,8 +112,8 @@ void Information_root_scheme::update ()
 	if (singular)
 		error (Numeric_exception("R not PD"));
 
-	X .noA()= prod_SPD(RI);		// X = RI*RI'
-	x .noA()= prod(RI,r);
+	noalias(X) = prod_SPD(RI);		// X = RI*RI'
+	noalias(x) = prod(RI,r);
 
 	assert_isPSD (X);
 }
@@ -130,8 +130,8 @@ void Information_root_info_scheme::update_yY ()
  */
 {
 	Information_root_scheme::update();
-	Y .noA()= prod(trans(R),R);		// Y = R'*R
-	y .noA()= prod(Y,x);
+	noalias(Y) = prod(trans(R),R);		// Y = R'*R
+	noalias(y) = prod(Y,x);
 }
 
 
@@ -205,9 +205,9 @@ Bayes_base::Float
 						// Extract the roots, junk in strict lower triangle
 	R = UpperTri( A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) );
     if (linear_r)
-		r .noA()= A.sub_column(q_size,q_size+x_size, q_size+x_size);
+		noalias(r) = A.sub_column(q_size,q_size+x_size, q_size+x_size);
 	else
-		r .noA()= prod(R,f.f(x));	// compute r using f(x)
+		noalias(r) = prod(R,f.f(x));	// compute r using f(x)
 
 	return UCrcond(R);	// compute rcond of result
 }
@@ -275,8 +275,8 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 	if (info != 0)
 			error (Numeric_exception("Observe no QR factor"));
 						// Extract the roots, junk in strict lower triangle
-	R .noA()= UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
-	r .noA()= A.sub_column(0,x_size, x_size);
+	noalias(R) = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
+	noalias(r) = A.sub_column(0,x_size, x_size);
 
 	return UCrcond(R);	// compute rcond of result
 }
@@ -320,8 +320,8 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelate
 	if (info != 0)
 			error (Numeric_exception("Observe no QR factor"));
 						// Extract the roots, junk in strict lower triangle
-	R .noA()= UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
-	r .noA()= A.sub_column(0,x_size, x_size);
+	noalias(R) = UpperTri( A.sub_matrix(0,x_size, 0,x_size) );
+	noalias(r) = A.sub_column(0,x_size, x_size);
 
 	return UCrcond(R);	// compute rcond of result
 }

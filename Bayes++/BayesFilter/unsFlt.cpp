@@ -138,7 +138,7 @@ namespace {
 			Unscented_predict_model(am.G.size1()),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
-			QGqG .noA()= prod_SPD(am.G, am.q);
+			noalias(QGqG) = prod_SPD(am.G, am.q);
 		}
 		const Vec& f(const Vec& x) const
 		{
@@ -200,9 +200,9 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 	}
 
 						// Mean of predicted distribution: x
-	x .noA()= column(fXX,0) * Kappa;
+	noalias(x) = column(fXX,0) * Kappa;
 	for (i = 1; i < XX_size; ++i) {
-		x .noA()+= column(fXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
+		noalias(x) += column(fXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
 	}
 	x /= x_Kappa;
 						// Covariance of distribution: X
@@ -213,17 +213,17 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 							// Center point, premult here by 2 for efficency
     {
 		ColMatrix::Column fXX0 = column(fXX,0);
-		X .noA()= FM::outer_prod(fXX0, fXX0);
+		noalias(X) = FM::outer_prod(fXX0, fXX0);
 		X *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (i = 1; i < XX_size; ++i) {
 		ColMatrix::Column fXXi = column(fXX,i);
-		X .noA()+= FM::outer_prod(fXXi, fXXi);
+		noalias(X) += FM::outer_prod(fXXi, fXXi);
 	}
 	X /= 2*x_Kappa;
 						// Addative Noise Prediction, computed about center point
-	X .noA()+= f.Q( column(fXX,0) );
+	noalias(X) += f.Q( column(fXX,0) );
 
 	assert_isPSD (X);
 }
@@ -294,9 +294,9 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	}
 
 						// Mean of predicted distribution: zp
-	zp .noA()= column(zXX,0) * Kappa;
+	noalias(zp) = column(zXX,0) * Kappa;
 	for (size_t i = 1; i < zXX.size2(); ++i) {
-		zp .noA()+= column(zXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
+		noalias(zp) += column(zXX,i) / Float(2); // ISSUE uBlas may not be able to promote integer 2
 	}
 	zp /= x_Kappa;
 
@@ -308,46 +308,46 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 							// Center point, premult here by 2 for efficency
 	{
 		ColMatrix::Column zXX0 = column(zXX,0);
-		Xzz .noA()= FM::outer_prod(zXX0, zXX0);
+		noalias(Xzz) = FM::outer_prod(zXX0, zXX0);
 		Xzz *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (size_t i = 1; i < zXX.size2(); ++i) {
 		ColMatrix::Column zXXi = column(zXX,i);
-		Xzz .noA()+= FM::outer_prod(zXXi, zXXi);
+		noalias(Xzz) += FM::outer_prod(zXXi, zXXi);
 	}
 	Xzz /= 2*x_Kappa;
 
 						// Correlation of state with observation: Xxz
 							// Center point, premult here by 2 for efficency
 	{
-		Xxz .noA()= FM::outer_prod(column(XX,0) - x, column(zXX,0));
+		noalias(Xxz) = FM::outer_prod(column(XX,0) - x, column(zXX,0));
 		Xxz *= 2*Kappa;
 	}
 							// Remaining unscented points
 	for (size_t i = 1; i < zXX.size2(); ++i) {
-		Xxz .noA()+= FM::outer_prod(column(XX,i) - x, column(zXX,i));
+		noalias(Xxz) += FM::outer_prod(column(XX,i) - x, column(zXX,i));
 	}
 	Xxz /= 2* (Float(x_size) + Kappa);
 
 						// Innovation covariance
 	S = Xzz;
-	S .noA()+= h.Z;
+	noalias(S) += h.Z;
 						// Inverse innovation covariance
 	Float rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 						// Kalman gain
-	W .noA()= prod(Xxz,SI);
+	noalias(W) = prod(Xxz,SI);
 
 						// Normalised innovation
 	s = z;
 	h.normalise(s, zp);
-	s .noA()-= zp;
+	noalias(s) -= zp;
 
 						// Filter update
-	x .noA()+= prod(W,s);
+	noalias(x) += prod(W,s);
 	RowMatrix WStemp(W.size1(), S.size2());
-	X .noA()-= prod_SPD(W,S, WStemp);
+	noalias(X) -= prod_SPD(W,S, WStemp);
 
 	assert_isPSD (X);
 

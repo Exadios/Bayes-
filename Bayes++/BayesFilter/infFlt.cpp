@@ -66,7 +66,7 @@ void Information_scheme::init ()
 	Float rcond = UdUinversePD (Y, X);
 	rclimit.check_PD(rcond, "Initial X not PD");
 						// Information state
-	y.noA() = prod(Y,x);
+	noalias(y) = prod(Y,x);
 	update_required = false;
 }
 
@@ -109,7 +109,7 @@ void Information_scheme::update ()
 		Float rcond = UdUinversePD (X, Y);
 		rclimit.check_PD(rcond, "Y not PD in update");
 
-		x.noA()= prod(X,y);
+		noalias(x) = prod(X,y);
 		update_required = false;
 	}
 }
@@ -131,7 +131,7 @@ Bayes_base::Float
 	Float rcond = UdUinversePD (Y, X);
 	rclimit.check_PD(rcond, "X not PD in predict");
 						// Predict information state
-	y.noA() = prod(Y,x);
+	noalias(y) = prod(Y,x);
 	return rcond;
 }
 
@@ -150,11 +150,11 @@ Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_pr
  */
 {
 						// A = invFx'*Y*invFx ,Inverse Predict covariance
-	b.tempA .noA()= prod(Y, f.inv.Fx);
-	b.A. noA()= prod(trans(f.inv.Fx), b.tempA);
+	noalias(b.tempA) = prod(Y, f.inv.Fx);
+	noalias(b.A) = prod(trans(f.inv.Fx), b.tempA);
 						// B = G'*A*G+invQ , A in coupled additive noise space
-	b.tempG .noA()= prod(trans(f.G), b.A);
-	b.B .noA()= prod(b.tempG, f.G);
+	noalias(b.tempG) = prod(trans(f.G), b.A);
+	noalias(b.B) = prod(b.tempG, f.G);
 	for (size_t i = 0; i < f.q.size(); ++i)
 	{
 		if (f.q[i] < 0)	// allow PSD q, let infinity propogate into B
@@ -168,13 +168,13 @@ Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_pr
 	rclimit.check_PD(rcond, "(G'invFx'.Y.invFx.G + invQ) not PD in predict");
 
 						// G*invB*G' ,in state space
-	b.tempG .noA()= prod(b.B,trans(f.G));
-	Y .noA()= prod(f.G,b.tempG);
+	noalias(b.tempG) = prod(b.B,trans(f.G));
+	noalias(Y) = prod(f.G,b.tempG);
 						// I - A* G*invB*G', information gain
 	FM::identity(b.tempY);
-	b.tempY .noA()-= prod(b.A,Y);
+	noalias(b.tempY) -= prod(b.A,Y);
 						// Information
-	Y .noA()= prod(b.tempY,b.A);
+	noalias(Y) = prod(b.tempY,b.A);
 						// Information state
 	y = prod(prod(b.tempY,trans(f.inv.Fx)), y);
 
@@ -215,12 +215,12 @@ Bayes_base::Float
 	RowMatrix HxT (trans(h.Hx));
 	RowMatrix HxTZI (prod(HxT, ZI));
 												// Calculate EIF i = Hx'*ZI*zz
-	i .noA()= prod(HxTZI, zz);
+	noalias(i) = prod(HxTZI, zz);
 												// Calculate EIF I = Hx'*ZI*Hx
-	I .noA()= prod(HxTZI, trans(HxT));				// use column matrix trans(HxT)
+	noalias(I) = prod(HxTZI, trans(HxT));				// use column matrix trans(HxT)
 
-	y .noA()+= i;
-	Y .noA()+= I;
+	noalias(y) += i;
+	noalias(Y) += I;
 	update_required = true;
 
 	assert_isPSD (Y);
@@ -247,12 +247,12 @@ Bayes_base::Float
 	for (size_t w = 0; w < h.Zv.size(); ++w)
 		column(HxT, w) *= 1 / h.Zv[w];
 												// Calculate EIF i = Hx'*ZI*zz
-	i .noA()= prod(HxT, zz);
+	noalias(i) = prod(HxT, zz);
 												// Calculate EIF I = Hx'*ZI*Hx
-	I .noA()= prod(HxT, h.Hx);
+	noalias(I) = prod(HxT, h.Hx);
 
-	y .noA()+= i;
-	Y .noA()+= I;
+	noalias(y) += i;
+	noalias(Y) += I;
 	update_required = true;
 
 	assert_isPSD (Y);
