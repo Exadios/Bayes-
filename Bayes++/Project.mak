@@ -5,6 +5,6 @@
 help:
 	echo Usage: make uploadweb
 
-SFWEBLIST = *.htm *.css Simple/simpleExample.cpp "ClassDocumentation"
+SFWEBLIST = *.htm Simple/simpleExample.cpp "ClassDocumentation"
 uploadweb:
 	rsync -vztre ssh $(SFWEBLIST)  mistevens@shell.sf.net:/home/groups/b/ba/bayesclasses/htdocs
