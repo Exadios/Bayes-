@@ -19,7 +19,6 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include <boost/bind.hpp>
 
 namespace {
 
@@ -419,7 +418,8 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
  */
 SIR_kalman_scheme::SIR_kalman_scheme (size_t x_size, size_t s_size, SIR_random& random_helper) :
 	SIR_scheme (x_size, s_size, random_helper),
-	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size) 
+	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size),
+	roughen_model (x_size,x_size, random_helper)
 {
 }
 
@@ -441,14 +441,12 @@ void SIR_kalman_scheme::init ()
 	Float rcond = UdUfactor (UD, X);
 	rclimit.check_PSD(rcond, "Roughening X not PSD");
 
-						// Create sampled prediction model using random
-    General_LiAd_predict_model model(x_size,x_size, boost::bind(&SIR_random::normal, &random, _1));
-	FM::identity (model.Fx);
-						// Initial prediction based on scaled variance
-	UdUseperate (model.G, model.q, UD);
-	model.init_GqG ();
+						// Sampled prediction model for initial noise variance
+	FM::identity (roughen_model.Fx);
+	UdUseperate (roughen_model.G, roughen_model.q, UD);
+	roughen_model.init_GqG ();
 						// Predict using model to apply initial noise
-	predict (model);
+	predict (roughen_model);
 
 	SIR_scheme::init_S ();
 }
@@ -545,15 +543,14 @@ void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
 	Float rcond = UdUfactor (UD, X);
 	rclimit.check_PSD(rcond, "Roughening X not PSD");
 
-						// Create roughening model using random
-    General_LiAd_predict_model roughen(x_size,x_size, boost::bind(&SIR_random::normal, &random, _1));
-	FM::identity (roughen.Fx);
+						// Sampled prediction model for roughening
+	FM::identity (roughen_model.Fx);
 						// Roughening prediction based on scaled variance
-	UdUseperate (roughen.G, roughen.q, UD);
-	roughen.q *= VarScale;
-	roughen.init_GqG();
-						// Predict particles P using roughening model
-	predict (roughen);
+	UdUseperate (roughen_model.G, roughen_model.q, UD);
+	roughen_model.q *= VarScale;
+	roughen_model.init_GqG();
+						// Predict using roughening model
+	predict (roughen_model);
 }
 
 

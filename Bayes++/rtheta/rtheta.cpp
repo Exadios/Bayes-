@@ -20,7 +20,6 @@
 #include <cmath>
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/bind.hpp>
 #include <boost/format.hpp>
 #include <boost/limits.hpp>
 
@@ -96,7 +95,7 @@ public:
  *  x static and y tending to x
  *  Correlated additive noise
  */
-class pred_model : public General_LiInAd_predict_model
+class pred_model : public Sampled_LiInAd_predict_model
 {
 public:
 	pred_model();
@@ -104,7 +103,7 @@ public:
 
 
 pred_model::pred_model () :
-	General_LiInAd_predict_model(NX,NQ, boost::bind(&SIR_random::normal, &Random2, _1))
+	Sampled_LiInAd_predict_model(NX,NQ, Random2)
 // Construct constant model
 {
 	// Build Fx, Identity all except active partition

@@ -47,7 +47,8 @@ namespace Bayesian_filter
 {
 
 struct SIR_random
-/* Random number generators interface
+/*
+ * Random number generators interface
  *  Helper to allow polymorthic use of random number generators
  */
 {
@@ -97,6 +98,72 @@ class Systematic_resampler : public Importance_resampler
 {
 	Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
+
+
+template <class Predict_model>
+class Sampled_general_predict_model: public Predict_model, public Sampled_predict_model
+/*
+ * Generalise a predict model to sampled predict model using and SIR random
+ *  To instantiate template std::sqrt is required
+ */
+{
+public:
+	Sampled_general_predict_model (size_t x_size, size_t q_size, SIR_random& random_helper) :
+		Predict_model(x_size, q_size),
+		Sampled_predict_model(),
+		genn(random_helper),
+		xp(x_size),
+		n(q_size), rootq(q_size)
+	{
+		first_init = true;
+	}
+
+	virtual const FM::Vec& fw(const FM::Vec& x) const
+	/*
+	 * Definition of sampler for addative noise model given state x
+	 *  Generate Gaussian correlated samples
+	 * Precond: init_GqG, automatic on first use
+	 */
+	{
+		if (first_init)
+			init_GqG();
+							// Predict state using supplied functional predict model
+		xp = Predict_model::f(x);
+							// Additive random noise
+		genn.normal(n);				// independant zero mean normal
+									// multiply elements by std dev
+		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
+			*ni *= rootq[ni.index()];
+		}
+		xp += FM::prod(G,n);			// add correlated noise
+		return xp;
+	}
+
+	void init_GqG() const
+	/* initialise predict given a change to q,G
+	 *  Implementation: Update rootq
+	 */
+	{
+		first_init = false;
+		for (FM::Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
+			if (*qi < 0.)
+				error (Numeric_exception("Negative q in init_GqG"));
+			rootq[qi.index()] = std::sqrt(*qi);
+		}
+	}
+private:
+	SIR_random& genn;
+	mutable FM::Vec xp;
+	mutable FM::DenseVec n;
+	mutable FM::Vec rootq;		// Optimisation of sqrt(q) calculation, automatic on first use
+	mutable bool first_init;	
+};
+
+typedef Sampled_general_predict_model<Linear_predict_model> Sampled_LiAd_predict_model;
+typedef Sampled_general_predict_model<Linear_invertable_predict_model> Sampled_LiInAd_predict_model;
+// Sampled predict model generalisations
+//  Names a shortened to first two letters of their model properties
+
 
 
 class SIR_scheme : public Sample_filter
@@ -156,7 +223,7 @@ public:
 	SIR_random& random;			// Reference random number generator helper
 
 protected:
-	void roughen_minmax (FM::ColMatrix& P, Float K) const;	// Roughening using minmax of P distribution
+	void roughen_minmax (FM::ColMatrix& P, Float K) const;	// roughening using minmax of P distribution
 	Importance_resampler::Resamples_t resamples;		// resampling counts
 	FM::DenseVec wir;			// resamping weights
 	bool wir_update;			// weights have been updated requring a resampling on update
@@ -204,6 +271,7 @@ public:
 
 protected:
 	void roughen_correlated (FM::ColMatrix& P, Float K);	// Roughening using covariance of P distribution
+	Sampled_LiAd_predict_model roughen_model;		// roughening prediction
 private:
 	static Float scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& S);
 	void mean();

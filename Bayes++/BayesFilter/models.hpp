@@ -30,7 +30,6 @@ typedef boost::function1<const FM::Vec&, const FM::Vec&> State_function;
 class Simple_addative_predict_model : public Addative_predict_model
 // Addative predict model initialised from function and model matricies
 {
-boost::function1<int, int> xx;
 	State_function ff;
 public:
 	Simple_addative_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init);
@@ -110,78 +109,6 @@ public:
 	Simple_linear_uncorrelated_observe_model (const FM::Matrix& Hx_init, const FM::Vec& Zv_init);
 	// Precondition: Hx, Zv are conformantly dimensioned (not checked)
 };
-
-
-/*
- * Generalise a addative predict model to sampled predict model
- *  To instantiate template std::sqrt is required
- */
-typedef boost::function1<void, FM::DenseVec&> Normal_random_vector_function;
-// A function to compute a normally distributed random vector
-
-template <class Predict_model>
-class General_sampled_predict_model: public Predict_model, public Sampled_predict_model
-{
-public:
-	typedef Normal_random_vector_function Random_function;
-
-	General_sampled_predict_model (size_t x_size, size_t q_size, Random_function random_helper) :
-		Predict_model(x_size, q_size),
-		Sampled_predict_model(),
-		genn(random_helper),
-		xp(x_size),
-		n(q_size), rootq(q_size)
-	{
-		first_init = true;
-	}
-
-	virtual const FM::Vec& fw(const FM::Vec& x) const
-	/*
-	 * Definition of sampler for addative noise model given state x
-	 *  Generate Gaussian correlated samples
-	 * Precond: init_GqG, automatic on first use
-	 */
-	{
-		if (first_init)
-			init_GqG();
-							// Predict state using supplied functional predict model
-		xp = Predict_model::f(x);
-							// Additive random noise
-		genn(n);				// independant zero mean normal
-									// multiply elements by std dev
-		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
-			*ni *= rootq[ni.index()];
-		}
-		xp += FM::prod(G,n);			// add correlated noise
-		return xp;
-	}
-
-	void init_GqG() const
-	/* initialise predict given a change to q,G
-	 *  Implementation: Update rootq
-	 */
-	{
-		first_init = false;
-		for (FM::Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
-			if (*qi < 0.)
-				error (Numeric_exception("Negative q in init_GqG"));
-			rootq[qi.index()] = std::sqrt(*qi);
-		}
-	}
-private:
-	Random_function genn;
-	mutable FM::Vec xp;
-	mutable FM::DenseVec n;
-	mutable FM::Vec rootq;		// Optimisation of sqrt(q) calculation, automatic on first use
-	mutable bool first_init;	
-};
-
-/*
- * General Model: Combine properties of mutliple models
- *  Names a shortened to first two letters of their model properties
- */
-typedef General_sampled_predict_model<Linear_predict_model> General_LiAd_predict_model;
-typedef General_sampled_predict_model<Linear_invertable_predict_model> General_LiInAd_predict_model;
 
 
 

@@ -35,8 +35,53 @@ using ublas::outer_prod;
 
 enum EmptyTag {Empty};	// Tag type used for empty matrix constructor
 
+#if (BOOST_VERSION >= 103100)
+using ublas::noalias;
+#else
+namespace detail
+{
+/*
+ * Improve syntax of effcient assignment where no aliases of LHS appear on the RHS
+ *  noalias(lhs) = rhs_expression
+ */
+template <class C>
+struct NoAliasAssign
+{	
+	NoAliasAssign (C& lval) : lval_(lval)
+	{}
+	template <class E>
+	void operator= (const E& e)
+	{	lval_.assign (e);
+	}
+	template <class E>
+	void operator+= (const E& e)
+	{	lval_.plus_assign (e);
+	}
+	template <class E>
+	void operator-= (const E& e)
+	{	lval_.minus_assign (e);
+	}
+	private:
+	    C& lval_;
+}; 
+}//namespace detail
 
-namespace detail {		// Lots of implementation detail
+template <class E>
+detail::NoAliasAssign<E> noalias(ublas::matrix_expression<E>& lvalue)
+{
+	return detail::NoAliasAssign<E> (lvalue() );
+}
+template <class E>
+detail::NoAliasAssign<E> noalias(ublas::vector_expression<E>& lvalue)
+{
+	return detail::NoAliasAssign<E> (lvalue() );
+}
+
+#endif
+
+
+namespace detail		// Lots of implementation detail
+{
 
 /*
  * Filter Vec type
@@ -243,54 +288,6 @@ public:
 }//namespace detail
 
 
-#if (BOOST_VERSION < 103100)
-namespace detail
-{
-
-/*
- * Improve syntax of effcient assignment where no aliases of LHS appear on the RHS
- *  noalias(lhs) = rhs_expression
- */
-template <class C>
-struct NoAliasAssign
-{	
-	NoAliasAssign (C& lval) : lval_(lval)
-	{}
-	template <class E>
-	void operator= (const E& e)
-	{	
-		lval_.assign (e);
-	}
-	template <class E>
-	void operator+= (const E& e)
-	{	
-		lval_.plus_assign (e);
-	}
-	template <class E>
-	void operator-= (const E& e)
-	{	
-		lval_.minus_assign (e);
-	}
-	private:
-	    C& lval_;
-}; 
-
-}//namespace detail
-
-template <class E>
-detail::NoAliasAssign<E>
- noalias(ublas::matrix_expression<E>& lvalue)
-{
-	return detail::NoAliasAssign<E> (lvalue() );
-}
-template <class E>
-detail::NoAliasAssign<E>
- noalias(ublas::vector_expression<E>& lvalue)
-{
-	return detail::NoAliasAssign<E> (lvalue() );
-}
-
-#endif
 
 
 /*

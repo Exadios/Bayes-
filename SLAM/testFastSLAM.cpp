@@ -28,7 +28,6 @@
 #include "Test/random.hpp"
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/bind.hpp>
 
 
 using namespace SLAM_filter;
@@ -133,8 +132,8 @@ void SLAMDemo::OneDExperiment()
 	const unsigned nM = 2;	// Map
 
 	// Construct simple Prediction models
-	BF::General_LiAd_predict_model location_predict(nL,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
-	BF::General_LiAd_predict_model all_predict(nL+nM,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
+	BF::Sampled_LiAd_predict_model location_predict(nL,1, goodRandom);
+	BF::Sampled_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
 	// Stationary Prediction model (Identity)
 	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
 				// Constant Noise model
@@ -238,8 +237,8 @@ void SLAMDemo::InformationLossExperiment()
 	const unsigned nM = 2;	// Map
 
 	// Construct simple Prediction models
-	BF::General_LiAd_predict_model location_predict(nL,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
-	BF::General_LiAd_predict_model all_predict(nL+nM,1, boost::bind(&BF::SIR_random::normal, &goodRandom, _1));
+	BF::Sampled_LiAd_predict_model location_predict(nL,1, goodRandom);
+	BF::Sampled_LiAd_predict_model all_predict(nL+nM,1, goodRandom);
 	// Stationary Prediction model (Identity)
 	FM::identity(location_predict.Fx);	FM::identity(all_predict.Fx);
 				// Constant Noise model
