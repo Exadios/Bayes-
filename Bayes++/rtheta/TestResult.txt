@@ -1,5 +1,5 @@
-2003.5-1 (debug build)
- Rrelease build has smaller state delta for cfilter, ifilter
+2003-7 Pre-release(debug build)
+ Fixed SIR covariance, new random
 
 const size_t NX = 2+1;			// State dimension (x,y) and some more to show noise coupling or singular X
 const size_t NQ = 2;			// State dimension of noise
@@ -19,12 +19,14 @@ const Float Z_CORRELATION = Float(0e-1);	// (Un)Correlated observation model
 const Float X_NOISE = Float(0.05);		// Prediction model
 const Float Y_NOISE = Float(0.09);
 const Float XY_NOISE_COUPLING = Float(0.05);
+const Float Q_NOISE = Float(1.0);		// Noise in addition Q terms
+const Float G_COUPLING = Float(1.0);	// Coupling in addition G terms
+
 const Float INIT_X_NOISE = Float(0.07);
 const Float INIT_Y_NOISE = Float(0.10);
 const Float INIT_XY_NOISE_CORRELATION = Float(0.4);
-const Float INIT_2_NOISE = Float(0.09);	// Use zero for singular X
+const Float INIT_2_NOISE = Float(0.09);	// Use zero for singular X	
 const Float INIT_2_NOISE_CORRELATION = Float(0.5);
-const Float INIT_XY_NOISE_CORRELATION = Float(0.04);
 
 
 udfilter, ufilter RA_MODEL:1 NOISE_MODEL:1 TRUTH_STATIONARY:0
@@ -109,28 +111,28 @@ irfilter, ilfilter RA_MODEL:1 NOISE_MODEL:1 TRUTH_STATIONARY:0
    6.4584e-03   2.7802e-02   2.0145e-03   3.9018e-03   2.6689e-02   9.0922e-04
 
 sfilter, itfilter RA_MODEL:1 NOISE_MODEL:1 TRUTH_STATIONARY:0
-*   -0.00316   -0.004093 *      1.000     -0.200     -11.000     -0.000
-    -0.00316   -0.004093 *      0.997     -0.204
-   0.0000e+00   0.0000e+00   0.0000e+00   6.1117e-03   1.0073e-02   2.9812e-03
+*  -0.002367   -0.005607 *      1.000     -0.200     -11.000     -0.000
+   -0.002367   -0.005607 *      0.998     -0.206
+   0.0000e+00   0.0000e+00   0.0000e+00   4.9713e-03   9.9632e-03   2.7137e-03
            0           0 *      1.000     -0.200
    0.0000e+00   0.0000e+00   0.0000e+00   4.9000e-03   1.0000e-02   2.8000e-03
-* -0.0005505   -0.005663 *      1.060     -0.078     -10.938     -1.473
-    -0.02435     0.02838 *      1.035     -0.049
-   8.5365e-03   1.6670e-02   3.7330e-03   5.2795e-03   1.5444e-02   1.3848e-03
+*  -0.002031   -0.001194 *      1.060     -0.078     -10.938     -1.473
+    -0.02583     0.03285 *      1.034     -0.045
+   7.3403e-03   1.6594e-02   3.9707e-03   4.2602e-03   1.4238e-02   2.5590e-03
      -0.0238     0.03404 *      1.036     -0.044
    7.4203e-03   1.6759e-02   3.5400e-03   4.2673e-03   1.5850e-02   2.0500e-03
-*  0.0004004    -0.02058 *      1.109      0.074     -11.092     -1.451
-     0.03425     0.04054 *      1.143      0.114
-   7.9756e-03   2.0860e-02   2.1960e-03   5.4975e-03   2.1030e-02   2.2575e-03
+*  -0.002184   -0.003916 *      1.109      0.074     -11.092     -1.451
+     0.03166     0.05721 *      1.141      0.131
+   6.4219e-03   1.9911e-02   3.0963e-03   4.3497e-03   2.1342e-02   1.7043e-03
      0.03385     0.06112 *      1.143      0.135
    6.7876e-03   2.1356e-02   2.8017e-03   4.0339e-03   2.0464e-02   1.5926e-03
-*  0.0001374    -0.02042 *      1.124      0.274     -10.855     -0.982
-    -0.01937    -0.05335 *      1.104      0.221
-   7.9430e-03   2.4589e-02   3.1177e-03   5.3297e-03   2.3808e-02   1.7177e-03
+*  -0.004418   -0.008176 *      1.124      0.274     -10.855     -0.982
+    -0.02393    -0.04111 *      1.100      0.233
+   7.0825e-03   2.5088e-02   2.1283e-03   4.0501e-03   2.4476e-02   1.0104e-03
     -0.01951    -0.03293 *      1.104      0.241
    6.5541e-03   2.5009e-02   2.3668e-03   3.9381e-03   2.3998e-02   1.2119e-03
-*  -0.003232    -0.02292 *      1.067      0.412     -10.925      0.299
-    -0.01218     -0.1314 *      1.055      0.280
-   7.9015e-03   2.8134e-02   2.4077e-03   4.9560e-03   2.4952e-02   1.0213e-03
+*  -0.002783    -0.00582 *      1.067      0.412     -10.925      0.299
+    -0.01173     -0.1143 *      1.056      0.297
+   6.7919e-03   2.6810e-02   1.9160e-03   4.1570e-03   2.5117e-02   9.0012e-04
    -0.008946     -0.1085 *      1.058      0.303
    6.4584e-03   2.7802e-02   2.0145e-03   3.9018e-03   2.6689e-02   9.0922e-04
