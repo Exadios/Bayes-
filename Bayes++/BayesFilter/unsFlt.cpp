@@ -25,16 +25,13 @@ namespace Bayesian_filter
 /**
  * Initialise filter and set the size of things we know about
  */
-Unscented_scheme::Unscented_scheme (size_t x_size, size_t z_initialsize) :
+Unscented_scheme::Unscented_scheme (size_t x_size) :
 		Kalman_state_filter(x_size), Functional_filter(),
 		XX(x_size, 2*x_size+1),
-		s(Empty), S(Empty), SI(Empty),
 		fXX(x_size, 2*x_size+1)
 {
 	Unscented_scheme::x_size = x_size;
 	Unscented_scheme::XX_size = 2*x_size+1;
-	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
-	observe_size (z_initialsize);
 }
 
 /** Optimise copy assignment to only copy filter state.
@@ -71,7 +68,7 @@ void Unscented_scheme::unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM:
 }
 
 Unscented_scheme::Float Unscented_scheme::predict_Kappa (size_t size) const
-// Default Kappa for prediction: state augmented with predict noise
+// Default Kappa for predict: state augmented with predict noise
 {
 	// Use the rule to minimise mean squared error of 4 order term
 	return Float(3-signed(size));
@@ -236,22 +233,8 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 	}
 
 	init_XX ();
-						// Addative Noise Prediction, computed about center point
+						// Addative Noise predict, computed about center point
 	noalias(X) += f.Q( column(fXX,0) );
-}
-
-
-/** Optimised dynamic observation sizing.
- */
-void Unscented_scheme::observe_size (size_t z_size)
-{
-	if (z_size != last_z_size) {
-		last_z_size = z_size;
-
-		s.resize(z_size);
-		S.resize(z_size,z_size);
-		SI.resize(z_size,z_size);
-	}
 }
 
 
@@ -261,10 +244,11 @@ void Unscented_scheme::observe_size (size_t z_size)
  *
  * ISSUE: Simplified implemenation using uncorrelated noise equations
  */
-Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z)
+Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	Adapted_Correlated_addative_observe_model hh(h);
-	return observe (hh, z);
+	return observe (hh, z, s, S, b);
 }
 
 
@@ -272,16 +256,14 @@ Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model
  * @pre x,X
  * @post x,X is PSD
  */
-Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& h, const FM::Vec& z)
+Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& h, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
 {
 	size_t z_size = z.size();
 	ColMatrix zXX (z_size, 2*x_size+1);
 	Vec zp(z_size);
 	SymMatrix Xzz(z_size,z_size);
 	Matrix Xxz(x_size,z_size);
-	Matrix W(x_size,z_size);
-
-	observe_size (z.size());	// Dynamic sizing
 
 						// Create unscented distribution
 	kappa = observe_Kappa(x_size);
@@ -308,7 +290,7 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	}
 	zp /= x_kappa;
 
-						// Covariance of observation prediction: Xzz
+						// Covariance of observation predict: Xzz
 							// Subtract mean from each point in zXX
 	for (size_t i = 0; i < XX_size; ++i) {
 		column(zXX,i).minus_assign (zp);
@@ -342,19 +324,19 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	S = Xzz;
 	noalias(S) += h.Z;
 						// Inverse innovation covariance
-	Float rcond = UdUinversePD (SI, S);
+	Float rcond = UdUinversePD (b.SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 						// Kalman gain
-	noalias(W) = prod(Xxz,SI);
+	noalias(b.W) = prod(Xxz,b.SI);
 
 						// Normalised innovation
 	h.normalise(s = z, zp);
 	noalias(s) -= zp;
 
 						// Filter update
-	noalias(x) += prod(W,s);
-	RowMatrix WStemp(W.size1(), S.size2());
-	noalias(X) -= prod_SPD(W,S, WStemp);
+	noalias(x) += prod(b.W,s);
+	RowMatrix WStemp(b.W.size1(), S.size2());
+	noalias(X) -= prod_SPD(b.W,S, WStemp);
 
 	return rcond;
 }

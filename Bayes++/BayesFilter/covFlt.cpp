@@ -19,15 +19,13 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Covariance_scheme::Covariance_scheme (size_t x_size, size_t z_initialsize) :
+Covariance_scheme::Covariance_scheme (size_t x_size) :
 	Kalman_state_filter(x_size),
-	S(Empty), SI(Empty), W(Empty)
+	tempX(x_size,x_size)
 /*
  * Initialise filter and set the size of things we know about
  */
 {
-	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
-	observe_size (z_initialsize);
 }
 
 Covariance_scheme& Covariance_scheme::operator= (const Covariance_scheme& a)
@@ -54,20 +52,19 @@ void Covariance_scheme::update ()
 
 Bayes_base::Float
  Covariance_scheme::predict (Linrz_predict_model& f)
-/* Standard Linrz prediction
+/* Standard Linrz predict
  */
 {
 	x = f.f(x);		// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
-	RowMatrix temp(f.Fx.size1(), X.size2());
-	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
+	X = prod_SPD(f.Fx,X, tempX) + prod_SPD(f.G, f.q);
 
 	return 1;
 }
 
 Bayes_base::Float
  Covariance_scheme::predict (Gaussian_predict_model& f)
-/* Specialised 'stationary' prediction, only addative noise
+/* Specialised 'stationary' predict, only addative noise
  */
 {
 						// Predict state covariance, simply add in noise
@@ -77,58 +74,66 @@ Bayes_base::Float
 }
 
 
-void Covariance_scheme::observe_size (size_t z_size)
-/*
- * Optimised dynamic observation sizing
+Bayes_base::Float
+ Covariance_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
+/* Extended_kalman_filter observe, unused byproduct
  */
 {
-	if (z_size != last_z_size) {
-		last_z_size = z_size;
-
-		S.resize(z_size,z_size);
-		SI.resize(z_size,z_size);
-		W.resize(x.size(),z_size);
-	}
-}
+	const size_t z_size = h.Hx.size1();
+	Covariance_byproduct S(z_size, z_size);
+	Kalman_gain_byproduct b(h.Hx.size2(), z_size);
+	return observe_innovation (h, s, S, b);
+}	
 
 Bayes_base::Float
  Covariance_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
-/* correlated innovation observe
+/* Extended_kalman_filter observe, unused byproduct
+ */
+{
+	const size_t z_size = h.Hx.size1();
+	Covariance_byproduct S(z_size, z_size);
+	Kalman_gain_byproduct b(h.Hx.size2(), z_size);
+	return observe_innovation (h, s, S, b);
+}	
+
+Bayes_base::Float
+ Covariance_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+ 				Covariance_byproduct& S, Kalman_gain_byproduct& b)
+ /* Correlated innovation observe with explict byproduct
  */
 {
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
 		error (Logic_exception("observation and model size inconsistent"));
-	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
 	Matrix temp_XZ (prod(X, trans(h.Hx)));
 	noalias(S) = prod(h.Hx, temp_XZ) + h.Z;
 
 						// Inverse innovation covariance
-	Float rcond = UdUinversePD (SI, S);
+	Float rcond = UdUinversePD (b.SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
 						// Kalman gain, X*Hx'*SI
-	noalias(W) = prod(temp_XZ, SI);
+	noalias(b.W) = prod(temp_XZ, b.SI);
 
 						// State update
-	noalias(x) += prod(W, s);
-	noalias(X) -= prod_SPD(W, S, temp_XZ);
+	noalias(x) += prod(b.W, s);
+	noalias(X) -= prod_SPD(b.W, S, temp_XZ);
 
 	return rcond;
 }
 
 
 Bayes_base::Float
- Covariance_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
-/* uncorrelated innovation observe
+ Covariance_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+ 				Covariance_byproduct& S, Kalman_gain_byproduct& b)
+/* Uncorrelated innovation observe with explict byproduct
  */
 {
 						// Size consistency, z to model
 	if (s.size() != h.Zv.size())
 		error (Logic_exception("observation and model size inconsistent"));
-	observe_size (s.size());// Dynamic sizing
 
 						// Innovation covariance
 	Matrix temp_XZ (prod(X, trans(h.Hx)));
@@ -137,15 +142,15 @@ Bayes_base::Float
 		S(i,i) += Float(h.Zv[i]);	// ISSUE mixed type proxy assignment
 
 						// Inverse innovation covariance
-	Float rcond = UdUinversePD (SI, S);
+	Float rcond = UdUinversePD (b.SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
 						// Kalman gain, X*Hx'*SI
-	noalias(W) = prod(temp_XZ, SI);
+	noalias(b.W) = prod(temp_XZ, b.SI);
 
 						// State update
-	noalias(x) += prod(W, s);
-	noalias(X) -= prod_SPD(W, S, temp_XZ);
+	noalias(x) += prod(b.W, s);
+	noalias(X) -= prod_SPD(b.W, S, temp_XZ);
 
 	return rcond;
 }

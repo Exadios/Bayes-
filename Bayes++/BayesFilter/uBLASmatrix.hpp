@@ -92,14 +92,16 @@ public:
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMVec(EmptyTag) : VecBase()
 	{}	// Empty constructor
-	explicit FMVec(size_t s) : VecBase(s)
+	explicit FMVec(size_t size) : VecBase(size)
 	{}	// Normal sized constructor
+	FMVec(const FMVec& c) : VecBase(static_cast<const VecBase&>(c))
+	{}	// Copy constructor
 	template <class E>
 	explicit FMVec(const ublas::vector_expression<E>& e) : VecBase(e)
 	{}	// vector_expression copy constructor
 	template <class E>
 	FMVec(const ublas::matrix_column<E>& e) : VecBase(e)
-	{}	// vector_expression convsersion copy constructor, hides the implict copy required for matrix column access
+	{}	// conversion copy constructor, hides the implict copy required for matrix column access
 
 	template <class E>
 	FMVec& operator= (const ublas::vector_expression<E>& r)
@@ -137,13 +139,13 @@ public:
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMMatrix(EmptyTag) : MatrixBase()
 	{}	// Empty constructor
-	FMMatrix(size_t r, size_t c) : MatrixBase(r,c)
+	FMMatrix(size_t size1, size_t size2) : MatrixBase(size1,size2)
 	{}	// Normal sized constructor
 	FMMatrix(const FMMatrix& c) : MatrixBase(static_cast<const MatrixBase&>(c))
 	{}	// Copy constructor
 	template <class E>
 	explicit FMMatrix(const ublas::matrix_expression<E>& e) : MatrixBase(e)
-	{}	// matrix_expression constructor
+	{}	// matrix_expression copy constructor
 
 	template <class E>
 	FMMatrix& operator= (const ublas::matrix_expression<E>& r)
@@ -246,15 +248,13 @@ class SymMatrixWrapper :
 public:
 	SymMatrixWrapper () : matrix_type(), adaptor_type(this->member)
 	{}
-	SymMatrixWrapper (size_t nsize1, size_t nsize2) : matrix_type(nsize1,nsize2), adaptor_type(this->member)
-	{}
+	SymMatrixWrapper (size_t size1, size_t size2) : matrix_type(size1,size2), adaptor_type(this->member)
+	{}	// Normal sized constructor
 	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), adaptor_type(this->member)
-	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
-	{}
+	{}	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
 	template <class E>
 	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), adaptor_type(this->member)
-	// Explict matrix_expression conversion constructor
-	{}
+	{}	// Explict matrix_expression conversion constructor
 
 	template <class E>
 	SymMatrixWrapper& operator=(const ublas::matrix_expression<E>& r)
@@ -505,7 +505,7 @@ typename prod_expression_result<E1,E2>::E1E2T_type
  * Symmetric Positive (Semi) Definate product: X*(X*S)', XStemp = X*S
  */
 {
-	return prod( X, trans(XStemp().assign(prod(X,S))) );
+	return prod( X, trans(prod(X,S,XStemp())) );
 }
 
 inline
@@ -521,24 +521,6 @@ SymMatrix prod_SPD (const RowMatrix& X, const Vec& s)
 	return P;
 }
 
-inline Vec::value_type prod_SPD (const Vec& x, const Vec& s)
-/*
- * Symmetric Positive (Semi) Definate product: x*diag_matrix(s)*x'
- * Optimised to exploit the symmetry of the computation of x * x' and result p
- * ISSUE: Implemention only exploits sparseness in x
- * TODO: Define using ublas ET
- */
-{
-	Vec::value_type p = 0.;
-	Vec::const_iterator xi = x.begin(), xi_end = x.end();
-	for (; xi != xi_end; ++xi)
-	{
-		Vec::value_type x2 = *xi; x2 *= x2;
-		p += x2 * s[xi.index()];
-	}
-	return p;
-}
-
 
 template<class E> inline
 typename prod_expression_result<E,E>::E1TE2_type
@@ -548,6 +530,16 @@ typename prod_expression_result<E,E>::E1TE2_type
  */
 {
 	return prod( trans(X), X );
+}
+
+template<class E1, class E2> inline
+typename prod_expression_result<E2,E1>::E1TE2_type
+ prod_SPDT (const ublas::matrix_expression<E1>& X, const SymMatrix& S, ublas::matrix_expression<E2>& SXtemp)
+/*
+ * Symmetric Positive (Semi) Definate product: (S*X)'*X, SXtemp = S*X
+ */
+{
+	return prod( trans(prod(S,X,SXtemp())), X);
 }
 
 inline
@@ -563,13 +555,20 @@ SymMatrix prod_SPDT (const ColMatrix& X, const Vec& s)
 	return P;
 }
 
+inline Vec::value_type prod_SPDT (const Vec& x, const Vec& s)
+/*
+ * Symmetric Positive (Semi) Definate product: x'*diag_matrix(s)*x
+ */
+{
+	return inner_prod(x, ublas::element_prod(s,x));
+}
+
 inline Vec::value_type prod_SPDT (const Vec& x, const SymMatrix& S)
 /*
  * Symmetric Positive (Semi) Definate multiply:	p = x'*S*x
  */
 {
-	return inner_prod (x, ublas::prod(S,x) );
+	return inner_prod (x, prod(S,x) );
 }
-
 
 }//namespace

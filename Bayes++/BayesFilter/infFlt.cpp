@@ -19,25 +19,22 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_scheme::Information_scheme (size_t x_size, size_t z_initialsize) :
+Information_scheme::Information_scheme (size_t x_size) :
 		Kalman_state_filter(x_size), Information_state_filter(x_size),
-		i(x_size), I(x_size,x_size),
-		ZI(Empty)
+		tempX(x_size,x_size)
 /*
  * Initialise filter and set the size of things we know about
  */
 {
-	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
-	observe_size (z_initialsize);
 	update_required = true;	// Not a valid state, init is required before update can be used
 }
 
-Information_scheme::Linear_predict_byproducts::Linear_predict_byproducts (size_t x_size, size_t q_size) :
+Information_scheme::Predict_linear_byproduct::Predict_linear_byproduct (size_t x_size, size_t q_size) :
 /* Set size of by-products for linear predict
  */
-		 tempA(x_size,x_size), A(x_size,x_size), tempG(q_size,x_size),
-		 B(q_size,q_size), tempY(x_size,x_size),
-		 invq(q_size)
+		 A(x_size,x_size), tempG(x_size,q_size),
+		 B(q_size,q_size),
+		 y(x_size)
 {}
 
 Information_scheme& Information_scheme::operator= (const Information_scheme& a)
@@ -116,15 +113,14 @@ void Information_scheme::update ()
 Bayes_base::Float
  Information_scheme::predict (Linrz_predict_model& f)
 /*
- * Extented linrz information prediction
+ * Extended_kalman_filter predict via state
  *  Computation is through state to accommodate linearied model
  */
 {
 	update ();			// x,X required
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict information matrix, and state covariance
-	RowMatrix temp(f.Fx.size1(), X.size2());
-	X = prod_SPD(f.Fx,X, temp) + prod_SPD(f.G, f.q);
+	noalias(X) = prod_SPD(f.Fx,X,tempX) + prod_SPD(f.G, f.q);
 
 						// Information
 	Float rcond = UdUinversePD (Y, X);
@@ -134,12 +130,21 @@ Bayes_base::Float
 	return rcond;
 }
 
-Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b)
+Bayes_base::Float
+ Information_scheme::predict (Linear_invertable_predict_model& f)
+/* Linear information predict, without byproduct
+ */
+{
+	Predict_linear_byproduct b(f.Fx.size1(),f.q.size());
+	return predict (f, b);	
+}
+
+Bayes_base::Float
+ Information_scheme::predict (Linear_invertable_predict_model& f, Predict_linear_byproduct& b)
 /*
- * Linear information prediction
- *  Computation is through information state only
+ * Linear information predict
+ *  Computation is through information state y,Y only
  *  Uses x(k+1|k) = Fx * x(k|k) instead of extended x(k+1|k) = f(x(k|k))
- * Prediction is done completely on y,Y
  * Requires y(k|k), Y(k|k)
  * Predicts y(k+1|k), Y(k+1|k)
  *
@@ -149,64 +154,71 @@ Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_pr
  */
 {
 						// A = invFx'*Y*invFx ,Inverse Predict covariance
-	noalias(b.tempA) = prod(Y, f.inv.Fx);
-	noalias(b.A) = prod(trans(f.inv.Fx), b.tempA);
+	noalias(b.A) = prod_SPDT(f.inv.Fx, Y, tempX);
 						// B = G'*A*G+invQ , A in coupled additive noise space
-	noalias(b.tempG) = prod(trans(f.G), b.A);
-	noalias(b.B) = prod(b.tempG, f.G);
+	noalias(b.B) = prod_SPDT(f.G, b.A, b.tempG);
 	for (size_t i = 0; i < f.q.size(); ++i)
 	{
 		if (f.q[i] < 0)	// allow PSD q, let infinity propogate into B
 			error (Numeric_exception("Predict q Not PSD"));
-		b.invq[i] = Float(1) / f.q[i];
+		b.B(i,i) += Float(1) / f.q[i];
 	}
-	diag(b.B).plus_assign (b.invq);
 
 						// invert B ,Addative noise
 	Float rcond = UdUinversePDignoreInfinity (b.B);
 	rclimit.check_PD(rcond, "(G'invFx'.Y.invFx.G + invQ) not PD in predict");
 
 						// G*invB*G' ,in state space
-	noalias(b.tempG) = prod(b.B,trans(f.G));
-	noalias(Y) = prod(f.G,b.tempG);
+	noalias(Y) = prod_SPD(f.G,b.B, b.tempG);
 						// I - A* G*invB*G', information gain
-	FM::identity(b.tempY);
-	noalias(b.tempY) -= prod(b.A,Y);
+	FM::identity(tempX);
+	noalias(tempX) -= prod(b.A,Y);
 						// Information
-	noalias(Y) = prod(b.tempY,b.A);
+	noalias(Y) = prod(tempX,b.A);
 						// Information state
-	y = prod(prod(b.tempY,trans(f.inv.Fx)), y);
+	noalias(b.y) = prod(trans(f.inv.Fx), y);
+	noalias(y) = prod(tempX, b.y);
 
 	update_required = true;
 	return rcond;
 }
 
 
-inline void Information_scheme::observe_size (size_t z_size)
-/*
- * Optimised dynamic observation sizing
+Bayes_base::Float
+ Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
+/* Extended_kalman_filter observe, unused byproduct
  */
 {
-	if (z_size != last_z_size) {
-		last_z_size = z_size;
-
-		ZI.resize(z_size,z_size);
-	}
-}
+	const size_t x_size = h.Hx.size2();
+	State_byproduct i(x_size);
+	Covariance_byproduct I(x_size,x_size);
+	return observe_innovation (h, s, i,I);
+}	
 
 Bayes_base::Float
  Information_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
-/* correlated innovation observe
+/* Extended_kalman_filter observe, unused byproduct
+ */
+{
+	const size_t x_size = h.Hx.size2();
+	State_byproduct i(x_size);
+	Covariance_byproduct I(x_size,x_size);
+	return observe_innovation (h, s, i,I);
+}	
+
+Bayes_base::Float
+ Information_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s, State_byproduct& i, Covariance_byproduct& I)
+/* Correlated innovation observe with explict byproduct
  */
 {
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
 		error (Logic_exception("observation and model size inconsistent"));
-	observe_size (s.size());// Dynamic sizing
 
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF observation object
 
 						// Observation Information
+	SymMatrix ZI(s.size(),s.size());
 	Float rcond = UdUinversePD (ZI, h.Z);
 	rclimit.check_PD(rcond, "Z not PD in observe");
 
@@ -225,14 +237,13 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
-/* Extended linrz uncorrelated observe
+ Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s, State_byproduct& i, Covariance_byproduct& I)
+/* Uncorrelated innovation observe with explict byproduct
  */
 {
 						// Size consistency, z to model
 	if (s.size() != h.Zv.size())
 		error (Logic_exception("observation and model size inconsistent"));
-	observe_size (s.size());// Dynamic sizing
 
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF observation object
 

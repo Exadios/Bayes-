@@ -124,7 +124,7 @@ void Kalman_state_filter::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 
 
 Bayes_base::Float
- Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
+ Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z, State_byproduct& innov)
 /*
  * Extended linrz correlated observe, compute innovation for observe_innovation
  */
@@ -132,14 +132,14 @@ Bayes_base::Float
 	update ();
 	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
 
-	FM::Vec s = z;
-	h.normalise(s, zp);
-	FM::noalias(s) -= zp;
-	return observe_innovation (h, s);
+	innov = z;
+	h.normalise(innov, zp);
+	FM::noalias(innov) -= zp;
+	return observe_innovation (h, innov);
 }
 
 Bayes_base::Float
- Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+ Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, State_byproduct& innov)
 /*
  * Extended kalman uncorrelated observe, compute innovation for observe_innovation
  */
@@ -147,10 +147,10 @@ Bayes_base::Float
 	update ();
 	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
 
-	FM::Vec s = z;
-	h.normalise(s, zp);
-	FM::noalias(s) -= zp;
-	return observe_innovation (h, s);
+	innov = z;
+	h.normalise(innov, zp);
+	FM::noalias(innov) -= zp;
+	return observe_innovation (h, innov);
 }
 
 

@@ -22,7 +22,7 @@
  *   r = R*x
  *   R is upper triangular but not strictly a Cholesky factor as diagonal may be negative
  * Observe algorithm has been extended to include linearised models
- * Discontinous observe models require that prediction is normailised with respect to the observation.
+ * Discontinous observe models require that state is normailised with respect to the observation.
  *
  * The filter is operated by performing a
  *  predict, observe
@@ -40,7 +40,7 @@ public:
 	FM::Vec r;			// Information Root state
 	FM::UTriMatrix R;	// Information Root
 
-	Information_root_scheme (size_t x_size, size_t z_initialsize = 0);
+	Information_root_scheme (size_t x_size);
 
 	void init ();
 	void update ();
@@ -60,6 +60,7 @@ public:
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
+	// Extended_kalman_filter observe
 
 	static void inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx);
 	/* Numerical Inversion of Fx using LU factorisation */
@@ -74,7 +75,7 @@ public:
 class Information_root_info_scheme : public Information_root_scheme, virtual public Information_state_filter
 {
 public:
-	Information_root_info_scheme (size_t x_size, size_t z_initialsize = 0);
+	Information_root_info_scheme (size_t x_size);
 
 	void init_yY ();
 	void update_yY ();

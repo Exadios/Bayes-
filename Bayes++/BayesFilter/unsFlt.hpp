@@ -20,9 +20,9 @@
 namespace Bayesian_filter
 {
 
-/** Specific Unscented prediction model for Addative noise.
+/** Specific Unscented predict model for Addative noise.
  * 
- * Prediction equation x(k|k-1) = f(x(k-1|k-1)) + w(x(k))
+ * predict equation x(k|k-1) = f(x(k-1|k-1)) + w(x(k))
  *
  * Unscented filter requires
  *  f the function part of the non-linear model
@@ -52,20 +52,20 @@ private:
 
 /** A Julier-Uhlmann Unscented non-linear Kalman filter.
  * 
- * The Unscented transform is used for non-linear state and observation predictions.
+ * The Unscented transform is used for non-linear state and observation predicts.
  * Uses the original Duplex Unscented transform implementation
  *
  * Observations are fused using innovation gain equations from a Covariance filter.
  *
- * Predictions of state and state covariance (and observation) use
+ * Predicts of state and state covariance (and observation) use
  * unscented transformations to interpolate the non-linear predict and observe
  * models. The Unscented transforms can be optimised by varying the Kappa
  * parameter.
  * Discontinous observe models require a normailisation function.
  *
- * The predict model is represtented by the state prediction function and a 
- * seperate prediction noise matrix.
- * The observe model is represtented by the observation prediction function and
+ * The predict model is represtented by the state predict function and a 
+ * seperate predict noise matrix.
+ * The observe model is represtented by the observation predict function and
  * a function to normalise observations.
  */
 class Unscented_scheme : public Linrz_kalman_filter, public Functional_filter
@@ -76,7 +76,7 @@ public:
 	FM::ColMatrix XX;		///< Unscented form of state, with associated kappa
 	Float kappa;
 
-	Unscented_scheme (size_t x_size, size_t z_initialsize = 0);
+	Unscented_scheme (size_t x_size);
 	Unscented_scheme& operator= (const Unscented_scheme&);
 
  	void init ();
@@ -85,31 +85,37 @@ public:
 	void update_XX (Float kappa);
 
 	void predict (Unscented_predict_model& f);
-	///< Efficient Unscented prediction 
+	///< Efficient Unscented predict 
 	void predict (Functional_predict_model& f);
 	void predict (Addative_predict_model& f);
 	Float predict (Linrz_predict_model& f)
-	{	// Adapt to use the more general addative model
+	{	///< Linrz_kalman_filter predict
 		predict(static_cast<Addative_predict_model&>(f));
 		return 1.;		// Always well condition for addative predict
 	}
 	
-	Float observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z);
-	Float observe (Correlated_addative_observe_model& h, const FM::Vec& z);
-	///< Unscented filter implements general addative observe models 
+	Float observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	Float observe (Correlated_addative_observe_model& h, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	///< Unscented filter implements general addative observe models with byproduct
 	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
-	{	///< Adapt to use the more general addative model
-		return observe (static_cast<Uncorrelated_addative_observe_model&>(h),z);
+	{	///< Linrz_kalman_filter observe
+		const size_t z_size = h.Hx.size1();
+		State_byproduct s(z_size);
+		Covariance_byproduct S(z_size,z_size);
+		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
+		return observe (static_cast<Uncorrelated_addative_observe_model&>(h), z, s,S,b);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
-	{	///< Adapt to use the more general addative model
-		return observe (static_cast<Correlated_addative_observe_model&>(h),z);
+	{	///< Linrz_kalman_filter observe, unused byproduct
+		const size_t z_size = h.Hx.size1();
+		State_byproduct s(z_size);
+		Covariance_byproduct S(z_size,z_size);
+		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
+		return observe (static_cast<Correlated_addative_observe_model&>(h), z, s,S,b);
 	}
-
-public:						// Exposed Numerical Results
-	FM::Vec s;					///< Last observation innovation
-	FM::SymMatrix S, SI;		///< Innovation Covariance and its Inverse
 
 protected:
 	//@{
@@ -119,10 +125,6 @@ protected:
 	virtual Float predict_Kappa (size_t size) const;
 	virtual Float observe_Kappa (size_t size) const;
 	//@}
-
-protected:					// allow fast operation if z_size remains constant
-	size_t last_z_size;
-	void observe_size (size_t z_size);
 
 private:
 	void unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale);

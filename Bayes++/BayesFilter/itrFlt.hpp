@@ -16,7 +16,7 @@
  *
  * The observe algorithm uses the iterated non-linear formulation 
  * from Bar-Shalom and Fortmann p.119 (full scheme)
- * Discontinous observe models require that prediction is normailised with
+ * Discontinous observe models require that state is normailised with
  * respect to the observation.
  *
  * The filter is operated by performing a
@@ -84,7 +84,7 @@ public:
 class Iterated_covariance_scheme : public Linrz_kalman_filter
 {
 public:
-	Iterated_covariance_scheme (size_t x_size, size_t z_initialsize = 0);
+	Iterated_covariance_scheme (size_t x_size);
 	/* Initialised filter requries an addition iteration limit for the
 	   observe algorithm */
 	Iterated_covariance_scheme& operator= (const Iterated_covariance_scheme&);
@@ -92,31 +92,38 @@ public:
 
 	void init ();
 	void update ();
-	Float predict (Linrz_predict_model& f);
 
-	Float observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z);
-	Float observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z);
-	// Observe with iteration
+	Float predict (Linrz_predict_model& f);
+	// Linrz_kalman_filter predict
+	Float predict (Gaussian_predict_model& f);
+	// Specialised 'stationary' predict, only addative noise
+
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
-	{	// Observe with default termination
+	{	// Linrz_kalman_filter observe with default termination
 		Iterated_terminator term;
-		return observe (h, term, z);
+		const size_t z_size = h.Hx.size1();
+		State_byproduct s(z_size);
+		Covariance_byproduct S(z_size,z_size);
+		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
+		return observe (h, term, z, s,S,b);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
-	{	// Observe with default termination
+	{	// Linrz_kalman_filter observe with default termination
 		Iterated_terminator term;
-		return observe (h, term, z);
+		const size_t z_size = h.Hx.size1();
+		State_byproduct s(z_size);
+		Covariance_byproduct S(z_size,z_size);
+		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
+		return observe (h, term, z, s,S,b);
 	}
+	Float observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	Float observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+				State_byproduct& s, Covariance_byproduct& S,  Kalman_gain_byproduct& b);
+	// Observe with iteration and explict byproduct
 
-public:						// Exposed Numerical Results
-	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
-
-protected:					// allow fast operation if z_size remains constant
-	size_t last_z_size;
-	void observe_size (size_t z_size);
-							// Permenantly allocated temps
-	FM::Vec s;
-	FM::Matrix HxT;
+protected:			   		// Permenantly allocated temps
+	FM::RowMatrix tempX;
 };
 
 

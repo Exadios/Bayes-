@@ -100,10 +100,10 @@ class Predict_model_base : public Bayes_base
 
 
 class Sampled_predict_model : virtual public Predict_model_base
-/* Sampled stochastic prediction model
+/* Sampled stochastic predict model
     x*(k) = fw(x(k-1), w(k))
    fw should generate samples from the stochastic variable w(k)
-   This fundamental model is used instead of the prediction likelihood function L(x*|x)
+   This fundamental model is used instead of the predict likelihood function L(x*|x)
    Since drawing samples from an arbitary L is non-trivial (see MCMC theory)
    the burden is place on the model to generate these samples.
    Defines an Interface without data members
@@ -115,9 +115,9 @@ public:
 };
 
 class Functional_predict_model :virtual public Predict_model_base
-/* Functional (non-stochastic) prediction model f
+/* Functional (non-stochastic) predict model f
     x*(k) = fx(x(k-1))
-   This fundamental model is used instead of the prediction likelihood function L(x*|x)
+   This fundamental model is used instead of the predict likelihood function L(x*|x)
    Since L is a delta function which isn't much use for numerical systems.
    Defines an Interface without data members
  */
@@ -134,7 +134,7 @@ public:
 };
 
 class Gaussian_predict_model : virtual public Predict_model_base
-/* Gaussian noise prediction model
+/* Gaussian noise predict model
    This fundamental noise model for linear/linearised filtering
     x(k|k-1) = x(k-1|k-1)) + G(k)w(k)
     G(k)w(k)
@@ -153,7 +153,7 @@ public:
 };
 
 class Addative_predict_model : virtual public Predict_model_base
-/* Addative Gaussian noise prediction model
+/* Addative Gaussian noise predict model
    This fundamental model for non-linear filtering with addative noise
     x(k|k-1) = f(x(k-1|k-1)) + G(k)w(k)
     q(k) = state noise covariance, q(k) is covariance of w(k)
@@ -176,7 +176,7 @@ public:
 };
 
 class Linrz_predict_model : public Addative_predict_model
-/* Linrz prediction model
+/* Linrz predict model
    This fundamental model for linear/linearised filtering
     x(k|k-1) = f(x(k-1|k-1)
     Fx(x(k-1|k-1) = Jacobian of of functional part fx with respect to state x
@@ -188,7 +188,7 @@ public:
 };
 
 class Linear_predict_model : public Linrz_predict_model
-/* Linear prediction model
+/* Linear predict model
    Enforces linearity on f
     x(k|k-1) = Fx(k-1|k-1) * x(k-1|k-1)
  */
@@ -205,7 +205,7 @@ private:
 };
 
 class Linear_invertable_predict_model : public Linear_predict_model
-/* Linear invertable prediction model
+/* Linear invertable predict model
    Fx has an inverse
     x(k-1|k-1) = inv.Fx(k-1|k-1) * x(k|k-1)
  */
@@ -230,7 +230,7 @@ class Observe_model_base : public Bayes_base
 };
 
 class Observe_function : public Bayes_base
-// Function object for prediction of observations
+// Function object for predict of observations
 {
 public:
 	virtual const FM::Vec& h(const FM::Vec& x) const = 0;
@@ -403,10 +403,32 @@ private:
 
 
 /*
+ * By product
+ *
+ * Store the numerical by products of filter scheme computations.
+ */
+typedef FM::Vec State_byproduct;
+// Vector of states
+
+typedef FM::SymMatrix Covariance_byproduct;
+// Covariance of states
+
+struct Kalman_gain_byproduct
+// Kalman gain and associated innovation covariance and inverse
+{
+	Kalman_gain_byproduct (size_t x_size, size_t z_size) :
+		SI(z_size,z_size), W(x_size, z_size)
+	{}
+	Covariance_byproduct SI;
+	FM::Matrix W;
+};
+
+
+/*
  * Bayesian Filter
  *
- * A filter that uses Bayes rule to fuse the probability distributions
- * of prior and likelhood 
+ * A Bayesian Filter uses Bayes rule to fuse the state probabilities
+ * of a prior and a likelhood function
  */
 class Bayes_filter_base : public Bayes_base
 {
@@ -429,7 +451,7 @@ public:
 
 /*
  * Functional Filter - Abstract filtering property
- * Represents only filter prediction by a simple functional
+ * Represents only filter predict by a simple functional
  * (non-stochastic) model
  * 
  * A similar functional observe is not generally useful. The inverse of h is needed for observe!
@@ -610,8 +632,16 @@ protected:
 	Extended_kalman_filter() : Kalman_state_filter(0) // define a default constructor
 	{}
 public:
-	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
-	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
+	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, State_byproduct& innov);
+	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z, State_byproduct& innov);
+	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
+	{	State_byproduct innov(z.size()); // unused innovation byproduct
+		return observe(h, z, innov);
+	}
+	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
+	{	State_byproduct innov(z.size()); // unused innovation byproduct
+		return observe(h, z, innov);
+	}
 	/* Observation z(k) and with (Un)correlated observation noise model
 	    Requires x(k|k), X(k|k) or internal equivilent
 	    Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)

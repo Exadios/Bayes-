@@ -397,7 +397,7 @@ void SIR_scheme::roughen_minmax (FM::ColMatrix& P, Float K) const
 	rootq = xmax;
 	noalias(rootq) -= xmin;
 	rootq *= SigmaScale;
-   						// Apply roughening prediction based on scaled variance
+   						// Apply roughening predict based on scaled variance
 	DenseVec n(x_size);
 	for (pi = P.begin2(); pi != P.end2(); ++pi) {
 		random.normal (n);			// independant zero mean normal
@@ -440,7 +440,7 @@ void SIR_kalman_scheme::init ()
 	Float rcond = UdUfactor (UD, X);
 	rclimit.check_PSD(rcond, "Roughening X not PSD");
 
-						// Sampled prediction model for initial noise variance
+						// Sampled predict model for initial noise variance
 	FM::identity (roughen_model.Fx);
 	UdUseperate (roughen_model.G, roughen_model.q, UD);
 	roughen_model.init_GqG ();
@@ -542,9 +542,9 @@ void SIR_kalman_scheme::roughen_correlated (FM::ColMatrix& P, Float K)
 	Float rcond = UdUfactor (UD, X);
 	rclimit.check_PSD(rcond, "Roughening X not PSD");
 
-						// Sampled prediction model for roughening
+						// Sampled predict model for roughening
 	FM::identity (roughen_model.Fx);
-						// Roughening prediction based on scaled variance
+						// Roughening predict based on scaled variance
 	UdUseperate (roughen_model.G, roughen_model.q, UD);
 	roughen_model.q *= VarScale;
 	roughen_model.init_GqG();

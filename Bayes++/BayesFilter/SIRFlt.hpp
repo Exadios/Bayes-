@@ -271,7 +271,7 @@ public:
 
 protected:
 	void roughen_correlated (FM::ColMatrix& P, Float K);	// Roughening using covariance of P distribution
-	Sampled_LiAd_predict_model roughen_model;		// roughening prediction
+	Sampled_LiAd_predict_model roughen_model;		// roughening predict
 private:
 	static Float scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& S);
 	void mean();

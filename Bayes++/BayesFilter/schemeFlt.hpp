@@ -31,8 +31,8 @@ struct Filter_scheme : public Scheme
  *  Default for Kalman_state_filter
  */
 {
-	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
-		Kalman_state_filter (x_size), Scheme (x_size, z_initialsize)
+	Filter_scheme(size_t x_size, size_t q_maxsize) :
+		Kalman_state_filter (x_size), Scheme (x_size)
 	{}
 };
 
@@ -41,8 +41,8 @@ struct Filter_scheme : public Scheme
 template <>
 struct Filter_scheme<UD_scheme> : public UD_scheme
 {
-	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
-		Kalman_state_filter (x_size), UD_scheme (x_size, q_maxsize, z_initialsize)
+	Filter_scheme(size_t x_size, size_t q_maxsize) :
+		Kalman_state_filter (x_size), UD_scheme (x_size, q_maxsize)
 	{}
 };
 
@@ -50,9 +50,9 @@ struct Filter_scheme<UD_scheme> : public UD_scheme
 template <>
 struct Filter_scheme<Information_scheme> : public Information_scheme
 {
-	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
+	Filter_scheme(size_t x_size, size_t q_maxsize) :
 		Kalman_state_filter (x_size), Information_state_filter (x_size),
-		Information_scheme (x_size, z_initialsize)
+		Information_scheme (x_size)
 	{}
 };
 
@@ -60,9 +60,9 @@ struct Filter_scheme<Information_scheme> : public Information_scheme
 template <>
 struct Filter_scheme<Information_root_info_scheme> : public Information_root_info_scheme
 {
-	Filter_scheme(size_t x_size, size_t q_maxsize, size_t z_initialsize) :
+	Filter_scheme(size_t x_size, size_t q_maxsize) :
 		Kalman_state_filter (x_size), Information_state_filter (x_size),
-		Information_root_info_scheme (x_size, z_initialsize)
+		Information_root_info_scheme (x_size)
 	{}
 };
 
