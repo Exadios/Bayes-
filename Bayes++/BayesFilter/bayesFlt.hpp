@@ -188,7 +188,10 @@ public:
 	Gaussian_predict_model (size_t x_size, size_t q_size);
 
 	FM::Vec q;		// Noise variance (always dense, use coupling to represent sparseness)
-	FM::Matrix G;	// Noise Coupling
+	FM::Matrix G;		// Noise Coupling
+	
+	Numerical_rcond rclimit;
+	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
 class Addative_predict_model : virtual public Predict_model_base
@@ -208,7 +211,10 @@ public:
 	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 
 	FM::Vec q;		// Noise variance (always dense, use coupling to represent sparseness)
-	FM::Matrix G;	// Noise Coupling
+	FM::Matrix G;		// Noise Coupling
+
+	Numerical_rcond rclimit;
+	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
 class Linrz_predict_model : public Addative_predict_model
