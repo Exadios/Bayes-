@@ -19,6 +19,6 @@ lib lapack : : <name>lapack ;
 
 exe rtheta :
      rtheta.cpp  tests.cpp
-     ../BayesFilter/BayesFilterLib
+     ../BayesFilter//BayesFilterLib
      lapack g2c
 ;

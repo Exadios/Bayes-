@@ -8,5 +8,5 @@ project
 
 exe simple :
      simpleExample.cpp
-     ../BayesFilter/BayesFilterLib
+     ../BayesFilter//BayesFilterLib
 ;

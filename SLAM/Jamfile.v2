@@ -10,5 +10,5 @@ exe testfastslam :
      testFastSLAM.cpp
      fastSLAM.cpp
      kalmanSLAM.cpp
-     ../BayesFilter/BayesFilterLib
+     ../BayesFilter//BayesFilterLib
 ;
