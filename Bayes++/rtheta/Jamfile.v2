@@ -8,12 +8,12 @@ project
 
 # System libraries
 lib g2c : : <name>g2c ;
-lib lapack : : <name>lapack ;
+lib lapack : : <toolset>gcc <name>lapack : <library>g2c ;
 
-# TODO: Adding gcc specific target fails in Boost.build v2 M3
+# TODO: Adding compiler specific target fails in Boost.build v2 M3 and M4.
 # lib g2c : : <name>g2c <toolset>gcc ;
-# lib lapack : g2c : <name>lapack <toolset>gcc ;
-# lib lapack : : <file>"../../CLAPACK3/clapack7.a" <toolset>msvc;
+# lib lapack : : <toolset>gcc <name>lapack ;
+#lib lapack : : <toolset>msvcms <file>"../../CLAPACK3/clapack7.a" ;
 
 # The executable for testing
 
