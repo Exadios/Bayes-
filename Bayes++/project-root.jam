@@ -3,3 +3,11 @@
 # Get Boost location from build system
 path-constant BOOST : [ modules.peek : BOOST_ROOT ] ;
 
+# Build variant for full compiler optimization
+variant hardoptimize_release : release : 
+ 	<toolset>gcc <cflags>"-march=pentium3 -msse" <cxxflags>"-ftemplate-depth-1000 -fforce-mem -fomit-frame-pointer -foptimize-sibling-calls -finline-limit=2000" ;
+
+ # Build variant for fast syntax checking
+variant syntax :  : 
+ 	<toolset>gcc <cflags>"-fsyntax-only" ;
+ 	
