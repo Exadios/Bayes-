@@ -1,7 +1,8 @@
 # Bayes++ Project Managment Makefile
 #   Provides interface for project development and sourceforge maintainance
+#   Use bjam to compile and build Bayes++
 
-RELEASE=2004.8
+RELEASE=2005
 RELEASE_SUB=-1
 BOOST_VERSION=boost_1_32_0
 
