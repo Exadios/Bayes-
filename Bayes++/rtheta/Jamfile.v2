@@ -3,13 +3,13 @@
 # Range Angle test for all filter schemes
 project
      : requirements <include>"../../include"
-     : default-build debug
 ;
 
-# System libraries - ISSUE Second compiler specific target still not functioning in Boost.build v2 M5
-lib g2c : : <toolset>gcc <name>g2c ;
-lib lapack : : <toolset>gcc <name>lapack : : <library>g2c ;
-#lib lapack : : <toolset>msvc <file>"../../CLAPACK3/clapack7.a" ;
+# System libraries - specifies local tools link requirements for lapack
+lib g2c : : <name>g2c ;
+lib lapack : : <name>lapack ;
+lib lapack : : <toolset>gcc <name>lapack : : <library>g2c  ;
+lib lapack : : <toolset>msvcms <file>"../../CLAPACK3/clapack7.a" ;
 
 # The executable for testing
 
@@ -17,4 +17,6 @@ exe rtheta :
      rtheta.cpp  tests.cpp
      ../BayesFilter//BayesFilterLib
 	lapack
+     : 
+     : debug
 ;
