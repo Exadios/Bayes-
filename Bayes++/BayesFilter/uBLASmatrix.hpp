@@ -69,12 +69,12 @@ public:
 		return *this;
 	}
 
-	// Range selection operators
-	const ublas::vector_range<const VecBase> operator()(size_t b, size_t e) const
+	// Sub-range selection operators
+	const ublas::vector_range<const VecBase> sub_range(size_t b, size_t e) const
 	{
 		return ublas::vector_range<const VecBase>(*this, ublas::range(b,e));
 	}
-	ublas::vector_range<VecBase> operator()(size_t b, size_t e)
+	ublas::vector_range<VecBase> sub_range(size_t b, size_t e)
 	{
 		return ublas::vector_range<VecBase>(*this, ublas::range(b,e));
 	}
@@ -138,7 +138,7 @@ public:
 		return const_Column(static_cast<const FMMatrix&>(ci()), ci.index2());
 	}
 
-	// Sub matrix/vector helpers
+	// Sub-range selection operators
 	ublas::matrix_range<const MatrixBase>
 	sub_matrix(size_t s1, size_t e1, size_t s2, size_t e2) const
 	{
