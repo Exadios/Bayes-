@@ -115,7 +115,7 @@ struct General_sampled_predict_random
  *  Helper to allow polymorthic use of random number generators 
  */
 {
-	virtual void normal(FM::Vec& v) = 0;
+	virtual void normal(FM::DenseVec& v) = 0;
 };
 
 template <class Predict_model>
@@ -148,7 +148,7 @@ public:
 							// Additive random noise
 		genn.normal(n);				// independant zero mean normal
 									// multiply elements by std dev
-		for (FM::Vec::iterator ni = n.begin(); ni != n.end(); ++ni) {
+		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
 		}
 		xp += FM::prod(G,n);			// add correlated noise
@@ -161,17 +161,16 @@ public:
 	 */
 	{
 		first_init = false;
-		FM::Vec::iterator rootqi = rootq.begin();
 		for (FM::Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
 			if (*qi < 0.)
 				throw Bayesian_filter::Bayes_filter_exception ("Negative q in init_GqG");
-			*rootqi = Bayesian_filter::compatibility::sqrt(*qi); ++rootqi;
+			rootq[qi.index()] = Bayesian_filter::compatibility::sqrt(*qi);
 		}
 	}
 private:
 	Random& genn;
 	mutable FM::Vec xp;
-	mutable FM::Vec n;
+	mutable FM::DenseVec n;
 	mutable FM::Vec rootq;		// Optimasation of sqrt(q) calculation, automatic on first use
 	mutable bool first_init;	
 };

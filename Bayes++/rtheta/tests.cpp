@@ -6,6 +6,7 @@
 #include "BayesFilter/allFilters.hpp"
 #include <cmath>
 #include <iostream>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/limits.hpp>
 #include <boost/random.hpp>
 
@@ -156,6 +157,9 @@ void test_SPD_all()
 	Float v1 = ublas::inner_prod (x, ublas::prod(S,x) );
 	Float v2 = prod_SPDT(x,S);
 	(void)v1,(void)v2;
+
+	v2 = prod_SPD(x,x);
+
 	test_SPD();
 }
 
@@ -272,9 +276,21 @@ void test_addative()
 
 void other_tests()
 {
-	//	test_();
-//		using boost::format;
-//		cout << sci5_13%1.1 << sci5_13%1.2 << std::endl;
 //	test_SPD_all();
-//	test_temp_prod();
 }
+
+
+/* Boost Random
+template boost::uniform_smallint<boost::mt19937, Float>;
+template boost::uniform_int<boost::mt19937, int>;
+template boost::uniform_01<boost::mt19937, Float>;
+template boost::uniform_real<boost::mt19937, Float>;
+template boost::triangle_distribution<boost::mt19937, Float>;
+template boost::bernoulli_distribution<boost::mt19937, Float>;
+template boost::cauchy_distribution<boost::mt19937, Float>;
+template boost::exponential_distribution<boost::mt19937, Float>;
+template boost::geometric_distribution<boost::mt19937, Float>;
+template boost::normal_distribution<boost::mt19937, Float>;
+template boost::lognormal_distribution<boost::mt19937, Float>;
+template boost::uniform_on_sphere<boost::mt19937, Float>;
+*/

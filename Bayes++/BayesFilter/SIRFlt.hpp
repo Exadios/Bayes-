@@ -52,8 +52,8 @@ struct SIR_random
  *  Helper to allow polymorthic use of random number generators
  */
 {
-	virtual void normal(FM::Vec& v) = 0;
-	virtual void uniform_01(FM::Vec& v) = 0;
+	virtual void normal(FM::DenseVec& v) = 0;
+	virtual void uniform_01(FM::DenseVec& v) = 0;
 };
 
 
@@ -67,7 +67,7 @@ class Importance_resampler : public Bayes_base
 public:
 	typedef std::vector<size_t> Resamples_t;	// resampling counts
 
-	virtual Float resample (Resamples_t& presamples, size_t& uresamples, FM::Vec& w, SIR_random& r) const = 0;
+	virtual Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const = 0;
 	/*
 	 * The resampling function
 	 *  Weights w are proportional to the posterior Likelihood of a state
@@ -90,13 +90,13 @@ public:
 class Standard_resampler : public Importance_resampler
 // Standard resample algorithm from [1]
 {
-	Float resample (Resamples_t& presamples, size_t& uresamples, FM::Vec& w, SIR_random& r) const;
+	Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
 
 class Systematic_resampler : public Importance_resampler
 // Systematic resample algorithm from [2]
 {
-	Float resample (Resamples_t& presamples, size_t& uresamples, FM::Vec& w, SIR_random& r) const;
+	Float resample (Resamples_t& presamples, size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
 
 
@@ -155,7 +155,7 @@ public:
 protected:
 	void roughen_minmax (FM::ColMatrix& P, Float K) const;	// Roughening using minmax of P distribution
 	Importance_resampler::Resamples_t resamples;		// resampling counts
-	FM::Vec wir;				// resamping weights
+	FM::DenseVec wir;			// resamping weights
 	bool wir_update;			// weights have been updated requring a resampling on update
 private:
 	static const Float rougheningKinit;
@@ -225,7 +225,7 @@ protected:
 		Roughen_random(SIR_random& random_helper) :
 			random(random_helper)
 		{}
-		virtual void normal(FM::Vec& v)
+		virtual void normal(FM::DenseVec& v)
 		{
 			random.normal(v);
 		}

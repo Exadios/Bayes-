@@ -26,6 +26,8 @@
 #include "BayesFilter/filters/indirect.hpp"
 #include <cmath>
 #include <iostream>
+#include <boost/numeric/ublas/io.hpp>
+#include <boost/random.hpp>
 #include <boost/random.hpp>
 
 namespace
@@ -45,12 +47,12 @@ namespace
 
 	// Random numbers from Boost
 	boost::mt19937 localRng;
-	inline void randNormal(Vec& v)
+	inline void randNormal(DenseVec& v)
 	{
 		boost::normal_distribution<boost::mt19937> gen(localRng);
 		std::generate (v.begin(), v.end(), gen);
 	}
-	inline void randNormal(Vec& v, const Float mean, const Float sigma)
+	inline void randNormal(DenseVec& v, const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<boost::mt19937> gen(localRng, mean, sigma);
 		std::generate (v.begin(), v.end(), gen);
@@ -174,7 +176,7 @@ int main()
 
 
 	// Iterate the filter with test observations
-	Vec u(1), z_true(1), z(1);
+	DenseVec u(1), z_true(1), z(1);
 	Float time = 0.; Float obs_time = 0.;
 	for (unsigned i = 0; i < 100; ++i)
 	{

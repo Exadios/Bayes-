@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/w44224 /Zm150"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)../boost;$(SolutionDir)"
+				AdditionalIncludeDirectories="$(SolutionDir)../ublas_2002_10_12;$(SolutionDir)"
 				PreprocessorDefinitions="_CONSOLE,_DEBUG,WIN32,BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"

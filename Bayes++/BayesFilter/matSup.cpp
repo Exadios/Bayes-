@@ -12,10 +12,12 @@
  * Relies on Bayesian_filter::Bayes_filter for exception
  * thrown by internal matrix checks
  */
-#include "bayesFlt.hpp"		// Require Excecptions
+#include "bayesFlt.hpp"		// Excecptions Required
 #include "matSup.hpp"
 #include <cassert>
-
+#ifndef NDEBUG
+#include "boost/numeric/ublas/io.hpp"
+#endif
 
 namespace {
 

@@ -163,8 +163,8 @@ Bayes_base::Float
 		ColMatrix FxLU(x_size, x_size);
 		FxLU = f.Fx;
 		LAPACK::pivot_t ipivot(x_size);		// Pivots initialised to zero
-		for (LAPACK::pivot_t::iterator i = ipivot.begin(); i != ipivot.end(); ++i)
-			*i = 0;
+		ipivot.clear();
+
 		int info = LAPACK::getrf(FxLU, ipivot);
 		if (info < 0)
 			filter_error ("Fx not LU factorisable");

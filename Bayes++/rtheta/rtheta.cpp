@@ -16,6 +16,7 @@
 #include <angle.hpp>			// Angle arithmatic header from Ms
 #include <cmath>
 #include <iostream>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/random.hpp>
 #include <boost/format.hpp>
 #include <boost/limits.hpp>
@@ -69,11 +70,11 @@ public:
 		boost::normal_distribution<boost::mt19937, Float> gen(rng, mean, sigma);
 		return gen();
 	}
-	void normal(Vec& v)
+	void normal(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_normal);
 	}
-	void uniform_01(Vec& v)
+	void uniform_01(DenseVec& v)
 	{
 		std::generate (v.begin(), v.end(), gen_uniform);
 	}
@@ -104,7 +105,7 @@ private:
 	 */
 	{
 	public:
-		void normal(FM::Vec& v)
+		void normal(FM::DenseVec& v)
 		{
 			::Random2.normal(v);
 		}
@@ -288,19 +289,18 @@ walk::walk (const Vec start, const bool fixed) : x(NX), x_pred(NX), rootq(NX), m
 	m_fixed = fixed;
 	m_base = start;
 	x = m_base;
-	Vec::iterator rootqi = rootq.begin();
 	for (Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
-		*rootqi = std::sqrt(*qi); ++rootqi;
+		rootq[qi.index()] = std::sqrt(*qi);
 	}
 }
 
 void walk::predict ()
 {
 						// Correlated additive random noise
-	Vec n(x.size()), nc(x.size());
+	DenseVec n(x.size()), nc(x.size());
 	::Random.normal (n);		// independant zero mean normal
 								// multiply elements by std dev
-	for (Vec::iterator ni = n.begin(); ni != n.end(); ++ni) {
+	for (DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 		*ni *= rootq[ni.index()];
 	}
 	nc = prod(G,n);				// correlate
@@ -407,9 +407,9 @@ private:
 
 	Vec ztrue, z;
 
-	Vec f1_xpred, f2_xpred;
-	SymMatrix f1_Xpred;
-	SymMatrix f2_Xpred;
+	DenseVec f1_xpred, f2_xpred;
+	DenseSymMatrix f1_Xpred;
+	DenseSymMatrix f2_Xpred;
 };
 
 template<class Tf1, class Tf2>
@@ -461,7 +461,7 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 			 	% truth.x[0] % truth.x[1] % zx % zy << endl;
 
 		format state(" %11.4g %11.4g * %10.3f %10.3f");
-		format covariance(" %12.5e %12.5e %12.5e");
+		format covariance(" %12.4e %12.4e %12.4e");
 
 		// Filter f1 performace
 		//		x[0]err, x[1]err, x[0], x[1],  Xpred*3, X*3
@@ -547,7 +547,7 @@ int main()
 	// Initialise and do the comparison
 	std::cout << "udfilter, irfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<UD_filter>, Filter<Information_root_filter> > test1(x_init, X_init, 4);
+// SPARSE	CCompare<Filter<UD_filter>, Filter<Information_root_filter> > test1(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;

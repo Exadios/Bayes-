@@ -28,7 +28,8 @@
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include <boost/numeric/ublas/vector_sparse.hpp>
+#include <boost/numeric/ublas/matrix_sparse.hpp>
 
 /* Filter Matrix Namespace */
 namespace Bayesian_filter_matrix
@@ -40,7 +41,7 @@ namespace ublas = boost::numeric::ublas;
  * Declare the value used for ALL linear algebra operations
  * Also required as the matrix/vector container value_type
  */
-typedef float Float;
+typedef double Float;
 
 /*
  * uBlas base types - these will be wrapper to provide the actual vector and matrix types
@@ -49,11 +50,33 @@ typedef float Float;
  *  we use a symmetric_adaptor to provide the base for symmetric matrices.
  */
 namespace detail {
-typedef ublas::matrix<Float, ublas::row_major> BaseRowMatrix;
-typedef ublas::matrix<Float, ublas::column_major> BaseColMatrix;
-typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseUpperTriMatrix;
-typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseLowerTriMatrix;
-typedef ublas::banded_matrix<Float> BaseDiagMatrix;
+							// Dense types
+typedef ublas::vector<Float> BaseDenseVector;
+typedef ublas::matrix<Float, ublas::row_major> BaseDenseRowMatrix;
+typedef ublas::matrix<Float, ublas::column_major> BaseDenseColMatrix;
+typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseDenseUpperTriMatrix;
+typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseDenseLowerTriMatrix;
+typedef ublas::banded_matrix<Float> BaseDenseDiagMatrix;
+							// Sparse types
+typedef ublas::sparse_vector<Float> BaseSparseVector;
+typedef ublas::sparse_matrix<Float, ublas::row_major> BaseSparseRowMatrix;
+typedef ublas::sparse_matrix<Float, ublas::column_major> BaseSparseColMatrix;
+
+							// Default types
+typedef BaseSparseVector BaseVector;
+typedef BaseSparseRowMatrix BaseRowMatrix;
+typedef BaseSparseColMatrix BaseColMatrix;
+typedef BaseSparseRowMatrix BaseUpperTriMatrix;
+typedef BaseSparseRowMatrix BaseLowerTriMatrix;
+typedef BaseSparseRowMatrix BaseDiagMatrix;
+/*
+typedef BaseDenseVector BaseVector;
+typedef BaseDenseRowMatrix BaseRowMatrix;
+typedef BaseDenseColMatrix BaseColMatrix;
+typedef BaseDenseRowMatrix BaseUpperTriMatrix;
+typedef BaseDenseRowMatrix BaseLowerTriMatrix;
+typedef BaseDenseRowMatrix BaseDiagMatrix;*/
+
 }
 
 }//namespace

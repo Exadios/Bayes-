@@ -20,6 +20,7 @@
 #include "BayesFilter/allFilters.hpp"
 #include <cmath>
 #include <iostream>
+#include <boost/numeric/ublas/io.hpp>
 #include <boost/random.hpp>
 
 namespace

@@ -41,7 +41,7 @@ Bayes_base::Float
 	FM::Vec s = h.h(x);		// Observation model, s is predicted observation
 	h.normalise(s, z);
 
-	s.assign (z-s);		// Innovation s
+	s = z - s;
 	return observe_innovation (h, s);
 }
 
@@ -54,7 +54,7 @@ Bayes_base::Float
 	FM::Vec s = h.h(x);		// Observation model, s is predicted observation
 	h.normalise(s, z);
 
-	s.assign (z-s);		// Innovation s
+	s = z - s;
 	return observe_innovation (h, s);
 }
 
@@ -167,13 +167,13 @@ Bayes_base::Float
 	// Likelihood w of observation z given particlar state xi is true state
 	// The state, xi, defines a predicted observation with a gaussian 
 	// distribution with variance Zd. Thus, the likelihood can be determined directly from the gaussian
-	Float logL = 0.;
 
-	Vec::iterator zInnovi = zInnov.begin();
-	for (Vec::const_iterator ZIi = Zv_inv.begin(); ZIi != Zv_inv.end(); ++ZIi) {
-		logL += sqr(*zInnovi) * (*ZIi);
-		++zInnovi;
+	Vec::iterator zi = zInnov.begin(), zi_end = zInnov.end();
+	for (; zi != zi_end; ++zi) {
+		*zi *= *zi;
 	}
+	Float logL = inner_prod(zInnov, Zv_inv);
+
 	using namespace std;
 	return exp(Float(-0.5)*(logL + logdetZ));
 }
@@ -190,11 +190,10 @@ void General_LzUnAd_observe_model::Lz (const FM::Vec& zz)
 	rclimit.check_PD(rcond, "Z not PD in observe");
 
 	Float detZ = 1.;
-	FM::Vec::iterator ZIi = Zv_inv.begin();
-	for (FM::Vec::const_iterator zi = Zv.begin(); zi != Zv.end(); ++zi) {
+	
+	for (FM::Vec::const_iterator zi = Zv.begin(), zi_end = Zv.end(); zi != zi_end; ++zi) {
 		detZ *= *zi;
-		*ZIi = 1 / (*zi);		// Protected from /0 by rcond check
-		++ZIi;
+		Zv_inv[zi.index()] = 1 / (*zi);		// Protected from /0 by rcond check
 	}
 	using namespace std;
 	logdetZ = log(detZ);		// Protected from ln(0) by rcond check
@@ -245,15 +244,7 @@ Bayes_base::Float
  * Compute covariance scaled square inner product of a Vector: v'*V*v
  */
 {
-	Float p = 0.;
-
-	FM::Vec::const_iterator vi = v.begin();
-	for (size_t i = 0; i < V.size1(); ++i)
-	{
-		p += *vi * FM::inner_prod(V[i], v);
-		++vi;
-	}
-	return p;
+	return FM::inner_prod(v, FM::prod(V,v));
 }
 
 
@@ -317,9 +308,13 @@ namespace {
 		// Provide a ordering on columns
 		static bool less(const ColProxy a, const ColProxy b)
 		{
-			FM::ColMatrix::const_iterator1 sai = (a.cm->begin2() + a.col) .begin();
+/*CHECK CHANGE			FM::ColMatrix::const_iterator1 sai = (a.cm->begin2() + a.col) .begin();
 			FM::ColMatrix::const_iterator1 sai_end = (a.cm->begin2() + a.col) .end();
-			FM::ColMatrix::const_iterator1 sbi = (b.cm->begin2() + b.col) .begin();
+			FM::ColMatrix::const_iterator1 sbi = (b.cm->begin2() + b.col) .begin();*/
+			FM::ColMatrix::const_iterator1 sai = a.cm->find_first1(1,0, a.col);
+			FM::ColMatrix::const_iterator1 sai_end = a.cm->find_last1(1,0, a.col); 
+	//TODO fix above line
+			FM::ColMatrix::const_iterator1 sbi = b.cm->find_first1(1,0, b.col);
 			do
 			{
 				if (*sai < *sbi)
@@ -343,7 +338,7 @@ size_t Sample_filter::unique_samples () const
 	typedef std::vector<ColProxy> SRContainer;
 	SRContainer sortR(S.size2());
 	size_t col_index = 0;
-	for (SRContainer::iterator si=sortR.begin(); si != sortR.end(); ++si) {
+	for (SRContainer::iterator si = sortR.begin(); si != sortR.end(); ++si) {
 		(*si).cm = &S; (*si).col = col_index++;
 	}
 						// Sort the column proxies
@@ -351,7 +346,7 @@ size_t Sample_filter::unique_samples () const
 
 						// Count element changes, precond: sortS not empty
 	size_t u = 1;
-	SRContainer::const_iterator ssi= sortR.begin();
+	SRContainer::const_iterator ssi = sortR.begin();
 	SRContainer::const_iterator ssp = ssi;
 	++ssi;
 	while (ssi < sortR.end())

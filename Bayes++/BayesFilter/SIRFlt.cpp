@@ -39,7 +39,7 @@ namespace Bayesian_filter
 
 
 Standard_resampler::Float
- Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, Vec& w, SIR_random& r) const
+ Standard_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
 /*
  * Standard resampler from [1]
  * Algorithm:
@@ -57,7 +57,7 @@ Standard_resampler::Float
 						// Normalised cumulative sum of likelihood weights, find smallest weight
 	Float wcum = 0.;
 	Float wmin = std::numeric_limits<Float>::max();
-	Vec::iterator wi, wi_end = w.end();
+	DenseVec::iterator wi, wi_end = w.end();
 	for (wi = w.begin(); wi != wi_end; ++wi) {
 		if (*wi < wmin) {
 			wmin = *wi;
@@ -67,13 +67,13 @@ Standard_resampler::Float
 	if (wmin < 0.)		// Bad weights
 		filter_error("negative weight");
 	if (wcum <= 0.)		// Bad cumulative weights (previous check should actually prevent -ve
-		filter_error("total likelihood zero");
+		filter_error("zero cumulative weight sum");
 						// Any numerical failure should cascade into cummulative sum
-	if (wcum != wcum)
-		filter_error("total likelihood numerical error");
+	if (wcum != wcum)	// Inequality due to NaN
+		filter_error("NaN cumulative weight sum");
 
 						// Sorted uniform random distribution [0..1) for each resample
-	Vec ur(w.size());
+	DenseVec ur(w.size());
 	r.uniform_01(ur);
 	std::sort (ur.begin(), ur.end());
 	assert(ur[0] >= 0. && ur[ur.size()-1] < 1.);		// Very bad if random is incorrect
@@ -83,7 +83,7 @@ Standard_resampler::Float
 						// Resamples based on cumulative weights from sorted resample random values
 	Resamples_t::iterator pri = presamples.begin();
 	wi = w.begin();
-	Vec::iterator ui = ur.begin(), ui_end = ur.end();
+	DenseVec::iterator ui = ur.begin(), ui_end = ur.end();
 	size_t unique = 0;
 
 	while (wi != wi_end)
@@ -101,15 +101,17 @@ Standard_resampler::Float
 		++wi;
 		*pri++ = Pres;
 	}
-	assert(ui==ui_end); assert(pri==presamples.end());
-
+	assert(pri==presamples.end());
+	if (ui != ui_end)				// Resample failed due no non numeric weights
+		filter_error("weights cannot be resampled");
+	
 	uresamples = unique;
 	return wmin / wcum;
 }
 
 
 Systematic_resampler::Float
- Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, Vec& w, SIR_random& r) const
+ Systematic_resampler::resample (Resamples_t& presamples, size_t& uresamples, DenseVec& w, SIR_random& r) const
 /*
  * Systematic resample algorithm from [2]
  * Algorithm:
@@ -129,7 +131,7 @@ Systematic_resampler::Float
 						// Normalised cumulative sum of likelihood weights, find smallest weight
 	Float wcum = 0.;
 	Float wmin = std::numeric_limits<Float>::max();
-	Vec::iterator wi, wi_end = w.end();
+	DenseVec::iterator wi, wi_end = w.end();
 	for (wi = w.begin(); wi != wi_end; ++wi) {
 		if (*wi < wmin) {
 			wmin = *wi;
@@ -147,7 +149,7 @@ Systematic_resampler::Float
 						// Stratified step
 	Float wstep = wcum / Float(nParticles);
 						
-	Vec ur(1);			// Single uniform for initialisation
+	DenseVec ur(1);			// Single uniform for initialisation
 	r.uniform_01(ur);
 	assert(ur[0] >= 0. && ur[0] < 1.);		// Very bad if random is incorrect
 
@@ -289,11 +291,9 @@ void
 	h.Lz (z);			// Observe likelihood at z
 
 						// Weight Particles. Fused with previous weight
-	Vec::iterator wi = wir.begin();
 	const size_t nSamples = S.size2();
 	for (size_t i = 0; i != nSamples; ++i) {
-		*wi *= h.L(FM::column(S,i));
-		++wi;
+		wir[i] *= h.L(FM::column(S,i));
 	}
 	wir_update = true;
 }
@@ -308,11 +308,9 @@ void
  */
 {
 					// Weight Particles. Fused with previous weight
-	Vec::iterator wi = wir.begin();
 	Vec::const_iterator lw_end = lw.end();
 	for (Vec::const_iterator lw_i = lw.begin(); lw_i != lw_end; ++lw_i) {
-		*wi *= *lw_i;
-		++wi;
+		wir[lw_i.index()] *= *lw_i;
 	}
 	wir_update = true;
 }
@@ -396,11 +394,11 @@ void SIR_filter::roughen_minmax (ColMatrix& P, Float K) const
 	rootq.minus_assign (xmin);
 	rootq *= SigmaScale;
    						// Apply roughening prediction based on scaled variance
-	Vec n(x_size);
+	DenseVec n(x_size);
 	for (pi = P.begin2(); pi != P.end2(); ++pi) {
 		random.normal (n);			// independant zero mean normal
 									// multiply elements by std dev
-		for (FM::Vec::iterator ni = n.begin(); ni != n.end(); ++ni) {
+		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
 		}
 		FM::ColMatrix::Column Pi(P,pi.index2());

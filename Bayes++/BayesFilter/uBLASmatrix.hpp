@@ -36,41 +36,43 @@ using ublas::outer_prod;
 enum EmptyTag {Empty};	// Tag type used for empty matrix constructor
 
 
+namespace detail {		// Lots of implementation detail
+
 /*
  * Filter Vec type
  */
-class Vec: public ublas::vector<Float>
+template <class VecBase>
+class FMVec : public VecBase
 {
-	typedef ublas::vector<Float> VecBase;
 public:
 	// No Default Constructor. Empty creation is very error prone
-	explicit Vec(EmptyTag) : VecBase()
+	explicit FMVec(EmptyTag) : VecBase()
 	{}	// Empty constructor
-	explicit Vec(size_t s) : VecBase(s)
+	explicit FMVec(size_t s) : VecBase(s)
 	{}	// Normal sized constructor
 	template <class E>
-	Vec(const ublas::vector_expression<E>& e) : VecBase(e)
+	FMVec(const ublas::vector_expression<E>& e) : VecBase(e)
 	{}	// vector_expression conversion constructor
 
-	Vec& operator=(const Vec& r)
+	FMVec& operator=(const FMVec& r)
 	{	// Vector assignment; independant
 		assign(r);
 		return *this;
 	}
 	template <class Base>
-	Vec& operator=(const ublas::matrix_row<Base>& r)
+	FMVec& operator=(const ublas::matrix_row<Base>& r)
 	{	// Matrix row assignment; independant
-		assign(r);
+assert(false);
 		return *this;
 	}
 	template <class Base>
-	Vec& operator=(const ublas::matrix_column<Base>& r)
+	FMVec& operator=(const ublas::matrix_column<Base>& r)
 	{	// Matrix column assignment; independant
-		assign(r);
+assert(false);
 		return *this;
 	}
 	template <class E>
-	Vec& operator=(const ublas::vector_expression<E>& r)
+	FMVec& operator=(const ublas::vector_expression<E>& r)
 	{	// Expression assignment, may be dependant on r
 		VecBase::operator=(r);
 		return *this;
@@ -86,8 +88,6 @@ public:
 	}
 };
 
-
-namespace detail {		// Lots of implementation detail
 
 /*
  * Filter Matrix class template. Augmentation for uBlas MatrixBase
@@ -122,32 +122,28 @@ public:
 	}
 
 	// Row,Column vector proxies
-	typedef ublas::matrix_row<FMMatrix> Row;
-	typedef const ublas::matrix_row<const FMMatrix> const_Row;
-	typedef ublas::matrix_column<FMMatrix> Column;
-	typedef const ublas::matrix_column<const FMMatrix> const_Column;
+	typedef ublas::matrix_row<MatrixBase> Row;
+	typedef const ublas::matrix_row<const MatrixBase> const_Row;
+	typedef ublas::matrix_column<MatrixBase> Column;
+	typedef const ublas::matrix_column<const MatrixBase> const_Column;
 
 	// Vector proxies from iterators - static members dependant on MatrixBase type
 	// ri() returns container associated with iterator. static_cast required as typeof(ri()) may not be typeof(MM)
-	static ublas::matrix_row<MatrixBase> rowi(const typename MatrixBase::iterator1& ri)
+	static Row rowi(const typename MatrixBase::iterator1& ri)
 	{
-		typedef MatrixBase MM;
-		return ublas::matrix_row<MM>(static_cast<MM&>(ri()), ri.index1());
+		return Row(static_cast<MatrixBase&>(ri()), ri.index1());
 	}
-	static ublas::matrix_row<const MatrixBase> rowi(const typename MatrixBase::const_iterator1& ri)
+	static const_Row rowi(const typename MatrixBase::const_iterator1& ri)
 	{
-		typedef const MatrixBase MM;
-		return ublas::matrix_row<MM>(static_cast<MM&>(ri()), ri.index1());
+		return const_Row(static_cast<const MatrixBase&>(ri()), ri.index1());
 	}
-	static ublas::matrix_column<MatrixBase> columni(const typename MatrixBase::iterator2& ci)
+	static Column columni(const typename MatrixBase::iterator2& ci)
 	{
-		typedef MatrixBase MM;
-		return ublas::matrix_column<MM>(static_cast<MM&>(ci()), ci.index2());
+		return Column(static_cast<MatrixBase&>(ci()), ci.index2());
 	}
-	static ublas::matrix_column<const MatrixBase> columni(const typename MatrixBase::const_iterator2& ci)
+	static const_Column columni(const typename MatrixBase::const_iterator2& ci)
 	{
-		typedef const MatrixBase MM;
-		return ublas::matrix_column<MM>(static_cast<MM&>(ci()), ci.index2());
+		return const_Column(static_cast<const MatrixBase&>(ci()), ci.index2());
 	}
 
 	// Sub matrix/vector helpers
@@ -202,55 +198,59 @@ public:
 };
 
 
-// Helper class for _BaseSymMatrix allow construction of BaseRowMatrix (rm) before symmertic_adaptor
-class BaseSymMatrix;
+// Helper class for SymMatrixAdaptor, allow construction of BaseMatrix (rm) before symmertic_adaptor
+template <class MatrixBase>
+class SymMatrixAdaptor;
+
+template <class MatrixBase>
 class RMConstruct
 {
-	BaseRowMatrix rm;
-	friend class BaseSymMatrix;
+	MatrixBase rm;
+	friend class SymMatrixAdaptor;
 	RMConstruct () : rm()
 	{}
-	RMConstruct (BaseRowMatrix::size_type size1, BaseRowMatrix::size_type size2) : rm(size1,size2)
+	RMConstruct (MatrixBase::size_type size1, MatrixBase::size_type size2) : rm(size1,size2)
 	{}
-	RMConstruct (const BaseRowMatrix& r) : rm(r)
+	RMConstruct (const MatrixBase& r) : rm(r)
 	{}
 	template <class E>
 	RMConstruct (const ublas::matrix_expression<E>& e) : rm(e)
 	{}
 };
 
-// Symmetric matrix base using addapted row matrix base
-class BaseSymMatrix : private RMConstruct, public ublas::symmetric_adaptor<BaseRowMatrix, ublas::upper>
+// Symmetric matrix base using addaptor
+template <class MatrixBase>
+class SymMatrixAdaptor : private RMConstruct<MatrixBase>, public ublas::symmetric_adaptor<MatrixBase, ublas::upper>
 {
-	typedef ublas::symmetric_adaptor<BaseRowMatrix, ublas::upper> SymAdap;
+	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> SymAdap;
 public:
-	BaseSymMatrix () : RMConstruct(), SymAdap(rm)
+	SymMatrixAdaptor () : RMConstruct<MatrixBase>(), SymAdap(rm)
 	{}
-	BaseSymMatrix (size_type nsize1, size_type nsize2) : RMConstruct(nsize1,nsize2), SymAdap(rm)
+	SymMatrixAdaptor (size_type nsize1, size_type nsize2) : RMConstruct<MatrixBase>(nsize1,nsize2), SymAdap(rm)
 	{}
-	explicit BaseSymMatrix (const BaseSymMatrix& r) : RMConstruct(reinterpret_cast<const BaseRowMatrix&>(r)), SymAdap(rm)
+	explicit SymMatrixAdaptor (const SymMatrixAdaptor& r) : RMConstruct<MatrixBase>(reinterpret_cast<const MatrixBase&>(r)), SymAdap(rm)
 	{}
-	// Explict construction referencing a BaseRowMatrix
+	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
 	template <class E>
-	explicit BaseSymMatrix (const ublas::matrix_expression<E>& e) : RMConstruct(e), SymAdap(rm)
+	explicit SymMatrixAdaptor (const ublas::matrix_expression<E>& e) : RMConstruct<MatrixBase>(e), SymAdap(rm)
 	{}
 	// Explict matrix_expression conversion constructor
 
 	template <class E>
-	BaseSymMatrix& operator=(const ublas::matrix_expression<E>& r)
+	SymMatrixAdaptor& operator=(const ublas::matrix_expression<E>& r)
 	{
 		SymAdap::operator=(r);
 		return *this;
 	}
 
 	// Conversions straight to a FMMatrix, equivilent to a RowMatrix
-	const FMMatrix<BaseRowMatrix>& asRowMatrix() const
+	const FMMatrix<MatrixBase>& asRowMatrix() const
 	{
-		return static_cast<const FMMatrix<BaseRowMatrix>& >(rm);
+		return static_cast<const FMMatrix<MatrixBase>& >(rm);
 	}
-	FMMatrix<BaseRowMatrix>& asRowMatrix()
+	FMMatrix<MatrixBase>& asRowMatrix()
 	{	
-		return static_cast<FMMatrix<BaseRowMatrix>& >(rm);
+		return static_cast<FMMatrix<MatrixBase>& >(rm);
 	}
 
 	// Matrix storage members
@@ -266,17 +266,38 @@ public:
 }//namespace detail
 
 /*
- * Define Filter Matrix types
+ * Define Filter Vector / Matrix types
  *  Finally the definitions !
  */
-using detail::FMMatrix;	// Matrix template class for template parameter matching
+using detail::FMVec;		// Template class for template parameter matching
+using detail::FMMatrix;
+
+							// Default types
+typedef FMVec<detail::BaseVector> Vec;
 typedef FMMatrix<detail::BaseRowMatrix> RowMatrix;
 typedef RowMatrix Matrix;
 typedef FMMatrix<detail::BaseColMatrix> ColMatrix;
-typedef FMMatrix<detail::BaseSymMatrix> SymMatrix;
+typedef FMMatrix<detail::SymMatrixAdaptor<detail::BaseRowMatrix> > SymMatrix;
 typedef FMMatrix<detail::BaseUpperTriMatrix> UTriMatrix;
 typedef FMMatrix<detail::BaseLowerTriMatrix> LTriMatrix;
 typedef FMMatrix<detail::BaseDiagMatrix> DiagMatrix;
+
+							// Explicitly dense types
+typedef FMVec<detail::BaseDenseVector> DenseVec;
+typedef FMMatrix<detail::BaseDenseRowMatrix> DenseRowMatrix;
+typedef DenseRowMatrix DenseMatrix;
+typedef FMMatrix<detail::BaseDenseColMatrix> DenseColMatrix;
+typedef FMMatrix<detail::SymMatrixAdaptor<detail::BaseDenseRowMatrix> > DenseSymMatrix;
+typedef FMMatrix<detail::BaseDenseUpperTriMatrix> DenseUTriMatrix;
+typedef FMMatrix<detail::BaseDenseLowerTriMatrix> DenseLTriMatrix;
+typedef FMMatrix<detail::BaseDenseDiagMatrix> DenseDiagMatrix;
+
+							// Explicitly sparse types
+typedef FMVec<detail::BaseSparseVector> SparseVec;
+typedef FMMatrix<detail::BaseDenseRowMatrix> SparseRowMatrix;
+typedef SparseRowMatrix SparseMatrix;
+typedef FMMatrix<detail::BaseSparseColMatrix> SparseColMatrix;
+//typedef FMMatrix<detail::SymMatrixAdaptor<detail::BaseSparseRowMatrix> > SparseSymMatrix;
 
 /*
  * Type conversions helper functions
@@ -304,7 +325,7 @@ void subcopy (const FMMatrix<BaseL>& L, FMMatrix<BaseR>& R)
 
 template <class Base>
 void identity(FMMatrix<Base>& I)
-// Fill as identity matrix
+// Clear and fill square submatrix of I as identity matrix
 {
 	I.clear();
 							// Set common diagonal elements
@@ -332,24 +353,24 @@ void mult_SPD (const MatrixX& X, const Vec& s, SymMatrix& P)
  */
 {
 	Vec::const_iterator si, send = s.end();
-	SymMatrix::iterator1 Pa = P.begin1();
 	typename MatrixX::const_iterator1 Xa = X.begin1();
 	const typename MatrixX::const_iterator1 Xend = X.end1();
 	typename MatrixX::const_iterator1 Xb;
 
 	// P(a,b) = X.row(a) * X.row(b)
-	for (; Xa != Xend; ++Xa,++Pa)			// Iterate Rows
+	for (; Xa != Xend; ++Xa)				// Iterate Rows
 	{		
+		MatrixX::const_Row Xav = MatrixX::rowi(Xa);
 		Xb = Xa;							// Start at the row Xa only one triangle of symetric result required
-		SymMatrix::iterator2 Pab= Pa.begin();
-		for (; Xb != Xend; ++Xb,++Pab)
+		for (; Xb != Xend; ++Xb)
 		{
-			SymMatrix::value_type p = *Pab;				// Simple vector operation
-			for (si = s.begin(); si != send; ++si) {
+			SymMatrix::value_type p = 0;	// Tripple vector inner product
+			MatrixX::const_Row Xbv = MatrixX::rowi(Xb);
+			for (si = s.begin(); si != send; ++si) {	// TODO: use iterator on Xav and Xbv
 				Vec::size_type i = si.index();
-				p += *(Xa.begin()+i) * (*si) * *(Xb.begin()+i);	// TODO: use iterator on *Xa and *Xb
+				p += Xav[i] * (*si) * Xbv[i];
 			}
-			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
+			P(Xa.index1(),Xb.index1()) += p;
 		}
 	}
 }
@@ -361,7 +382,6 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
  *  Result is always PD
  */
 {
-	SymMatrix::iterator1 Pa = P.begin1();
 	typename MatrixX::const_iterator1 Xa = X.begin1();
 	const typename MatrixX::const_iterator1 Xend = X.end1();
 	typename MatrixX::const_iterator1 Xb;
@@ -369,13 +389,12 @@ void mult_SPDi (const MatrixX& X, SymMatrix& P)
 	// P(a,b) = X.row(a) * X.row(b)
 	for (; Xa != Xend; ++Xa,++Pa)			// Iterate vectors
 	{		
+		MatrixX::const_Row Xav = MatrixX::rowi(Xa);
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required
-		SymMatrix::iterator2 Pab= Pa.begin();
-		for (; Xb != Xend; ++Xb,++Pab)
-		{
-			SymMatrix::value_type p = *Pab;				// Simply multiple row Xa by row Xb
-			p += inner_prod( MatrixX::rowi(Xa), MatrixX::rowi(Xb) );
-			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
+		for (; Xb != Xend; ++Xb)
+		{									// Simply multiple row Xa by row Xb
+			SymMatrix::value_type p = inner_prod( Xav, MatrixX::rowi(Xb) );
+			P(Xa.index1(),Xb.index1()) += p;
 		}
 	}
 }
@@ -387,7 +406,6 @@ void mult_SPD (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
  *  A temporary Vec is required of same size as S
  */
 {
-	SymMatrix::iterator1 Pa = P.begin1();
 	typename MatrixX::const_iterator1 Xa = X.begin1();
 	const typename MatrixX::const_iterator1 Xend = X.end1();
 	typename MatrixX::const_iterator1 Xb;
@@ -395,15 +413,14 @@ void mult_SPD (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 	// P(a,b) = X.row(a) * S * X'.col(b) = X.row(a) * S * X.row(b)
 	//        = (S * X.row(a)')' * X.row(b)
 
-	for (; Xa != Xend; ++Xa,++Pa)			// Iterate Rows
+	for (; Xa != Xend; ++Xa)				// Iterate Rows
 	{
 		stemp.assign( ublas::prod(S, MatrixX::rowi(Xa)) );			// treated as a column vector
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required
-		SymMatrix::iterator2 Pab= Pa.begin();
-		for (; Xb!= Xend; ++Xb,++Pab)
+		for (; Xb!= Xend; ++Xb)
 		{
-			SymMatrix::value_type p = *Pab + inner_prod(stemp, MatrixX::rowi(Xb));
-			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
+			SymMatrix::value_type p = inner_prod(stemp, MatrixX::rowi(Xb));
+			P(Xa.index1(),Xb.index1()) += p;
 		}
 	}
 }
@@ -416,7 +433,6 @@ void mult_SPDT (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
  * S must be Symetric (SPD -> P remains SPD)
  */
 {
-	SymMatrix::iterator1 Pa = P.begin1();
 	typename MatrixX::const_iterator2 Xa = X.begin2();
 	const typename MatrixX::const_iterator2 Xend = X.end2();
 	typename MatrixX::const_iterator2 Xb;
@@ -424,15 +440,14 @@ void mult_SPDT (const MatrixX& X, const SymMatrix& S, SymMatrix& P, Vec& stemp)
 	// P(a,b) = X'.row(a) * S * X.col(b) = X.col(a) * S * X.col(b)
 	//        = X.col(b) * S * X.col(a)
 
-	for (; Xa != Xend; ++Xa,++Pa)			// Iterate Rows
+	for (; Xa != Xend; ++Xa)				// Iterate Rows
 	{
 		stemp = ublas::prod(S, MatrixX::columni(Xa));			// treated as a column vector
 		Xb = Xa;							// Start at the column Xa, only one triangle of symertric result required
-		SymMatrix::iterator2 Pab= Pa.begin();
-		for (; Xb != Xend; ++Xb,++Pab)
+		for (; Xb != Xend; ++Xb)
 		{
-			SymMatrix::value_type p = *Pab + inner_prod(stemp, MatrixX::columni(Xb));
-			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
+			SymMatrix::value_type p = inner_prod(stemp, MatrixX::columni(Xb));
+			P(Xa.index2(),Xb.index2()) += p;
 		}
 	}
 }
@@ -444,24 +459,24 @@ void mult_SPDT (const MatrixX& X, const Vec& s, SymMatrix& P)
  */
 {
 	Vec::const_iterator si, send = s.end();
-	SymMatrix::iterator1 Pa = P.begin1();
 	typename MatrixX::const_iterator2 Xa = X.begin2();
 	const typename MatrixX::const_iterator2 Xend = X.end2();
 	typename MatrixX::const_iterator2 Xb;
 
 	// P(a,b) = X.col(a) * X.col(b)
-	for (; Xa != Xend; ++Xa,++Pa)			// Iterate vectors
+	for (; Xa != Xend; ++Xa)				// Iterate vectors
 	{		
+		MatrixX::const_Column Xav = MatrixX::columni(Xa);
 		Xb = Xa;							// Start at the row Xa only one triangle of symertric result required
-		SymMatrix::iterator2 Pab= Pa.begin();
-		for (; Xb != Xend; ++Xb,++Pab)
-		{
-			SymMatrix::value_type p = *Pab;				// Simple vector operation
-			for (si = s.begin(); si != send; ++si) {
+		for (; Xb != Xend; ++Xb)
+		{									// Tripple vector inner product
+			SymMatrix::value_type p = 0;
+			MatrixX::const_Column Xbv = MatrixX::columni(Xb);
+			for (si = s.begin(); si != send; ++si) {	// TODO: use iterator on Xav and Xbv
 				Vec::size_type i = si.index();
-				p += *(Xa.begin()+i) * (*si) * *(Xb.begin()+i);	// TODO: use iterator on *Xa and *Xb
+				p += Xav[i] * (*si) * Xbv[i];
 			}
-			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
+			P(Xa.index2(),Xb.index2()) += p;
 		}
 	}
 }
@@ -473,21 +488,18 @@ void mult_SPDTi (const MatrixX& X, SymMatrix& P)
  *  Result is always PD
  */
 {
-	SymMatrix::iterator1 Pa = P.begin1();
 	typename MatrixX::const_iterator2 Xa = X.begin2();
 	const typename MatrixX::const_iterator2 Xend = X.end2();
 	typename MatrixX::const_iterator2 Xb;
 
 	// P(a,b) = X.row(a) * X.row(b)
-	for (; Xa != Xend; ++Xa,++Pa)			// Iterate vectors
+	for (; Xa != Xend; ++Xa)				// Iterate vectors
 	{		
 		Xb = Xa;							// Start at the row Xa, only one triangle of symetric result required
-		SymMatrix::iterator2 Pab= Pa.begin();
-		for (; Xb != Xend; ++Xb,++Pab)
-		{
-			SymMatrix::value_type p = *Pab;				// Simply multiple col Xa by col Xb
-			p += inner_prod( MatrixX::columni(Xa), MatrixX::columni(Xb) );
-			*Pab = p; P(Pab.index2(),Pab.index1()) = p;
+		for (; Xb != Xend; ++Xb)
+		{									// Simply multiple col Xa by col Xb
+			SymMatrix::value_type p = inner_prod( MatrixX::columni(Xa), MatrixX::columni(Xb) );
+			P(Xa.index2(),Xb.index2()) += p;
 		}
 	}
 }
@@ -549,15 +561,16 @@ inline Vec::value_type prod_SPD (const Vec& x, const Vec& s)
 /*
  * Symmetric Positive (Semi) Definate product: x*diag_matrix(s)*x'
  * Optimised to exploit the symmetry of the computation of x * x' and result p
- * ISSUE: not sparse efficient
+ * ISSUE: Implemention only exploits sparseness in x
  * TODO: Define using ublas ET
  */
 {
 	Vec::value_type p = 0.;
-	Vec::const_iterator xi = x.begin();
-	for (Vec::const_iterator si = s.begin(); si != s.end(); ++si, ++xi)
+	Vec::const_iterator xi = x.begin(), xi_end = x.end();
+	for (; xi != xi_end; ++xi)
 	{
-		p += (*xi)*(*xi) * (*si);
+		Vec::value_type x2 = *xi; x2 *= x2;
+		p += x2 * s[xi.index()];
 	}
 	return p;
 }

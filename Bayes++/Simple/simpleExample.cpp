@@ -14,6 +14,7 @@
 #include <iostream>
 // Include all the Bayes++ Bayesian filtering classes
 #include "BayesFilter/allFilters.hpp"
+#include <boost/numeric/ublas/io.hpp>
 
 using namespace std;
 using namespace Bayesian_filter;

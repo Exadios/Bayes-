@@ -457,6 +457,24 @@ RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
 }
 
 
+template <class BaseMatrix>
+class baseLTriMatrixAdaptor : public BaseMatrix
+{
+public:
+	baseLTriMatrixAdaptor(const BaseMatrix& m)
+		: BaseMatrix(m)
+	{}
+};
+
+template <class BaseMatrix>
+class baseUTriMatrixAdaptor : public BaseMatrix
+{
+public:
+	baseUTriMatrixAdaptor(const BaseMatrix& m)
+		: BaseMatrix(m)
+	{}
+};
+
 LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
 /*
  * Modified lower triangular Cholesky factor of a
@@ -468,7 +486,8 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  *		see in-place LdLfactor 
  */
 {
-	ublas::triangular_adaptor<const SymMatrix, ublas::lower> ltriM(M);
+//TODO	ublas::triangular_adaptor<const SymMatrix, ublas::lower> ltriM(M);
+	baseLTriMatrixAdaptor<const SymMatrix> ltriM(M);
 	LD.assign (ltriM);
 	LTriMatrix::value_type rcond = LdLfactor (LD, M.size1());
 
@@ -487,7 +506,8 @@ UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M)
  *		see in-place UCfactor
  */
 {
-	ublas::triangular_adaptor<const SymMatrix, ublas::upper> utriM(M);
+//TODO	ublas::triangular_adaptor<const SymMatrix, ublas::upper> utriM(M);
+	baseLTriMatrixAdaptor<const SymMatrix> utriM(M);
 	U.assign (utriM);
 	UTriMatrix::value_type rcond = UCfactor (U, M.size1());
 

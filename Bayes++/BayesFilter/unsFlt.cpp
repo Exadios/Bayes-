@@ -76,8 +76,8 @@ void Unscented_filter::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& 
 			SigmaCol[r] = Sigma(r,c);
 		for (; r < x_size; ++r)
 			SigmaCol[r] = 0.;
-		column(XX,c+1) = x + SigmaCol;
-		column(XX,x_size+c+1) = x - SigmaCol;
+		column(XX,c+1).assign (x  + SigmaCol);
+		column(XX,x_size+c+1).assign (x - SigmaCol);
 	}
 }
 
@@ -102,13 +102,11 @@ void Unscented_filter::init ()
  *		Post: x,X
  */
 {
-					// Precondition that unscented distribution can be created
-	unscented (XX, x, X, 0.);		// Kappa can be zero for check
 }
 
 void Unscented_filter::update ()
 /*
- * Update state varibles
+ * Update state variables
  *		Pre : x,X
  *		Post: x,X
  */
@@ -338,7 +336,8 @@ Bayes_base::Float Unscented_filter::observe (Correlated_addative_observe_model& 
 	Xxz *= 2*Kappa;
 							// Remaining unscented points
 	for (i = 1; i < zXX.size2(); ++i) {
-		Xxz.plus_assign (FM::outer_prod(column(XX,i) -x, column(zXX,i)));
+		Xxz.plus_assign (FM::outer_prod(column(XX,i) - x, column(zXX,i)));
+		Vec v1 = column(XX,i) -x, v2 = column(zXX,i);
 	}
 	Xxz /= 2* (Float(x_size) + Kappa);
 
