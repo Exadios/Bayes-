@@ -6,7 +6,7 @@
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.0.1  (Linux)">
 	<META NAME="CREATED" CONTENT="20030727;11013700">
 	<META NAME="CHANGEDBY" CONTENT="Michael Stevens">
-	<META NAME="CHANGED" CONTENT="20030822;10324700">
+	<META NAME="CHANGED" CONTENT="20030825;11210600">
 </HEAD>
 <BODY LANG="en-US">
 <H1 ALIGN=CENTER><U>Bayes++</U></H1>
@@ -356,30 +356,30 @@ significant task.</P>
 <H2><A NAME="whatsnew"></A>What's new in Bayes++ 2003-8?</H2>
 <H3>Compiler support</H3>
 <P>The list of compiler for which Bayes++ is built and tested has
-been extended. It is validated ofr GCC 3.2, GCC 2.95.3, VisualC++
-7.0, and IntelC++ 7.1</P>
+been extended. It is validated for GCC 3.2, GCC 2.95.3, Visual C++
+7.0, and Intel C++ 7.1</P>
 <H3>New Boost Support</H3>
 <P>Jens Mauer has been working hard on getting <B>boost::random</B>
 accepted as part of the future C++ standard library. To this end
 there have been substantial changes to its interface. These have now
-be committed to Boost. The Bayes++ examples make use of
+be committed to Boost CVS. The Bayes++ examples make use of
 boost::random. So things migrate smoothly I have added a new
 &quot;test/random.hpp&quot; header which hides the interface changes.</P>
 <P>The very excellent <B>Boost Build system version 2 </B>has
-advanced a great deal recently. Bayes++ is normal built with standard
-Boost Build system. You can select the version 2 build system by
-simply using &quot;bjam --v2&quot;. Bayes++ has all the necessary
-&quot;Jamfiles.v2&quot; to use the new system.</P>
+advanced a great deal recently. Bayes++ is built with standard Boost
+Build system. To select the version 2 build system, simply use &quot;bjam
+--v2&quot;. Bayes++ has all the necessary &quot;Jamfiles.v2&quot; to
+use the new system.</P>
 <H3>Scheme extensions</H3>
 <P>The UD_scheme observe functions have had their numerical
-capabilities extended to include a PSD state covariance. It is now
-possible to work with singular covariance matrices.</P>
+capabilities extended. It is now possible to work with singular (zero
+variance) covariance matrices.</P>
 <P>The Unscented_scheme has additional function init_XX() and
-update_XX() to allow access to an Unscented state representation</P>
+update_XX() to allow access to an Unscented state representation.</P>
 <H3>Numeric fixes</H3>
-<P>An error in SIR_kalman_schemes covariance calculation has been
-fixed. This error also effected the Fast_kalman_SLAM implementation.
-The error was significant for small small sizes.</P>
+<P>An error in <I>SIR_kalman_schemes</I> covariance calculation has
+been fixed. This error also effected the <I>Fast_kalman_SLAM</I>
+implementation. The error was significant for small small sizes.</P>
 <H2>What's new in Bayes++ 2003-5?</H2>
 <H3>'noalias' assignment</H3>
 <P>For efficiency it is important to avoid creating temporary matrix
