@@ -21,7 +21,7 @@ namespace Bayesian_filter
 
 
 Information_scheme::Information_scheme (size_t x_size, size_t z_initialsize) :
-		Information_state_filter(x_size), Kalman_state_filter(x_size),
+		Kalman_state_filter(x_size), Information_state_filter(x_size),
 		i(x_size), I(x_size,x_size),
 		ZI(Empty)
 /*

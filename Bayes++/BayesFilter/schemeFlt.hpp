@@ -71,8 +71,8 @@ template <>
 struct Filter_scheme<SIR_scheme> : public SIR_scheme
 {
 	Filter_scheme(size_t x_size, size_t s_size, SIR_random& random_helper) :
-		SIR_scheme (x_size, s_size, random_helper),
-		Sample_state_filter (x_size, s_size)
+		Sample_state_filter (x_size, s_size),
+		SIR_scheme (x_size, s_size, random_helper)
 	{}
 };
 
@@ -81,9 +81,9 @@ template <>
 struct Filter_scheme<SIR_kalman_scheme> : public SIR_kalman_scheme
 {
 	Filter_scheme(size_t x_size, size_t s_size, SIR_random& random_helper) :
-		SIR_kalman_scheme (x_size, s_size, random_helper),
 		Sample_state_filter (x_size, s_size),
-		Kalman_state_filter (x_size)
+		Kalman_state_filter (x_size),
+		SIR_kalman_scheme (x_size, s_size, random_helper)
 	{}
 };
 
