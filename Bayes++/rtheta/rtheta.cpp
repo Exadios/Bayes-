@@ -350,6 +350,9 @@ public:
 	const SymMatrix& X()
 	{	return ts.X;
 	}
+	void dump_state()
+	{	// output any additional state variables
+	}
 };
 
 template <class TestScheme>
@@ -365,6 +368,13 @@ Filter<SIR_kalman_scheme>::Filter (const Vec& x_init, const SymMatrix& X_init) :
 	ts (x_init.size(), NS, ::Random2)
 {
 	ts.init_kalman (x_init, X_init);
+}
+
+// dump_state specialisations
+template <>
+void Filter<Information_root_scheme>::dump_state()
+{	// output any additional state variables
+	std::cout << ts.r << ts.R << std::endl;
 }
 
 
@@ -424,6 +434,9 @@ CCompare<Tf1,Tf2>::CCompare (const Vec x_init, const SymMatrix X_init, unsigned 
 template<class Tf1, class Tf2>
 void CCompare<Tf1, Tf2>::dumpCompare ()
 {
+	// Additional Scheme state
+	//	f1.dump_state(); f2.dump_state();
+
 	Float zx, zy;
 	if (RA_MODEL) {
 		zx = truth.x[0] + z[0] * cos (z[1]);
@@ -477,7 +490,7 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 		truth.predict ();		// Predict truth model
 		f1.predict (f);			// Predict filters
 		f2.predict (f);
-
+		
 		// Update the filter
 		f1.update (); f2.update ();
 
@@ -507,6 +520,7 @@ void CCompare<Tf1, Tf2>::doIt (unsigned nIterations)
 
 		// Update the filter
 		f1.update (); f2.update ();
+		
 		dumpCompare();
 		// DEBUG char c;std::cin>>c;
 	}

@@ -245,15 +245,15 @@ class SymMatrixWrapper :
 	typedef BaseFromMember<MatrixBase> matrix_type;
 	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> adaptor_type;
 public:
-	SymMatrixWrapper () : matrix_type(), adaptor_type(member)
+	SymMatrixWrapper () : matrix_type(), adaptor_type(this->member)
 	{}
-	SymMatrixWrapper (size_t nsize1, size_t nsize2) : matrix_type(nsize1,nsize2), adaptor_type(member)
+	SymMatrixWrapper (size_t nsize1, size_t nsize2) : matrix_type(nsize1,nsize2), adaptor_type(this->member)
 	{}
-	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), adaptor_type(member)
+	explicit SymMatrixWrapper (const SymMatrixWrapper& r) : matrix_type(reinterpret_cast<const MatrixBase&>(r)), adaptor_type(this->member)
 	// Explict copy construction referencing the copy reinterpreted as a MatrixBase
 	{}
 	template <class E>
-	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), adaptor_type(member)
+	explicit SymMatrixWrapper (const ublas::matrix_expression<E>& e) : matrix_type(e), adaptor_type(this->member)
 	// Explict matrix_expression conversion constructor
 	{}
 
@@ -267,20 +267,20 @@ public:
 	// Conversions straight to a FMMatrix, equivilent to a RowMatrix types
 	const FMMatrix<MatrixBase>& asRowMatrix() const
 	{
-		return static_cast<const FMMatrix<MatrixBase>& >(member);
+		return static_cast<const FMMatrix<MatrixBase>& >(this->member);
 	}
 	FMMatrix<MatrixBase>& asRowMatrix()
 	{
-		return static_cast<FMMatrix<MatrixBase>& >(member);
+		return static_cast<FMMatrix<MatrixBase>& >(this->member);
 	}
 
 	// Matrix storage members
 	void clear()
-	{	member.clear();
+	{	this->member.clear();
 	}
 	void resize(size_t nsize1, size_t nsize2)
 	{
-		member.resize(nsize1, nsize2);
+		this->member.resize(nsize1, nsize2);
 	}
 };
 

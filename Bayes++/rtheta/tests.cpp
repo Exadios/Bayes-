@@ -7,6 +7,7 @@
 
 #ifndef NO_TESTS
 #include "BayesFilter/allFilters.hpp"
+#include "BayesFilter/matSup.hpp"
 #include "Test/random.hpp"
 #include <cmath>
 #include <iostream>
@@ -301,6 +302,19 @@ void test_sym_proxy()
 	ublas::row(S, 1).assign(v);		// ERROR only one element in upper for packed proxy assign
 }
 
+void utinverse_test()
+{
+	UTriMatrix m(3,3);
+	m(0,0) = 2; m(0,1) = 4; m(0,2) = 5;
+	m(1,1) = 3; m(1,2) = 7;
+	m(2,2) = 5;
+	std::cout << m << std::endl;
+	std::cout << UTinverse(m) << std::endl;
+	std::cout << m << std::endl;
+	std::cout << UTinverse(m) << std::endl;
+	std::cout << m << std::endl;
+}
+
 void other_tests()
 {
 	// Other things I might want to benchmark
@@ -308,6 +322,7 @@ void other_tests()
 //	other_bench();
 
 	try {
+		utinverse_test ();
 		// Tests go here
 	}
 	catch (std::exception& e)
@@ -315,6 +330,7 @@ void other_tests()
 		std::cerr << e.what() << std::endl;
 	}
 }
+
 
 #else
 void other_tests()

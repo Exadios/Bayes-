@@ -135,7 +135,7 @@ public:
 		for (FM::DenseVec::iterator ni = n.begin(); ni != n.end(); ++ni) {
 			*ni *= rootq[ni.index()];
 		}
-		FM::noalias(xp) += FM::prod(G,n);			// add correlated noise
+		FM::noalias(xp) += FM::prod(this->G,n);			// add correlated noise
 		return xp;
 	}
 
@@ -145,7 +145,7 @@ public:
 	 */
 	{
 		first_init = false;
-		for (FM::Vec::const_iterator qi = q.begin(); qi != q.end(); ++qi) {
+		for (FM::Vec::const_iterator qi = this->q.begin(); qi != this->q.end(); ++qi) {
 			if (*qi < 0.)
 				error (Numeric_exception("Negative q in init_GqG"));
 			rootq[qi.index()] = std::sqrt(*qi);
