@@ -1,0 +1,15 @@
+# Bayes++ Jamfile - See Boost.build v2
+
+# Bayes++ Deployment.
+
+project deployment
+    : requirements <define>DEPLOY
+    ;
+
+# Construct all targets
+build-project .. ;
+build-project ../rtheta ;
+build-project ../SLAM ;
+
+#alias all
+#    :   ../PV//PV  :  ;
