@@ -14,7 +14,7 @@ exe testfastslam :
      kalmanSLAM.cpp
      <lib>../BayesFilter/BayesFilter
     :
-     <include>$(BOOST_ROOT)
-     <include>$(BAYES_ROOT)
+     <include>$(BOOST)
+     <include>$(BAYES++)
     : release
 ;

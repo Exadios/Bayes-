@@ -108,7 +108,7 @@ structure:</P>
 				</DT><DT>
 				Test</DT></DL>
 			<DT>
-			boost_1_30_0 
+			boost-1.30.2 
 			</DT><DL>
 				<DT>
 				boost 
@@ -125,12 +125,12 @@ Boost explains how to obtain bjam and the sources to compile it
 yourself. For everything to work <B>bjam</B> must be placed in the
 path. <BR>To build Bayes++ and the examples simply execute: (Bayes++
 should be the current directory)</P>
-<PRE>        bjam -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
+<PRE>        bjam -s&quot;BOOST=../boost-1.30.2&quot;</PRE><P>
 If there is more then one toolsets (compiler etc) available you may
 want to tell bjam which to use. For example to use Visual C++ 7
 execute:</P>
-<PRE>        bjam -sTOOLS=&quot;vc7&quot; -s&quot;BOOST_ROOT=../boost_1_30_0&quot;</PRE><P>
-It is possible to drop the BOOST_ROOT variable by either creating a
+<PRE>        bjam -sTOOLS=&quot;vc7&quot; -s&quot;BOOST=../boost-1.30.2&quot;</PRE><P>
+It is possible to drop the BOOST variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
 by setting it as an environment variable. A simple Makefile also
 exists to encapsulate the bjam build commands.</P>
@@ -148,7 +148,7 @@ all three examples.
 and the active configuration <B>uBLAS Debug</B>. The compiler options
 must be set so the <B>Boost</B> include files can be found. That is,
 the <U>include path</U> must contain the base directory of Boost. In
-this case the <B>boost_1_30_0</B> directory. In VC7 you should do
+this case the <B>boost-1.30.2</B> directory. In VC7 you should do
 this by choosing the <I>Tools/Options/Projects/VC++ Directories</I>
 option.</P>
 <H2>Licensing</H2>
@@ -235,7 +235,7 @@ following tests.
 	<LI><P>Test examples: simpleExample, PV, QuadCalib <BR>Compile debug
 	and release builds (using Boost Build version 2) :- with no errors
 	and no warnings.<BR>Execution output :- Identical to expected
-	reference results.<BR><I>As of Boost_1_31_0 PV and QuadCalib are
+	reference results.<BR><I>As of Boost-1.31.0 PV and QuadCalib are
 	excluded from tests with gcc 2.95.3 as it is no able to compile the
 	new Boost.Random.</I></P>
 	<LI><P><FONT SIZE=3><FONT FACE="Times">Numerical tests: rtheta -

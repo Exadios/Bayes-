@@ -5,13 +5,13 @@
 
 # Establish the root of Bayes++
 # $(gTOP) is the name of the variable containing the path from the invocation directory to the project root.
-BAYES_ROOT = $($(gTOP)) ;
+"BAYES++" = $($(gTOP)) ;
 
-# BOOST_ROOT must be set to the root of the boost installation.
-# Bayes++ targets will want $(BOOST_ROOT) and $(BAYES_ROOT) in their #include path.
+# BOOST must be set to the root of the boost installation.
+# Bayes++ targets will want $(BOOST) and $(BAYES++) in their #include path.
 
-path-global BOOST_ROOT ;
-path-global BAYES_ROOT ;
+path-global BOOST ;
+path-global "BAYES++" ;
 
 # Target output in Project Root
 ALL_LOCATE_TARGET ?= target ;

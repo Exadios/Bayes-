@@ -11,7 +11,7 @@ CPP_SOURCES =
 # Declare the BayesFilter static link library
 lib BayesFilter : $(CPP_SOURCES).cpp
     :
-     <include>$(BOOST_ROOT)
+     <include>$(BOOST)
 #     <gcc><*><cxxflags>"-pedantic"		# Pedantic make a lot of noise with GCC2.95.3 in Boost headers because of long long
      <intel-linux><*><cxxflags>"-mp1"		# Require IEEE NaN comparisons
     : debug release
