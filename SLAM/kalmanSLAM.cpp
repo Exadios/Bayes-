@@ -8,14 +8,13 @@
 
 /*
  * SLAM : Simultaneous Locatization and Mapping
- *  FastSLAM augmented particle algorithm
+ *  Kalman filter representing representation of SLAM
  */
 
 // Include Bayesian filtering library
 #include "BayesFilter/bayesFlt.hpp"
 #include "SLAM.hpp"
 #include "kalmanSLAM.hpp"
-
 
 namespace SLAM_filter
 {
@@ -28,8 +27,8 @@ inline void clear(FM::ublas::matrix_range<Base> A)
 	A.assign(FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type()) );
 }
 
-Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter, unsigned full_nL ) :
-	SLAM(), full(full_filter), nL(full_nL)
+Kalman_SLAM::Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter ) :
+	SLAM(), full(full_filter), nL(full.x.size())
 {
 	nM = 0;
 }
@@ -43,7 +42,7 @@ void Kalman_SLAM::predict( BF::Linear_predict_model& lpred )
 	all.q.clear();
 	all.Fx.sub_matrix(0,nL, 0,nL) = lpred.Fx;
 	all.G.sub_matrix(0,nL, 0,lpred.G.size2()) = lpred.G;
-	all.q(0,lpred.q.size()) = lpred.q;
+	all.q.sub_range(0,lpred.q.size()) = lpred.q;
 
 	full.predict(all);
 }
@@ -57,7 +56,7 @@ void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const F
 	}
 	// TODO Implement nonlinear form
 	// Create a augmented sparse observe model for full states
-	BF::Linear_uncorrelated_observe_model fullm(nL+nM, 1);
+	BF::Linear_uncorrelated_observe_model fullm(full.x.size(), 1);
 	fullm.Hx.clear();
 	fullm.Hx.sub_matrix(0,nL, 0,nL) = fom.Hx.sub_matrix(0,nL, 0,nL);
 	fullm.Hx(0,nL+feature) = fom.Hx(0,nL);
@@ -68,37 +67,54 @@ void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const F
 void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
 // fom: must have a the special from required for SLAM::obeserve_new
 {
-	if (nL+feature >= full.x.size()) {
-		error (BF::Logic_exception("Observe_new no feature space"));
-		return;
-	}
-	++nM;
-
 	FM::Vec sz(nL+1);
-	sz(0,nL) = full.x(0,nL);
+	sz.sub_range(0,nL) = full.x.sub_range(0,nL);
 	sz[nL] = z[0];
 	FM::Vec t = fom.h(sz);
 
-	full.x[nL+feature] = t[0];
+		// Make space in scheme for feature, requires the scheme can deal with resized state
+	if (feature >= nM) {	// init with resize
+		nM = feature+1;	
+				// ISSUE requires noalias
+		FM::Vec px(nL+nM); px.sub_range(0,full.x.size()) = full.x;
+		FM::SymMatrix pX(nL+nM,nL+nM); pX.sub_matrix(0,full.x.size(),0,full.x.size()) = full.X;
 
+		px[nL+feature] = t[0];
+		pX(nL+feature,nL+feature) = fom.Zv[0];
+		full.init_kalman(px,pX);
+	}
+	else
+	{
+		full.x[nL+feature] = t[0];
+		full.X(nL+feature,nL+feature) = fom.Zv[0];
 			// ISSUE uBLAS has problems accessing the lower symmetry via a sub_matrix proxy, there two two parts seperately
-	clear( full.X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
-	clear( full.X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full.X.size1()) );
+		clear( full.X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
+		clear( full.X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full.X.size1()) );
+		full.init();
+	}
+
 	full.X(nL+feature,nL+feature) = fom.Zv[0];
-	full.init();
 }
 
 void Kalman_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& T )
 {
-	if (nL+feature >= full.x.size()) {
-		error (BF::Logic_exception("Observe_new no feature space"));
-		return;
-	}
-	++nM;
+		// Make space in scheme for feature, requires the scheme can deal with resized state
+	if (feature >= nM) {
+		nM = feature+1;
+				// ISSUE requires noalias
+		FM::Vec px(nL+nM); px.sub_range(0,full.x.size()) = full.x;
+		FM::SymMatrix pX(nL+nM,nL+nM); pX.sub_matrix(0,full.x.size(),0,full.x.size()) = full.X;
 
-	full.x[nL+feature] = t[0];
-	full.X(nL+feature,nL+feature) = T[0];
-	full.init();
+		px[nL+feature] = t[0];
+		pX(nL+feature,nL+feature) = T[0];
+		full.init_kalman(px,pX);
+	}
+	else
+	{
+		full.x[nL+feature] = t[0];
+		full.X(nL+feature,nL+feature) = T[0];
+		full.init();
+	}
 }
 
 void Kalman_SLAM::forget( unsigned feature, bool must_exist )
@@ -108,7 +124,6 @@ void Kalman_SLAM::forget( unsigned feature, bool must_exist )
 	clear( full.X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
 	clear( full.X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full.X.size1()) );
 	full.init();
-	--nM;
 }
 
 void Kalman_SLAM::decorrelate( Bayesian_filter::Bayes_base::Float d )

@@ -52,7 +52,7 @@ public:
 		(void)update_resample (Bayesian_filter::Standard_resampler());
 	}
 
-	unsigned feature_unique_samples( unsigned feature );
+	size_t feature_unique_samples( unsigned feature );
 
 protected:
 	struct Feature_1
@@ -72,7 +72,7 @@ protected:
 
 private:
 	typedef Bayesian_filter::Importance_resampler::Resamples_t Resamples_t;
-	FM::DenseVec wir;			// Likelihood weights of map augmented particles
+	FM::DenseVec wir;		// Likelihood weights of map augmented particles
 	bool wir_update;		// weights have been updated requring a resampling on update
 };
 
@@ -86,11 +86,17 @@ public:
 	Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter );
 	// Construct Fast_SLAM filter using referenced filter for resampling
 	
-	unsigned statistics( BF::Kalman_state_filter& kstats );
-	// Compute statistics of particles. Return: Number of features in map
-	//  Sample mean and covariance of particle.
+	void statistics_compressed( BF::Kalman_state_filter& kstats );
+	// Compute statistics of particles: Sample mean and covariance of particle.
+	// Statistics are returned in a compressed form with location states augmented with active feature states
+	void statistics_sparse( BF::Kalman_state_filter& kstats );
+	// Compute statistics of particles: Sample mean and covariance of particle.
+	// Statistics are returned in a sparse form indexed by feature number
 
 protected:
+	void statistics_feature( BF::Kalman_state_filter& kstat, size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
+	// Compute statistics of particles for a map feature: Sample mean and covariance of particle.
+
 	BF::SIR_kalman_scheme& L;			// Reference to filter parameter in constructor
 };
 

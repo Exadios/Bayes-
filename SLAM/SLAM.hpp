@@ -54,19 +54,19 @@ public:
 
 										// Multi feature observe: Defaults using multiple single feature observes
 	typedef std::vector<unsigned> afeatures_t;	// Use a vector to store feature assocations
-	virtual void observe( afeatures_t& features, const Feature_observe& fom, const FM::Vec& z )
+	virtual void multi_observe( afeatures_t& features, const Feature_observe& fom, const FM::Vec& z )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}
-	virtual void observe_new( afeatures_t& features, const Feature_observe_inverse& fom, const FM::Vec& z )
+	virtual void multi_observe_new( afeatures_t& features, const Feature_observe_inverse& fom, const FM::Vec& z )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}
-	virtual void observe_new( afeatures_t& features, const FM::Vec& t, const FM::Vec& T )
+	virtual void multi_observe_new( afeatures_t& features, const FM::Vec& t, const FM::Vec& T )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}
-	virtual void forget( afeatures_t& features, bool must_exist = true )
+	virtual void multi_forget( afeatures_t& features, bool must_exist = true )
 	{
 		error (BF::Logic_exception("Unimplemented"));
 	}

@@ -24,7 +24,7 @@ namespace SLAM_filter
 class Kalman_SLAM : public SLAM
 {
 public:
-	Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter, unsigned full_nL);
+	Kalman_SLAM( Bayesian_filter::Linrz_kalman_filter& full_filter );
 	void predict( Bayesian_filter::Linear_predict_model& m ); 	// TODO Allow nonlinear
 
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z);

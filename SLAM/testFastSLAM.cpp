@@ -17,57 +17,44 @@
 
 // Bayes++ Bayesian filtering schemes
 #include "BayesFilter/SIRFlt.hpp"
+#include "BayesFilter/covFlt.hpp"
 #include "BayesFilter/unsFlt.hpp"
 // Bayes++ SLAM
 #include "SLAM.hpp"
 #include "fastSLAM.hpp"
 #include "kalmanSLAM.hpp"
 
+#include "Test/random.hpp"
 #include <iostream>
 #include <boost/numeric/ublas/io.hpp>
-#include <boost/random.hpp>
 
 
 using namespace SLAM_filter;
 
 
-// Random numbers for filters from Boost
-class Boost_random : public BF::SIR_random, public BF::General_LiInAd_predict_model::Random
+class SLAM_random : public Bayesian_filter_test::Boost_random, public BF::SIR_random, public BF::General_LiInAd_predict_model::Random
 /*
- * Random number distributions
+ * Random numbers for SLAM test
  */
 {
 public:
-	Boost_random() : dist_normal(), dist_uniform()
-	{}
-	FM::Float normal(const FM::Float mean, const FM::Float sigma)
+	FM::Float normal (const FM::Float mean, const FM::Float sigma)
 	{
-		boost::normal_distribution<FM::Float> dist(mean, sigma);
-		boost::variate_generator<boost::mt19937& ,boost::normal_distribution<FM::Float> > gen(rng, dist);
-		return gen();
+		return Boost_random::normal (mean, sigma);
 	}
-	void normal(FM::DenseVec& v)
+	void normal (FM::DenseVec& v)
 	{
-		boost::variate_generator<boost::mt19937& ,boost::normal_distribution<FM::Float> > gen(rng, dist_normal);
-		std::generate (v.begin(), v.end(), gen);
+		Boost_random::normal (v);
 	}
-	void uniform_01(FM::DenseVec& v)
+	void uniform_01 (FM::DenseVec& v)
 	{
-		boost::variate_generator<boost::mt19937& ,boost::uniform_real<FM::Float> > gen(rng, dist_uniform);
-		std::generate (v.begin(), v.end(), gen);
+		Boost_random::uniform_01 (v);
 	}
-	void reseed()
+	void seed ()
 	{
-		rng.seed();
+		Boost_random::seed();
 	}
-private:
-	boost::mt19937 rng;
-	boost::normal_distribution<FM::Float> dist_normal;
-	boost::uniform_real<FM::Float> dist_uniform;
 };
-
-
-
 
 
 /*
@@ -78,7 +65,7 @@ struct SLAMDemo
 	void OneDExperiment ();
 	void InformationLossExperiment ();
 	
-	Boost_random goodRandom;
+	SLAM_random goodRandom;
 
 	// Relative Observation with  Noise model
 	struct Simple_observe : BF::Linear_uncorrelated_observe_model
@@ -122,6 +109,7 @@ struct SLAMDemo
 
 void SLAMDemo::OneDExperiment()
 // Experiment with a one dimensional problem
+//  Use to look at implication of highly correlated features
 {
 	// State size
 	const unsigned nL = 1;	// Location
@@ -149,17 +137,18 @@ void SLAMDemo::OneDExperiment()
 
 	// Truth model : location plus one map feature
 	FM::Vec true0(nL+1), true1(nL+1);
-	true0(0,nL) = x_init; true0[nL] = 50.;
-	true1(0,nL) = x_init; true1[nL] = 70.;
+	true0.sub_range(0,nL) = x_init; true0[nL] = 50.;
+	true1.sub_range(0,nL) = x_init; true1[nL] = 70.;
 	FM::Vec z(1);
 
-	// Kalman_SLAM filter
-	BF::Unscented_scheme full_filter(nL+nM);
+	// Kalman_SLAM filter: ISSUE Use Covariance for resize
+	BF::Covariance_scheme full_filter(nL);
 	full_filter.x.clear(); full_filter.X.clear();
 	full_filter.x[0] = x_init[0];
 	full_filter.X(0,0) = X_init(0,0);
 	full_filter.init();
-	Kalman_SLAM kalm(full_filter, nL);
+
+	Kalman_SLAM kalm (full_filter);
 
 	// Fast_SLAM filter
 #ifdef NDEBUG
@@ -167,9 +156,9 @@ void SLAMDemo::OneDExperiment()
 #else
 	unsigned nParticles = 20;
 #endif
-	BF::SIR_kalman_scheme fast_location(nL, nParticles, goodRandom);
-	fast_location.init_kalman(x_init, X_init);
-	Fast_SLAM_Kstatistics fast(fast_location);
+	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
+	fast_location.init_kalman (x_init, X_init);
+	Fast_SLAM_Kstatistics fast (fast_location);
 
 	Kalman_statistics stat(nL+nM);
 
@@ -184,16 +173,14 @@ void SLAMDemo::OneDExperiment()
 	kalm.observe_new (1, observe_new1, z);
 	fast.observe_new (1, observe_new1, z);
 
-	// Experiment with highly correlated features
-	//
-	kalm.update(); display("Initial Kalm", full_filter);
-	fast.update(); fast.statistics(stat); display("Initial Fast", stat);
+	kalm.update(); display("Feature Kalm", full_filter);
+	fast.update(); fast.statistics_sparse(stat); display("Feature Fast", stat);
 
 	// Predict the filter forward
 	full_filter.predict (all_predict);
 	kalm.update(); display("Predict Kalm", full_filter);
 	fast_location.predict (location_predict);
-	fast.update(); fast.statistics(stat); display("Predict Fast", stat);
+	fast.update(); fast.statistics_sparse(stat); display("Predict Fast", stat);
 
 	// Observation feature 0
 	z = observe0.h(true0);
@@ -201,7 +188,7 @@ void SLAMDemo::OneDExperiment()
 	kalm.observe( 0, observe0, z );
 	kalm.update(); display("ObserveA Kalm", full_filter);
 	fast.observe( 0, observe0, z );
-	fast.update(); fast.statistics(stat); display("ObserveA Fast", stat);
+	fast.update(); fast.statistics_sparse(stat); display("ObserveA Fast", stat);
 
 	// Observation feature 1
 	z = observe1.h(true1);
@@ -209,7 +196,7 @@ void SLAMDemo::OneDExperiment()
 	kalm.observe( 1, observe1, z );
 	kalm.update(); display("ObserveB Kalm", full_filter);
 	fast.observe( 1, observe1, z );
-	fast.update(); fast.statistics(stat); display("ObserveB Fast", stat);
+	fast.update(); fast.statistics_sparse(stat); display("ObserveB Fast", stat);
 
 	// Observation feature 0
 	z = observe0.h(true0);
@@ -217,13 +204,13 @@ void SLAMDemo::OneDExperiment()
 	kalm.observe( 0, observe0, z );
 	kalm.update(); display("ObserveC Kalm", full_filter);
 	fast.observe( 0, observe0, z );
-	fast.update(); fast.statistics(stat); display("ObserveC Fast", stat);
+	fast.update(); fast.statistics_sparse(stat); display("ObserveC Fast", stat);
 
 	// Forget feature 0
 	kalm.forget(0);
 	kalm.update(); display("Forget Kalm", full_filter);
 	fast.forget(0);
-	fast.update(); fast.statistics(stat); display("Forget Fast", stat);
+	fast.update(); fast.statistics_sparse(stat); display("Forget Fast", stat);
 }
 
 
@@ -256,8 +243,8 @@ void SLAMDemo::InformationLossExperiment()
 
 	// Truth model : location plus one map feature
 	FM::Vec true0(nL+1), true1(nL+1);
-	true0(0,nL) = x_init; true0[nL] = 50.;
-	true1(0,nL) = x_init; true1[nL] = 70.;
+	true0.sub_range(0,nL) = x_init; true0[nL] = 50.;
+	true1.sub_range(0,nL) = x_init; true1[nL] = 70.;
 	FM::Vec z(1);
 
 	// Kalman_SLAM filter
@@ -266,15 +253,15 @@ void SLAMDemo::InformationLossExperiment()
 	full_filter.x[0] = x_init[0];
 	full_filter.X(0,0) = X_init(0,0);
 	full_filter.init();
-	Kalman_SLAM kalm(full_filter, nL);
+	Kalman_SLAM kalm (full_filter);
 
 	// Fast_SLAM filter
 	unsigned nParticles = 1000;
-	BF::SIR_kalman_scheme fast_location(nL, nParticles, goodRandom);
-	fast_location.init_kalman(x_init, X_init);
-	Fast_SLAM_Kstatistics fast(fast_location);
+	BF::SIR_kalman_scheme fast_location (nL, nParticles, goodRandom);
+	fast_location.init_kalman (x_init, X_init);
+	Fast_SLAM_Kstatistics fast (fast_location);
 
-	Kalman_statistics stat(nL+nM);
+	Kalman_statistics stat (nL+nM);
 
 	// Initial feature states
 	z = observe0.h(true0);		// Observe a relative position between location and map landmark
@@ -317,18 +304,10 @@ void SLAMDemo::InformationLossExperiment()
 
 		// Update and resample
 		kalm.update();
-		try {
-			fast.update();
-		}
-		catch (BF::Filter_exception ne)
-		{
-			std::cout << ne.what() << std::endl;
-			std::cout.flush();
-			throw;	// re-throw
-		}
+		fast.update();
 		
 		display("Kalm", full_filter);
-		fast.statistics(stat); display("Fast", stat);
+		fast.statistics_sparse(stat); display("Fast", stat);
 		std::cout << fast_location.stochastic_samples <<','<< fast_location.unique_samples()
 			<<' '<< fast.feature_unique_samples(0) <<','<< fast.feature_unique_samples(1) <<std::endl;
 		std::cout.flush();
@@ -342,7 +321,13 @@ int main()
 	std::cout.flags(std::ios::fixed); std::cout.precision(4);
 
 	// Create test and run experiments
-	SLAMDemo test;
-	test.OneDExperiment();
-	//test.InformationLossExperiment();
+	try {
+		SLAMDemo test;
+		test.OneDExperiment();
+		//test.InformationLossExperiment();
+	}
+	catch (BF::Filter_exception ne)
+	{
+		std::cout << ne.what() << std::endl;
+	}
 }

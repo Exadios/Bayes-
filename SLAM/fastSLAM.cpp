@@ -56,15 +56,15 @@ void Fast_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fo
 {
 	assert(z.size() == 1);		// Only single state observation supported
 
-	const unsigned nL = L.S.size1();	// No of location states
-	const unsigned nparticles = L.S.size2();
+	const size_t nL = L.S.size1();	// No of location states
+	const size_t nparticles = L.S.size2();
 	FeatureCondMap fmap(nparticles);
 
 	FM::Vec sz(nL+1);						// Location state
 
-	for (unsigned pi = 0; pi < nparticles; ++pi)
+	for (size_t pi = 0; pi < nparticles; ++pi)
 	{
-		sz(0,nL) = L.S.column(pi);
+		sz.sub_range(0,nL) = L.S.column(pi);
 		sz[nL] = z[0];
 		FM::Vec t = fom.h(sz);
 		fmap[pi].x = t[0];
@@ -79,7 +79,7 @@ void Fast_SLAM::observe_new( unsigned feature, const FM::Vec& t, const FM::Vec& 
  */
 {
 	assert(t.size() == 1);		// Only single state observation supported
-	const unsigned nparticles = L.S.size2();
+	const size_t nparticles = L.S.size2();
 	Feature_1 m1;				// single map feature
 	FeatureCondMap fmap(nparticles);
 
@@ -105,8 +105,8 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	}
 								// Existing feature
 	FeatureCondMap& afm = (*inmap).second;	// Reference the associated feature map
-	const unsigned nL = L.S.size1();	// No of location states
-	const unsigned nparticles = L.S.size2();
+	const size_t nL = L.S.size1();	// No of location states
+	const size_t nparticles = L.S.size2();
 
 	Float Ht = fom.Hx(0,nL);
 	if (Ht == 0.)
@@ -114,11 +114,11 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 
 	FM::Vec x2(nL+1);					// Augmented state (particle + feature mean)
 
-	for (unsigned pi = 0; pi < nparticles; ++pi)
+	for (size_t pi = 0; pi < nparticles; ++pi)
 	{
 		Feature_1& m1 = afm[pi];		// Associated feature's map particle
 							
-		x2(0,nL) = L.S.column(pi);			// Build Augmented state x2
+		x2.sub_range(0,nL) = L.S.column(pi);			// Build Augmented state x2
 		x2[nL] = m1.x;
 		FM::Vec zp = fom.h(x2);				// Observation model
 		fom.normalise(zp, z);
@@ -134,10 +134,10 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	wir_update = true;			// Weights have been updated requiring a resampling
 
 								// Estimate associated features conditional map for resampled particles
-	for (unsigned pi = 0; pi < nparticles; ++pi)
+	for (size_t pi = 0; pi < nparticles; ++pi)
 	{
 		Feature_1& m1 = afm[pi];	// Associated feature's map particle
-		x2(0,nL) = L.S.column(pi);		// Build Augmented state x2
+		x2.sub_range(0,nL) = L.S.column(pi);		// Build Augmented state x2
 		x2[nL] = m1.x;
 		FM::Vec zp = fom.h(x2);			// Observation model
 		fom.normalise(zp, z);
@@ -163,9 +163,9 @@ Fast_SLAM::Float
 {
 	if (wir_update)
 	{
-		const unsigned nparticles = L.S.size2();
+		const size_t nparticles = L.S.size2();
 		Resamples_t presamples(nparticles);
-		unsigned R_unique;			// Determine resamples of S
+		size_t R_unique;			// Determine resamples of S
 		Float lcond = resampler.resample (presamples, R_unique, wir, L.random);
 
 									// Initial uniform weights
@@ -184,7 +184,7 @@ Fast_SLAM::Float
 			FeatureCondMap::iterator fmri = fmr.begin();
 			for (fmi = fmi_begin; fmi < fmi_end; ++fmi)
 			{							// Multiple copies of this resampled feature
-				for (unsigned res = presamples[fmi-fmi_begin]; res > 0; --res) {
+				for (size_t res = presamples[fmi-fmi_begin]; res > 0; --res) {
 					*fmri = *fmi;
 					++fmri;
 				}
@@ -208,7 +208,7 @@ void Fast_SLAM::forget( unsigned feature, bool must_exist )
 		error (BF::Logic_exception("Forget non existing feature"));
 }
 
-unsigned Fast_SLAM::feature_unique_samples( unsigned feature )
+size_t Fast_SLAM::feature_unique_samples( unsigned feature )
 /*
  * Count the number of unique samples in S associated with a feature
  */
@@ -247,7 +247,7 @@ unsigned Fast_SLAM::feature_unique_samples( unsigned feature )
 	std::sort (sortR.begin(), sortR.end(), order::less);
 
 						// Count element changes, precond: sortS not empty
-	unsigned u = 1;
+	size_t u = 1;
 	SRContainer::const_iterator ssi= sortR.begin();
 	SRContainer::const_iterator ssp = ssi;
 	++ssi;
@@ -271,23 +271,85 @@ Fast_SLAM_Kstatistics::Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter ) 
 {
 }
 
-unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_state_filter& kstat )
+
+void Fast_SLAM_Kstatistics::statistics_feature(
+		BF::Kalman_state_filter& kstat, size_t fs,
+		const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const
+/*
+ * Compute sample mean and covariance statistics of feature.
+ *  fs is subscript in kstat to return statisics
+ *  fi iterator of feature
+ *  fend end of map iterator (statistics are computed for fi with a map subset)
+ * Precond: kstat contains location mean
+ */
+{
+	const size_t nL = L.S.size1();	// No of location states
+	const size_t nparticles = L.S.size2();
+
+	const FeatureCondMap& fm = (*fi).second;		// Reference the feature map
+
+									// Iterate over All feature particles
+	FeatureCondMap::const_iterator fpi, fpi_begin = fm.begin(), fpi_end = fm.end();
+
+	Float mean = 0.;				// Feature mean
+	for (fpi = fpi_begin; fpi < fpi_end; ++fpi)	{
+		mean += (*fpi).x;
+	}
+	mean /= Float(nparticles);
+
+	Float var = 0.;					// Feature variance: 1/(n-1) is unbiased estimate given estimated mean
+	for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
+		var += (*fpi).X + sqr((*fpi).x);
+	}
+	var = (var - Float(nparticles)*sqr(mean)) / Float(nparticles-1);
+
+	kstat.x[fs] = mean;				// Copy into Kalman statistics
+	kstat.X(fs,fs) = var;
+
+									// Location,feature covariance
+	for (size_t si=0; si < nL; ++si)
+	{
+		Float covar = 0.;
+		size_t spi=0;
+		for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
+			covar += (*fpi).x*L.S(si,spi);
+			++spi;
+		}
+		covar = (covar - Float(nparticles)*mean*kstat.x[si]) / Float(nparticles);
+		kstat.X(si,fs) = covar;
+	}
+
+									// Feature,feature covariance. Iterate over previous features with means already computed
+	size_t fsj = nL;				// Feature subscript
+	for (AllFeature::const_iterator fj = M.begin(); fj != fend; ++fj, ++fsj)
+	{
+		Float covar = 0.;
+		FeatureCondMap::const_iterator fpj = (*fj).second.begin();
+		for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
+			covar += (*fpi).x*(*fpj).x;
+			++fpj;
+		}
+		covar = (covar - Float(nparticles)*mean*kstat.x[fsj]) / Float(nparticles);
+		kstat.X(fs,fsj) = covar;
+	}
+}
+
+
+void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& kstat )
 /*
  * Compute sample mean and covariance statistics of filter
  *  
  *  kstat elements are filled first with Location statistics and then the Map feature statistics
  *  Feature statisics are are computed in feature number order and only for those for which there is space in kstat
  * Note: Covariance values are indeterminate for nparticles ==1
- * Return: Number of features in map
  * Precond:
  *   nparticles >=1 (enforced by Sample_filter contruction)
  *   kstat must have space for Location statistics
  * Postcond:
- *  kstat complete sample statisics of filter
+ *  kstat compressed sample statisics of filter
  */
 {	
-	const unsigned nL = L.S.size1();	// No of location states
-	const unsigned nparticles = L.S.size2();
+	const size_t nL = L.S.size1();	// No of location states
 
 	kstat.x.clear();			// Zero everything (required only for non existing feature states
 	kstat.X.clear();			// Zero everything (required only for non existing feature states
@@ -296,62 +358,54 @@ unsigned Fast_SLAM_Kstatistics::statistics( BF::Kalman_state_filter& kstat )
 	if (nL > kstat.x.size())
 		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
 	L.update_statistics();
-	kstat.x(0,nL) = L.x;
+	kstat.x.sub_range(0,nL) = L.x;
 	kstat.X.sub_matrix(0,nL, 0,nL) = L.X;
 
 								// Iterated over feature statistics (that there is space for in kstat)
 	size_t fs = nL;						// Feature subscript
-	for (AllFeature::iterator fi = M.begin(); fi != M.end() && fs < kstat.x.size(); ++fi, ++fs)
+	for (AllFeature::const_iterator fi = M.begin(); fi != M.end() && fs < kstat.x.size(); ++fi, ++fs)
 	{
-		FeatureCondMap& fm = (*fi).second;		// Reference the feature map
-										// Iterate over All feature particles
-		FeatureCondMap::iterator fpi, fpi_begin = fm.begin(), fpi_end = fm.end();
+		statistics_feature(kstat, fs, fi, fi);	// build statistics of fi with other features up to fi
+	}
+}//statistics_compressed
 
-		Float mean = 0.;				// Feature mean
-		for (fpi = fpi_begin; fpi < fpi_end; ++fpi)	{
-			mean += (*fpi).x;
-		}
-		mean /= Float(nparticles);
 
-		Float var = 0.;					// Feature variance: 1/(n-1) is unbiased estimate given estimated mean
-		for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
-			var += (*fpi).X + sqr((*fpi).x);
-		}
-		var = var / Float(nparticles-1) - sqr(mean);
+void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
+/*
+ * Compute sample mean and covariance statistics of filter
+ *  
+ *  kstat elements are filled first with Location statistics and then the Map feature statistics
+ *  Feature statisics are are computed in feature number as index (after location) and only for those for which there is space in kstat
+ * Note: Covariance values are indeterminate for nparticles ==1
+ * Precond:
+ *   nparticles >=1 (enforced by Sample_filter contruction)
+ *   kstat must have space for Location statistics
+ * Postcond:
+ *  kstat sparse sample statisics of filter
+ */
+{	
+	const size_t nL = L.S.size1();	// No of location states
 
-		kstat.x[fs] = mean;				// Copy into Kalman statistics
-		kstat.X(fs,fs) = var;
+	kstat.x.clear();			// Zero everything (required only for non existing feature states
+	kstat.X.clear();			// Zero everything (required only for non existing feature states
 
-										// Location,feature covariance
-		for (size_t si=0; si < nL; ++si)
+								// Get Location statistics
+	if (nL > kstat.x.size())
+		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
+	L.update_statistics();
+	kstat.x.sub_range(0,nL) = L.x;
+	kstat.X.sub_matrix(0,nL, 0,nL) = L.X;
+
+								// Iterated over feature statistics (that there is space for in kstat)
+	for (AllFeature::const_iterator fi = M.begin(); fi != M.end(); ++fi)
+	{
+		size_t fs = nL + (*fi).first;		// Feature subscript
+		if (fs < kstat.x.size())			// Space in kstat
 		{
-			Float covar = 0.;
-			size_t spi=0;
-			for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
-				covar += (*fpi).x*L.S(si,spi);
-				++spi;
-			}
-			covar = covar / Float(nparticles) - mean*kstat.x[si];
-			kstat.X(si,fs) = covar;
-		}
-
-										// Feature,feature covariance. Iterate over previous features with means already computed
-		size_t fsj = nL;				// Feature subscript
-		for (AllFeature::iterator fj = M.begin(); fj != fi; ++fj, ++fsj)
-		{
-			Float covar = 0.;
-			FeatureCondMap::iterator fpj = (*fj).second.begin();
-			for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
-				covar += (*fpi).x*(*fpj).x;
-				++fpj;
-			}
-			covar = covar / Float(nparticles) - mean*kstat.x[fsj];
-			kstat.X(fs,fsj) = covar;
+		statistics_feature(kstat, fs, fi, fi);	// build statistics of fi with other features up to fi
 		}
 	}//all feature
-
-	return M.size();
-}//statistics
+}//statistics_sparse
 
 
 }//namespace SLAM
