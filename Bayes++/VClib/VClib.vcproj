@@ -99,49 +99,6 @@
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
 		</Configuration>
-		<Configuration
-			Name="uBLAS(Development) Debug|Win32"
-			OutputDirectory="uBLAS(Development) Debug"
-			IntermediateDirectory="uBLAS(Development) Debug"
-			ConfigurationType="4"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="FALSE"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)../ublas_2002_10_12"
-				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,BAYES_FILTER_SPARSE"
-				StringPooling="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="3"
-				PrecompiledHeaderThrough="bayesFlt.hpp"
-				WarningLevel="3"
-				DebugInformationFormat="3"
-				CompileAs="0"
-				DisableSpecificWarnings="4224"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="BayesFilter_UBLAS_MD7d.lib"
-				SuppressStartupBanner="TRUE"/>
-			<Tool
-				Name="VCMIDLTool"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
-				Culture="3081"/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"/>
-		</Configuration>
 	</Configurations>
 	<Files>
 		<Filter
@@ -226,12 +183,6 @@
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\SIRFlt.cpp">
@@ -243,12 +194,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
@@ -268,12 +213,6 @@
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\UdU.cpp">
@@ -285,12 +224,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
@@ -310,12 +243,6 @@
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\bayesFltAlg.cpp">
@@ -327,12 +254,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
@@ -352,12 +273,6 @@
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\infFlt.cpp">
@@ -369,12 +284,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
@@ -394,12 +303,6 @@
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm200"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\itrFlt.cpp">
@@ -411,12 +314,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
@@ -440,14 +337,6 @@
 						UsePrecompiledHeader="1"
 						PrecompiledHeaderThrough="bayesFlt.hpp"/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"
-						UsePrecompiledHeader="1"
-						PrecompiledHeaderThrough="bayesFlt.hpp"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\BayesFilter\unsFlt.cpp">
@@ -459,12 +348,6 @@
 				</FileConfiguration>
 				<FileConfiguration
 					Name="uBLAS Release|Win32">
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalOptions="/Zm150"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="uBLAS(Development) Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalOptions="/Zm150"/>
