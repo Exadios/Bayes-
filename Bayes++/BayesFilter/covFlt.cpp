@@ -22,7 +22,7 @@ namespace Bayesian_filter
 
 Covariance_filter::Covariance_filter (size_t x_size, size_t z_initialsize) :
 	Extended_filter(x_size),
-	S(Empty), SI(Empty)
+	S(Empty), SI(Empty), W(Empty)
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -75,6 +75,7 @@ void Covariance_filter::observe_size (size_t z_size)
 
 		S.resize(z_size,z_size);
 		SI.resize(z_size,z_size);
+		W.resize(W.size1(),z_size);
 	}
 }
 
@@ -97,7 +98,7 @@ Bayes_base::Float
 	rclimit.check_PD(rcond, "S not PD in observe");
 
 						// Kalman gain
-	Matrix W = prod(prod(X,trans(h.Hx)), SI);
+	W = prod(prod(X,trans(h.Hx)), SI);
 
 						// State update
 	x += prod(W, s);
@@ -130,7 +131,7 @@ Bayes_base::Float
 	rclimit.check_PD(rcond, "S not PD in observe");
 
 						// Kalman gain
-	Matrix W = prod(prod(X,trans(h.Hx)), SI);
+	W = prod(prod(X,trans(h.Hx)), SI);
 
 						// State update
 	x += prod(W, s);

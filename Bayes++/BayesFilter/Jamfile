@@ -12,6 +12,7 @@ CPP_SOURCES =
 lib BayesFilter : $(CPP_SOURCES).cpp
     :
      <include>$(BOOST_ROOT)
+     <gcc><*><cxxflags>"-pedantic"
     : debug release
 ;
 

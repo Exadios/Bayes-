@@ -47,6 +47,7 @@ public:
 
 public:						// Exposed Numerical Results
 	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
+	FM::Matrix W;				// Kalman Gain
 
 protected:					// allow fast operation if z_size remains constant
 	size_t last_z_size;

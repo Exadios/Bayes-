@@ -158,7 +158,7 @@ namespace {
 
 void Unscented_filter::predict (Functional_predict_model& f)
 /*
- * Adapt Unscented noise model by creating a noise model with zero noise
+ * Adapt model by creating an Unscented predict with zero noise
  * ISSUE: A simple specialisation is possible, rather then this adapted implemenation
  */
 {
@@ -169,7 +169,7 @@ void Unscented_filter::predict (Functional_predict_model& f)
 
 void Unscented_filter::predict (Addative_predict_model& f)
 /*
- * Adapt Unscented noise model by creating a noise model with zero noise
+ * Adapt model by creating an Unscented predict with addative noise
  *  Computes noise covariance Q = GqG'
  */
 {
