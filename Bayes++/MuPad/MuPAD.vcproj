@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.00"
+	Name="MuPAD"
+	ProjectGUID="{BA999D94-196F-4D33-A42C-6378D5ED3FA9}"
+	SccProjectName=""
+	SccAuxPath=""
+	SccLocalPath=""
+	SccProvider=""
+	Keyword="MakeFileProj">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="uBLAS Debug|Win32"
+			OutputDirectory="UBLAS Debug"
+			IntermediateDirectory="UBLAS Debug"
+			ConfigurationType="0"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake debug"
+				ReBuildCommandLine="nmake debug /a"
+				CleanCommandLine="nmake clean"
+				Output="bfilterD.mdm"/>
+		</Configuration>
+		<Configuration
+			Name="uBLAS Release|Win32"
+			OutputDirectory="UBLAS Release"
+			IntermediateDirectory="UBLAS Release"
+			ConfigurationType="0"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake release"
+				ReBuildCommandLine="nmake release /a"
+				CleanCommandLine="nmake clean"
+				Output="bfilterR.mdm"/>
+		</Configuration>
+		<Configuration
+			Name="uBLAS(Development) Debug|Win32"
+			OutputDirectory="uBLAS(Development) Debug"
+			IntermediateDirectory="uBLAS(Development) Debug"
+			ConfigurationType="0"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake debug"
+				ReBuildCommandLine="nmake debug /a"
+				CleanCommandLine="nmake clean"
+				Output="bfilterD.mdm"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<File
+			RelativePath="Makefile">
+		</File>
+		<File
+			RelativePath=".\MuPadConvert.h">
+		</File>
+		<File
+			RelativePath=".\bfilter.cpp">
+		</File>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>
