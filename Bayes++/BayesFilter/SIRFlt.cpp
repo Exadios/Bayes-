@@ -5,12 +5,10 @@
  *
  * $Header$
  * $NoKeywords: $
- *
  */
 
 /*
  * Sampling Importance Resampleing Filter.
- *  Bootstrap filter as an Abstract class
  *
  * Bootstap filter (Sequential Importance Resampleing).
  */
@@ -189,8 +187,8 @@ const SIR_filter::Float SIR_filter::rougheningKinit = 1.;
 
 SIR_filter::SIR_filter (size_t x_size, size_t s_size, SIR_random& random_helper) :
 		Sample_filter(x_size, s_size),
-		resamples(s_size), wir(s_size),
-		random(random_helper)
+		random(random_helper),
+		resamples(s_size), wir(s_size)
 /*
  * Initialise filter and set the size of things we know about
  */

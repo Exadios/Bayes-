@@ -552,14 +552,14 @@ int main()
 	X_init(1,0) = X_init(0,1) = INIT_X_NOISE*INIT_Y_NOISE*INIT_XY_NOISE_CORRELATION;
 
 	// Initialise and do the comparison
-	std::cout << "irfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
-	Random.reseed();
-	CCompare<Filter<Information_root_filter>, Filter<Information_filter> > test0(x_init, X_init, 4);
-	std::cout << std::endl;
-
 	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
 	CCompare<Filter<UD_filter>, Filter<Unscented_filter> > test1(x_init, X_init, 4);
+	std::cout << std::endl;
+
+	std::cout << "irfilter, ijfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	Random.reseed();
+	CCompare<Filter<Information_root_filter>, Filter<Information_joseph_filter> > test0(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	std::cout << "cfilter, ifilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
@@ -567,9 +567,9 @@ int main()
 	CCompare<Filter<Covariance_filter>, Filter<Information_filter> > test2(x_init, X_init, 4);
 	std::cout << std::endl;
 
-	std::cout << "ijfilter, sfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
+	std::cout << "cifilter, sfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-	CCompare<Filter<Information_joseph_filter>, Filter<SIR_kalman_filter> > test3(x_init, X_init, 4);
+	CCompare<Filter<CI_filter>, Filter<SIR_kalman_filter> > test3(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	return 0;

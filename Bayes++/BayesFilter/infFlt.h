@@ -23,15 +23,13 @@
  *		Y = inv(X)
  *		y = Y*x
  *  
-* These require that X, and Y are invertable so state can be computed.
+ * These require that X, and Y are invertable so state can be computed.
  * Discontinous observe models require that prediction is normailised with
  * respect to the observation.
  *
- * Derived filters must supply the plant model function.
- * State and control input sizes should remain constant.
  * The filter is operated by performing a
  * 	predict, observe
- * cycle derived from the Linrz_filter
+ * cycle defined by the base class
  */
 #include "bayesFlt.h"
 

@@ -18,11 +18,12 @@
 
 #include "matSup.h"
 #include "UDFlt.h"
+#include "CIFlt.h"
+#include "unsFlt.h"
 #include "covFlt.h"
 #include "infFlt.h"
 #include "infRtFlt.h"
 #include "itrFlt.h"
-#include "unsFlt.h"
 #include "SIRFlt.h"
 #include "models.h"
 #include "schemeFlt.h"

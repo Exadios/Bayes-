@@ -9,7 +9,6 @@
 
 /*
  * Iterated Covariance Filter.
- *	A non-linear Covariance (Kalman) filter as an Abstract class
  */
 #include "matSup.h"
 #include "itrFlt.h"
@@ -92,7 +91,7 @@ Bayes_base::Float
  * Uncorrelated noise
  */
 {
-						// ISSUE: Implement simplied uncorrelated noise equations
+						// ISSUE: Implement simplified uncorrelated noise equations
 	size_t z_size = z.size();
 	SymMatrix Z(z_size,z_size);
 	

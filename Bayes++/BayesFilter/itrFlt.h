@@ -19,11 +19,9 @@
  * Discontinous observe models require that prediction is normailised with
  * respect to the observation.
  *
- * Derived filters must supply predict and observe model functions.
- * State and control input sizes should remain constant.
  * The filter is operated by performing a
  * 	predict, observe
- * cycle derived from the covariance_filter
+ * cycle defined by the base class
  */
 #include "covFlt.h"
 

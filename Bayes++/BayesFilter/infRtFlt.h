@@ -12,7 +12,7 @@
 
 /*
  * Information Root Filter.
- *	A possibly non-linear Square-Root Information filter as an Abstract class
+ *	A extended 'Square-root' Information filter as an Abstract class
  *
  * Algorithm: Square-root information propogation using QR factorisation
  * Ref:	P. Dyer and S. McReynolds, "Extension of Square-Root Filtering to Include Process Noise",
@@ -24,11 +24,9 @@
  * Observe algorithm has been extended to include linearised models
  * Discontinous observe models require that prediction is normailised with respect to the observation.
  *
- * Derived filters must supply the plant model function
- * State and control input sizes should remain constant.
  * The filter is operated by performing a
  * 	predict, observe
- * cycle derived from the Linrz_filter
+ * cycle defined by the base class
  */
 #include "bayesFlt.h"
 

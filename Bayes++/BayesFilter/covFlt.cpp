@@ -9,7 +9,6 @@
  
 /*
  * Covariance Filter.
- *	A Covariance (Kalman-Busy) filter as an Abstract class
  */
 #include "matSup.h"
 #include "covFlt.h"

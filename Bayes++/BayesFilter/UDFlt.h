@@ -10,23 +10,20 @@
  */
 
 /*
- * UD Factorisation of Covariance Filter.
- *	A Covariance (Kalman) filter as an Abstract class
+ * UdU' Factorisation of Covariance Filter.
+ *  Implementation of a 'Square-root' linearised kalman filter
  * 
  * Bierman's UD factorisatised update algorithm using Agee-Turner UdU' factorisation rank 1 update
  * Thornton's MWG-S factorisation prediction  algorithm
  * References
- * "Factorisation Methods for Discrete Sequential Estimation" Gerald J. Bierman ISBN 0-12-097350-2
- * "Real time Kalman Filter Application", Mohinder S. Grewal, Angus P. Andrews ISBN 0-13-211335-X
+ * [1] "Factorisation Methods for Discrete Sequential Estimation" Gerald J. Bierman ISBN 0-12-097350-2
+ * [2] "Real time Kalman Filter Application", Mohinder S. Grewal, Angus P. Andrews ISBN 0-13-211335-X
  *
- * Derived filters must supply predict and observe model functions.
- * State and control input sizes should remain constant.
  * A initial observation size may also be specified for efficiency.
  * 
  * The filter is operated by performing a
  * 	predict, observe
- * cycle derived from the Linrz_filter
- *
+ * cycle defined by the base class
  */
 #include "bayesFlt.h"
 

@@ -9,7 +9,6 @@
 
 /*
  * Information Root Filter.
- *	A possibly non-linear Square-Root Information filter as an Abstract class
  */
 #include "matSup.h"
 #include "infRtFlt.h"

@@ -46,6 +46,11 @@ void forceSymmetric (SymMatrix &M, bool bUpperToLower = false);
 /*
  * UdU' and LdL' and UU' Cholesky Factorisation and function
  * Very important to manipulate PD and PSD matrices
+ *
+ * Return values:
+ *  Many algorithms return a value_type which is a reciprocal condition number
+ *  These values are documented for each algorithm and are important way to
+ *  determine the validity of the results
  */
 RowMatrix::value_type UdUrcond (const RowMatrix& UD);
 SymMatrix::value_type UdUrcond (const SymMatrix& UD);
@@ -79,7 +84,7 @@ void Uzero (RowMatrix& M);
 
 /*
  * Functions using UdU factorisation:
- *  inverse of Positive Definate matrix
+ *  inverse of Positive Definate matrix retruning rcond
  */
 SymMatrix::value_type UdUinversePD (SymMatrix& M);
 SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM);

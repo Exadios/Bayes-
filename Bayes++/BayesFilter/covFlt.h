@@ -12,7 +12,7 @@
 
 /*
  * Covariance Filter.
- *	A Covariance (Extended Kalman) filter as an Abstract class
+ *	Implemention of extended Kalman filter
  * 
  * To work with with Linear and Linrz models
  *  a) a state seperate from covariance prediction is used.
@@ -20,13 +20,11 @@
  * Discontinous observe models require that prediction is normailised with
  * respect to the observation.
  *
- * Derived filters must supply predict and observe model functions.
- * State and control input sizes should remain constant.
  * A initial observation size may also be specified for efficiency.
  * 
  * The filter is operated by performing a
  * 	predict, observe
- * cycle derived from the Linrz_filter
+ * cycle defined by the base class
  */
 #include "bayesFlt.h"
 

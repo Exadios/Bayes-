@@ -8,7 +8,6 @@
  */
 
 /*
- * A possibly non-linaer Covariance Filter filter as an Abstract class
  * UdU' Factorisation of Covariance Filter.
  *
  * For efficiency UD_filter requires to know the maximum q_size of the predict_model

@@ -12,7 +12,7 @@
 
 /*							
  * Sampling Importance Resampleing Filter.
- *  Bootstrap filter as an Abstract class
+ *  Also know as a weighted Booststrap 
  *
  * References
  *  [1] "Novel approach to nonlinear-non-Guassian Bayesian state estimation"

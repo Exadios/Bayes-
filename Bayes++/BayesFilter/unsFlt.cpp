@@ -5,9 +5,11 @@
  *
  * $Header$
  * $NoKeywords: $
- *
+ */
+
+/*
  * Unscented Filter.
- *	A Julier-Uhlmann unscented non-linear Kalman filter as an Abstract class
+ *
  * TODO
  *	Update can be done directly in factorised form
  */

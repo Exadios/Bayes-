@@ -9,7 +9,6 @@
 
 /*
  * Information Filter.
- *	A possibly non-linaer Information filter as an Abstract class
  */
 #include "matSup.h"
 #include "infFlt.h"

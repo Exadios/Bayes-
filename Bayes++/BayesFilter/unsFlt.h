@@ -25,12 +25,10 @@
  * seperate prediction noise matrix.
  * The observe model is represtented by the observation prediction function and
  * a function to normalise observeations.
- * Derived filters must supply the predict functions and observe function. The
- * observer normailise function is only required for discontinous functions.
  *
  * The filter is operated by performing a
  * 	predict, observe
- * cycle derived from the bayes_filter
+ * cycle defined by the base class
  */
 #include "bayesFlt.h"
 

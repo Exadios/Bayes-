@@ -155,6 +155,9 @@
 			Name="BayesFilter Header Files"
 			Filter="h;hpp;hxx;hm;inl">
 			<File
+				RelativePath="..\BayesFilter\CIFlt.h">
+			</File>
+			<File
 				RelativePath="..\BayesFilter\SIRFlt.h">
 			</File>
 			<File
@@ -220,6 +223,21 @@
 		<Filter
 			Name="BayesFilter Source Files"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			<File
+				RelativePath="..\BayesFilter\CIFlt.cpp">
+				<FileConfiguration
+					Name="uBLAS Debug|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="uBLAS Release|Win32">
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/Zm150"/>
+				</FileConfiguration>
+			</File>
 			<File
 				RelativePath="..\BayesFilter\SIRFlt.cpp">
 				<FileConfiguration
