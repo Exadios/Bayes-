@@ -16,10 +16,10 @@
  *  d is diagonal
  *  L is unit lower triangular
  * Storage
- *  UD format of UdU' factor 
+ *  UD(RowMatrix) format of UdU' factor
  *   strict_upper_triangle(UD) = strict_upper_triangle(U), diagonal(UD) = d, strict_lower_triangle(UD) ignored or zeroed
- *  LD format of LdL' factor 
- *   strict_lower_triangle(UD) = strict_lower_triangle(U), diagonal(UD) = d, strict_upper_triangle(UD) ignored or zeroed
+ *  LD(LTriMatrix) format of LdL' factor 
+ *   strict_lower_triangle(LD) = strict_lower_triangle(L), diagonal(LD) = d, strict_upper_triangle(LD) ignored or zeroed
  */
 #include "bayesFlt.hpp"
 #include "matSup.hpp"
@@ -33,11 +33,11 @@ namespace Bayesian_filter_matrix
 {
 
 
-RowMatrix::value_type UdUrcond (const RowMatrix& UD)
+template <class V>
+inline typename V::value_type rcond_internal (const V& D)
 /*
- * Estimate the reciprocal condition number of the original PSD
- * matrix for which UD is the factor UdU' or LdL'
- * 
+ * Estimate the reciprocal condition number of the diagonal vector D
+ *
  * The Condition Number is defined from a matrix norm.
  *  Choose max element of D as the norm of the original matrix.
  *  Assume this norm for inverse matrix is min element D.
@@ -46,45 +46,10 @@ RowMatrix::value_type UdUrcond (const RowMatrix& UD)
  * Note:
  *  Defined to be 0 for semi-definate or zero or empty matrix
  *  Defined to be <0 for negative matrix (D element a value  < 0)
- * 
+ *
  *  A negative matrix may also be due to errors in the original matrix resulting in
  *   a factorisation producing special values in D (e.g. -infinity,NaN etc)
  *  By definition rcond <= 1 as min<=max
- */
-{
-	// Special case an empty matrix
-	const size_t n = UD.size1();
-	if (n == 0)
-		return 0;
-
-	RowMatrix::value_type rcond, mind = UD(0,0), maxd = 0;
-
-	for (size_t i = 0; i < n; ++i)	{
-		RowMatrix::value_type d = UD(i,i);
-		if (d < mind) mind = d;
-		if (d > maxd) maxd = d;
-	}
-	// mind is NaN, define as negative matrix
-	if (!(mind <= maxd))
-		return -1;
-
-	if (maxd == 0)	{	// avoid division by zero, for zero or negative matrix
-		rcond = mind;	// mind may be zero of less  depending on D
-	}
-	else {
-		// rcond from min/max norm
-		rcond = mind / maxd;
-	}
-	assert (rcond <= 1);
-	return rcond;
-}
-
-
-Vec::value_type UdUrcond_vec (const Vec& D)
-/*
- * Estimate the reciprocal condition number of the diagonal vector D
- * Note: diagonal(D) == UD_factor(diagonal(D)) so this rcond of both an original D and it factor
- * Equivilent to UdUrcond(diagonal(D))
  */
 {
 	// Special case an empty vector
@@ -114,8 +79,35 @@ Vec::value_type UdUrcond_vec (const Vec& D)
 	return rcond;
 }
 
+Vec::value_type rcond_vec (const Vec& D)
+/*
+ * Estimate the reciprocal condition number of the diagonal vector D
+ * Note: diagonal(D) == UD_factor(diagonal(D)) so this rcond of both an original D and it factor
+ * Equivilent to UdUrcond(diagonal(D))
+ */
+{
+	return rcond_internal (D);
+}
 
-UTriMatrix::value_type UCrcond (const UTriMatrix& U)
+RowMatrix::value_type UdUrcond (const RowMatrix& UD)
+/*
+ * Estimate the reciprocal condition number of the original PSD
+ * matrix for which UD is the factor UdU' or LdL'
+ */
+{
+	assert (UD.size1() == UD.size2());
+	return rcond_internal (diag(UD));
+}
+
+RowMatrix::value_type UdUrcond (const RowMatrix& UD, size_t n)
+/*
+ * As above but only first n elements are used
+ */
+{
+	return rcond_internal (diag(UD,n));
+}
+
+UTriMatrix::value_type UCrcond (const UTriMatrix& UC)
 /*
  * Estimate the reciprocal condition number of the original PSD
  * matrix for which U is the factor UU'
@@ -123,31 +115,26 @@ UTriMatrix::value_type UCrcond (const UTriMatrix& U)
  * See UdUrcond(RowMatrix) for definition and return value
  */
 {
-	// Special case an empty matrix
-	const size_t n = U.size1();
-	if (n == 0)
-		return 0;
+	assert (UC.size1() == UC.size2());
+	Float rcond = rcond_internal (diag(UC));
+	// Square to get rcond of original matrix, take care to propogate rcond's sign!
+	if (rcond < 0)
+		return -(rcond*rcond);
+	else
+		return rcond*rcond;
+}
 
-	UTriMatrix::value_type rcond, mind = U(0,0), maxd = 0;
-
-	for (size_t i = 0; i < n; ++i)	{
-		UTriMatrix::value_type d = U(i,i);
-		if (d < mind) mind = d;
-		if (d > maxd) maxd = d;
-	}
-	// mind is NaN, define as negative matrix
-	if (!(mind <= maxd))
-		return -1;
-
-	if (maxd == 0)	{	// avoid division by zero, for zero or negative matrix
-		rcond = mind;	// mind may be zero of less  depending on D
-	}
-	else {
-		// Rcond from min/max norm
-		rcond = mind / maxd;
-	}
-	assert (rcond <= 1.);
-	return rcond*rcond;		// Square to get rcond of original matrix
+inline UTriMatrix::value_type UCrcond (const UTriMatrix& UC, size_t n)
+/*
+ * As above but for use by UCfactor functions where only first n elements are used
+ */
+{
+	Float rcond = rcond_internal (diag(UC,n));
+	// Square to get rcond of original matrix, take care to propogate rcond's sign!
+	if (rcond < 0)
+		return -(rcond*rcond);
+	else
+		return rcond*rcond;
 }
 
 
@@ -157,9 +144,10 @@ RowMatrix::value_type UdUdet (const RowMatrix& UD)
  * matrix for which UD is the factor UdU' or LdL'
  * Result comes directly from determinant of diagonal in triangular matrices
  *  Defined to be 1 for 0 size UD
- */ 
+ */
 {
 	const size_t n = UD.size1();
+	assert (n == UD.size2());
 	RowMatrix::value_type det = 1.;
 	for (size_t i = 0; i < n; ++i)	{
 		det *= UD(i,i);
@@ -182,7 +170,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
  *    diagonal(M) = d
  *    strict_lower_triangle(M) is unmodifed
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -226,7 +214,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, size_t n)
 	}
 
 	// Estimate the reciprocal condition number
-	return UdUrcond (M);
+	return rcond_internal (diag(M,n));
 
 Negative:
    return -1.;
@@ -246,7 +234,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
  *    diagonal(M) = d
  *    strict_lower_triangle(M) is unmodifed
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	size_t i,j,k;
@@ -295,7 +283,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, size_t n)
 	}
 
 	// Estimate the reciprocal condition number
-	return UdUrcond (M);
+	return rcond_internal (diag(M,n));
 
 Negative:
    return -1.;
@@ -313,7 +301,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
  *    strict_lower_triangle(M) = strict_lower_triangle(L)
  *    diagonal(M) = d
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  * ISSUE: This could change to equivilient of UdUfactor_varient2
  */
 {
@@ -358,10 +346,10 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, size_t n)
 	}
 
 	// Estimate the reciprocal condition number
-	return UdUrcond (RowMatrix(M));		// ISSUE Requires creation of temporary RowMatrix
+	return rcond_internal (diag(M,n));
 
 Negative:
-   return -1.;
+	return -1.;
 }
 
 
@@ -373,13 +361,12 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
  * Strict lower triangle of M is ignored in computation
  *
  * Input: M, n=last size_t to be included in factorisation
- * Output: M as UC factor
- *    upper_triangle(M) = upper_triangle(UC)
+ * Output: M as UC*UC' factor
+ *    upper_triangle(M) = UC
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
-	using namespace std;		// for sqrt
 	size_t i,j,k;
 	UTriMatrix::value_type e, d;
 
@@ -393,7 +380,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 			if (d > 0)
 			{
 				// Positive definate
-				d = sqrt(d);
+				d = std::sqrt(d);
 				M(j,j) = d;
 				d = 1 / d;
 
@@ -426,7 +413,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
 	}
 
 	// Estimate the reciprocal condition number
-	return UCrcond (M);
+	return UCrcond (M,n);
 
 Negative:
    return -1;
@@ -439,9 +426,9 @@ RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
  * Positive definate or Semi-definate Matrix M
  * Wraps UdUfactor for non in place factorisation
  * Output:
- *		UD the UdU' factorisation of M with strict lower triangle zero
+ *    UD the UdU' factorisation of M with strict lower triangle zero
  * Return:
- *		see in-place UdUfactor
+ *    see in-place UdUfactor
  */
 {
 	UD.assign (M);
@@ -458,9 +445,9 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  * Positive definate or Semi-definate Matrix M
  * Wraps LdLfactor for non in place factorisation
  * Output:
- *		LD the LdL' factorisation of M
+ *    LD the LdL' factorisation of M
  * Return:
- *		see in-place LdLfactor 
+ *    see in-place LdLfactor
  */
 {
 	LD.assign (M);
@@ -470,24 +457,24 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
 }
 
 
-UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M)
+UTriMatrix::value_type UCfactor (UTriMatrix& UC, const SymMatrix& M)
 /*
  * Upper triangular Cholesky factor of a
  * Positive definate or Semi-definate Matrix M
  * Wraps UCfactor for non in place factorisation
  * Output:
- *		U the UU' factorisation of M
+ *    UC the UC*UC' factorisation of M
  * Return:
- *		see in-place UCfactor
+ *    see in-place UCfactor
  */
 {
-	U.assign (UTriMatrix(M));
-	UTriMatrix::value_type rcond = UCfactor (U, M.size1());
+	UC.assign (UTriMatrix(M));
+	UTriMatrix::value_type rcond = UCfactor (UC, M.size1());
 
 	return rcond;
 }
 
- 
+
 
 bool UdUinverse (RowMatrix& UD)
 /*
@@ -497,15 +484,16 @@ bool UdUinverse (RowMatrix& UD)
  * Lower triangle of UD is ignored and unmodified
  * Only diagonal part d can be singular (zero elements), inverse is computed of all elements other then singular
  * Reference: A+G p.223
- *  
+ *
  * Output:
- *		UD: inv(U), inv(d)
+ *    UD: inv(U), inv(d)
  * Return:
- *		singularity (of d), true iff d has a zero element
+ *    singularity (of d), true iff d has a zero element
  */
 {
 	size_t i,j,k;
 	const size_t n = UD.size1();
+	assert (n == UD.size2());
 
 	// Invert U in place
 	if (n > 1)
@@ -540,43 +528,51 @@ bool UdUinverse (RowMatrix& UD)
 
 bool UTinverse (UTriMatrix& U)
 /*
- * In-place (destructive) inversion of upper triangular matrices in U
- * 
+ * In-place (destructive) inversion of upper triangular matrix in U
+ *
  * Output:
- *		U: inv(U)
+ *    U: inv(U)
  * Return:
- *		singularity (of U), true iff diagonal of U has a zero element
+ *    singularity (of U), true iff diagonal of U has a zero element
  */
 {
-	size_t i,j,k;
-	const size_t n = U.size1();
+	const size_t size = U.size1();
+	assert (size == U.size2());
 
 	bool singular = false;
-	// Invert U in place
-	if (n > 0)
-	{
-		i = n-1;
-		do {
-			UTriMatrix::Row Ui(U,i);
-			UTriMatrix::value_type d = Ui[i];
-			if (d == 0)
-			{
-				singular = true;
-				break;
-			}
-			d = 1 / d;
-			Ui[i] = d;
+	UTriMatrix UI(size,size);	// ISSUE Temporay matrix
+	identity(UI);
 
-			for (j = n-1; j > i; --j)
+	// ISSUE Cannot use ublas::inplace_solve (U, UI, ublas::upper_tag());
+	// It only checks for singularity in debug build
+	// Reimplement the general algorithm with a few tweaks
+
+	for (UTriMatrix::difference_type n = size - 1; n >= 0; -- n) {
+		UTriMatrix::value_type d = U(n, n);
+		if (d == 0) {
+			singular = true;
+			break;
+		}
+		for (UTriMatrix::difference_type l = size - 1; l >= 0; -- l) {
+			UTriMatrix::value_type t;
+			if (n <= l)		// ISSUE uBLAS may not support indexing a 0 element
+				t = UI(n, l) / d;
+			else
+				t = 0;
+			if (t != 0)		// Optimises for zeros in UI and prevents assignments to 0 elements of packed matrices
 			{
-				UTriMatrix::value_type e = 0;
-				for (k = i; k < j; ++k)
-					e -= Ui[k] * U(k,j);
-				Ui[j] = e*U(j,j);
+				UI(n, l) = t;
+				UTriMatrix::const_reverse_iterator1 it1e1 (U.find_first1 (1, n, n));
+				UTriMatrix::const_reverse_iterator1 it1e1_rend (U.find_first1 (1, 0, n));
+				while (it1e1 != it1e1_rend) {
+					UI(it1e1.index1 (), l) -= *it1e1 * t;
+					++ it1e1;
+				}
 			}
-		} while (i-- > 0);
+		}
 	}
 
+	U = UI;
 	return singular;
 }
 
@@ -593,13 +589,14 @@ void UdUrecompose_transpose (RowMatrix& M)
  *  However M(i,j) only dependant R(k<=i), C(k<=j) due to zeros
  *  Therefore in place multiple sequences such k < i <= j
  * Input:
- *		M - U'dU factorisation (UD format)
+ *    M - U'dU factorisation (UD format)
  * Output:
- *		M - U'dU recomposition (symetric)
+ *    M - U'dU recomposition (symetric)
  */
 {
 	size_t i,j,k;
 	const size_t n = M.size1();
+	assert (n == M.size2());
 
 	// Recompose M = (U'dU) in place
 	if (n > 0)
@@ -614,7 +611,7 @@ void UdUrecompose_transpose (RowMatrix& M)
 			j = n-1;
 			do { // j>=i
 				// Compute matrix product (U'd) row i * U col j
-				RowMatrix::value_type Mij = Mi[j];			
+				RowMatrix::value_type Mij = Mi[j];
 				if (j > i)					// Optimised handling of 1 in U
 					Mij *= Mi[i];
 				for (k = 0; k < i; ++k)		// Inner loop k < i <=j, only strict triangular elements
@@ -631,13 +628,14 @@ void UdUrecompose (RowMatrix& M)
  * In-place recomposition of Symetric matrix from UdU' factor store in UD format
  *  See UdUrecompose_transpose()
  * Input:
- *		M - UdU' factorisation (UD format)
+ *    M - UdU' factorisation (UD format)
  * Output:
- *		M - UdU' recomposition (symetric)
+ *    M - UdU' recomposition (symetric)
  */
 {
 	size_t i,j,k;
 	const size_t n = M.size1();
+	assert (n == M.size2());
 
 	// Recompose M = (UdU') in place
 	for (i = 0; i < n; ++i)
@@ -652,7 +650,7 @@ void UdUrecompose (RowMatrix& M)
 		for (j = 0; j <= i; ++j)	// j<=i
 		{
 			// Compute matrix product (U'd) row i * U col j
-			RowMatrix::value_type Mij = Mi[j];			
+			RowMatrix::value_type Mij = Mi[j];
 			if (j > i)					// Optimised handling of 1 in U
 				Mij *= Mi[i];
 			for (k = i+1; k < n; ++k)		// Inner loop k > i >=j, only strict triangular elements
@@ -670,6 +668,7 @@ void Lzero (RowMatrix& M)
 {
 	size_t i,j;
 	const size_t n = M.size1();
+	assert (n == M.size2());
 	for (i = 1; i < n; ++i)
 	{
 		RowMatrix::Row Ui(M,i);
@@ -687,6 +686,7 @@ void Uzero (RowMatrix& M)
 {
 	size_t i,j;
 	const size_t n = M.size1();
+	assert (n == M.size2());
 	for (i = 0; i < n; ++i)
 	{
 		RowMatrix::Row Li(M,i);
@@ -708,13 +708,14 @@ void UdUfromUCholesky (RowMatrix& U)
  * Note: There is no inverse to this function toCholesky as square losses the sign
  *
  * Input:
- *		U Normal Cholesky factor (Upper triangular)
+ *    U Normal Cholesky factor (Upper triangular)
  * Output:
- *		U Modified Cholesky factor (UD format)
+ *    U Modified Cholesky factor (UD format)
  */
 {
 	size_t i,j;
 	const size_t n = U.size1();
+	assert (n == U.size2());
 	for (j = 0; j < n; ++j)
 	{
 		RowMatrix::value_type sd = U(j,j);
@@ -734,11 +735,12 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
 /*
  * Extract the seperate U and d parts of the UD factorisation
  * Output:
- *		U and d parts of UD
+ *    U and d parts of UD
  */
 {
 	size_t i,j;
 	const size_t n = UD.size1();
+	assert (n == UD.size2());
 
 	for (j = 0; j < n; ++j)
 	{
@@ -763,11 +765,11 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
 /*
  * inverse of Positive Definate matrix
  * Input:
- *		M is a symetric matrix
+ *     M is a symetric matrix
  * Output:
- *		M inverse of M, only updated if return value >0
+ *     M inverse of M, only updated if return value >0
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *     reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 					// Abuse as a RowMatrix
@@ -803,11 +805,11 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 /*
  * inverse of Positive Definate matrix
  * Input:
- *		M is a symetric matrix
+ *    M is a symetric matrix
  * Output:
- *		MI inverse of M, only valid if return value >0
+ *    MI inverse of M, only valid if return value >0
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
  */
 {
 	MI = M;

@@ -321,10 +321,32 @@ void subcopy (const FMMatrix<BaseL>& L, FMMatrix<BaseR>& R)
 
 template <class Base>
 ublas::matrix_vector_range<FMMatrix<Base> >
+ diag(FMMatrix<Base>& M, size_t n)
+{	// Return a vector proxy to the first n diagonal elements of M
+	return ublas::matrix_vector_range<FMMatrix<Base> >(M, ublas::range(0,n), ublas::range(0,n));
+}
+
+template <class Base>
+const ublas::matrix_vector_range<const FMMatrix<Base> >
+ diag(const FMMatrix<Base>& M, size_t n)
+{	// Return a vector proxy to the first n diagonal elements of M
+	return ublas::matrix_vector_range<const FMMatrix<Base> >(M, ublas::range(0,n), ublas::range(0,n));
+}
+
+template <class Base>
+ublas::matrix_vector_range<FMMatrix<Base> >
  diag(FMMatrix<Base>& M)
 {	// Return a vector proxy to the diagonal elements of M
 	const size_t common_size = std::min(M.size1(),M.size2());
 	return ublas::matrix_vector_range<FMMatrix<Base> >(M, ublas::range(0,common_size), ublas::range(0,common_size));
+}
+
+template <class Base>
+const ublas::matrix_vector_range<const FMMatrix<Base> >
+ diag(const FMMatrix<Base>& M)
+{	// Return a vector proxy to the diagonal elements of M
+	const size_t common_size = std::min(M.size1(),M.size2());
+	return ublas::matrix_vector_range<const FMMatrix<Base> >(M, ublas::range(0,common_size), ublas::range(0,common_size));
 }
 
 template <class Base>

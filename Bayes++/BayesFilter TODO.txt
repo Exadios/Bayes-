@@ -56,3 +56,43 @@ DOCUMENTATION
 		Q may have zeros. But if we have G then linear algebra can still use inverse.
 		This is also why inverse(G) is not needed in inverse model. It would not be defined for signular Q
 
+
+
+// Look at using this implementation
+template<class M>
+bool lower_cholesky (M &m)
+{
+	using namespace ublas;
+	bool negative = false;
+	size_t size = m.size1();
+	for (size_t i = 0; i < size; ++ i)
+	{
+		typename M::value_type t (m (i, i));
+		// why this doesn't compile ?
+		// matrix_vector_slice<M> mvs (m.column (i).project(range (i +1, size)));
+		m.column (i).project(range (i +1, size)) -=
+			prod(project (m, range (i + 1, size), range (0, i)),conj (project (row (m, i),range (0, i))));
+		t -= inner_prod (conj (project (row(m, i), range (0,i))),project (row (m, i),range (0, i)));
+		if (t <= 0)  {
+			negative = true;
+			break;
+		};
+		t = std::sqrt (t);
+		m (i, i) = t;
+		m.column (i).project(range (i +1, size)) /= t;
+	}
+	return negative;
+}
+
+UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n)
+{
+	assert (M.size1() == n);
+	assert (M.size2() == n);
+	bool negative = cholesky(M);
+	// Estimate the reciprocal condition number
+	if (negative)
+		return -1;
+	return UCrcond (M,n);
+
+}
+

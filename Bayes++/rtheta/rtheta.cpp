@@ -7,8 +7,10 @@
  * $NoKeywords: $
  */
 
- /*
- * Implement a NON-LINEAR range angle observer
+/*
+ * Implement a NON-LINEAR range angle observer for many filter schemes
+ * The model parameters allow model sizes and the non-linearity.
+ * This provides an excellent vehicle to test each scheme. Use for regression testing
  */
 
 #include "BayesFilter/allFilters.hpp"
@@ -26,7 +28,7 @@ using namespace Bayesian_filter_matrix;
 using namespace angleArith;
 
 
-const size_t NX = 2+1;			// State dimension (x,y) and some empty dummies so GqG' is singular
+const size_t NX = 2+1;			// State dimension (x,y) and some more to show noise coupling or singular X
 const size_t NQ = 2;			// State dimension of noise
 const size_t NZ = 2+2;			// Observation dimension (r,a) and some empty dummies
 const size_t NS = 1000;			// Number of samples for a sampled representation
@@ -34,18 +36,21 @@ const size_t NS = 1000;			// Number of samples for a sampled representation
 const bool RA_MODEL = true;		// Use Range angle NON-linear model (requires normalising angle)
 const bool NOISE_MODEL = true;		// Add noise to truth model
 const bool TRUTH_STATIONARY = false;// Truth model setup
-const Float INIT_XY[2] = {1.,Float(-0.2)};// XY initial position
+const Float INIT_XY[2] = {1.,-0.2};	// XY initial position
 const Float TARGET[2] = {-11.,0.};	// XY position of target
 
 const Float RANGE_NOISE = NOISE_MODEL ? Float(0.1) : Float(1e-6);
-const Float ANGLE_NOISE = NOISE_MODEL ? Float(5. * angle<Float>::Pi / 180.) : Float(1e-6);
-const Float Z_CORRELATION = Float(0e-1);	// Correlated observation model
+const Float ANGLE_NOISE = NOISE_MODEL ? Float(5. * angle<Float>::Deg2Rad) : Float(1e-6);
+const Float Z_CORRELATION = Float(0e-1);	// (Un)Correlated observation model
+
 const Float X_NOISE = Float(0.05);		// Prediction model
 const Float Y_NOISE = Float(0.09);
 const Float XY_NOISE_COUPLING = Float(0.05);
 const Float INIT_X_NOISE = Float(0.07);
 const Float INIT_Y_NOISE = Float(0.10);
-const Float INIT_XY_NOISE_CORRELATION = Float(0.04);
+const Float INIT_XY_NOISE_CORRELATION = Float(0.4);
+const Float INIT_2_NOISE = Float(0.09);	// Use zero for singular X	
+const Float INIT_2_NOISE_CORRELATION = Float(0.5);
 
 
 // Square 
@@ -545,6 +550,10 @@ int main()
 	X_init(0,0) = sqr(INIT_X_NOISE);
 	X_init(1,1) = sqr(INIT_Y_NOISE);
 	X_init(1,0) = X_init(0,1) = INIT_X_NOISE*INIT_Y_NOISE*INIT_XY_NOISE_CORRELATION;
+	// Additional state correlation is useful for testing
+	X_init(2,2) = sqr(INIT_2_NOISE);
+	X_init(2,0) = X_init(0,2) = INIT_X_NOISE*INIT_2_NOISE*INIT_2_NOISE_CORRELATION;
+	X_init(2,1) = X_init(1,2) = INIT_Y_NOISE*INIT_2_NOISE*INIT_2_NOISE_CORRELATION;
 
 	// Initialise and do the comparison
 	std::cout << "udfilter, ufilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
@@ -564,8 +573,7 @@ int main()
 
 	std::cout << "sfilter, itfilter " << "RA_MODEL:" << RA_MODEL << " NOISE_MODEL:" << NOISE_MODEL << " TRUTH_STATIONARY:" << TRUTH_STATIONARY << std::endl;
 	Random.reseed();
-//	CCompare<Filter<SIR_kalman_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
-	CCompare<Filter<Covariance_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
+	CCompare<Filter<SIR_kalman_filter>, Filter<Iterated_covariance_filter> > test4(x_init, X_init, 4);
 	std::cout << std::endl;
 
 	return 0;

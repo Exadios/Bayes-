@@ -228,7 +228,7 @@ Bayes_base::Float
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF obsevation object object
 
 						// Observation Information
-	Float rcond = UdUrcond_vec(h.Zv);
+	Float rcond = rcond_vec(h.Zv);
 	rclimit.check_PD(rcond, "Zv not PD in observe");
 
 	RowMatrix HxT (trans(h.Hx));      			// HxT = Hx'*inverse(Z)

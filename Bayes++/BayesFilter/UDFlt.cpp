@@ -268,7 +268,7 @@ UD_filter::Float
 	}
 
 	// Estimate the reciprocal condition number from upper triangular part
-	return FM::UdUrcond(UD);
+	return FM::UdUrcond(UD,n);
 
 Negative:
 	return -1.;
@@ -568,7 +568,7 @@ UD_filter::Float
 		gain[j] = b[j] * gamma;
 	}
  	// Estimate the reciprocal condition number from upper triangular part
-	return FM::UdUrcond(UD);
+	return FM::UdUrcond(UD,n);
 
 NotPD:
 	return -1.;

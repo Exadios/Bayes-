@@ -50,10 +50,10 @@ void forceSymmetric (Matrix &M, bool bUpperToLower = false);
  *  These values are documented for each algorithm and are important way to
  *  determine the validity of the results
  */
+Vec::value_type rcond_vec (const Vec& D);
 RowMatrix::value_type UdUrcond (const RowMatrix& UD);
-SymMatrix::value_type UdUrcond (const SymMatrix& UD);
-UTriMatrix::value_type UCrcond (const UTriMatrix& U);
-Vec::value_type UdUrcond_vec (const Vec& D);
+RowMatrix::value_type UdUrcond (const RowMatrix& UD, size_t n);
+UTriMatrix::value_type UCrcond (const UTriMatrix& UC);
 SymMatrix::value_type UdUdet (const SymMatrix& UD);
 
 // In-place factorisations
@@ -68,7 +68,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, size_t n);
 // Copy factorisations
 RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M);
 LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M);
-UTriMatrix::value_type UCfactor (UTriMatrix& U, const SymMatrix& M);
+UTriMatrix::value_type UCfactor (UTriMatrix& UC, const SymMatrix& M);
 
 // Factor manipulations
 bool UdUinverse (RowMatrix& UD);
