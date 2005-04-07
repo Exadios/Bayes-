@@ -27,10 +27,10 @@ archivesrc:
 	rm Bayes++
 
 buildall :
-	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release compress_debug compress_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1/runtime-link=static  . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release compressed_debug compressed_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1/link-runtime=static  . SLAM rtheta
 	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release msvc-7.0 . SLAM rtheta
 
 buildallCVS :
-	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release compress_debug compress_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1 . SLAM rtheta
+	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release compressed_debug compressed_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1 . SLAM rtheta
 	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release msvc-7.0 . SLAM rtheta
 	
