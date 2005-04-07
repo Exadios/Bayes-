@@ -78,7 +78,7 @@ PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 	Fx(0,0) = 1.;
 	Fx(0,1) = dt;
 	Fx(1,0) = 0.;
-	Fx(1,1) = exp(-dt*V_GAMMA);
+	Fx(1,1) = Fvv;
 	// Setup constant noise model: G is identity
 	q[0] = dt*sqr((1-Fvv)*V_NOISE);
 	G(0,0) = 0.;
