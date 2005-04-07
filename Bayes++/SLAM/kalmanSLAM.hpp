@@ -27,8 +27,8 @@ class Kalman_filter_generator
 {
 public:
 	typedef Bayesian_filter::Linrz_kalman_filter Filter_type;
-	virtual Filter_type* generate( unsigned full_size ) =0;
-	virtual void dispose( Filter_type* filter ) =0;
+	virtual Filter_type* generate( unsigned full_size ) = 0;
+	virtual void dispose( Filter_type* filter ) = 0;
 	virtual ~Kalman_filter_generator()
 	{}
 };

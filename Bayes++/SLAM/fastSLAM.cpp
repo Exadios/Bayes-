@@ -197,7 +197,7 @@ void Fast_SLAM::forget( unsigned feature, bool must_exist )
 // Forget all feature information, feature no can be reused for a new feature
 {
 	AllFeature::size_type n = M.erase(feature);
-	if (n==0 && must_exist)
+	if (n == 0 && must_exist)
 		error (BF::Logic_exception("Forget non existing feature"));
 }
 
@@ -307,10 +307,10 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 	kstat.X(fs,fs) = var_f;
 
 									// Location,feature covariance
-	for (std::size_t si=0; si < nL; ++si)
+	for (std::size_t si = 0; si < nL; ++si)
 	{
 		Float covar_f_si = 0.;
-		std::size_t spi=0;
+		std::size_t spi = 0;
 		const Float mean_si = kstat.x[si];
 		for (fpi = fpi_begin; fpi < fpi_end; ++fpi, ++spi) {
 			covar_f_si += ((*fpi).x - mean_f) * (L.S(si,spi) - mean_si);

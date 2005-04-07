@@ -14,11 +14,11 @@ MTcell List(const FilterMatrix& M)
 {
 	MTcell mpList = MFnewList(M.size1());
     // creates a MuPAD list of lists
-	for (unsigned r=0; r < M.size1(); ++r)
+	for (unsigned r = 0; r < M.size1(); ++r)
 	{
 	    // creates a MuPAD list
 		MTcell colList = MFnewList(M.size2());
-		for (unsigned c=0; c < M.size2(); ++c) {
+		for (unsigned c = 0; c < M.size2(); ++c) {
 			MFsetList( &colList, c, MFdouble(M(r,c)));
 		}
 		MFsig(colList);
@@ -36,7 +36,7 @@ MTcell List(const Bayesian_filter_matrix::Vec& V)
 {
 	MTcell mpList = MFnewList(V.size());
     // creates a MuPAD list
-	for (unsigned r=0; r < V.size(); ++r)
+	for (unsigned r = 0; r < V.size(); ++r)
 	{
 		MFsetList (&mpList, r, MFdouble(V[r]) );
 	}
@@ -52,11 +52,11 @@ MTcell ListTranspose(const FilterMatrix& M)
 {
 	MTcell mpList = MFnewList(M.size2());
     // creates a MuPAD list of lists
-	for (unsigned r=0; r < M.size2(); ++r)
+	for (unsigned r = 0; r < M.size2(); ++r)
 	{
 	    // creates a MuPAD list
 		MTcell colList = MFnewList(M.size1());
-		for (unsigned c=0; c < M.size1(); ++c) {
+		for (unsigned c = 0; c < M.size1(); ++c) {
 			MFsetList( &colList, c, MFdouble(M(c,r)));
 		}
 		MFsig(colList);
@@ -195,7 +195,7 @@ Matrix_from_list(MTcell list)
 		else
 		{
 			cols = MFnops( MFgetList(&list,0) );
-			for (int i=0; i < rows && !conversionFailed; ++i)
+			for (int i = 0; i < rows && !conversionFailed; ++i)
 			{
 				if (!MFisList(MFgetList(&list,i)) || 
 					!MFnops  (MFgetList(&list,i)) == cols)
@@ -212,7 +212,7 @@ Matrix_from_list(MTcell list)
 		MFerror( "Conversion of list of list to Matrix failed" );
 
 	Bayesian_filter_matrix::Matrix M(rows, cols);
-	for (int i=0; i < rows; ++i) 
+	for (int i = 0; i < rows; ++i) 
 	{
 		MTcell sublist = MFgetList(&list,i);
 		for (int j = 0; j < cols; ++j)

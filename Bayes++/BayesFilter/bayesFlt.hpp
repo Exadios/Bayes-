@@ -551,7 +551,7 @@ public:
 	FM::Vec y;				// Information state
 	FM::SymMatrix Y;		// Information
 
-	virtual void init_yY () =0;
+	virtual void init_yY () = 0;
 	/* Initialise from a information state and information
 	    Requires y(k|k), Y(k|k)
 	    Parameters that reference the instance's y and Y members are valid
@@ -561,7 +561,7 @@ public:
 	    Parameters that reference the instance's y and Y members are valid
 	*/
 
-	virtual void update_yY () =0;
+	virtual void update_yY () = 0;
 	/* Update filters information state and information
 	    Updates y(k|k), Y(k|k)
 	*/

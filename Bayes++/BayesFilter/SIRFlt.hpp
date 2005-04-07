@@ -54,6 +54,7 @@ struct SIR_random
 {
 	virtual void normal(FM::DenseVec& v) = 0;
 	virtual void uniform_01(FM::DenseVec& v) = 0;
+	virtual ~SIR_random () {}
 };
 
 

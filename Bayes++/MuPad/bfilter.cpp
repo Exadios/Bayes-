@@ -149,7 +149,7 @@ MuFilter*  BFilter_handler::remove (MTcell arg)
 	if (!MFisInt(arg))
 		MFerror( "Filter handle not an Int" );
 	const int h = MFint(arg);
-	if (h <=0) {
+	if (h <= 0) {
 		MFerror( "Filter handle incorrect" );
 		return NULL;	// Never reached
 	}
@@ -173,7 +173,7 @@ MuFilter* BFilter_handler::get_filter (MTcell arg)
 	if (!MFisInt(arg))
 		MFerror( "Filter handle not an Int" );
 	const int h = MFint(arg);
-	if (h <=0) {
+	if (h <= 0) {
 		MFerror( "Filter handle incorrect" );
 		return NULL;	// Never reached
 	}

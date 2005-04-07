@@ -40,7 +40,7 @@ protected: // model is not sufficient, it is used to build observe model's
 	Iterated_observe_model ()
 	{}
 public:
-	virtual void relinearise (const FM::Vec& x) =0;
+	virtual void relinearise (const FM::Vec& x) = 0;
 	// Relinearised about state x
 };
 
