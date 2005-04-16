@@ -151,12 +151,12 @@ MuFilter*  BFilter_handler::remove (MTcell arg)
 	const int h = MFint(arg);
 	if (h <= 0) {
 		MFerror( "Filter handle incorrect" );
-		return NULL;	// Never reached
+		return 0;	// Never reached
 	}
 	Flt_map::iterator e = fltmap.find(h);
 	if (e ==fltmap.end()) {
 		MFerror( "Filter handle incorrect" );
-		return NULL;	// Never reached
+		return 0;	// Never reached
 	}
 
 	MuFilter* f = (*e).second;
@@ -175,12 +175,12 @@ MuFilter* BFilter_handler::get_filter (MTcell arg)
 	const int h = MFint(arg);
 	if (h <= 0) {
 		MFerror( "Filter handle incorrect" );
-		return NULL;	// Never reached
+		return 0;	// Never reached
 	}
 	Flt_map::iterator e = fltmap.find(h);
 	if (e ==fltmap.end()) {
 		MFerror( "Filter handle incorrect" );
-		return NULL;	// Never reached
+		return 0;	// Never reached
 	}
 
 	return (*e).second;
@@ -276,7 +276,7 @@ Likelihood_observe_MuPAD::Likelihood_observe_MuPAD(unsigned z_size, const MTcell
 	Likelihood_observe_model(z_size),
 	Mu_fn(f)
 {
-	Mu_z = NULL;
+	Mu_z = 0;
 }
 
 Likelihood_observe_MuPAD::~Likelihood_observe_MuPAD()
@@ -403,7 +403,7 @@ Filter_maker::Filter
 								// Find the entry in filterMakers map
 	Make_map::iterator i = filterMakers.find (filterTypeName);
 
-	Filter f = NULL;
+	Filter f = 0;
 	if (i != filterMakers.end())
 	{	// Call the make member function found to create a filter
 		pMake_mem pmake = i->second;
@@ -737,7 +737,7 @@ MFUNC( predict_addative, MCnop )
 		MFreturn (MFdouble(rcond));
 	}
 	else {
-		filter->checkdef(NULL);
+		filter->checkdef(0);
 	}
 } MFEND
 
@@ -801,7 +801,7 @@ MFUNC( predict_linear, MCnop )
 		MFreturn (MFdouble(rcond));
 	}
 	else {
-		filter->checkdef(NULL);
+		filter->checkdef(0);
 	}
 } MFEND
 
@@ -892,7 +892,7 @@ MFUNC( observe_linear_uncorrelated, MCnop )
 		MFreturn (MFdouble(rcond));
 	}
 	else {
-		filter->checkdef(NULL);
+		filter->checkdef(0);
 	}
 } MFEND
 
@@ -953,7 +953,7 @@ MFUNC( observe_linear_correlated, MCnop )
 		MFreturn (MFdouble(rcond));
 	}
 	else {
-		filter->checkdef(NULL);
+		filter->checkdef(0);
 	}
 } MFEND
 
@@ -1098,7 +1098,7 @@ MFUNC( sample, MCnop )
 		}
 
 		// Fall through if type unknown
-		filter->checkdef(NULL);
+		filter->checkdef(0);
 	}
 	catch (Bayesian_filter::Bayes_filter_exception fe)
 	{
@@ -1184,7 +1184,7 @@ MFUNC( nearest_sample, MCnop )
 		}
 
 		// Fall through if type unknown
-		filter->checkdef(NULL);
+		filter->checkdef(0);
 	}
 	catch (Bayesian_filter::Bayes_filter_exception fe)
 	{

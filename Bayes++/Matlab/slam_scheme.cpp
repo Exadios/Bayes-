@@ -74,7 +74,7 @@ Slam_maker::Filter
 								// Find the entry in filterMakers map
 	Make_map::iterator i = filterMakers.find (filter_scheme);
 
-	Filter f = NULL;
+	Filter f = 0;
 	if (i != filterMakers.end())
 	{							// Rememeber args for scheme maker
 		args = make_args; nargs = make_nargs;
@@ -175,7 +175,7 @@ void mexFunction(
 	 * Create a filter from its scheme name and remaining arguments
 	 * - Must catch exceptions for Matlab kernel
 	 */
-	Run_Filter* filter = NULL;
+	Run_Filter* filter = 0;
 	try
 	{
 		filter = DefaultFilters.make (filter_scheme, &prhs[1], nrhs-1);

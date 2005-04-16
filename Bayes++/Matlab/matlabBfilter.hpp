@@ -53,7 +53,7 @@ public:
 	}
 	virtual ~Run_Filter() = 0
 	{	// Destory signature
-		signature_data = NULL;
+		signature_data = 0;
 	}; 
 
 		// Matlab handle interface
@@ -239,7 +239,7 @@ Matlab_function_model::Matlab_function_model(const mxArray* fname) :
     /* must be a string. */
 	if (!function_name)
 		mexErrMsgTxt("Function name must be a string");
-	prhs[0] = NULL;
+	prhs[0] = 0;
 }
 
 const FM::Vec& Matlab_function_model::fx(const FM::Vec& x) const

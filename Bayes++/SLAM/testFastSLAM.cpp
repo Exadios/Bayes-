@@ -326,7 +326,7 @@ int main (int argc, char* argv[])
 	std::cout.flags(std::ios::fixed); std::cout.precision(4);
 
 	unsigned nParticles = 1000;
-	if (argv[1] != NULL)
+	if (argv[1] != 0)
 	{
     	try {
 			nParticles = boost::lexical_cast<unsigned>(argv[1]);

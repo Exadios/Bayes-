@@ -196,15 +196,15 @@ SymMatrix(const mxArray* ma)
 char* cstring (const mxArray* ma)
 /*
  * Convert mxArray to null terminated C string
-  * Return NULL for non string type
+  * Return 0 pointer for non string type
  */
 {
     /* must be a string. */
 	if (mxIsChar(ma) != 1)
-		return NULL;
+		return 0;
     /* Input must be a row vector. */
     if (mxGetM(ma) != 1)
-		return NULL;      
+		return 0;      
     
     /* Get the length of the input string. */
     int numchar = (mxGetM(ma) * mxGetN(ma)) + 1;

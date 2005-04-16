@@ -38,7 +38,7 @@ Matlab_Likelihood_observe_model::Matlab_Likelihood_observe_model(unsigned z_size
 	if (!function_name)
 		mexErrMsgTxt("Function name must be a string");
 
-	M_z = NULL;
+	M_z = 0;
 }
 
 Matlab_Likelihood_observe_model::~Matlab_Likelihood_observe_model()

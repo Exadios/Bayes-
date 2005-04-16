@@ -69,7 +69,7 @@ void mexFunction(
 		}
 
 		// Fall through error if type unknown
-		Run_Filter::check_def(NULL);
+		Run_Filter::check_def(0);
 	}
 	catch (std::exception& se)
 	{

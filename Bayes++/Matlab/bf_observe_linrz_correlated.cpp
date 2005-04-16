@@ -70,7 +70,7 @@ void mexFunction(
 				plhs[0] = Array(rcond);
 		}
 		else {
-			Run_Filter::check_def(NULL);
+			Run_Filter::check_def(0);
 		}
 	}
 	catch (std::exception& se)

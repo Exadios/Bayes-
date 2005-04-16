@@ -31,7 +31,7 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 Kalman_SLAM::Kalman_SLAM( Kalman_filter_generator& filter_generator ) :
 	SLAM(),
 	fgenerator(filter_generator),
-	full(NULL)
+	full(0)
 {
 	nL = 0;
 	nM = 0;
