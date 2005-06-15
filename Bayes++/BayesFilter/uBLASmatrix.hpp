@@ -47,6 +47,7 @@ class FMVec : public VecBase
 {
 public:
 	typedef typename VecBase::value_type value_type;
+	typedef typename VecBase::vector_temporary_type vector_temporary_type;
 
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMVec(EmptyTag) : VecBase()
@@ -96,6 +97,8 @@ class FMMatrix : public MatrixBase
 {
 public:
 	typedef typename MatrixBase::value_type value_type;
+	typedef typename MatrixBase::vector_temporary_type vector_temporary_type;
+	typedef typename MatrixBase::matrix_temporary_type matrix_temporary_type;
 
 	// No Default Constructor. Empty creation is very error prone
 	explicit FMMatrix(EmptyTag) : MatrixBase()
@@ -209,6 +212,10 @@ class SymMatrixWrapper :
 	typedef BaseFromMember<MatrixBase> matrix_type;
 	typedef ublas::symmetric_adaptor<MatrixBase, ublas::upper> symadaptor_type;
 public:
+	typedef typename MatrixBase::value_type value_type;
+	typedef typename MatrixBase::vector_temporary_type vector_temporary_type;
+	typedef typename MatrixBase::matrix_temporary_type matrix_temporary_type;
+
 	SymMatrixWrapper () : matrix_type(), symadaptor_type(matrix_type::member)
 	{}
 	SymMatrixWrapper (typename MatrixBase::size_type size1, typename MatrixBase::size_type size2) : matrix_type(size1,size2), symadaptor_type(matrix_type::member)
