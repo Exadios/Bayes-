@@ -604,7 +604,7 @@ bool UTinverse (UTriMatrix& U)
 
 			for (std::size_t j = n-1; j > i; --j)
 			{
-				UTriMatrix::value_type e = 0.;
+				UTriMatrix::value_type e = 0;
 				for (std::size_t k = i+1; k <= j; ++k)
 					e -= Ui[k] * U(k,j);
 				Ui[j] = e*d;

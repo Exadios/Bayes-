@@ -204,7 +204,7 @@ UD_scheme::Float
 		j = n-1;
 		do {							// n-1..0
 			Matrix::Row UDj(UD,j);
-			e = 0.;
+			e = 0;
 			for (k = 0; k < N; ++k)		// 0..N-1
 			{
 				b.v[k] = Float(UDj[k]);	// ISSUE mixed type proxy assignment
@@ -212,7 +212,7 @@ UD_scheme::Float
 				e += b.v[k] * b.dv[k];
 			}
 			// Check diagonal element
-			if (e > 0.)
+			if (e > 0)
 			{
 				// Positive definate
 				UDj[j] = e;
@@ -221,7 +221,7 @@ UD_scheme::Float
 				for (k = 0; k < j; ++k)	// 0..j-1
 				{
 					Matrix::Row UDk(UD,k);
-					e = 0.;
+					e = 0;
 					for (i = 0; i < N; ++i)	// 0..N-1
 						e += UDk[i] * b.dv[i];
 					e *= diaginv;
@@ -231,7 +231,7 @@ UD_scheme::Float
 						UDk[i] -= e * b.v[i];
 				}
 			}//PD
-			else if (e == 0.)
+			else if (e == 0)
 			{
 				// Possibly Semidefinate, check not negative
 				UDj[j] = e;
@@ -243,7 +243,7 @@ UD_scheme::Float
 					for (i = 0; i < N; ++i)	// 0..N-1
 					{
 						e = UDk[i] * b.dv[i];
-						if (e != 0.)
+						if (e != 0)
 							goto Negative;
 					}
 					// UD(j,k) uneffected
@@ -263,7 +263,7 @@ UD_scheme::Float
 			for (i = 0; i < j; ++i)
 			{
 				UD(i,j) = UDj[i];
-				UDj[i] = 0.;			// Zeroing unnecessary as lower only used as a scratch
+				UDj[i] = 0;			// Zeroing unnecessary as lower only used as a scratch
 			}
 		}
 
@@ -315,7 +315,7 @@ Bayes_base::Float
 		h.normalise(b.znorm = z, zp);
 		noalias(b.a) = row(h.Hx,o);
 								// Check Z precondition
-		if (h.Zv[o] < 0.)
+		if (h.Zv[o] < 0)
 			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
 		Float rcond = observeUD (h.Zv[o], b.a, b.w, S);
@@ -337,7 +337,7 @@ Bayes_base::Float
 /* NO solution for Correlated noise and Linearised model */
 {
 	error (Logic_exception("observe no Linrz_correlated_observe_model solution"));
-	return 0.;	// never reached
+	return 0;	// never reached
 }
 
 Bayes_base::Float
@@ -442,7 +442,7 @@ Bayes_base::Float
 		const Vec& zp = h.ho(x, o, Zv_o, b.a);
 		h.normalise(b.znorm = z, zp);
 								// Check Z precondition
-		if (Zv_o < 0.)
+		if (Zv_o < 0)
 			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
 		Float rcond = observeUD (Zv_o, b.a, b.w, S);
@@ -509,7 +509,7 @@ UD_scheme::Float
 		alpha_jm1 = alpha;	// alpha at j-1
 		alpha += b[j] * a[j];
 		lamda = -a[j] * gamma;
-		if (alpha <= 0.) goto alphaNotPD;
+		if (alpha <= 0) goto alphaNotPD;
 		gamma = 1 / alpha;
 		UD(j,j) *= alpha_jm1 * gamma;
 					// U modification

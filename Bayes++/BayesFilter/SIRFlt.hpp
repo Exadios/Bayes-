@@ -147,7 +147,7 @@ public:
 	{
 		first_init = false;
 		for (FM::Vec::const_iterator qi = this->q.begin(); qi != this->q.end(); ++qi) {
-			if (*qi < 0.)
+			if (*qi < 0)
 				error (Numeric_exception("Negative q in init_GqG"));
 			rootq[qi.index()] = std::sqrt(*qi);
 		}
@@ -214,7 +214,7 @@ public:
 	virtual void roughen()
 	// Generalised roughening:  Default to roughen_minmax
 	{
-		if (rougheningK != 0.)
+		if (rougheningK != 0)
 			roughen_minmax (S, rougheningK);
 	}
 
@@ -266,7 +266,7 @@ public:
 
 	void roughen()
 	{	// Specialised correlated roughening
-		if (rougheningK != 0.)
+		if (rougheningK != 0)
 			roughen_correlated (S, rougheningK);
 	}
 
