@@ -12,5 +12,4 @@ build-project QuadCalib ;
 # Project requirements
 project
     : requirements <include>$(BOOST)
-    : build-dir "target"
     ;
