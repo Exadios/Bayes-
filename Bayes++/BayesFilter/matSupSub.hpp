@@ -28,8 +28,8 @@
  */
 
 #include <boost/version.hpp>
-#if !(BOOST_VERSION >= 103100)
-#error Requires Boost 1.31.0 or later
+#if !(BOOST_VERSION >= 103300)
+#error Requires Boost 1.33.0 or later
 #endif
 
 #include <boost/numeric/ublas/vector.hpp>
@@ -39,7 +39,7 @@
 #include <boost/numeric/ublas/symmetric.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
 #include <boost/numeric/ublas/banded.hpp>
-#if defined(BAYES_FILTER_SPARSE) || defined(BAYES_FILTER_COMPRESSED) || defined(BAYES_FILTER_COORDINATE)
+#if defined(BAYES_FILTER_MAPPED) || defined(BAYES_FILTER_COMPRESSED) || defined(BAYES_FILTER_COORDINATE)
 #include <map>
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/matrix_sparse.hpp>
@@ -72,11 +72,11 @@ typedef ublas::matrix<Float, ublas::column_major> BaseDenseColMatrix;
 typedef ublas::triangular_matrix<Float, ublas::upper, ublas::row_major> BaseDenseUpperTriMatrix;
 typedef ublas::triangular_matrix<Float, ublas::lower, ublas::row_major> BaseDenseLowerTriMatrix;
 typedef ublas::banded_matrix<Float> BaseDenseDiagMatrix;
-							// Sparse types
-#if defined(BAYES_FILTER_SPARSE)
-typedef ublas::sparse_vector<Float, std::map<std::size_t,Float> > BaseSparseVector;
-typedef ublas::sparse_matrix<Float, ublas::row_major, std::map<std::size_t,Float> > BaseSparseRowMatrix;
-typedef ublas::sparse_matrix<Float, ublas::column_major, std::map<std::size_t,Float> > BaseSparseColMatrix;
+							// Mapped types
+#if defined(BAYES_FILTER_MAPPED)
+typedef ublas::mapped_vector<Float, std::map<std::size_t,Float> > BaseSparseVector;
+typedef ublas::mapped_matrix<Float, ublas::row_major, std::map<std::size_t,Float> > BaseSparseRowMatrix;
+typedef ublas::mapped_matrix<Float, ublas::column_major, std::map<std::size_t,Float> > BaseSparseColMatrix;
 							// OR Compressed types
 #elif defined(BAYES_FILTER_COMPRESSED)
 typedef ublas::compressed_vector<Float> BaseSparseVector;
