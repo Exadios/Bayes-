@@ -65,7 +65,7 @@ void Fast_SLAM::observe_new( unsigned feature, const BF::Uncorrelated_additive_o
 
 	for (std::size_t pi = 0; pi < nparticles; ++pi)
 	{
-		sz.sub_range(0,nL) = L.S.column(pi);
+		sz.sub_range(0,nL) = FM::column (L.S, pi);
 		sz[nL] = z[0];
 		FM::Vec t = fom.h(sz);
 		fmap[pi].x = t[0];
@@ -123,7 +123,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	{
 		Feature_1& m1 = afm[pi];		// Associated feature's map particle
 							
-		x2.sub_range(0,nL) = L.S.column(pi);		// Build Augmented state x2
+		x2.sub_range(0,nL) = FM::column (L.S, pi);		// Build Augmented state x2
 		x2[nL] = m1.x;
 		const FM::Vec& zp = fom.h(x2);	// Observation model
 		znorm = z;									// Normalised observation
