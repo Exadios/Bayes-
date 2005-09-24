@@ -11,7 +11,7 @@
  * Linear algebra support functions for filter classes
  * Cholesky and Modified Cholesky factorisations
  *
- * UdU' and LdL' factorisations of Positive semi-definate matrices. Where
+ * UdU' and LdL' factorisations of positive semi-definite matrices. Where
  *  U is unit upper triangular
  *  d is diagonal
  *  L is unit lower triangular
@@ -43,7 +43,7 @@ inline typename V::value_type rcond_internal (const V& D)
  *  Therefore rcond = min/max
  *
  * Note:
- *  Defined to be 0 for semi-definate and 0 for an empty matrix
+ *  Defined to be 0 for semi-definite and 0 for an empty matrix
  *  Defined to be 0 for max and min infinite
  *  Defined to be <0 for negative matrix (D element a value  < 0)
  *  Defined to be <0 with any NaN element
@@ -201,7 +201,7 @@ RowMatrix::value_type UdUdet (const RowMatrix& UD)
 RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, std::size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
- *  Positive definate or semi-definate matrix M
+ *  Positive definite or semi-definite matrix M
  * Reference: A+G p.218 Upper cholesky algorithm modified for UdU'
  *  Numerical stability may not be as good as M(k,i) is updated from previous results
  *  Algorithm has poor locality of reference and avoided for large matrices
@@ -215,7 +215,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, std::size_t n)
  *    diagonal(M) = d
  *    strict_lower_triangle(M) is unmodifed
  * Return:
- *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 	std::size_t i,j,k;
@@ -229,7 +229,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, std::size_t n)
 
 			// Diagonal element
 			if (d > 0)
-			{	// Positive definate
+			{	// Positive definite
 				d = 1 / d;
 
 				for (i = 0; i < j; ++i)
@@ -244,7 +244,7 @@ RowMatrix::value_type UdUfactor_variant1 (RowMatrix& M, std::size_t n)
 				}
 			}
 			else if (d == 0)
-			{	// Possibly Semidefinate, check not negative
+			{	// Possibly semi-definite, check not negative
 				for (i = 0; i < j; ++i)
 				{
 					if (M(i,j) != 0)
@@ -269,7 +269,7 @@ Negative:
 RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, std::size_t n)
 /*
  * In place Modified upper triangular Cholesky factor of a
- *  Positive definate or semi-definate matrix M
+ *  Positive definite or semi-definite matrix M
  * Reference: A+G p.219 right side of table
  *  Algorithm has good locality of reference and preferable for large matrices
  *  Infinity values on the diagonal cannot be factorised
@@ -282,7 +282,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, std::size_t n)
  *    diagonal(M) = d
  *    strict_lower_triangle(M) is unmodifed
  * Return:
- *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 	std::size_t i,j,k;
@@ -296,7 +296,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, std::size_t n)
 
 			// Diagonal element
 			if (d > 0)
-			{	// Positive definate
+			{	// Positive definite
 				i = j;
 				do
 				{
@@ -315,7 +315,7 @@ RowMatrix::value_type UdUfactor_variant2 (RowMatrix& M, std::size_t n)
 				} while (i-- > 0);
 			}
 			else if (d == 0)
-			{	// Possibly Semidefinate, check not negative, whole row must be identically zero
+			{	// Possibly semi-definite, check not negative, whole row must be identically zero
 				for (k = j+1; k < n; ++k)
 				{
 					if (Mj[k] != 0)
@@ -340,7 +340,7 @@ Negative:
 LTriMatrix::value_type LdLfactor (LTriMatrix& M, std::size_t n)
 /*
  * In place Modified lower triangular Cholesky factor of a
- *  Positive definate or semi-definate matrix M
+ *  Positive definite or semi-definite matrix M
  * Reference: A+G p.218 Lower cholesky algorithm modified for LdL'
  *
  * Input: M, n=last std::size_t to be included in factorisation
@@ -348,7 +348,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, std::size_t n)
  *    strict_lower_triangle(M) = strict_lower_triangle(L)
  *    diagonal(M) = d
  * Return:
- *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  * ISSUE: This could change to equivilient of UdUfactor_varient2
  */
 {
@@ -362,7 +362,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, std::size_t n)
 		// Diagonal element
 		if (d > 0)
 		{
-			// Positive definate
+			// Positive definite
 			d = 1 / d;
 
 			for (i = j+1; i < n; ++i)
@@ -378,7 +378,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& M, std::size_t n)
 		}
 		else if (d == 0)
 		{
-			// Possibly Semidefinate, check not negative
+			// Possibly semi-definite, check not negative
 			for (i = j+1; i < n; ++i)
 			{
 				if (M(i,j) != 0)
@@ -403,7 +403,7 @@ Negative:
 UTriMatrix::value_type UCfactor (UTriMatrix& M, std::size_t n)
 /*
  * In place Upper triangular Cholesky factor of a
- *  Positive definate or semi-definate matrix M
+ *  Positive definite or semi-definite matrix M
  * Reference: A+G p.218
  * Strict lower triangle of M is ignored in computation
  *
@@ -411,7 +411,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, std::size_t n)
  * Output: M as UC*UC' factor
  *    upper_triangle(M) = UC
  * Return:
- *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 	std::size_t i,j,k;
@@ -426,7 +426,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, std::size_t n)
 			// Diagonal element
 			if (d > 0)
 			{
-				// Positive definate
+				// Positive definite
 				d = std::sqrt(d);
 				M(j,j) = d;
 				d = 1 / d;
@@ -444,7 +444,7 @@ UTriMatrix::value_type UCfactor (UTriMatrix& M, std::size_t n)
 			}
 			else if (d == 0)
 			{
-				// Possibly Semidefinate, check not negative
+				// Possibly semi-definite, check not negative
 				for (i = 0; i < j; ++i)
 				{
 					if (M(i,j) != 0)
@@ -470,7 +470,7 @@ Negative:
 RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
 /*
  * Modified upper triangular Cholesky factor of a
- * Positive definate or Semi-definate Matrix M
+ * Positive definite or semi-definite Matrix M
  * Wraps UdUfactor for non in place factorisation
  * Output:
  *    UD the UdU' factorisation of M with strict lower triangle zero
@@ -489,7 +489,7 @@ RowMatrix::value_type UdUfactor (RowMatrix& UD, const SymMatrix& M)
 LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
 /*
  * Modified lower triangular Cholesky factor of a
- * Positive definate or Semi-definate Matrix M
+ * Positive definite or semi-definite Matrix M
  * Wraps LdLfactor for non in place factorisation
  * Output:
  *    LD the LdL' factorisation of M
@@ -507,7 +507,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
 UTriMatrix::value_type UCfactor (UTriMatrix& UC, const SymMatrix& M)
 /*
  * Upper triangular Cholesky factor of a
- * Positive definate or Semi-definate Matrix M
+ * Positive definite or semi-definite Matrix M
  * Wraps UCfactor for non in place factorisation
  * Output:
  *    UC the UC*UC' factorisation of M
@@ -620,8 +620,8 @@ void UdUrecompose_transpose (RowMatrix& M)
 /*
  * In-place recomposition of Symmetric matrix from U'dU factor store in UD format
  *  Generally used for recomposing result of UdUinverse
- * Note definateness of result depends purely on diagonal(M)
- *  i.e. if d is positive definate (>0) then result is positive definate
+ * Note definiteness of result depends purely on diagonal(M)
+ *  i.e. if d is positive definite (>0) then result is positive definite
  * Reference: A+G p.223
  * In place computation uses simple structure of solution due to triangular zero elements
  *  Defn: R = (U' d) row i , C = U column j   -> M(i,j) = R dot C;
@@ -822,7 +822,7 @@ SymMatrix::value_type UdUinversePDignoreInfinity (SymMatrix& M)
  * Output:
  *     M inverse of M, only updated if return value >0
  * Return:
- *     reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *     reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 					// Abuse as a RowMatrix
@@ -849,7 +849,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
  * Output:
  *     M inverse of M, only updated if return value >0
  * Return:
- *     reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *     reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 					// Abuse as a RowMatrix
@@ -891,7 +891,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
  * Output:
  *    MI inverse of M, only valid if return value >0
  * Return:
- *    reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *    reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 	MI = M;

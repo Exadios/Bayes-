@@ -507,9 +507,9 @@ void SIR_kalman_scheme::update_statistics ()
  * Sample Covariance := Sum_i [transpose(S[i]-mean)*(S[i]-mean)] / (s_size-1)
  *  The definition is the unbiased estimate of covariance given samples with unknown (estimated) mean
  *  Implies X is indeterminate when size == 1
- * Semi-definate covariance X due to colapse of S:
+ * Semi-definite covariance X due to colapse of S:
  *  If the number of unique samples in S is small relative to the state size then
- *  X will become semi-definate and numerically may appear be negative
+ *  X will become semi-definite and numerically may appear be negative
  *  As this situation is quite common and due to the normal circumstances and
  *  not an algorithm failure no assertion is made.
  *  Use with care and check the results of any algorithms relying on X
@@ -541,7 +541,7 @@ void SIR_kalman_scheme::roughen_correlated (ColMatrix& P, Float K)
  *  into account the correlation of P
  *  K is scaleing factor for roughening noise
  * Numerical colapse of P
- *  Numerically when covariance of P semi definate (or close), X's UdU factorisation
+ *  Numerically when covariance of P semi-definite (or close), X's UdU factorisation
  *  may be negative.
  * Exceptions:
  *   Bayes_filter_exception due colapse of P

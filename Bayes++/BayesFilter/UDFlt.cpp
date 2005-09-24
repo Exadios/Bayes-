@@ -148,7 +148,7 @@ UD_scheme::Float
  *  UD
  *
  * Return:
- *		reciprocal condition number, -1 if negative, 0 if semi-definate (including zero)
+ *		reciprocal condition number, -1 if negative, 0 if semi-definite (including zero)
  */
 {
 	std::size_t i,j,k;
@@ -214,7 +214,7 @@ UD_scheme::Float
 			// Check diagonal element
 			if (e > 0)
 			{
-				// Positive definate
+				// Positive definite
 				UDj[j] = e;
 
 				Float diaginv = 1 / e;
@@ -233,7 +233,7 @@ UD_scheme::Float
 			}//PD
 			else if (e == 0)
 			{
-				// Possibly Semidefinate, check not negative
+				// Possibly semi-definite, check not negative
 				UDj[j] = e;
 
 				// 1 / e is infinite
