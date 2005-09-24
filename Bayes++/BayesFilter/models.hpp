@@ -14,7 +14,7 @@
  * Predict and Observe models
  *  These models extend, adapt and simpilify the fundamental Bayesian filter models
  *  Simple : Simplify model construction and use
- *  General: Combine model types to form more general models
+ *  General: Generalise a model so it include properties of more then one model
  *  Adapted: Adapt one model type into another
  */
 #include <boost/function.hpp>
@@ -159,7 +159,7 @@ protected:
 
 
 /*
- * Genereal Models: Include properties of more then on observe model.
+ * Generalised Models: generalise a model so it include properties of more then one model.
  */
 
 // General Linearised Uncorrelated Additive and Likelihood observe model
