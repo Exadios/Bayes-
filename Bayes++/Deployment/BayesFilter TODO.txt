@@ -46,7 +46,7 @@ TO REVIEW
 	Check consistency of model to filter
 		Validate (z to h.Z) model sizes in predict and observe
 	Check when numerics fail:
-		For both state and obs semidefinate
+		For both state and obs semi-definite
 		Negtive matrices
 		UDpredict catching Negative matrices in observe
 	Use normalisation dtandard form for Jacobian_obersve. Should be to normalise(z,zp).
