@@ -2,7 +2,8 @@
 <?eclipse-cdt version="2.0"?>
 
 <cdtproject id="org.eclipse.cdt.make.core.make">
-<extension point="org.eclipse.cdt.core.BinaryParser" id="org.eclipse.cdt.core.ELF"/>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.domsourceindexer" point="org.eclipse.cdt.core.CIndexer"/>
 <data>
         
     <item id="org.eclipse.cdt.core.pathentry">
@@ -12,30 +13,43 @@
 </item>
 <item id="org.eclipse.cdt.make.core.buildtargets">
 <buildTargets>
-<target name="debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="SLAM">
+<target name="debug" path="SLAM" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
 <buildTarget>debug</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
-<target name="release" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="SLAM">
+<target name="release" path="SLAM" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
 <buildTarget>release</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
-<target name="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="rtheta">
+<target name="rtheta" path="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
-<target name="debug" targetID="org.eclipse.cdt.make.MakeTargetBuilder" path="">
+<target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
 <buildTarget>debug</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
 </buildTargets>
+</item>
+<item id="scannerConfiguration">
+<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
+<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+<buildOutputProvider>
+<openAction enabled="false" filePath=""/>
+<parser enabled="true"/>
+</buildOutputProvider>
+<scannerInfoProvider id="specsFile">
+<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+<parser enabled="true"/>
+</scannerInfoProvider>
+</profile>
 </item>
 </data>
 </cdtproject>
