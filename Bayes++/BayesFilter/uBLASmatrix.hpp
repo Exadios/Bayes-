@@ -248,9 +248,9 @@ public:
 	{
 		matrix_type::member.clear();
 	}
-	void resize(typename MatrixBase::size_type nsize1, typename MatrixBase::size_type nsize2)
+	void resize(typename MatrixBase::size_type nsize1, typename MatrixBase::size_type nsize2, bool preserve = true)
 	{
-		matrix_type::member.resize(nsize1, nsize2);
+		matrix_type::member.resize(nsize1, nsize2, preserve);
 	}
 };
 
@@ -390,7 +390,7 @@ struct prod_expression_result
 };
 
  
-template<class E> inline
+template <class E>
 typename prod_expression_result<E,E>::E1E2T_type
  prod_SPD (const ublas::matrix_expression<E>& X)
 /*
@@ -402,7 +402,7 @@ typename prod_expression_result<E,E>::E1E2T_type
 	return prod( X, trans(const_cast<ublas::matrix_expression<E>&>(X) ));
 }
 
-template<class EX, class ES, class ET> inline
+template <class EX, class ES, class ET>
 typename prod_expression_result<EX,ET>::E1E2T_type
  prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::matrix_expression<ES>& S, ublas::matrix_expression<ET>& XStemp)
 /*
@@ -413,7 +413,7 @@ typename prod_expression_result<EX,ET>::E1E2T_type
 	return prod( X, trans(prod(X,S,XStemp())) );
 }
 
-template<class EX, class ES, class ET> inline
+template <class EX, class ES, class ET>
 ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s, ublas::matrix_expression<ET>& Ptemp)
 /*
  * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X'
@@ -448,7 +448,7 @@ ET prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expressi
 	return Ptemp();
 }
 
-template<class EX, class ES> inline
+template <class EX, class ES>
 SymMatrix prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s)
 /*
  * Symmetric Positive (Semi) Definate product: X*diag_matrix(s)*X'
@@ -463,7 +463,7 @@ SymMatrix prod_SPD (const ublas::matrix_expression<EX>& X, const ublas::vector_e
 }
 
 
-template<class E> inline
+template <class E>
 typename prod_expression_result<E,E>::E1TE2_type
  prod_SPDT (const ublas::matrix_expression<E>& X)
 /*
@@ -474,7 +474,7 @@ typename prod_expression_result<E,E>::E1TE2_type
 	return prod( trans(const_cast<ublas::matrix_expression<E>&>(X) ), X);
 }
 
-template<class EX, class ES, class ET> inline
+template <class EX, class ES, class ET>
 typename prod_expression_result<ET,EX>::E1TE2_type
  prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::matrix_expression<ES>& S, ublas::matrix_expression<ET>& SXtemp)
 /*
@@ -485,7 +485,7 @@ typename prod_expression_result<ET,EX>::E1TE2_type
 	return prod( trans(prod(S,X,SXtemp())), X);
 }
 
-template<class EX, class ES, class ET> inline
+template <class EX, class ES, class ET>
 ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s, ublas::matrix_expression<ET>& Ptemp)
 /*
  * Symmetric Positive (Semi) Definate product: X'*diag_matrix(s)*X, Ptemp = return value
@@ -520,7 +520,7 @@ ET prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_express
 	return Ptemp();
 }
 
-template<class EX, class ES> inline
+template <class EX, class ES>
 SymMatrix prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_expression<ES>& s)
 /*
  * Symmetric Positive (Semi) Definate product: X'*diag_matrix(s)*X
@@ -534,7 +534,8 @@ SymMatrix prod_SPDT (const ublas::matrix_expression<EX>& X, const ublas::vector_
 	return Ptemp;
 }
 
-inline Vec::value_type prod_SPDT (const Vec& x, const Vec& s)
+template <class Dummy>
+ Vec::value_type prod_SPDT (const Vec& x, const Vec& s)
 /*
  * Symmetric Positive (Semi) Definate product: x'*diag_matrix(s)*x
  */
@@ -546,13 +547,14 @@ inline Vec::value_type prod_SPDT (const Vec& x, const Vec& s)
 	while (xi != xi_end)
 	{
 		p += (*xi) * (*si) * (*xi);
-		++xi; ++ si;
+		++xi; ++si;
 	}
 	
 	return p;
 }
 
-inline Vec::value_type prod_SPDT (const Vec& x, const SymMatrix& S)
+template <class Dummy>
+ Vec::value_type prod_SPDT (const Vec& x, const SymMatrix& S)
 /*
  * Symmetric Positive (Semi) Definate multiply:	p = x'*S*x
  */
