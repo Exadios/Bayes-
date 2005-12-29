@@ -15,23 +15,34 @@
 <buildTargets>
 <target name="debug" path="SLAM" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
 <buildTarget>debug</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
 <target name="release" path="SLAM" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
 <buildTarget>release</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
 <target name="rtheta" path="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
 </target>
 <target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
+<buildTarget>debug</buildTarget>
+<stopOnError>false</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
+<target name="debug" path="BayesFilter" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
 <buildTarget>debug</buildTarget>
 <stopOnError>false</stopOnError>
 <useDefaultCommand>false</useDefaultCommand>
