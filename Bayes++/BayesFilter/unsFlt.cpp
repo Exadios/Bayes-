@@ -245,11 +245,11 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
  *
  * ISSUE: Simplified implemenation using uncorrelated noise equations
  */
-Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_model& h, const Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
+Bayes_base::Float Unscented_scheme::byobserve (Uncorrelated_additive_observe_model& h, const Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
 {
 	Adapted_Correlated_additive_observe_model hh(h);
-	return eobserve (hh, z, s, S, b);
+	return byobserve (hh, z, s,S,SI,W);
 }
 
 
@@ -257,8 +257,8 @@ Bayes_base::Float Unscented_scheme::eobserve (Uncorrelated_additive_observe_mode
  * @pre x,X
  * @post x,X is PSD
  */
-Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model& h, const Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
+Bayes_base::Float Unscented_scheme::byobserve (Correlated_additive_observe_model& h, const Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
 {
 	std::size_t z_size = z.size();
 	ColMatrix zXX (z_size, 2*x_size+1);
@@ -325,19 +325,19 @@ Bayes_base::Float Unscented_scheme::eobserve (Correlated_additive_observe_model&
 	S = Xzz;
 	noalias(S) += h.Z;
 						// Inverse innovation covariance
-	Float rcond = UdUinversePD (b.SI, S);
+	Float rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 						// Kalman gain
-	noalias(b.W) = prod(Xxz,b.SI);
+	noalias(W) = prod(Xxz,SI);
 
 						// Normalised innovation
 	h.normalise(s = z, zp);
 	noalias(s) -= zp;
 
 						// Filter update
-	noalias(x) += prod(b.W,s);
-	RowMatrix WStemp(b.W.size1(), S.size2());
-	noalias(X) -= prod_SPD(b.W,S, WStemp);
+	noalias(x) += prod(W,s);
+	RowMatrix WStemp(W.size1(), S.size2());
+	noalias(X) -= prod_SPD(W,S, WStemp);
 
 	return rcond;
 }

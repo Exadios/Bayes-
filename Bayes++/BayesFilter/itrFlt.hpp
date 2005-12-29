@@ -102,24 +102,24 @@ public:
 	{	// Linrz_kalman_filter observe with default termination
 		Iterated_terminator term;
 		const std::size_t z_size = h.Hx.size1();
-		State_byproduct s(z_size);
-		Covariance_byproduct S(z_size,z_size);
-		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve (h, term, z, s,S,b);
+		FM::Vec s(z_size);
+		FM::SymMatrix S(z_size,z_size), SI(z_size, z_size);
+		FM::Matrix W(h.Hx.size2(), z_size);
+		return byobserve (h, term, z, s,S,SI,W);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	// Linrz_kalman_filter observe with default termination
 		Iterated_terminator term;
 		const std::size_t z_size = h.Hx.size1();
-		State_byproduct s(z_size);
-		Covariance_byproduct S(z_size,z_size);
-		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve (h, term, z, s,S,b);
+		FM::Vec s(z_size);
+		FM::SymMatrix S(z_size,z_size), SI(z_size, z_size);
+		FM::Matrix W(h.Hx.size2(), z_size);
+		return byobserve (h, term, z, s,S,SI,W);
 	}
-	Float eobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float eobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
-				State_byproduct& s, Covariance_byproduct& S,  Kalman_gain_byproduct& b);
+	Float byobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
+	Float byobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
 	// Observe with iteration and explict byproduct
 
 protected:			   		// Permenantly allocated temps

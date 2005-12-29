@@ -36,36 +36,21 @@
 namespace Bayesian_filter
 {
 
-class CI_scheme : public Extended_kalman_filter
+class CI_bscheme : public Extended_kalman_filter
 {
 public:
-	CI_scheme (std::size_t x_size);
-	CI_scheme& operator= (const CI_scheme&);
+	CI_bscheme (std::size_t x_size);
+	CI_bscheme& operator= (const CI_bscheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();
 	void update ();
 	Float predict (Linrz_predict_model& f);
 
-	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
-	{	// Extended_kalman_filter observe
-		const std::size_t z_size = h.Hx.size1();
-		Covariance_byproduct S(z_size,z_size);
-		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve_innovation (h, s, S,b);
-	}
-	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
-	{	// Extended_kalman_filter observe
-		const std::size_t z_size = h.Hx.size1();
-		Covariance_byproduct S(z_size,z_size);
-		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve_innovation (h, s, S,b);
-	}
-
-	Float eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
-				Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
-				Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	Float byobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
+	Float byobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
 	// Observe with explict byproduct
 
 	virtual Float Omega(const FM::SymMatrix& Ai, const FM::SymMatrix& Bi, const FM::SymMatrix& A)
@@ -77,6 +62,27 @@ public:
 
 };
 
+
+class CI_scheme : public CI_bscheme
+{
+public:
+	CI_scheme (std::size_t x_size);
+
+	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
+	{	// Extended_kalman_filter observe
+		const std::size_t z_size = h.Hx.size1();
+		FM::SymMatrix S(z_size,z_size), SI(z_size,z_size);
+		FM::Matrix W(h.Hx.size2(), z_size);
+		return byobserve_innovation (h, s, S,SI,W);
+	}
+	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
+	{	// Extended_kalman_filter observe
+		const std::size_t z_size = h.Hx.size1();
+		FM::SymMatrix S(z_size,z_size), SI(z_size,z_size);
+		FM::Matrix W(h.Hx.size2(), z_size);
+		return byobserve_innovation (h, s, S,SI,W);
+	}
+};
 
 }//namespace
 #endif

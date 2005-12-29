@@ -19,7 +19,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_scheme::Information_scheme (std::size_t x_size) :
+Information_bscheme::Information_bscheme (std::size_t x_size) :
 		Kalman_state_filter(x_size), Information_state_filter(x_size),
 		tempX(x_size,x_size)
 /*
@@ -29,7 +29,13 @@ Information_scheme::Information_scheme (std::size_t x_size) :
 	update_required = true;	// Not a valid state, init is required before update can be used
 }
 
-Information_scheme::Predict_linear_byproduct::Predict_linear_byproduct (std::size_t x_size, std::size_t q_size) :
+Information_scheme::Information_scheme (std::size_t x_size) :
+		Kalman_state_filter(x_size), Information_state_filter(x_size),
+		Information_bscheme(x_size)
+{
+}
+
+Information_bscheme::Predict_linear_byproduct::Predict_linear_byproduct (std::size_t x_size, std::size_t q_size) :
 /* Set size of by-products for linear predict
  */
 		 A(x_size,x_size), tempG(x_size,q_size),
@@ -37,7 +43,7 @@ Information_scheme::Predict_linear_byproduct::Predict_linear_byproduct (std::siz
 		 y(x_size)
 {}
 
-Information_scheme& Information_scheme::operator= (const Information_scheme& a)
+Information_bscheme& Information_bscheme::operator= (const Information_bscheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
@@ -48,7 +54,7 @@ Information_scheme& Information_scheme::operator= (const Information_scheme& a)
 }
 
 
-void Information_scheme::init ()
+void Information_bscheme::init ()
 /*
  * Initialise the filter from x,X
  * Precondition:
@@ -66,7 +72,7 @@ void Information_scheme::init ()
 	update_required = false;
 }
 
-void Information_scheme::init_yY ()
+void Information_bscheme::init_yY ()
 /*
  * Initialisation directly from Information
  * Precondition:
@@ -81,7 +87,7 @@ void Information_scheme::init_yY ()
 	update_required = true;
 }
 
-void Information_scheme::update_yY ()
+void Information_bscheme::update_yY ()
 /*
  * Postcondition:
  *		y, Y is PSD
@@ -89,7 +95,7 @@ void Information_scheme::update_yY ()
 {
 }
 
-void Information_scheme::update ()
+void Information_bscheme::update ()
 /*
  * Recompute x,X from y,Y
  *  Optimised using update_required (postcondition met iff update_required false)
@@ -111,10 +117,19 @@ void Information_scheme::update ()
 }
 
 Bayes_base::Float
- Information_scheme::predict (Linrz_predict_model& f)
+ Information_scheme::predict (Linear_invertible_predict_model& f)
+/* Linear information predict, without byproduct
+ */
+{
+	Predict_linear_byproduct b(f.Fx.size1(),f.q.size());
+	return bypredict (f, b);	
+}
+
+Bayes_base::Float
+ Information_bscheme::predict (Linrz_predict_model& f)
 /*
  * Extended_kalman_filter predict via state
- *  Computation is through state to accommodate linearied model
+ *  Computation is through state to accommodate linrz model
  */
 {
 	update ();			// x,X required
@@ -132,16 +147,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Information_scheme::predict (Linear_invertable_predict_model& f)
-/* Linear information predict, without byproduct
- */
-{
-	Predict_linear_byproduct b(f.Fx.size1(),f.q.size());
-	return epredict (f, b);	
-}
-
-Bayes_base::Float
- Information_scheme::epredict (Linear_invertable_predict_model& f, Predict_linear_byproduct& b)
+ Information_bscheme::bypredict (Linear_invertible_predict_model& f, Predict_linear_byproduct& b)
 /*
  * Linear information predict
  *  Computation is through information state y,Y only
@@ -191,9 +197,9 @@ Bayes_base::Float
  */
 {
 	const std::size_t x_size = h.Hx.size2();
-	State_byproduct i(x_size);
-	Covariance_byproduct I(x_size,x_size);
-	return eobserve_innovation (h, s, i,I);
+	FM::Vec i(x_size);
+	FM::SymMatrix I(x_size,x_size);
+	return byobserve_innovation (h, s, i,I);
 }	
 
 Bayes_base::Float
@@ -202,13 +208,13 @@ Bayes_base::Float
  */
 {
 	const std::size_t x_size = h.Hx.size2();
-	State_byproduct i(x_size);
-	Covariance_byproduct I(x_size,x_size);
-	return eobserve_innovation (h, s, i,I);
+	FM::Vec i(x_size);
+	FM::SymMatrix I(x_size,x_size);
+	return byobserve_innovation (h, s, i,I);
 }	
 
 Bayes_base::Float
- Information_scheme::eobserve_innovation (Linrz_correlated_observe_model& h, const Vec& s, State_byproduct& i, Covariance_byproduct& I)
+ Information_bscheme::byobserve_innovation (Linrz_correlated_observe_model& h, const Vec& s, FM::Vec& i, FM::SymMatrix& I)
 /* Correlated innovation observe with explict byproduct
  */
 {
@@ -238,7 +244,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Information_scheme::eobserve_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s, State_byproduct& i, Covariance_byproduct& I)
+ Information_bscheme::byobserve_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s, FM::Vec& i, FM::SymMatrix& I)
 /* Uncorrelated innovation observe with explict byproduct
  */
 {

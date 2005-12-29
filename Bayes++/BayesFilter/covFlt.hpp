@@ -32,11 +32,11 @@
 namespace Bayesian_filter
 {
 
-class Covariance_scheme : public Extended_kalman_filter
+class Covariance_bscheme : public Extended_kalman_filter
 {
 public:
-	Covariance_scheme (std::size_t x_size);
-	Covariance_scheme& operator= (const Covariance_scheme&);
+	Covariance_bscheme (std::size_t x_size);
+	Covariance_bscheme& operator= (const Covariance_bscheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();
@@ -45,21 +45,37 @@ public:
 	Float predict (Linrz_predict_model& f);
 	// Extended_kalman_filter predict
 	Float predict (Gaussian_predict_model& f);
-	// Specialised 'stationary' predict, only addative noise
+	// Specialised 'stationary' predict, only additive noise
 
-	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
-	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
-	// Extended_kalman_filter observe
-	Float eobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
-				Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float eobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
-				Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	Float byobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
+				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W, FM::Matrix& XtHx);
+	Float byobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
+				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W, FM::Matrix& XtHx);
 	// Observe with explict byproduct
 
 protected:			   		// Permenantly allocated temps
 	FM::RowMatrix tempX;
 };
 
+
+class Covariance_scheme : public Covariance_bscheme
+{
+public:
+	Covariance_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
+
+	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
+	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
+	// Extended_kalman_filter observe
+
+public:						// Exposed numerical byproducts
+	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
+	FM::Matrix W;				// Kalman Gain
+	FM::Matrix XtHx;			// X * Hx'
+
+protected:					// Allow fast operation if z_size remains constant
+	std::size_t last_z_size;
+	void observe_size (std::size_t z_size);
+};
 
 }//namespace
 #endif

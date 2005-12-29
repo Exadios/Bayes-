@@ -34,28 +34,24 @@
 namespace Bayesian_filter
 {
 
-class Information_root_scheme : public Extended_kalman_filter
+class Information_root_bscheme : public Extended_kalman_filter
 {
 public:
 	FM::Vec r;			// Information Root state
 	FM::UTriMatrix R;	// Information Root
 
-	Information_root_scheme (std::size_t x_size);
+	Information_root_bscheme (std::size_t x_size);
 
 	void init ();
 	void update ();
 	// Covariance form state interface
 
-	Float predict (Linrz_predict_model& f);
-	/* Use linrz form for r, computes inverse model using inverse_Fx */
-	Float predict (Linear_predict_model& f);
-	/* Use linear form for r, computes inverse model using inverse_Fx */
-	Float predict (Linear_invertable_predict_model& f)
-	/* Use linear form for r, and use inv.Fx from invertable model */
+	Float bypredict (Linear_invertible_predict_model& f)
+	// Use linear form for r, and use inv.Fx from invertible model
 	{
-		return epredict(f, f.inv.Fx, true);
+		return bypredict(f, f.inv.Fx, true);
 	}
-	Float epredict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r);
+	Float bypredict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r);
 	/* Explict form, using precomputed inverse of f.Fx */
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
@@ -64,6 +60,18 @@ public:
 
 	static void inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx);
 	/* Numerical Inversion of Fx using LU factorisation */
+};
+
+
+class Information_root_scheme : public Information_root_bscheme
+{
+public:
+	Information_root_scheme (std::size_t x_size);
+
+	Float predict (Linrz_predict_model& f);
+	// Extended_kalman_filter predict - use linrz form for r, computes inverse model using inverse_Fx
+	Float predict (Linear_predict_model& f);
+	/* Use linear form for r, computes inverse model using inverse_Fx */
 };
 
 

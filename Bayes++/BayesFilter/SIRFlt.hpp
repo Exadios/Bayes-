@@ -161,7 +161,7 @@ private:
 };
 
 typedef Sampled_general_predict_model<Linear_predict_model> Sampled_LiAd_predict_model;
-typedef Sampled_general_predict_model<Linear_invertable_predict_model> Sampled_LiInAd_predict_model;
+typedef Sampled_general_predict_model<Linear_invertible_predict_model> Sampled_LiInAd_predict_model;
 // Sampled predict model generalisations
 //  Names a shortened to first two letters of their model properties
 

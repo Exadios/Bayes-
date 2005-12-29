@@ -21,12 +21,17 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_root_scheme::Information_root_scheme (std::size_t x_size) :
+Information_root_bscheme::Information_root_bscheme (std::size_t x_size) :
 		Kalman_state_filter(x_size),
 		r(x_size), R(x_size,x_size)
 /*
  * Set the size of things we know about
  */
+{}
+
+Information_root_scheme::Information_root_scheme (std::size_t x_size) :
+		Kalman_state_filter(x_size),
+		Information_root_bscheme(x_size)
 {}
 
 Information_root_info_scheme::Information_root_info_scheme (std::size_t x_size) :
@@ -35,7 +40,7 @@ Information_root_info_scheme::Information_root_info_scheme (std::size_t x_size) 
 {}
 
 
-void Information_root_scheme::init ()
+void Information_root_bscheme::init ()
 /*
  * Inialise the filter from x,X
  * Predcondition:
@@ -95,7 +100,7 @@ void Information_root_info_scheme::init_yY ()
 	noalias(r) = prod(FM::trans(RI),y);
 }
 
-void Information_root_scheme::update ()
+void Information_root_bscheme::update ()
 /*
  * Recompute x,X from r,R
  * Precondition:
@@ -132,7 +137,7 @@ void Information_root_info_scheme::update_yY ()
 }
 
 
-void Information_root_scheme::inverse_Fx (DenseColMatrix& invFx, const Matrix& Fx)
+void Information_root_bscheme::inverse_Fx (DenseColMatrix& invFx, const Matrix& Fx)
 /*
  * Numerical Inversion of Fx using LU factorisation
  * Required LAPACK getrf (with PIVOTING) and getrs
@@ -150,13 +155,13 @@ void Information_root_scheme::inverse_Fx (DenseColMatrix& invFx, const Matrix& F
 	FM::identity(invFx);				// Invert
 	info = LAPACK::getrs('N', FxLU, ipivot, invFx);
 	if (info != 0)
-		error (Numeric_exception("Predict Fx not LU invertable"));
+		error (Numeric_exception("Predict Fx not LU invertible"));
 }
 
 
 
 Bayes_base::Float
- Information_root_scheme::epredict (Linrz_predict_model& f, const ColMatrix& invFx, bool linear_r)
+ Information_root_bscheme::bypredict (Linrz_predict_model& f, const ColMatrix& invFx, bool linear_r)
 /* Linrz Prediction: using precomputed inverse of f.Fx
  * Precondition:
  *   r(k|k),R(k|k)
@@ -165,7 +170,7 @@ Bayes_base::Float
  *   R(k+1|k)
  *
  * r can be computed in two was:
- * Either directly in the linear form or  using extended form via R*f.f(x)
+ * Either directly in the linear form or using extended form via R*f.f(x)
  *
  * Requires LAPACK geqrf for QR decomposition (without PIVOTING)
  */
@@ -219,7 +224,7 @@ Bayes_base::Float
 	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
 	inverse_Fx (FxI, f.Fx);
 
-	return epredict (f, ColMatrix(FxI), false);
+	return bypredict (f, ColMatrix(FxI), false);
 }
 
 
@@ -232,11 +237,11 @@ Bayes_base::Float
 	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
 	inverse_Fx (FxI, f.Fx);
 
-	return epredict (f, ColMatrix(FxI), true);
+	return bypredict (f, ColMatrix(FxI), true);
 }
 
 
-Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
+Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
 /* Extended linrz correlated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)
@@ -279,7 +284,7 @@ Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_
 }
 
 
-Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
+Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
 /* Extended linrz uncorrelated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)

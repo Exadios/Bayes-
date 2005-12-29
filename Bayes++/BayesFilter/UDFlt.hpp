@@ -64,7 +64,7 @@ public:
 	// Kalman gain and associated innovation and variance from sequential observe
 	{
 		Observe_innovation_byproduct (std::size_t x_size, std::size_t z_size);
-		State_byproduct s;
+		FM::Vec s;
 		FM::Vec Sv;
 		FM::Matrix W;
 	};

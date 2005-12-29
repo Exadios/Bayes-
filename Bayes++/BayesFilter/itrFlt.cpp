@@ -84,8 +84,8 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- Iterated_covariance_scheme::eobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
+ Iterated_covariance_scheme::byobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -96,12 +96,12 @@ Bayes_base::Float
 {
 						// ISSUE: Implement simplified uncorrelated noise equations
 	Adapted_Linrz_correlated_observe_model hh(h);
-	return eobserve (hh, term, z, s, S, b);
+	return byobserve (hh, term, z, s,S,SI,W);
 }
 
 Bayes_base::Float
- Iterated_covariance_scheme::eobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b)
+ Iterated_covariance_scheme::byobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -142,11 +142,11 @@ Bayes_base::Float
 							// Innovation covariance
 		noalias(S) = prod_SPD(h.Hx, Xpred, HxXtemp) + h.Z;
 							// Inverse innovation covariance
-		rcond = UdUinversePD (b.SI, S);
+		rcond = UdUinversePD (SI, S);
 		rclimit.check_PD(rcond, "S not PD in observe");
 
 							// Iterative observe
-		noalias(temp3) = prod_SPD(HxT,b.SI, temp2);
+		noalias(temp3) = prod_SPD(HxT,SI, temp2);
 		noalias(temp1) = prod(Xpred,temp3);
 		noalias(X) = Xpred - prod(temp1,Xpred);
 

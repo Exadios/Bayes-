@@ -91,24 +91,24 @@ public:
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 	{	///< Linrz_kalman_filter observe
 		const std::size_t z_size = h.Hx.size1();
-		State_byproduct s(z_size);
-		Covariance_byproduct S(z_size,z_size);
-		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve (static_cast<Uncorrelated_additive_observe_model&>(h), z, s,S,b);
+		FM::Vec s(z_size);
+		FM::SymMatrix S(z_size,z_size), SI(z_size,z_size);
+		FM::Matrix W(h.Hx.size2(), z_size);
+		return byobserve (static_cast<Uncorrelated_additive_observe_model&>(h), z, s,S,SI,W);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	///< Linrz_kalman_filter observe
 		const std::size_t z_size = h.Hx.size1();
-		State_byproduct s(z_size);
-		Covariance_byproduct S(z_size,z_size);
-		Kalman_gain_byproduct b(h.Hx.size2(), z_size);
-		return eobserve (static_cast<Correlated_additive_observe_model&>(h), z, s,S,b);
+		FM::Vec s(z_size);
+		FM::SymMatrix S(z_size,z_size), SI(z_size,z_size);
+		FM::Matrix W(h.Hx.size2(), z_size);
+		return byobserve (static_cast<Correlated_additive_observe_model&>(h), z, s,S,SI,W);
 	}
 	
-	Float eobserve (Uncorrelated_additive_observe_model& h, const FM::Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
-	Float eobserve (Correlated_additive_observe_model& h, const FM::Vec& z,
-				State_byproduct& s, Covariance_byproduct& S, Kalman_gain_byproduct& b);
+	Float byobserve (Uncorrelated_additive_observe_model& h, const FM::Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
+	Float byobserve (Correlated_additive_observe_model& h, const FM::Vec& z,
+				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
 	///< General additive observe models form, with explict byproduct
 	
 

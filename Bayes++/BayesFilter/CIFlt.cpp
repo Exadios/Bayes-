@@ -21,7 +21,7 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-CI_scheme::CI_scheme (std::size_t x_size) :
+CI_bscheme::CI_bscheme (std::size_t x_size) :
 	Kalman_state_filter(x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -29,7 +29,13 @@ CI_scheme::CI_scheme (std::size_t x_size) :
 {
 }
 
-CI_scheme& CI_scheme::operator= (const CI_scheme& a)
+CI_scheme::CI_scheme (std::size_t x_size) :
+	Kalman_state_filter(x_size),
+	CI_bscheme(x_size)
+{
+}
+
+CI_bscheme& CI_bscheme::operator= (const CI_bscheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
@@ -39,20 +45,20 @@ CI_scheme& CI_scheme::operator= (const CI_scheme& a)
 }
 
 
-void CI_scheme::init ()
+void CI_bscheme::init ()
 {
 						// Postconditions
 	if (!isPSD (X))
 		error (Numeric_exception("Initial X not PSD"));
 }
 
-void CI_scheme::update ()
+void CI_bscheme::update ()
 {
 	// Nothing to do, implicit in observation
 }
 
 Bayes_base::Float
- CI_scheme::predict (Linrz_predict_model& f)
+ CI_bscheme::predict (Linrz_predict_model& f)
 {
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
@@ -65,8 +71,8 @@ Bayes_base::Float
 
 
 Bayes_base::Float
- CI_scheme::eobserve_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s,
-				Covariance_byproduct& S, Kalman_gain_byproduct& b)
+ CI_bscheme::byobserve_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s,
+				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -80,13 +86,13 @@ Bayes_base::Float
 	SymMatrix Z(z_size,z_size);
 
 	Adapted_Linrz_correlated_observe_model hh(h);
-	return eobserve_innovation (hh, s, S, b);
+	return byobserve_innovation (hh, s, S, SI, W);
 }
 
 
 Bayes_base::Float
- CI_scheme::eobserve_innovation (Linrz_correlated_observe_model& h, const Vec& s,
-				Covariance_byproduct& S, Kalman_gain_byproduct& b)
+ CI_bscheme::byobserve_innovation (Linrz_correlated_observe_model& h, const Vec& s,
+				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
 /* Correlated innovation observe
  */
 {
@@ -117,10 +123,10 @@ Bayes_base::Float
 	S = HXHT * (one-omega) + h.Z * omega;
 
 						// inverse innovation covariance
-	rcond = UdUinversePD (b.SI, S);
+	rcond = UdUinversePD (SI, S);
 	rclimit.check_PD(rcond, "S not PD in observe");
 
-	Matrix K (prod(XHT*(one-omega), b.SI));
+	Matrix K (prod(XHT*(one-omega), SI));
 
 						// state update
 	noalias(x) += prod(K, s);
