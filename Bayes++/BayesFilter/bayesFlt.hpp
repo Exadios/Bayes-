@@ -204,14 +204,14 @@ private:
 	mutable FM::Vec xp;
 };
 
-class Linear_invertable_predict_model : public Linear_predict_model
-/* Linear invertable predict model
+class Linear_invertible_predict_model : public Linear_predict_model
+/* Linear invertible predict model
    Fx has an inverse
     x(k-1|k-1) = inv.Fx(k-1|k-1) * x(k|k-1)
  */
 {
 public:
-	Linear_invertable_predict_model (std::size_t x_size, std::size_t q_size);
+	Linear_invertible_predict_model (std::size_t x_size, std::size_t q_size);
 	struct inverse_model {
 		inverse_model (std::size_t x_size);
 		FM::ColMatrix Fx;	// Model inverse (ColMatrix as usually transposed)
@@ -399,28 +399,6 @@ public:
 	}
 private:
 	mutable FM::Vec hx;
-};
-
-
-/*
- * By product
- *
- * Store the numerical by products of filter scheme computations.
- */
-typedef FM::Vec State_byproduct;
-// Vector of states
-
-typedef FM::SymMatrix Covariance_byproduct;
-// Covariance of states
-
-struct Kalman_gain_byproduct
-// Kalman gain and associated innovation covariance and inverse
-{
-	Kalman_gain_byproduct (std::size_t x_size, std::size_t z_size) :
-		SI(z_size,z_size), W(x_size, z_size)
-	{}
-	Covariance_byproduct SI;
-	FM::Matrix W;
 };
 
 
@@ -632,14 +610,14 @@ protected:
 	Extended_kalman_filter() : Kalman_state_filter(0) // define a default constructor
 	{}
 public:
-	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, State_byproduct& innov);
-	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z, State_byproduct& innov);
+	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, FM::Vec& innov);
+	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z, FM::Vec& innov);
 	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
-	{	State_byproduct innov(z.size()); // unused innovation byproduct
+	{	FM::Vec innov(z.size()); // unused innovation byproduct
 		return observe(h, z, innov);
 	}
 	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
-	{	State_byproduct innov(z.size()); // unused innovation byproduct
+	{	FM::Vec innov(z.size()); // unused innovation byproduct
 		return observe(h, z, innov);
 	}
 	/* Observation z(k) and with (Un)correlated observation noise model

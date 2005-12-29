@@ -80,7 +80,7 @@ Linear_predict_model::Linear_predict_model (std::size_t x_size, std::size_t q_si
 		xp(x_size)
 {}
 
-Linear_invertable_predict_model::Linear_invertable_predict_model (std::size_t x_size, std::size_t q_size) :
+Linear_invertible_predict_model::Linear_invertible_predict_model (std::size_t x_size, std::size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -88,7 +88,7 @@ Linear_invertable_predict_model::Linear_invertable_predict_model (std::size_t x_
 		inv(x_size)
 {}
 
-Linear_invertable_predict_model::inverse_model::inverse_model (std::size_t x_size) :
+Linear_invertible_predict_model::inverse_model::inverse_model (std::size_t x_size) :
 		Fx(x_size,x_size)
 {}
 
@@ -124,7 +124,7 @@ void Kalman_state_filter::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 
 
 Bayes_base::Float
- Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z, State_byproduct& innov)
+ Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z, FM::Vec& innov)
 /*
  * Extended linrz correlated observe, compute innovation for observe_innovation
  */
@@ -139,7 +139,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, State_byproduct& innov)
+ Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, FM::Vec& innov)
 /*
  * Extended kalman uncorrelated observe, compute innovation for observe_innovation
  */
@@ -285,7 +285,7 @@ void Sample_filter::predict (Functional_predict_model& f)
 						// Predict particles S using supplied predict model
 	const std::size_t nSamples = S.size2();
 	for (std::size_t i = 0; i != nSamples; ++i) {
-		FM::ColMatrix::Column Si(S,i);
+		FM::Vec Si = FM::ColMatrix::Column (S,i);
 		FM::noalias(Si) = f.fx(Si);
 	}
 }
