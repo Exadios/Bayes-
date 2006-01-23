@@ -57,6 +57,7 @@ void Covariance_scheme::observe_size (std::size_t z_size)
 		S.resize(z_size,z_size, false);
 		SI.resize(z_size,z_size, false);
 		W.resize(x.size(),z_size, false);
+		XtHx.resize(x.size(),z_size, false);
 	}
 }
 
