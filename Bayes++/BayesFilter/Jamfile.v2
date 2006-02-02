@@ -13,7 +13,5 @@ CPP_SOURCES =
 # Declare the BayesFilter static link library
 lib BayesFilter : $(CPP_SOURCES).cpp
     : <link>static
-     <toolset>gcc:<cxxflags>"-Wall"
-#     <toolset>gcc:<cxxflags>"-pedantic"		# Pedantic checks for validation with GCC, generates long long errors
      <toolset>intel:<cxxflags>"-mp1"		# Require IEEE NaN comparisons
 ;
