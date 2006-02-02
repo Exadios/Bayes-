@@ -20,7 +20,7 @@ namespace Bayesian_filter
 
 
 Covariance_bscheme::Covariance_bscheme (std::size_t x_size) :
-	Kalman_state_filter(x_size),
+	Kalman_state(x_size),
 	tempX(x_size,x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -29,7 +29,7 @@ Covariance_bscheme::Covariance_bscheme (std::size_t x_size) :
 }
 
 Covariance_scheme::Covariance_scheme (std::size_t x_size, std::size_t z_initialsize) :
-	Kalman_state_filter(x_size),
+	Kalman_state(x_size),
 	Covariance_bscheme(x_size),
 	S(Empty), SI(Empty), W(Empty), XtHx(Empty)
 {
@@ -42,7 +42,7 @@ Covariance_bscheme& Covariance_bscheme::operator= (const Covariance_bscheme& a)
  * Precond: matrix size conformance
  */
 {
-	Kalman_state_filter::operator=(a);
+	Kalman_state::operator=(a);
 	return *this;
 }
 
@@ -75,7 +75,7 @@ void Covariance_bscheme::update ()
 }
 
 Bayes_base::Float
- Covariance_bscheme::predict (Linrz_predict_model& f)
+ Covariance_scheme::predict (Linrz_predict_model& f)
 /* Standard Linrz predict
  */
 {
