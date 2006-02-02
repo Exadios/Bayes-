@@ -24,9 +24,9 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-UD_scheme::
-UD_scheme (std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state_filter(x_size),
+UD_bscheme::
+UD_bscheme (std::size_t x_size, std::size_t q_maxsize) :
+		Kalman_state(x_size),
 		q_max(q_maxsize),
 		UD(x_size,x_size+q_max)
 /*
@@ -35,25 +35,31 @@ UD_scheme (std::size_t x_size, std::size_t q_maxsize) :
 {}
 
 UD_scheme::
+UD_scheme (std::size_t x_size, std::size_t q_maxsize) :
+		Kalman_state(x_size),
+		UD_bscheme(x_size,q_maxsize)
+{}
+
+UD_bscheme::
 Predict_byproduct::Predict_byproduct (std::size_t x_size, std::size_t q_size) :
 	d(x_size+q_size), dv(x_size+q_size), v(x_size+q_size)
 {}
 
-UD_scheme::
+UD_bscheme::
 Observe_innovation_byproduct::Observe_innovation_byproduct (std::size_t x_size, std::size_t z_size) :
 		s(z_size),
 		Sv(z_size),
 		W(x_size, z_size)
 {}
 
-UD_scheme::
+UD_bscheme::
 Observe_byproduct::Observe_byproduct (std::size_t x_size, std::size_t z_size) :
 		a(x_size),
 		w(x_size),
 		znorm(z_size)
 {}
 
-UD_scheme::
+UD_bscheme::
 Observe_linear_byproduct::Observe_linear_byproduct (std::size_t x_size, std::size_t z_size) :
 		Observe_byproduct(x_size, z_size),
 		zpdecol(z_size),
@@ -61,13 +67,13 @@ Observe_linear_byproduct::Observe_linear_byproduct (std::size_t x_size, std::siz
 		GIHx(z_size, x_size)
 {}
 
-UD_scheme&
- UD_scheme::operator= (const UD_scheme& a)
+UD_bscheme&
+ UD_bscheme::operator= (const UD_bscheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
 {
-	Kalman_state_filter::operator=(a);
+	Kalman_state::operator=(a);
 	q_max = a.q_max;
 	UD = a.UD;
 	return *this;
@@ -75,7 +81,7 @@ UD_scheme&
 
 
 void
- UD_scheme::init ()
+ UD_bscheme::init ()
 /*
  * Initialise from a state and state coveriance
  * Computes UD factor from initial covaiance
@@ -95,7 +101,7 @@ void
 
 
 void
- UD_scheme::update ()
+ UD_bscheme::update ()
 /*
  * Defactor UD back into X
  * Precond:
@@ -114,11 +120,11 @@ UD_scheme::Float
  */
 {
 	Predict_byproduct b(f.G.size1(), f.G.size2());
-	return epredict (f, b);
+	return bypredict (f, b);
 }
 
-UD_scheme::Float
- UD_scheme::epredict (Linrz_predict_model& f, Predict_byproduct& b)
+Bayes_base::Float
+ UD_bscheme::bypredict (Linrz_predict_model& f, Predict_byproduct& b)
 /*
  * Predict using a diagonalised noise q, and its coupling G
  *  q can have order less then x and a matching G so GqG' has order of x
@@ -137,8 +143,8 @@ UD_scheme::Float
 }
 
 
-UD_scheme::Float
- UD_scheme::predictGq (const Matrix& Fx, const Matrix& G, const Vec& q, Predict_byproduct& b)
+Bayes_base::Float
+ UD_bscheme::predictGq (const Matrix& Fx, const Matrix& G, const Vec& q, Predict_byproduct& b)
 /*
  * MWG-S predict from Bierman  p.132
  *  q can have order less then x and a matching G so GqG' has order of x
@@ -284,11 +290,11 @@ Bayes_base::Float
 {
 	Observe_innovation_byproduct g(h.Hx.size2(), h.Hx.size1());
 	Observe_byproduct b(h.Hx.size2(), h.Hx.size1());
-	return eobserve (h, z, g, b);
+	return byobserve (h, z, g, b);
 }
 
 Bayes_base::Float
- UD_scheme::eobserve (Linrz_uncorrelated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
+ UD_bscheme::byobserve (Linrz_uncorrelated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
 /*
  * Linrz observe with byproduct
  *  Uncorrelated observations are applied sequentialy in the order they appear in z
@@ -341,7 +347,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- UD_scheme::eobserve (Linear_correlated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_linear_byproduct& b)
+ UD_bscheme::byobserve (Linear_correlated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_linear_byproduct& b)
 /*
  * Special Linear Hx observe for correlated Z
  *  Z must be PD and will be decorrelated
@@ -415,7 +421,7 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- UD_scheme::eobserve (Sequential_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
+ UD_bscheme::byobserve (Sequential_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
 /*
  * Special observe using observe_model_sequential for fast uncorrelated linrz operation
  * Uncorrelated observations are applied sequentialy in the order they appear in z
@@ -460,8 +466,8 @@ Bayes_base::Float
 }
 
 
-UD_scheme::Float
- UD_scheme::observeUD (const Float r, Vec& a, Vec& b, Float& alpha)
+Bayes_base::Float
+ UD_bscheme::observeUD (const Float r, Vec& a, Vec& b, Float& alpha)
 /*
  * Linear UD factorisation update
  *  Bierman UdU' factorisation update. Bierman p.100

@@ -91,10 +91,10 @@ struct SLAMDemo
 		}
 	};
 
-	struct Kalman_statistics : public BF::Kalman_state_filter
+	struct Kalman_statistics : public BF::Kalman_state
 	// Kalman_statistics without any filtering
 	{
-		Kalman_statistics (std::size_t x_size) : Kalman_state_filter(x_size) {}
+		Kalman_statistics (std::size_t x_size) : Kalman_state(x_size) {}
 		void init() {}
 		void update() {}
 	};
@@ -114,7 +114,7 @@ struct SLAMDemo
 	};
 
 
-	void display( const std::string label, const BF::Kalman_state_filter& stats)
+	void display( const std::string label, const BF::Kalman_state& stats)
 	{
 		std::cout << label << stats.x << stats.X << std::endl;
 	}

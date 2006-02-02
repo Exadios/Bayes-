@@ -80,7 +80,7 @@ public:
  * Augments Information_root_filter with y,Y in the interface
  */
 
-class Information_root_info_scheme : public Information_root_scheme, virtual public Information_state_filter
+class Information_root_info_scheme : public Information_root_scheme, virtual public Information_state
 {
 public:
 	Information_root_info_scheme (std::size_t x_size);

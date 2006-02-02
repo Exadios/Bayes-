@@ -23,14 +23,14 @@ namespace Bayesian_filter
 
 
 template <typename Error_base>
-class Indirect_state_filter : public State_filter {
+class Indirect_state_filter : public Expected_state {
 /*
  * Indirect state filter
  *  Estimates state using an associated observation error filter
  */
 public:
 	Indirect_state_filter (Error_base& error_filter)
-		: State_filter(error_filter.x.size()), direct(error_filter)
+		: Expected_state(error_filter.x.size()), direct(error_filter)
 	{	// Construct and zero initial error filter
 		direct.x.clear();
 	}
@@ -85,14 +85,14 @@ private:
 
 
 template <typename Error_base>
-class Indirect_kalman_filter : public Kalman_state_filter {
+class Indirect_kalman_filter : public Kalman_state {
 /*
  * Indirect kalman filter
  *  Estimates state using an associated observation error filter
  */
 public:
 	Indirect_kalman_filter (Error_base& error_filter)
-		: Kalman_state_filter(error_filter.x.size()), direct(error_filter)
+		: Kalman_state(error_filter.x.size()), direct(error_filter)
 	{	
 	}
 

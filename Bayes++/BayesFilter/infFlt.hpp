@@ -43,7 +43,7 @@
 namespace Bayesian_filter
 {
 
-class Information_bscheme : public Extended_kalman_filter, virtual public Information_state_filter
+class Information_bscheme : public Extended_kalman_filter, virtual public Information_state
 {
 public:
 	Information_bscheme (std::size_t x_size);

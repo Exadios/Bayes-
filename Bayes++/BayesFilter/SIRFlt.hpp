@@ -234,7 +234,7 @@ private:
 };
 
 
-class SIR_kalman_scheme : public SIR_scheme, virtual public Kalman_state_filter
+class SIR_kalman_scheme : public SIR_scheme, virtual public Kalman_state
 /*
  * SIR implementation of a Kalman filter
  *  Updates Kalman statistics of SIR_filter

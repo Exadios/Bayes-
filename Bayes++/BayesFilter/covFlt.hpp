@@ -32,7 +32,7 @@
 namespace Bayesian_filter
 {
 
-class Covariance_bscheme : public Extended_kalman_filter
+class Covariance_bscheme : virtual public Kalman_state
 {
 public:
 	Covariance_bscheme (std::size_t x_size);
@@ -42,8 +42,6 @@ public:
 	void init ();
 	void update ();
 
-	Float predict (Linrz_predict_model& f);
-	// Extended_kalman_filter predict
 	Float predict (Gaussian_predict_model& f);
 	// Specialised 'stationary' predict, only additive noise
 
@@ -58,7 +56,7 @@ protected:			   		// Permenantly allocated temps
 };
 
 
-class Covariance_scheme : public Covariance_bscheme
+class Covariance_scheme : public Extended_kalman_filter, public Covariance_bscheme
 {
 public:
 	Covariance_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
@@ -67,14 +65,16 @@ public:
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
 	// Extended_kalman_filter observe
 
-public:						// Exposed numerical byproducts
-	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
-	FM::Matrix W;				// Kalman Gain
-	FM::Matrix XtHx;			// X * Hx'
+	Float predict (Linrz_predict_model& f);
+	// Extended_kalman_filter predict
 
 protected:					// Allow fast operation if z_size remains constant
 	std::size_t last_z_size;
 	void observe_size (std::size_t z_size);
+							// Numerical byproducts
+	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
+	FM::Matrix W;				// Kalman Gain
+	FM::Matrix XtHx;			// X * Hx'
 };
 
 }//namespace

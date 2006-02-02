@@ -20,7 +20,7 @@ namespace Bayesian_filter
 
 
 Information_bscheme::Information_bscheme (std::size_t x_size) :
-		Kalman_state_filter(x_size), Information_state_filter(x_size),
+		Kalman_state(x_size), Information_state(x_size),
 		tempX(x_size,x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -30,7 +30,7 @@ Information_bscheme::Information_bscheme (std::size_t x_size) :
 }
 
 Information_scheme::Information_scheme (std::size_t x_size) :
-		Kalman_state_filter(x_size), Information_state_filter(x_size),
+		Kalman_state(x_size), Information_state(x_size),
 		Information_bscheme(x_size)
 {
 }
@@ -48,8 +48,8 @@ Information_bscheme& Information_bscheme::operator= (const Information_bscheme& 
  * Precond: matrix size conformance
  */
 {
-	Information_state_filter::operator=(a);
-	Kalman_state_filter::operator=(a);
+	Information_state::operator=(a);
+	Kalman_state::operator=(a);
 	return *this;
 }
 

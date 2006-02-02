@@ -32,7 +32,7 @@ struct Filter_scheme : public Scheme
  */
 {
 	Filter_scheme(std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state_filter (x_size), Scheme (x_size)
+		Kalman_state (x_size), Scheme (x_size)
 	{}
 };
 
@@ -42,7 +42,7 @@ template <>
 struct Filter_scheme<UD_scheme> : public UD_scheme
 {
 	Filter_scheme(std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state_filter (x_size), UD_scheme (x_size, q_maxsize)
+		Kalman_state (x_size), UD_scheme (x_size, q_maxsize)
 	{}
 };
 
@@ -51,7 +51,7 @@ template <>
 struct Filter_scheme<Information_scheme> : public Information_scheme
 {
 	Filter_scheme(std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state_filter (x_size), Information_state_filter (x_size),
+		Kalman_state (x_size), Information_state (x_size),
 		Information_scheme (x_size)
 	{}
 };
@@ -61,7 +61,7 @@ template <>
 struct Filter_scheme<Information_root_info_scheme> : public Information_root_info_scheme
 {
 	Filter_scheme(std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state_filter (x_size), Information_state_filter (x_size),
+		Kalman_state (x_size), Information_state (x_size),
 		Information_root_info_scheme (x_size)
 	{}
 };
@@ -71,7 +71,7 @@ template <>
 struct Filter_scheme<SIR_scheme> : public SIR_scheme
 {
 	Filter_scheme(std::size_t x_size, std::size_t s_size, SIR_random& random_helper) :
-		Sample_state_filter (x_size, s_size),
+		Sample_state (x_size, s_size),
 		SIR_scheme (x_size, s_size, random_helper)
 	{}
 };
@@ -81,8 +81,8 @@ template <>
 struct Filter_scheme<SIR_kalman_scheme> : public SIR_kalman_scheme
 {
 	Filter_scheme(std::size_t x_size, std::size_t s_size, SIR_random& random_helper) :
-		Sample_state_filter (x_size, s_size),
-		Kalman_state_filter (x_size),
+		Sample_state (x_size, s_size),
+		Kalman_state (x_size),
 		SIR_kalman_scheme (x_size, s_size, random_helper)
 	{}
 };

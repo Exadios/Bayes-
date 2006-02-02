@@ -11,44 +11,7 @@
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
 </item>
-<item id="org.eclipse.cdt.make.core.buildtargets">
-<buildTargets>
-<target name="debug" path="SLAM" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<buildTarget>debug</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-<target name="release" path="SLAM" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<buildTarget>release</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-<target name="rtheta" path="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-<target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<buildTarget>debug</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-<target name="debug" path="BayesFilter" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<buildTarget>debug</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-</buildTargets>
-</item>
+
 <item id="scannerConfiguration">
 <autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
@@ -61,6 +24,17 @@
 <parser enabled="true"/>
 </scannerInfoProvider>
 </profile>
+</item>
+<item id="org.eclipse.cdt.make.core.buildtargets">
+<buildTargets>
+<target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
+<buildTarget>debug</buildTarget>
+<stopOnError>false</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
+</buildTargets>
 </item>
 </data>
 </cdtproject>

@@ -52,7 +52,7 @@ public:
 		full->update();
 	}
 
-	void statistics_sparse( BF::Kalman_state_filter& kstats ) const;
+	void statistics_sparse( BF::Kalman_state& kstats ) const;
 	void decorrelate( Bayesian_filter::Bayes_base::Float d);
 
 protected:

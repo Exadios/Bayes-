@@ -30,7 +30,7 @@ bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance
 
 
 Iterated_covariance_scheme::Iterated_covariance_scheme (std::size_t x_size) :
-		Kalman_state_filter(x_size),
+		Kalman_state(x_size),
 		tempX(x_size,x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -44,7 +44,7 @@ Iterated_covariance_scheme&
  * Precond: matrix size conformance
  */
 {
-	Kalman_state_filter::operator=(a);
+	Kalman_state::operator=(a);
 	return *this;
 }
 

@@ -22,7 +22,7 @@ namespace Bayesian_filter
 
 
 CI_bscheme::CI_bscheme (std::size_t x_size) :
-	Kalman_state_filter(x_size)
+	Kalman_state(x_size)
 /*
  * Initialise filter and set the size of things we know about
  */
@@ -30,7 +30,7 @@ CI_bscheme::CI_bscheme (std::size_t x_size) :
 }
 
 CI_scheme::CI_scheme (std::size_t x_size) :
-	Kalman_state_filter(x_size),
+	Kalman_state(x_size),
 	CI_bscheme(x_size)
 {
 }
@@ -40,7 +40,7 @@ CI_bscheme& CI_bscheme::operator= (const CI_bscheme& a)
  * Precond: matrix size conformance
  */
 {
-	Kalman_state_filter::operator=(a);
+	Kalman_state::operator=(a);
 	return *this;
 }
 

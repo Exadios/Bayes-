@@ -93,7 +93,7 @@ Linear_invertible_predict_model::inverse_model::inverse_model (std::size_t x_siz
 {}
 
 
-State_filter::State_filter (std::size_t x_size) :
+Expected_state::Expected_state (std::size_t x_size) :
 	x(x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -104,21 +104,21 @@ State_filter::State_filter (std::size_t x_size) :
 }
 
 
-Kalman_state_filter::Kalman_state_filter (std::size_t x_size) :
+Kalman_state::Kalman_state (std::size_t x_size) :
 /*
  * Initialise state size
  */
-		State_filter(x_size), X(x_size,x_size)
+		Expected_state(x_size), X(x_size,x_size)
 {}
 
-void Kalman_state_filter::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
+void Kalman_state::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 /*
  * Initialise from a state and state covariance
  *  Parameters that reference the instance's x and X members are valid
  */
 {
-	Kalman_state_filter::x = x;
-	Kalman_state_filter::X = X;
+	Kalman_state::x = x;
+	Kalman_state::X = X;
 	init ();
 }
 
@@ -154,26 +154,26 @@ Bayes_base::Float
 }
 
 
-Information_state_filter::Information_state_filter (std::size_t x_size) :
+Information_state::Information_state (std::size_t x_size) :
 /*
  * Initialise state size
  */
 		y(x_size), Y(x_size,x_size)
 {}
 
-void Information_state_filter::init_information (const FM::Vec& y, const FM::SymMatrix& Y)
+void Information_state::init_information (const FM::Vec& y, const FM::SymMatrix& Y)
 /*
  * Initialise from a information state and information
  *  Parameters that reference the instance's y and Y members are valid
  */
 {
-	Information_state_filter::y = y;
-	Information_state_filter::Y = Y;
+	Information_state::y = y;
+	Information_state::Y = Y;
 	init_yY ();
 }
 
 
-Sample_state_filter::Sample_state_filter (std::size_t x_size, std::size_t s_size) :
+Sample_state::Sample_state (std::size_t x_size, std::size_t s_size) :
 		S(x_size,s_size)
 
 /*
@@ -185,20 +185,12 @@ Sample_state_filter::Sample_state_filter (std::size_t x_size, std::size_t s_size
 		error (Logic_exception("Zero sample filter constructed"));
 }
 
-Sample_state_filter::~Sample_state_filter()
-/*
- * Default definition required for a pure virtual distructor
- * ISSUE Cannot be defined if Matrix has private distructor
- */
-{
-}
-
-void Sample_state_filter::init_sample (const FM::ColMatrix& initS)
+void Sample_state::init_sample (const FM::ColMatrix& S)
 /*
  * Initialise from a sampling
  */
 {
-	S = initS;
+	Sample_state::S = S;
 	init_S();
 }
 
@@ -233,7 +225,7 @@ namespace {
 	};
 }//namespace
 
-std::size_t Sample_state_filter::unique_samples () const
+std::size_t Sample_state::unique_samples () const
 /*
  * Count number of unique (unequal value) samples in S
  * Implementation requires std::sort on sample column references
@@ -266,7 +258,7 @@ std::size_t Sample_state_filter::unique_samples () const
 
 
 Sample_filter::Sample_filter (std::size_t x_size, std::size_t s_size) :
-		Sample_state_filter(x_size,s_size)
+		Sample_state(x_size,s_size)
 
 /*
  * Initialise filter and set the size of things we know about

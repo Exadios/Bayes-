@@ -22,7 +22,7 @@ namespace Bayesian_filter
 
 
 Information_root_bscheme::Information_root_bscheme (std::size_t x_size) :
-		Kalman_state_filter(x_size),
+		Kalman_state(x_size),
 		r(x_size), R(x_size,x_size)
 /*
  * Set the size of things we know about
@@ -30,12 +30,12 @@ Information_root_bscheme::Information_root_bscheme (std::size_t x_size) :
 {}
 
 Information_root_scheme::Information_root_scheme (std::size_t x_size) :
-		Kalman_state_filter(x_size),
-		Information_root_bscheme(x_size)
+		Kalman_state (x_size),
+		Information_root_bscheme (x_size)
 {}
 
 Information_root_info_scheme::Information_root_info_scheme (std::size_t x_size) :
-		Kalman_state_filter(x_size), Information_state_filter (x_size), 
+		Kalman_state (x_size), Information_state (x_size), 
 		Information_root_scheme (x_size)
 {}
 

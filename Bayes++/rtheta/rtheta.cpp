@@ -300,8 +300,8 @@ class Information_linrz_scheme : public Information_scheme
 {
 public:
 	Information_linrz_scheme (std::size_t x_size) :
-		Kalman_state_filter (x_size),
-		Information_state_filter (x_size),
+		Kalman_state (x_size),
+		Information_state (x_size),
 		Information_scheme (x_size)
 	{}
 	Float predict (Linrz_predict_model& f)
@@ -312,12 +312,14 @@ public:
 };
 
 // Filter_scheme Information_linrz_scheme specialisation
+namespace Bayesian_filter {
 template <>
 Filter_scheme<Information_linrz_scheme>::Filter_scheme(std::size_t x_size, std::size_t q_maxsize) :
-	Kalman_state_filter (x_size),
-	Information_state_filter (x_size),
+	Kalman_state (x_size),
+	Information_state (x_size),
 	Information_linrz_scheme (x_size)
 {}
+}
 
 /*
  * Filter under test. Initialised for state and covariance

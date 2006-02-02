@@ -266,7 +266,7 @@ Fast_SLAM_Kstatistics::Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter ) 
 
 
 void Fast_SLAM_Kstatistics::statistics_feature(
-		BF::Kalman_state_filter& kstat, std::size_t fs,
+		BF::Kalman_state& kstat, std::size_t fs,
 		const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const
 /*
  * Compute sample mean and covariance statistics of feature
@@ -336,7 +336,7 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 }
 
 
-void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& kstat )
+void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state& kstat )
 /*
  * Compute sample mean and covariance statistics of filter
  *  
@@ -371,7 +371,7 @@ void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& ksta
 }//statistics_compressed
 
 
-void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
+void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state& kstat )
 /*
  * Compute sample mean and covariance statistics of filter
  *  

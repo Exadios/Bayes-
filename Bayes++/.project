@@ -7,7 +7,12 @@
 	<buildSpec>
 		<buildCommand>
 			<name>org.eclipse.cdt.make.core.makeBuilder</name>
+			<triggers>auto,clean,incremental,</triggers>
 			<arguments>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.arguments</key>
+					<value></value>
+				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.core.errorOutputParser</key>
 					<value>org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.VCErrorParser;</value>
@@ -21,11 +26,19 @@
 					<value></value>
 				</dictionary>
 				<dictionary>
+					<key>org.eclipse.cdt.make.core.environment</key>
+					<value></value>
+				</dictionary>
+				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableAutoBuild</key>
-					<value>false</value>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildLocation</key>
+					<value></value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.inc</key>
 					<value></value>
 				</dictionary>
 				<dictionary>
@@ -37,12 +50,32 @@
 					<value>true</value>
 				</dictionary>
 				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.location</key>
+					<value></value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.clean</key>
+					<value>--clean</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.command</key>
+					<value>bjam</value>
+				</dictionary>
+				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
 					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
 					<value>--clean</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.append_environment</key>
+					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.full</key>
+					<value></value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.useDefaultBuildCmd</key>
@@ -63,6 +96,10 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.stopOnError</key>
 					<value>false</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.target.auto</key>
+					<value></value>
 				</dictionary>
 			</arguments>
 		</buildCommand>

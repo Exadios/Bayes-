@@ -30,7 +30,7 @@ namespace Bayesian_filter
 {
 
 
-class UD_scheme : public Linrz_kalman_filter
+class UD_bscheme : virtual public Kalman_state
 {
 private:
 	std::size_t q_max;	// Maxiumum size allocated for noise model, constructed before UD
@@ -85,30 +85,23 @@ public:
 		FM::Matrix GIHx;		// modified model for linear decorrelation
 	};
 
-	UD_scheme (std::size_t x_size, std::size_t q_maxsize);
-	UD_scheme& operator= (const UD_scheme&);
+	UD_bscheme (std::size_t x_size, std::size_t q_maxsize);
+	UD_bscheme& operator= (const UD_bscheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();
 	void update ();
 
-	Float predict (Linrz_predict_model& f);
-	// Linrz_kalman_filter predict
-	Float epredict (Linrz_predict_model& f, Predict_byproduct& b);
+	Float bypredict (Linrz_predict_model& f, Predict_byproduct& b);
 	// Predict with explict byproduct
 
-	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
-	// Linrz_kalman_filter observe
-	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
-	// NO solution for Correlated noise and Linearised model
-
-	Float eobserve (Linrz_uncorrelated_observe_model& h, const FM::Vec& z,
+	Float byobserve (Linrz_uncorrelated_observe_model& h, const FM::Vec& z,
 			Observe_innovation_byproduct& g, Observe_byproduct& b);
 	// Observe with explict byproduct
-	Float eobserve (Linear_correlated_observe_model& h, const FM::Vec& z,
+	Float byobserve (Linear_correlated_observe_model& h, const FM::Vec& z,
 			Observe_innovation_byproduct& g, Observe_linear_byproduct& b);
 	// Special Linear observe for correlated Z, fast Z decorrelation
-	Float eobserve (Sequential_observe_model& h, const FM::Vec& z,
+	Float byobserve (Sequential_observe_model& h, const FM::Vec& z,
 			Observe_innovation_byproduct& g, Observe_byproduct& b);
 	// Special Linrz observe using fast sequential model
 
@@ -117,6 +110,20 @@ protected:
 	Float observeUD (const Float r, FM::Vec& a, FM::Vec& b, Float& alpha);
 };
 
+
+class UD_scheme : public Linrz_kalman_filter, public UD_bscheme
+{
+public:
+	UD_scheme (std::size_t x_size, std::size_t q_maxsize);
+	
+	Float predict (Linrz_predict_model& f);
+	// Linrz_kalman_filter predict
+
+	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z);
+	// Linrz_kalman_filter observe
+	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z);
+	// NO solution for Correlated noise and Linearised model
+};
 
 }//namespace
 #endif

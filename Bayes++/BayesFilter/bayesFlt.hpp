@@ -403,6 +403,156 @@ private:
 
 
 /*
+ * State Filter - Abstract filtering property
+ * Represents only filter state and an update on that state
+ */
+class Expected_state : virtual public Bayes_base
+{
+public:
+	Expected_state (std::size_t x_size);
+	/* Set constant sizes, state must not be empty (must be >=1)
+	    Exceptions:
+	     bayes_filter_exception is x_size < 1
+	 */
+
+	FM::Vec x;			// expected state
+
+	/* Virtual functions for state changes */
+
+	virtual void update () = 0;
+	/* Update filters state
+	    Updates x(k|k)
+	*/
+};
+
+
+/*
+ * Kalman State Filter -  Abstract state representation
+ * Linear filter representation for 1st (mean) and 2nd (covariance) moments of a distribution
+ *
+ * Probability distributions are represted by state vector (x) and a covariance matix.(X)
+ *
+ * State (x) sizes is assumed to remain constant.
+ * The state and state covariance are public so they can be directly manipulated.
+ *  init: Should be called if x or X are altered
+ *  update: Guarantees that any internal changes made filter are reflected in x,X.
+ *  This allows considerable flexibility so filter implemtations can use different numerical representations
+ *
+ * Derived filters supply definititions for the abstract functions and determine the algorithm used
+ * to implement the filter.
+ */
+
+class Kalman_state : public Expected_state
+{
+public:
+	FM::SymMatrix X;	// state covariance
+
+	Kalman_state (std::size_t x_size);
+	/* Initialise filter and set constant sizes
+	 */
+
+	/* Virtual functions for state changes */
+
+	virtual void init () = 0;
+	/* Initialise from current state and state covariance
+	    Requires x(k|k), X(k|k)
+	*/
+	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X);
+	/* Initialise from a state and state covariance
+	    Parameters that reference the instance's x and X members are valid
+	*/
+	virtual void update () = 0;
+	/* Update filters state and state covariance 
+	    Updates x(k|k), X(k|k)
+	*/
+						
+	// Minimum allowable reciprocal condition number for PD Matrix factorisations
+	Numerical_rcond rclimit;
+};
+
+
+/*
+ * Information State - Abstract state representation
+ *  Linear filter information space representation for 1st (mean) and 2nd (covariance) moments of a distribution
+ *   Y = inv(X)   Information
+ *   y = Y*x      Information state
+ */
+
+class Information_state : virtual public Bayes_base
+{
+public:
+	Information_state (std::size_t x_size);
+	FM::Vec y;				// Information state
+	FM::SymMatrix Y;		// Information
+
+	/* Virtual functions for state changes */
+
+	virtual void init_yY () = 0;
+	/* Initialise from a information state and information
+	    Requires y(k|k), Y(k|k)
+	    Parameters that reference the instance's y and Y members are valid
+	*/
+	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
+	/* Initialise from a information state and information
+	    Parameters that reference the instance's y and Y members are valid
+	*/
+
+	virtual void update_yY () = 0;
+	/* Update filters information state and information
+	    Updates y(k|k), Y(k|k)
+	*/
+};
+
+
+/*
+ * Sample State Filter - Abstract state representation
+ *
+ * Probability distributions are represented by a finite sampling
+ *
+ * State (x_size) size and its sampling (s_size) are assumed to remain constant.
+ * The state sampling public so they can be directly manipulated.
+ *  init: Should be used if they to be altered
+ *  update: Guarantees that any internal changes made filter are reflected in sampling S.
+ */
+
+class Sample_state : virtual public Bayes_base
+{
+public:
+	FM::ColMatrix S;		// state sampleing (x_size,s_size)
+
+	Sample_state (std::size_t x_size, std::size_t s_size);
+	/* Initialise filter and set constant sizes for
+	    x_size of the state vector
+	    s_size sample size
+	    Exceptions:
+	     bayes_filter_exception is s_size < 1
+	*/
+
+	/* Virtual functions for state changes */
+
+	virtual void init_S () = 0;
+	/* Initialise from current sampleing
+	*/
+
+	void init_sample (const FM::ColMatrix& initS);
+	/* Initialise from a sampling
+	 */
+
+	virtual Float update_resample () = 0;
+	/* Resampling update
+	    Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
+	            lcond == 1. if no resampling performed
+	            This should by multipled by the number of samples to get the Likelihood function conditioning
+	 */
+
+	std::size_t unique_samples () const;
+	/* Count number of unique (unequal value) samples in S
+	    Implementation requires std::sort on sample column references
+	*/
+};
+
+
+/*
  * Bayesian Filter
  *
  * A Bayesian Filter uses Bayes rule to fuse the state probabilities
@@ -447,106 +597,6 @@ public:
 };
 
 /*
- * State Filter - Abstract filtering property
- * Represents only filter state and an update on that state
- */
-class State_filter : virtual public Bayes_filter_base
-{
-public:
-	State_filter (std::size_t x_size);
-	/* Set constant sizes, state must not be empty (must be >=1)
-	    Exceptions:
-	     bayes_filter_exception is x_size < 1
-	 */
-
-	FM::Vec x;			// expected state
-
-	/* Virtual functions for filter algorithm */
-
-	virtual void update () = 0;
-	/* Update filters state
-	    Updates x(k|k)
-	*/
-};
-
-
-/*
- * Kalman State Filter - Abstract filtering property
- * Linear filter representation for 1st (mean) and 2nd (covariance) moments of a distribution
- *
- * Probability distributions are represted by state vector (x) and a covariance matix.(X)
- *
- * State (x) sizes is assumed to remain constant.
- * The state and state covariance are public so they can be directly manipulated.
- *  init: Should be called if x or X are altered
- *  update: Guarantees that any internal changes made filter are reflected in x,X.
- *  This allows considerable flexibility so filter implemtations can use different numerical representations
- *
- * Derived filters supply definititions for the abstract functions and determine the algorithm used
- * to implement the filter.
- */
-
-class Kalman_state_filter : public State_filter
-{
-public:
-	FM::SymMatrix X;	// state covariance
-
-	Kalman_state_filter (std::size_t x_size);
-	/* Initialise filter and set constant sizes
-	 */
-
-	/* Virtual functions for filter algorithm */
-
-	virtual void init () = 0;
-	/* Initialise from current state and state covariance
-	    Requires x(k|k), X(k|k)
-	*/
-	void init_kalman (const FM::Vec& x, const FM::SymMatrix& X);
-	/* Initialise from a state and state covariance
-	    Parameters that reference the instance's x and X members are valid
-	*/
-	virtual void update () = 0;
-	/* Update filters state and state covariance 
-	    Updates x(k|k), X(k|k)
-	*/
-						
-	// Minimum allowable reciprocal condition number for PD Matrix factorisations
-	Numerical_rcond rclimit;
-};
-
-
-/*
- * Information State Filter - Abstract filtering property
- * Linear filter information space representation for 1st (mean) and 2nd (covariance) moments of a distribution
- *   Y = inv(X)   Information
- *   y = Y*x      Information state
- */
-
-class Information_state_filter : virtual public Bayes_filter_base
-{
-public:
-	Information_state_filter (std::size_t x_size);
-	FM::Vec y;				// Information state
-	FM::SymMatrix Y;		// Information
-
-	virtual void init_yY () = 0;
-	/* Initialise from a information state and information
-	    Requires y(k|k), Y(k|k)
-	    Parameters that reference the instance's y and Y members are valid
-	*/
-	void init_information (const FM::Vec& y, const FM::SymMatrix& Y);
-	/* Initialise from a information state and information
-	    Parameters that reference the instance's y and Y members are valid
-	*/
-
-	virtual void update_yY () = 0;
-	/* Update filters information state and information
-	    Updates y(k|k), Y(k|k)
-	*/
-};
-
-
-/*
  * Linearizable filter models - Abstract filtering property
  *  Linrz == A linear, or gradient Linearized filter
  *
@@ -586,10 +636,10 @@ public:
  * Common abstration for many linear filters
  *  Has a virtual base to represent the common state
  */
-class Linrz_kalman_filter : public Linrz_filter, virtual public Kalman_state_filter
+class Linrz_kalman_filter : public Linrz_filter, virtual public Kalman_state
 {
 protected:
-	Linrz_kalman_filter() : Kalman_state_filter(0) // define a default constructor
+	Linrz_kalman_filter() : Kalman_state(0) // define a default constructor
 	{}
 };
 
@@ -607,7 +657,7 @@ protected:
 class Extended_kalman_filter : public Linrz_kalman_filter
 {
 protected:
-	Extended_kalman_filter() : Kalman_state_filter(0) // define a default constructor
+	Extended_kalman_filter() : Kalman_state(0) // define a default constructor
 	{}
 public:
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, FM::Vec& innov);
@@ -636,55 +686,6 @@ public:
 
 
 /*
- * Sample State Filter - Abstract filtering property
- *
- * Probability distributions are represented by a finite sampling
- *
- * State (x_size) size and its sampling (s_size) are assumed to remain constant.
- * The state sampling public so they can be directly manipulated.
- *  init: Should be used if they to be altered
- *  update: Guarantees that any internal changes made filter are reflected in sampling S.
- */
-
-class Sample_state_filter : virtual public Bayes_filter_base
-{
-public:
-	FM::ColMatrix S;		// state sampleing (x_size,s_size)
-
-	Sample_state_filter (std::size_t x_size, std::size_t s_size);
-	/* Initialise filter and set constant sizes for
-	    x_size of the state vector
-	    s_size sample size
-	    Exceptions:
-	     bayes_filter_exception is s_size < 1
-	*/
-	~Sample_state_filter() = 0;	// ISSUE Provide unambigues distructor incase S is not distructable
-
-	/* Virtual functions for filter algorithm */
-
-	virtual void init_S () = 0;
-	/* Initialise from current sampleing
-	*/
-
-	void init_sample (const FM::ColMatrix& initS);
-	/* Initialise from a sampling
-	 */
-
-	virtual Float update_resample () = 0;
-	/* Resampling update
-	    Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
-	            lcond == 1. if no resampling performed
-	            This should by multipled by the number of samples to get the Likelihood function conditioning
-	 */
-
-	std::size_t unique_samples () const;
-	/* Count number of unique (unequal value) samples in S
-	    Implementation requires std::sort on sample column references
-	*/
-};
-
-
-/*
  * Sample Filter: Bayes filter using
  *
  * Probability distributions are represted by a finite sampling
@@ -698,7 +699,7 @@ public:
  * to implement the filter.
  */
 
-class Sample_filter : public Likelihood_filter, public Functional_filter, virtual public Sample_state_filter
+class Sample_filter : public Likelihood_filter, public Functional_filter, virtual public Sample_state
 {
 public:
 	Sample_filter (std::size_t x_size, std::size_t s_size);

@@ -91,15 +91,15 @@ public:
 	Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter );
 	// Construct Fast_SLAM filter using referenced filter for resampling
 	
-	void statistics_compressed( BF::Kalman_state_filter& kstats );
+	void statistics_compressed( BF::Kalman_state& kstats );
 	// Compute statistics of particles: Sample mean and covariance of particle.
 	// Statistics are returned in a compressed form with location states augmented with active feature states
-	void statistics_sparse( BF::Kalman_state_filter& kstats );
+	void statistics_sparse( BF::Kalman_state& kstats );
 	// Compute statistics of particles: Sample mean and covariance of particle.
 	// Statistics are returned in a sparse form indexed by feature number
 
 protected:
-	void statistics_feature( BF::Kalman_state_filter& kstat, std::size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
+	void statistics_feature( BF::Kalman_state& kstat, std::size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
 	// Compute statistics of particles for a map feature: Sample mean and covariance of particle.
 
 	BF::SIR_kalman_scheme& L;			// Reference to filter parameter in constructor

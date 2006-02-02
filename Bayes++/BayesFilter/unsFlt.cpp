@@ -26,7 +26,7 @@ namespace Bayesian_filter
  * Initialise filter and set the size of things we know about
  */
 Unscented_scheme::Unscented_scheme (std::size_t x_size) :
-		Kalman_state_filter(x_size), Functional_filter(),
+		Kalman_state(x_size), Functional_filter(),
 		XX(x_size, 2*x_size+1),
 		fXX(x_size, 2*x_size+1)
 {
@@ -39,7 +39,7 @@ Unscented_scheme::Unscented_scheme (std::size_t x_size) :
  */
 Unscented_scheme& Unscented_scheme::operator= (const Unscented_scheme& a)
 {
-	Kalman_state_filter::operator=(a);
+	Kalman_state::operator=(a);
 	XX = a.XX;
 	return *this;
 }

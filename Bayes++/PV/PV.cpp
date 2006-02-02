@@ -107,7 +107,7 @@ Pobserve::Pobserve () :
 }
 
 
-void initialise (Kalman_state_filter& kf, const Vec& initState)
+void initialise (Kalman_state& kf, const Vec& initState)
 /*
  * Initialise Kalman filter with an initial guess for the system state and fixed covariance
  */

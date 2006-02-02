@@ -25,7 +25,8 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 // Zero a matrix_range
 {	// Note A cannot be a reference
 	typedef typename Base::value_type Base_value_type;
-	FM::noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type());
+//TODO	FM::noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type(0));
+	FM::noalias(A) = FM::ublas::zero_matrix<Base_value_type>(A.size1(),A.size2());
 }
 
 Kalman_SLAM::Kalman_SLAM( Kalman_filter_generator& filter_generator ) :
@@ -126,7 +127,12 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
         // X+ = [0 Ha] X [0 Ha]' + Hb Z Hb'
         // - zero exisiting feature covariance
 	zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
-	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
+	// full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
+	{	// ISSUE uBLAS has problems assigning to symmetric proxy as above, go element by element
+		const FM::Matrix cross (FM::prod(Ha, full->X.sub_matrix(0,nL, 0,nL+nM)) );
+		for (std::size_t i = 0; i != nL+nM-1; ++i)
+			full->X(nL+feature, i) = cross(0,i);
+	}
 		// feature state and variance
 	full->x[nL+feature] = fom.h(sz)[0];
 	full->X(nL+feature,nL+feature) = ( FM::prod_SPD(Ha,full->X.sub_matrix(0,nL, 0,nL),tempHa) +
@@ -162,11 +168,13 @@ void Kalman_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::F
 void Kalman_SLAM::forget( unsigned feature, bool must_exist )
 {
 	full->x[nL+feature] = 0.;
-	zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
+			// zero upper row and column
+	zero( full->X.sub_matrix(0,nL+feature, nL+feature,nL+feature+1) );
+	zero( full->X.sub_matrix(nL+feature,nL+feature+1, nL+feature,full->X.size1()) );
 	full->init();
 }
 
-void Kalman_SLAM::statistics_sparse( BF::Kalman_state_filter& kstats ) const
+void Kalman_SLAM::statistics_sparse( BF::Kalman_state& kstats ) const
 {
 	const std::size_t k = std::min(kstats.x.size(), full->x.size());
 	kstats.x.clear(); kstats.X.clear();
