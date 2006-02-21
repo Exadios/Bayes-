@@ -25,7 +25,6 @@ inline void zero(FM::ublas::matrix_range<Base> A)
 // Zero a matrix_range
 {	// Note A cannot be a reference
 	typedef typename Base::value_type Base_value_type;
-//TODO	FM::noalias(A) = FM::ublas::scalar_matrix<Base_value_type>(A.size1(),A.size2(), Base_value_type(0));
 	FM::noalias(A) = FM::ublas::zero_matrix<Base_value_type>(A.size1(),A.size2());
 }
 
