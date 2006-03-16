@@ -24,7 +24,6 @@
  *
  * Gappy matrix support: The macros BAYES_FILTER_(SPARSE/COMPRESSED/COORDINATE) control experimental gappy matrix support
  * When enabled the default storage types are replaced with their sparse equivilents
- *
  */
 
 #include <boost/version.hpp>
