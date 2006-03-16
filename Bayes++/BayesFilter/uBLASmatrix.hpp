@@ -54,7 +54,7 @@ public:
 	{}	// Empty constructor
 	explicit FMVec(typename VecBase::size_type size) : VecBase(size)
 	{	// Sized constructor
-		assign (ublas::scalar_vector<value_type>(size, std::numeric_limits<value_type>::signaling_NaN()));
+		VecBase::assign (ublas::scalar_vector<value_type>(size, std::numeric_limits<value_type>::signaling_NaN()));
 	}
 	FMVec(const FMVec& c) : VecBase(static_cast<const VecBase&>(c))
 	{}	// Copy constructor
@@ -105,7 +105,7 @@ public:
 	{}	// Empty constructor
 	FMMatrix(typename MatrixBase::size_type size1, typename MatrixBase::size_type size2) : MatrixBase(size1,size2)
 	{	// Sized constructor
-		assign (ublas::scalar_matrix<value_type>(size1, size2, std::numeric_limits<value_type>::signaling_NaN()));
+		VecBase::assign (ublas::scalar_matrix<value_type>(size1, size2, std::numeric_limits<value_type>::signaling_NaN()));
 	}
 	FMMatrix(const FMMatrix& c) : MatrixBase(static_cast<const MatrixBase&>(c))
 	{}	// Copy constructor
