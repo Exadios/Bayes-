@@ -34,7 +34,7 @@ public:
 protected:
 	Filter_exception (const char* description)
 	{	error_description = description;
-	};
+	}
 private:
 	const char* error_description;
 };
@@ -47,7 +47,7 @@ class Logic_exception : virtual public Filter_exception
 public:
 	Logic_exception (const char* description) :
 		Filter_exception (description)
-	{};
+	{}
 };
 
 class Numeric_exception : virtual public Filter_exception
@@ -58,7 +58,7 @@ class Numeric_exception : virtual public Filter_exception
 public:
 	Numeric_exception (const char* description) :
 		Filter_exception (description)
-	{};
+	{}
 };
 
 
