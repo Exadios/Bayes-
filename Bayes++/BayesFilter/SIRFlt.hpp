@@ -91,12 +91,14 @@ public:
 class Standard_resampler : public Importance_resampler
 // Standard resample algorithm from [1]
 {
+public:
 	Float resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
 
 class Systematic_resampler : public Importance_resampler
 // Systematic resample algorithm from [2]
 {
+public:
 	Float resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const;
 };
 
