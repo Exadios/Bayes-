@@ -5,8 +5,7 @@
  * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.html for terms and conditions of use.
  *
- * $Header$
- * $NoKeywords: $
+ * $Id$
  */
 
 /*
