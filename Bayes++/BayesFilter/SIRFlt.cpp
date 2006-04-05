@@ -109,7 +109,7 @@ Standard_resampler::Float
 	}
 	assert (pri==presamples.end());	// must traverse all of P
 	
-	if (ui != ui_end)				// resample failed due no non numeric weights
+	if (ui != ui_end)				// resample failed due non numeric weights
 		error (Numeric_exception("weights are not numeric and cannot be resampled"));
 	
 	uresamples = unique;
