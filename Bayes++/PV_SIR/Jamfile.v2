@@ -1,0 +1,16 @@
+# Bayes++ Jamfile - See Boost.build v2
+
+# PV_SIR - Position Velocity filter using SIR scheme
+project
+     :
+     : default-build release
+;
+
+exe gcc41test :
+     GCC41test.cpp
+     :
+     <debug-symbols>on
+     #<cxxflags>"-S"
+     # <cxxflags>"-fno-tree-loop-optimize"
+;
+
