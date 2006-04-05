@@ -1,4 +1,10 @@
 /*
+ * Bayes++ the Bayesian Filtering Library
+ * Copyright (c) 2004 Michael Stevens
+ * See accompanying Bayes++.html for terms and conditions of use.
+ */
+
+/*
  * Bayesian_filter_matrix <-> MuPAD conversions
  *  Many MuPAD function use long, we assume long === int
  */

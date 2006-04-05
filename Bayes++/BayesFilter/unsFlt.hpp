@@ -9,7 +9,8 @@
  * $Id$
  */
 
-/** Unscented Filter Scheme.
+/*
+ * Unscented Filter Scheme.
  *
  *  A Julier-Uhlmann Unscented non-linear Kalman filter
  */

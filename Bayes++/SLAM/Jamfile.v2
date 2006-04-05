@@ -1,4 +1,6 @@
 # Bayes++ Jamfile - See Boost.build
+#
+# $Id$
 
 # FastSLAM Test. Compare Kalman and FastSLAM results
 project

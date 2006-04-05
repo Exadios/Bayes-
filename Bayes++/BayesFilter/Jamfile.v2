@@ -1,5 +1,7 @@
 # Bayes++ Jamfile - See Boost.build v2
 # BayesFilter - The Bayesian filtering library
+#
+# $Id$
 
 # Propagated usage requirements
 project BayesFilter
