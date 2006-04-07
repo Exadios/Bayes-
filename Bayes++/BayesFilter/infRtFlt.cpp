@@ -78,9 +78,8 @@ void Information_root_info_scheme::init_yY ()
 		std::size_t i,j;
 		for (i = 0; i < n; ++i)
 		{
-			using namespace std;		// for sqrt
 			LTriMatrix::value_type sd = LC(i,i);
-			sd = sqrt(sd);
+			sd = std::sqrt(sd);
 			LC(i,i) = sd;
 						// Multiply columns by square of non zero diagonal. TODO use column operation
 			for (j = i+1; j < n; ++j)

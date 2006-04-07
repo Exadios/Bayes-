@@ -378,9 +378,8 @@ void SIR_scheme::roughen_minmax (ColMatrix& P, Float K) const
  *		unchanged: P
  */
 {
-	using namespace std;
 						// Scale Sigma by constant and state dimensions
-	Float SigmaScale = K * pow (Float(P.size2()), -1/Float(x_size));
+	Float SigmaScale = K * std::pow (Float(P.size2()), -1/Float(x_size));
 
 						// Find min and max states in all P, precond P not empty
 	Vec xmin(x_size); noalias(xmin) = column(P,0);
@@ -547,9 +546,8 @@ void SIR_kalman_scheme::roughen_correlated (ColMatrix& P, Float K)
  *    unchanged: P
  */
 {
-	using namespace std;
 						// Scale variance by constant and state dimensions
-	Float VarScale = sqr(K) * pow (Float(P.size2()), Float(-2.)/Float(x_size));
+	Float VarScale = sqr(K) * std::pow (Float(P.size2()), Float(-2.)/Float(x_size));
 
 	update_statistics();	// Estimate sample mean and covariance
 

@@ -131,8 +131,7 @@ Bayes_base::Float
 	}
 	Float logL = FM::inner_prod(zInnov, Zv_inv);
 
-	using namespace std;
-	return exp(Float(-0.5)*(logL + logdetZ));
+	return std::exp(Float(-0.5)*(logL + logdetZ));
 }
 
 void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelated_additive_observe_model& model)
@@ -145,14 +144,14 @@ void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelat
 	Float rcond = FM::UdUrcond(model.Zv);
 	model.rclimit.check_PD(rcond, "Z not PD in observe");
 
+						// Zv[i] > 0 as Zv PD
 	Bayes_base::Float detZ = 1;
-	
 	for (FM::Vec::const_iterator zi = model.Zv.begin(), zi_end = model.Zv.end(); zi != zi_end; ++zi) {
 		detZ *= *zi;
 		Zv_inv[zi.index()] = 1 / (*zi);		// Protected from /0 by rcond check
 	}
-	using namespace std;
-	logdetZ = log(detZ);		// Protected from ln(0) by rcond check
+						// detZ > 0 as Zv PD
+	logdetZ = std::log(detZ);
 }
 
 Bayes_base::Float
@@ -172,8 +171,7 @@ Bayes_base::Float
 	FM::noalias(zInnov) -= zp;
 
 	Float logL = scaled_vector_square(zInnov, Z_inv);
-	using namespace std;
-	return exp(Float(-0.5)*(logL + logdetZ));
+	return std::exp(Float(-0.5)*(logL + logdetZ));
 }
 
 void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_additive_observe_model& model)
@@ -186,7 +184,8 @@ void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_a
 	Float detZ;
 	Float rcond = FM::UdUinversePD (Z_inv, detZ, model.Z);
 	model.rclimit.check_PD(rcond, "Z not PD in observe");
-	logdetZ = log(detZ);		// Protected from ln(0) by rcond check
+						// detZ > 0 as Z PD
+	logdetZ = std::log(detZ);
 }
 
 
