@@ -2,9 +2,9 @@ Bayes++ TODO List
 
 FOR RELEASE
 		Doxygen PROJECT_NUMBER and compile Class Documentation!
-		Commit to CVS (for file versions)
-		Build gcc-3.4 gcc-3.3.1 msvc-7 intelinux-71
-		Check VC7 solution
+		Commit to SVN (for file versions)
+		Build gcc msvc intelinux1
+		Check MSVC solution
 		Check rtheta
 	Check what uBLAS macros are needed
 		For exceptions/errors
