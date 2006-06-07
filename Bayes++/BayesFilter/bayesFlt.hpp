@@ -45,8 +45,9 @@ public:
 	static void error (const Numeric_exception& a);
 	static void error (const Logic_exception& a);
 	// Report a filter, throw a Filter_exception
-	//  No exception saftey rules are specified, assume the object is invalid
-	// May have side effects for debuging
+	//  No exception saftey rules are specified for derived classes.
+	//  Assume the throwing instance is invalid unless otherwise stated.
+	// May have side effects for debugging
 };
 
 
@@ -708,6 +709,13 @@ public:
 	    Exceptions:
 	     bayes_filter_exception is s_size < 1
 	*/
+
+	Sample_filter& operator= (const Sample_filter& a)
+	// ISSUE require explict definition for VC7.1
+	{
+		Sample_state::operator=(a);
+		return *this;
+	}
 
 	/* Virtual functions for filter algorithm */
 
