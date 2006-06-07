@@ -3,7 +3,7 @@
  * Copyright (c) 2004 Michael Stevens
  * See accompanying Bayes++.html for terms and conditions of use.
  *
- * $Id$
+ * $Id:unsFlt.cpp 560 2006-04-05 18:27:05Z mistevens $
  */
 
 /*
@@ -44,7 +44,7 @@ Unscented_scheme& Unscented_scheme::operator= (const Unscented_scheme& a)
 }
 
 /*
- * Generate the unscented point representing a distribution.
+ * Generate the unscented sigma points representing a distribution.
  * Fails if scale is negative
  */
 void Unscented_scheme::unscented (ColMatrix& XX, const Vec& x, const SymMatrix& X, Float scale)
@@ -299,7 +299,7 @@ Bayes_base::Float Unscented_scheme::byobserve (Correlated_additive_observe_model
 	{
 		ColMatrix::Column zXX0 = column(zXX,0);
 		noalias(Xzz) = FM::outer_prod(zXX0, zXX0);
-		Xzz *= 2*kappa;
+		Xzz *= 2* (x_kappa+kappa);
 	}
 							// Remaining unscented points
 	for (std::size_t i = 1; i < zXX.size2(); ++i) {
