@@ -8,11 +8,8 @@ project
      : default-build release
 ;
 
-exe gcc41test :
-     GCC41test.cpp
-     :
-     <debug-symbols>on
-     #<cxxflags>"-S"
-     # <cxxflags>"-fno-tree-loop-optimize"
+exe pv_sir :
+     PV_SIR.cpp
+     ../BayesFilter//BayesFilter
 ;
 

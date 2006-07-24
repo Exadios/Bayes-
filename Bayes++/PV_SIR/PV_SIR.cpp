@@ -68,10 +68,12 @@ class Boost_random : public SIR_random, public Bayesian_filter_test::Boost_rando
  */
 {
 public:
+	using Bayesian_filter_test::Boost_random::normal;
 	void normal (DenseVec& v)
 	{
 		Bayesian_filter_test::Boost_random::normal (v);
 	}
+	using Bayesian_filter_test::Boost_random::uniform_01;
 	void uniform_01 (DenseVec& v)
 	{
 		Bayesian_filter_test::Boost_random::uniform_01 (v);
@@ -130,7 +132,7 @@ PVobserve::PVobserve () :
 }
 
 
-void initialise (Kalman_state& kf, const Vec& initState)
+void initialise (Kalman_state_filter& kf, const Vec& initState)
 /*
  * Initialise Kalman filter with an initial guess for the system state and fixed covariance
  */
