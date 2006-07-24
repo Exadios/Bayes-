@@ -9,6 +9,7 @@
 build-project BayesFilter ;
 build-project Simple ;
 build-project PV ;
+build-project PV_SIR ;
 build-project QuadCalib ;
 
 # Project requirements
