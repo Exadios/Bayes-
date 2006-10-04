@@ -1,0 +1,13 @@
+x,P,v,R,H
+
+PHt = P*H';
+S = H*PHt + R;
+
+Sc = chol(S);
+Sci = inv(Sc);
+
+Wc = PHt * Sci;
+W = Wc * Sci';
+
+x = x + W*v;
+P = P - Wv*Wc';
