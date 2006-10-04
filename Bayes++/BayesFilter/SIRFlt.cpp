@@ -522,8 +522,8 @@ void SIR_kalman_scheme::update_statistics ()
     mean ();
     X.clear();              // Covariance
 
-    const FM::ColMatrix::size_type nSamples = S.size2();
-    for (FM::ColMatrix::size_type i = 0; i != nSamples; ++i) {
+    const std::size_t nSamples = S.size2();
+    for (std::size_t i = 0; i != nSamples; ++i) {
         FM::ColMatrix::Column Si(S,i);
         X.plus_assign (FM::outer_prod(Si-x, Si-x));
     }
