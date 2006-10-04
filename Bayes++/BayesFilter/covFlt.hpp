@@ -49,6 +49,7 @@ public:
 	Float byobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
 				FM::SymMatrix& S, FM::UTriMatrix& Sci, FM::Matrix& W, FM::Matrix& Wc, FM::Matrix& XtHx);
 	// Observe with explict byproduct
+	// Innovation observe using Cholesky factor innovation covariance
 
 protected:			   		// Permenantly allocated temps
 	FM::RowMatrix tempX;
