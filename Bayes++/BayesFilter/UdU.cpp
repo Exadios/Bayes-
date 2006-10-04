@@ -496,7 +496,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  *    see in-place LdLfactor
  */
 {
-	noalias(LD) = M;
+	noalias(LD) = LowerTri(M);
 	LTriMatrix::value_type rcond = LdLfactor (LD, M.size1());
 
 	return rcond;
