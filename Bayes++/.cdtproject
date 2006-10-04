@@ -27,6 +27,13 @@
 </item>
 <item id="org.eclipse.cdt.make.core.buildtargets">
 <buildTargets>
+<target name="rtheta" path="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
+<buildCommand>bjam</buildCommand>
+<buildArguments></buildArguments>
+<buildTarget>debug</buildTarget>
+<stopOnError>false</stopOnError>
+<useDefaultCommand>false</useDefaultCommand>
+</target>
 <target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
 <buildCommand>bjam</buildCommand>
 <buildArguments></buildArguments>
