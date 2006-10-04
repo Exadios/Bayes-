@@ -45,9 +45,9 @@ public:
 	// Specialised 'stationary' predict, only additive noise
 
 	Float byobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
-				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W, FM::Matrix& XtHx);
+				FM::SymMatrix& S, FM::UTriMatrix& Sci, FM::Matrix& W, FM::Matrix& Wc, FM::Matrix& XtHx);
 	Float byobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
-				FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W, FM::Matrix& XtHx);
+				FM::SymMatrix& S, FM::UTriMatrix& Sci, FM::Matrix& W, FM::Matrix& Wc, FM::Matrix& XtHx);
 	// Observe with explict byproduct
 
 protected:			   		// Permenantly allocated temps
@@ -71,9 +71,11 @@ protected:					// Allow fast operation if z_size remains constant
 	std::size_t last_z_size;
 	void observe_size (std::size_t z_size);
 							// Numerical byproducts
-	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
-	FM::Matrix W;				// Kalman Gain
-	FM::Matrix XtHx;			// X * Hx'
+	FM::SymMatrix S;		// Innovation Covariance
+	FM::UTriMatrix Sci;		// Sci'*Sci = inv(S)
+	FM::Matrix W;			// Kalman Gain
+	FM::Matrix Wc;			// W = Wc * Sci
+	FM::Matrix XtHx;		// X * Hx'
 };
 
 }//namespace
