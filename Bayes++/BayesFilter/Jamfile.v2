@@ -6,6 +6,7 @@
 # Propagated usage requirements
 project BayesFilter
      : usage-requirements <include>".."		# Library headers are refered to as "BayesFilter/xxx.hpp"
+       <toolset>msvc:<define>"_SECURE_SCL_DEPRECATE=0"
 ;
 
 # Base names of the source files for BayesFilter
@@ -15,5 +16,6 @@ CPP_SOURCES =
 # Declare the BayesFilter static link library
 lib BayesFilter : $(CPP_SOURCES).cpp
     : <link>static
-     <toolset>intel:<cxxflags>"-mp1"		# Require IEEE NaN comparisons
+      <toolset>msvc:<define>"_SECURE_SCL_DEPRECATE=0"
+      <toolset>intel:<cxxflags>"-mp1"		# Require IEEE NaN comparisons
 ;
