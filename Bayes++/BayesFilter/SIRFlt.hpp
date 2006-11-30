@@ -250,12 +250,12 @@ public:
 	void init ();
 
 	void update ()
-	// Implement Kalman_filter::update identically to SIR_scheme
+	// Implement Kalman_filter::update using default SIR_scheme resampler
 	{	(void)SIR_scheme::update_resample();
 	}
 
 	Float update_resample ()
-	// Implement identically to SIR_scheme
+	// Implement identically to SIR_scheme - would be hidden by next overload
 	{	return SIR_scheme::update_resample();
 	}
 
