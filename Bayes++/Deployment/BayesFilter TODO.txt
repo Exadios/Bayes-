@@ -25,7 +25,7 @@ DOCUMENTATION
 
 PROFILING
 	bjam release gcc/debug-symbols=on SLAM
-	valgrind --skin=cachegrind target/SLAM/gcc/release/debug-symbols-on/
+	valgrind --tool=callgrind target/SLAM/gcc/release/debug-symbols-on/
 	
 TODO
 	Parametised_observe_model could loose h
