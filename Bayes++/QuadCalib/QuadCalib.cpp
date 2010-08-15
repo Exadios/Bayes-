@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -39,6 +39,9 @@ namespace
 	{
 		return x*x;
 	}
+
+	// Random numbers from Boost
+	Bayesian_filter_test::Boost_random localRng;
 
 	// Constant Dimensions
 	const unsigned NX = 3;			// Filter State dimension 	(SystemState, Scale, Bias)
@@ -128,9 +131,6 @@ int main()
 {
 	// Global setup for test output
 	std::cout.flags(std::ios::scientific); std::cout.precision(6);
-
-	// Random numbers from Boost
-	Bayesian_filter_test::Boost_random localRng;
 
 	// Setup the test filters
 	FM::Vec x_true (NX);

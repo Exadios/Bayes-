@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -23,56 +23,34 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-UD_bscheme::
-UD_bscheme (std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state(x_size),
+UD_scheme::
+UD_scheme (std::size_t x_size, std::size_t q_maxsize, std::size_t z_initialsize) :
+		Kalman_state_filter(x_size),
 		q_max(q_maxsize),
-		UD(x_size,x_size+q_max)
+		UD(x_size,x_size+q_max),
+		s(Empty), Sd(Empty),
+		d(x_size+q_max), dv(x_size+q_max), v(x_size+q_max),
+		a(x_size), b(x_size),
+		h1(x_size), w(x_size),
+		znorm(Empty),
+		zpdecol(Empty),
+		Gz(Empty),
+		GIHx(Empty)
 /*
  * Initialise filter and set the size of things we know about
  */
-{}
+{
+	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
+	observe_size (z_initialsize);
+}
 
-UD_scheme::
-UD_scheme (std::size_t x_size, std::size_t q_maxsize) :
-		Kalman_state(x_size),
-		UD_bscheme(x_size,q_maxsize)
-{}
-
-UD_bscheme::
-Predict_byproduct::Predict_byproduct (std::size_t x_size, std::size_t q_size) :
-	d(x_size+q_size), dv(x_size+q_size), v(x_size+q_size)
-{}
-
-UD_bscheme::
-Observe_innovation_byproduct::Observe_innovation_byproduct (std::size_t x_size, std::size_t z_size) :
-		s(z_size),
-		Sv(z_size),
-		W(x_size, z_size)
-{}
-
-UD_bscheme::
-Observe_byproduct::Observe_byproduct (std::size_t x_size, std::size_t z_size) :
-		a(x_size),
-		w(x_size),
-		znorm(z_size)
-{}
-
-UD_bscheme::
-Observe_linear_byproduct::Observe_linear_byproduct (std::size_t x_size, std::size_t z_size) :
-		Observe_byproduct(x_size, z_size),
-		zpdecol(z_size),
-		Gz(z_size, z_size),
-		GIHx(z_size, x_size)
-{}
-
-UD_bscheme&
- UD_bscheme::operator= (const UD_bscheme& a)
+UD_scheme&
+ UD_scheme::operator= (const UD_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
 {
-	Kalman_state::operator=(a);
+	Kalman_state_filter::operator=(a);
 	q_max = a.q_max;
 	UD = a.UD;
 	return *this;
@@ -80,7 +58,7 @@ UD_bscheme&
 
 
 void
- UD_bscheme::init ()
+ UD_scheme::init ()
 /*
  * Initialise from a state and state coveriance
  * Computes UD factor from initial covaiance
@@ -93,14 +71,14 @@ void
 {
 					// Factorise X into left partition of UD
 	std::size_t x_size = UD.size1();
-	noalias(UD.sub_matrix(0,x_size, 0,x_size)) = X;
+	UD.sub_matrix(0,x_size, 0,x_size) .assign (X);
 	Float rcond = UdUfactor (UD, x_size);
 	rclimit.check_PSD(rcond, "Initial X not PSD");
 }
 
 
 void
- UD_bscheme::update ()
+ UD_scheme::update ()
 /*
  * Defactor UD back into X
  * Precond:
@@ -115,17 +93,8 @@ void
 
 UD_scheme::Float
  UD_scheme::predict (Linrz_predict_model& f)
-/* Linrz_kalman_filter predict, unused byproduct
- */
-{
-	Predict_byproduct b(f.G.size1(), f.G.size2());
-	return bypredict (f, b);
-}
-
-Bayes_base::Float
- UD_bscheme::bypredict (Linrz_predict_model& f, Predict_byproduct& b)
 /*
- * Predict using a diagonalised noise q, and its coupling G
+ * Prediction using a diagonalised noise q, and its coupling G
  *  q can have order less then x and a matching G so GqG' has order of x
  * Precond:
  *	UD
@@ -136,16 +105,16 @@ Bayes_base::Float
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 
 						// Predict UD from model
-	Float rcond = predictGq (f.Fx, f.G, f.q, b);
+	Float rcond = predictGq (f.Fx, f.G, f.q);
 	rclimit.check_PSD(rcond, "X not PSD in predict");
 	return rcond;
 }
 
 
-Bayes_base::Float
- UD_bscheme::predictGq (const Matrix& Fx, const Matrix& G, const Vec& q, Predict_byproduct& b)
+UD_scheme::Float
+ UD_scheme::predictGq (const Matrix& Fx, const Matrix& G, const FM::Vec& q)
 /*
- * MWG-S predict from Bierman  p.132
+ * MWG-S prediction from Bierman  p.132
  *  q can have order less then x and a matching G so GqG' has order of x
  * Precond:
  *  UD
@@ -170,7 +139,7 @@ Bayes_base::Float
 						// Augment d with q, UD with G
 		for (i = 0; i < Nq; ++i)		// 0..Nq-1
 		{
-			b.d[i+n] = q[i];
+			d[i+n] = q[i];
 		}
 		for (j = 0; j < n; ++j)		// 0..n-1
 		{
@@ -185,7 +154,7 @@ Bayes_base::Float
 		{
 						// Prepare d(0)..d(j) as temporary
 			for (i = 0; i <= j; ++i)	// 0..j
-				b.d[i] = Float(UD(i,j));	// ISSUE mixed type proxy assignment
+				d[i] = Float(UD(i,j));	// ISSUE mixed type proxy assignment
 
 						// Lower triangle of UD is implicity empty
 			for (i = 0; i < n; ++i) 	// 0..n-1
@@ -194,10 +163,10 @@ Bayes_base::Float
 				Matrix::const_Row Fxi(Fx,i);
 				UDi[j] = Fxi[j];
 				for (k = 0; k < j; ++k)	// 0..j-1
-					UDi[j] += Fxi[k] * b.d[k];
+					UDi[j] += Fxi[k] * d[k];
 			}
 		}
-		b.d[0] = Float(UD(0,0));	// ISSUE mixed type proxy assignment
+		d[0] = Float(UD(0,0));	// ISSUE mixed type proxy assignment
 
 						//  Complete U = Fx*U
 		for (j = 0; j < n; ++j)			// 0..n-1
@@ -212,9 +181,9 @@ Bayes_base::Float
 			e = 0;
 			for (k = 0; k < N; ++k)		// 0..N-1
 			{
-				b.v[k] = Float(UDj[k]);	// ISSUE mixed type proxy assignment
-				b.dv[k] = b.d[k] * b.v[k];
-				e += b.v[k] * b.dv[k];
+				v[k] = Float(UDj[k]);	// ISSUE mixed type proxy assignment
+				dv[k] = d[k] * v[k];
+				e += v[k] * dv[k];
 			}
 			// Check diagonal element
 			if (e > 0)
@@ -228,12 +197,12 @@ Bayes_base::Float
 					Matrix::Row UDk(UD,k);
 					e = 0;
 					for (i = 0; i < N; ++i)	// 0..N-1
-						e += UDk[i] * b.dv[i];
+						e += UDk[i] * dv[i];
 					e *= diaginv;
 					UDj[k] = e;
 
 					for (i = 0; i < N; ++i)	// 0..N-1
-						UDk[i] -= e * b.v[i];
+						UDk[i] -= e * v[i];
 				}
 			}//PD
 			else if (e == 0)
@@ -247,7 +216,7 @@ Bayes_base::Float
 					Matrix::Row UDk(UD,k);
 					for (i = 0; i < N; ++i)	// 0..N-1
 					{
-						e = UDk[i] * b.dv[i];
+						e = UDk[i] * dv[i];
 						if (e != 0)
 							goto Negative;
 					}
@@ -282,27 +251,32 @@ Negative:
 }
 
 
-Bayes_base::Float
- UD_scheme::observe (Linrz_uncorrelated_observe_model& h, const Vec& z)
-/* Linrz_kalman_filter observe
+void
+ UD_scheme::observe_size (std::size_t z_size)
+/*
+ * Optimised dyamic observation sizing
  */
 {
-	Observe_innovation_byproduct g(h.Hx.size2(), h.Hx.size1());
-	Observe_byproduct b(h.Hx.size2(), h.Hx.size1());
-	return byobserve (h, z, g, b);
+	if (z_size != last_z_size) {
+		last_z_size = z_size;
+
+		s.resize(z_size, false);
+		Sd.resize(z_size, false);
+		znorm.resize(z_size, false);
+	}
 }
 
 Bayes_base::Float
- UD_bscheme::byobserve (Linrz_uncorrelated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
+ UD_scheme::observe (Linrz_uncorrelated_observe_model& h, const Vec& z)
 /*
- * Linrz observe with byproduct
+ * Standard linrz observe
  *  Uncorrelated observations are applied sequentialy in the order they appear in z
  *  The sequential observation updates state x
  *  Therefore the model of each observation needs to be computed sequentially. Generally this
  *  is inefficient and observe (UD_sequential_observe_model&) should be used instead
  * Precond:
- *  UD
- *  Zv is PSD
+ *	 UD
+ *	 Zv is PSD
  * Postcond:
  *  UD is PSD
  * Return: Minimum rcond of all squential observe
@@ -311,42 +285,43 @@ Bayes_base::Float
 	const std::size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
+								// Dynamic sizing
+	observe_size (z_size);
 								// Apply observations sequentialy as they are decorrelated
 	Float rcondmin = std::numeric_limits<Float>::max();
 	for (std::size_t o = 0; o < z_size; ++o)
 	{
 								// Observation model, extracted for a single z element
 		const Vec& zp = h.h(x);
-		h.normalise(b.znorm = z, zp);
-		noalias(b.a) = row(h.Hx,o);
+		h.normalise(znorm = z, zp);
+		h1 = row(h.Hx,o);
 								// Check Z precondition
 		if (h.Zv[o] < 0)
 			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
-		Float rcond = observeUD (h.Zv[o], b.a, b.w, S);
+		Float rcond = observeUD (w, S, h1, h.Zv[o]);
 		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using normalised non-linear innovation
-		s = b.znorm[o] - zp[o];
-		noalias(x) += b.w * s;
-								// Innovation and gain byproducts
-		g.s[o] = s;
-		g.Sv[o] = S;
-		noalias(column(g.W, o)) = b.w;
+		s = znorm[o] - zp[o];
+		noalias(x) += w * s;
+								// Copy s and Sd
+		UD_scheme::s[o] = s;
+		UD_scheme::Sd[o] = S;
 	}
 	return rcondmin;
 }
 
 Bayes_base::Float
  UD_scheme::observe (Linrz_correlated_observe_model& /*h*/, const Vec& /*z*/)
-/* NO solution for Correlated noise and Linearised model */
+/* No solution for Correlated noise and Linearised model */
 {
 	error (Logic_exception("observe no Linrz_correlated_observe_model solution"));
 	return 0;	// never reached
 }
 
 Bayes_base::Float
- UD_bscheme::byobserve (Linear_correlated_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_linear_byproduct& b)
+ UD_scheme::observe (Linear_correlated_observe_model& h, const Vec& z)
 /*
  * Special Linear Hx observe for correlated Z
  *  Z must be PD and will be decorrelated
@@ -365,36 +340,44 @@ Bayes_base::Float
 	const std::size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
+					// Dynamic sizing
+	observe_size (z_size);
+	if (z_size != zpdecol.size()) {
+		zpdecol.resize(z_size, false);
+		Gz.resize(z_size,z_size, false);
+		GIHx.resize(z_size, x_size, false);
+	}
+
 					// Factorise process noise as GzG'
-	{	Float rcond = UdUfactor (b.Gz, h.Z);
+	{	Float rcond = FM::UdUfactor (Gz, h.Z);
 		rclimit.check_PSD(rcond, "Z not PSD in observe");
 	}
 
-								// Observation predict and normalised observation
+								// Observation prediction and normalised observation
 	const Vec& zp = h.h(x);
-	h.normalise(b.znorm = z, zp);
+	h.normalise(znorm = z, zp);
 	
 	if (z_size > 0)
 	{							// Solve G* GIHx = Hx for GIHx in-place
-		b.GIHx = h.Hx;
+		GIHx = h.Hx;
 		for (j = 0; j < x_size; ++j)
 		{
 			i = z_size-1;
 			do {
 				for (k = i+1; k < z_size; ++k)
 				{
-					b.GIHx(i,j) -= b.Gz(i,k) * b.GIHx(k,j);
+					GIHx(i,j) -= Gz(i,k) * GIHx(k,j);
 				}
 			} while (i-- > 0);
 		}
 					
-		b.zpdecol = zp;			// Solve G zp~ = z, G z~ = z  for zp~,z~ in-place
+		zpdecol = zp;			// Solve G zp~ = z, G z~ = z  for zp~,z~ in-place
 		i = z_size-1;
 		do {
 			for (k = i+1; k < z_size; ++k)
 			{
-				b.znorm[i] -= b.Gz(i,k) * b.znorm[k];
-				b.zpdecol[i] -= b.Gz(i,k) * b.zpdecol[k];
+				znorm[i] -= Gz(i,k) * znorm[k];
+				zpdecol[i] -= Gz(i,k) * zpdecol[k];
 			}
 		} while (i-- > 0);
 	}//if (z_size>0)
@@ -403,24 +386,23 @@ Bayes_base::Float
 	Float rcondmin = std::numeric_limits<Float>::max();
 	for (std::size_t o = 0; o < z_size; ++o)
 	{
-		noalias(b.a) = row(b.GIHx,o);
+		h1 = row(GIHx,o);
 								// Update UD and extract gain
-		Float rcond = observeUD (b.Gz(o,o), b.a, b.w, S);
+		Float rcond = observeUD (w, S, h1, Gz(o,o));
 		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using linear innovation
-		s = b.znorm[o]-b.zpdecol[o];
-		noalias(x) += b.w * s;
-								// Innovation and gain byproducts
-		g.s[o] = s;
-		g.Sv[o] = S;
-		noalias(column(g.W, o)) = b.w;
+		s = znorm[o]-zpdecol[o];
+		noalias(x) += w * s;
+								// Copy s and Sd
+		UD_scheme::s[o] = s;
+		UD_scheme::Sd[o] = S;
 	}
 	return rcondmin;
 }
 
 Bayes_base::Float
- UD_bscheme::byobserve (Sequential_observe_model& h, const Vec& z, Observe_innovation_byproduct& g, Observe_byproduct& b)
+ UD_scheme::observe (UD_sequential_observe_model& h, const Vec& z)
 /*
  * Special observe using observe_model_sequential for fast uncorrelated linrz operation
  * Uncorrelated observations are applied sequentialy in the order they appear in z
@@ -438,45 +420,46 @@ Bayes_base::Float
 	const std::size_t z_size = z.size();
 	Float s, S;			// Innovation and covariance
 
+								// Dynamic sizing
+	observe_size (z_size);
 								// Apply observations sequentialy as they are decorrelated
 	Float rcondmin = std::numeric_limits<Float>::max();
 	for (o = 0; o < z_size; ++o)
 	{
-								// Observation predict and model
-		Float Zv_o;
-		const Vec& zp = h.ho(x, o, Zv_o, b.a);
-		h.normalise(b.znorm = z, zp);
+								// Observation prediction and model
+		const Vec& zp = h.ho(x, o);
+		h.normalise(znorm = z, zp);
 								// Check Z precondition
-		if (Zv_o < 0)
+		if (h.Zv[o] < 0)
 			error (Numeric_exception("Zv not PSD in observe"));
 								// Update UD and extract gain
-		Float rcond = observeUD (Zv_o, b.a, b.w, S);
+		Float rcond = observeUD (w, S, h.Hx_o, h.Zv[o]);
 		rclimit.check_PSD(rcond, "S not PD in observe");	// -1 implies S singular
 		if (rcond < rcondmin) rcondmin = rcond;
 								// State update using non-linear innovation
-		s = b.znorm[o]-zp[o];
-		noalias(x) += b.w * s;
-								// Innovation and gain byproducts
-		g.s[o] = s;
-		g.Sv[o] = S;
-		noalias(column(g.W, o)) = b.w;
+		s = znorm[o]-zp[o];
+		noalias(x) += w * s;
+								// Copy s and Sd
+		UD_scheme::s[o] = s;
+		UD_scheme::Sd[o] = S;
 	}
 	return rcondmin;
 }
 
 
-Bayes_base::Float
- UD_bscheme::observeUD (const Float r, Vec& a, Vec& b, Float& alpha)
+UD_scheme::Float
+ UD_scheme::observeUD (FM::Vec& gain, Float & alpha, const Vec& h, const Float r)
 /*
  * Linear UD factorisation update
  *  Bierman UdU' factorisation update. Bierman p.100
  * Input
- *  a linrz observation model (h)
+ *  h observation coeficients
  *  r observation variance
  * Output
- *  a  U'h
- *  b  observation Kalman gain
+ *  gain  observation Kalman gain
  *  alpha observation innovation variance
+ * Variables with physical significance
+ *  gamma becomes covariance of innovation
  * Predcondition:
  *  UD
  *  r is PSD (not checked)
@@ -488,10 +471,12 @@ Bayes_base::Float
 {
 	std::size_t i,j,k;
 	const std::size_t n = UD.size1();
-	Float gamma;	// becomes inverse covariance of innovation
-	Float alpha_jm1, lamda;
+	Float gamma, alpha_jm1, lamda;
+	// a(n) is U'a
+	// b(n) is Unweighted Kalman gain
 
 					// Compute b = DU'h, a = U'h
+	a = h;
 	for (j = n-1; j >= 1; --j)	// n-1..1
 	{
 		for (k = 0; k < j; ++k)	// 0..j-1
@@ -525,8 +510,8 @@ Bayes_base::Float
 			b[i] += b[j] * UD_jm1;
 		}
 	}
-					// weighted gain
-	b *= gamma;
+					// Update gain from b
+	noalias(gain) = b * gamma;
  	// Estimate the reciprocal condition number from upper triangular part
 	return UdUrcond(UD,n);
 

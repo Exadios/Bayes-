@@ -1,10 +1,4 @@
 /*
- * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
- */
-
-/*
  * MODULE : bayesFilter - Bayesian Filtering
  * Provides a MuPAD module interface to a filtering class
  */
@@ -19,10 +13,10 @@
 #include <map>
 								// MF macro is define by MuPAD module system
 #undef MF
-#include "BayesFilter/allFilters.hpp" // Include all of Bayesian Filtering library
+#include "BayesFilter/allFlt.h" // Include all of Bayesian Filtering library
 #include <boost/random.hpp>		// Fast and good random numbers
 #include "TNear.h"				// Nearest neighbour
-#include "MuPadConvert.hpp"
+#include "MuPadConvert.h"
 
 MMG( info = "Module: Bayesian Filtering" ) 
 
@@ -155,7 +149,7 @@ MuFilter*  BFilter_handler::remove (MTcell arg)
 	if (!MFisInt(arg))
 		MFerror( "Filter handle not an Int" );
 	const int h = MFint(arg);
-	if (h <= 0) {
+	if (h <=0) {
 		MFerror( "Filter handle incorrect" );
 		return 0;	// Never reached
 	}
@@ -179,7 +173,7 @@ MuFilter* BFilter_handler::get_filter (MTcell arg)
 	if (!MFisInt(arg))
 		MFerror( "Filter handle not an Int" );
 	const int h = MFint(arg);
-	if (h <= 0) {
+	if (h <=0) {
 		MFerror( "Filter handle incorrect" );
 		return 0;	// Never reached
 	}
@@ -253,7 +247,7 @@ const FM::Vec& MuPAD_function_model::fx(const FM::Vec& x) const
 	MTcell fxarray = MFcall( MFcopy(Mu_fn), 1, xarray );
 
 	if (MFisExpr(fxarray))
-		MFerror ("predict function not found");	// ISSUE: MFerror may leak arrays
+		MFerror ("prediction function not found");	// ISSUE: MFerror may leak arrays
 
 	rfx = MuC::Vector(fxarray);
 	MFfree(xarray);

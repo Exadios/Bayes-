@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -44,11 +44,14 @@ namespace
 		return x*x;
 	}
 
+	// Random numbers from Boost
+	Bayesian_filter_test::Boost_random localRng;
+
 	// Constant Dimensions
 	const unsigned NX = 2;			// Filter State dimension 	(Position, Velocity)
 
 	// Filter Parameters
-	// Prediction parameters for Integrated Ornstein-Uhlenbeck Process
+	// Prediction parameters for Integrated Ornstein-Uhlembeck Process
 	const Float dt = 0.01;
 	const Float V_NOISE = 0.1;	// Velocity noise, giving mean squared error bound
 	const Float V_GAMMA = 1.;	// Velocity correlation, giving velocity change time constant
@@ -87,17 +90,23 @@ PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 
 
 /*
- * Observation model
- * Linear observation of position with addative noise
+ * Position Observation model
+ * Linear observation is addative uncorrelated model
  */
-class Pobserve : public Linear_uncorrelated_observe_model
+class PVobserve : public Linrz_uncorrelated_observe_model
 {
+	mutable Vec z_pred;
 public:
-	Pobserve ();
+	PVobserve ();
+	const Vec& h(const Vec& x) const
+	{
+		z_pred[0] = x[0];
+		return z_pred;
+	};
 };
 
-Pobserve::Pobserve () :
-	Linear_uncorrelated_observe_model (NX,1)
+PVobserve::PVobserve () :
+	Linrz_uncorrelated_observe_model(NX,1), z_pred(1)
 {
 	// Linear model
 	Hx(0,0) = 1;
@@ -107,7 +116,7 @@ Pobserve::Pobserve () :
 }
 
 
-void initialise (Kalman_state& kf, const Vec& initState)
+void initialise (Kalman_state_filter& kf, const Vec& initState)
 /*
  * Initialise Kalman filter with an initial guess for the system state and fixed covariance
  */
@@ -126,9 +135,6 @@ int main()
 	// global setup
 	std::cout.flags(std::ios::scientific); std::cout.precision(6);
 
-	// Random numbers from Boost
-	Bayesian_filter_test::Boost_random localRng;
-
 	// Setup the test filters
 	Vec x_true (NX);
 
@@ -142,18 +148,18 @@ int main()
 	// Construct Prediction and Observation model and filter
 	// Give the filter an initial guess of the system state
 	PVpredict linearPredict;
-	Pobserve linearObserve;
+	PVobserve linearObserve;
 	Vec x_guess(NX);
 	x_guess[0] = 900.;
 	x_guess[1] = 1.5;
 	std::cout << "Guess Initial " << x_guess << std::endl;
 
 	// f1 Direct filter construct and initialize with initial state guess
-	FilterScheme f1(NX, 1);
+	FilterScheme f1(NX,NX);
 	initialise (f1, x_guess);
 
 	// f2 Indirect filter construct and Initialize with initial state guess
-	FilterScheme error_filter(NX, 1);
+	FilterScheme error_filter(NX,NX);
 	Indirect_kalman_filter<FilterScheme> f2(error_filter);
 	initialise (f2, x_guess);
 
@@ -178,7 +184,7 @@ int main()
 		if (obs_time <= time)
 		{
 			// True Observation
-			z_true = linearObserve.h (x_true);
+			z_true[0] = x_true[0];
 
 			// Observation with addative noise
 			localRng.normal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.

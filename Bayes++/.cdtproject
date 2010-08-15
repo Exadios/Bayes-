@@ -5,13 +5,6 @@
 <extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 <extension id="org.eclipse.cdt.core.domsourceindexer" point="org.eclipse.cdt.core.CIndexer"/>
 <data>
-        
-    <item id="org.eclipse.cdt.core.pathentry">
-<pathentry kind="src" path=""/>
-<pathentry kind="out" path=""/>
-<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-</item>
-
 <item id="scannerConfiguration">
 <autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile"/>
 <profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
@@ -25,23 +18,17 @@
 </scannerInfoProvider>
 </profile>
 </item>
-<item id="org.eclipse.cdt.make.core.buildtargets">
-<buildTargets>
-<target name="rtheta" path="rtheta" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<buildTarget>debug</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-<target name="debug" path="" targetID="org.eclipse.cdt.make.MakeTargetBuilder">
-<buildCommand>bjam</buildCommand>
-<buildArguments></buildArguments>
-<buildTarget>debug</buildTarget>
-<stopOnError>false</stopOnError>
-<useDefaultCommand>false</useDefaultCommand>
-</target>
-</buildTargets>
+
+<item id="org.eclipse.cdt.core.pathentry">
+<pathentry kind="src" path="BayesFilter"/>
+<pathentry kind="src" path="PV"/>
+<pathentry kind="src" path="PV_SIR"/>
+<pathentry kind="src" path="QuadCalib"/>
+<pathentry kind="src" path="rtheta"/>
+<pathentry kind="src" path="Simple"/>
+<pathentry kind="src" path="SLAM"/>
+<pathentry kind="out" path="target"/>
+<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
 </item>
 </data>
 </cdtproject>

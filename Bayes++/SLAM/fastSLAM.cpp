@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -43,14 +43,14 @@ Fast_SLAM::Fast_SLAM( BF::SIR_scheme& L_filter ) :
 	wir_update = false;
 }
 
-void Fast_SLAM::observe_new( unsigned feature, const BF::Uncorrelated_additive_observe_model& fom, const FM::Vec& z )
+void Fast_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
 /*
  * SLAM New Feature observation (overwrite)
  * Assumes there is no prior information about the feature (strictly a uniform un-informative prior)
  *
  * This implies
  *  a) There has no information about location so no resampling is requires
- *  b) Feature Posterior estimated directly from observation using information form
+ *  b) Feature Posterior estimated directly from observation using inormation form
  *
  * fom: must have a the special from required for SLAM::obeserve_new
  */
@@ -111,7 +111,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 	const std::size_t nparticles = L.S.size2();
 
 	Float Ht = fom.Hx(0,nL);
-	if (Ht == 0.)
+	if (Ht == 0)
 		error (BF::Numeric_exception("observe Hx feature component zero"));
 
 							// Loop in invariants and temporary storage
@@ -131,7 +131,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
 														// Observation innovation and innovation variance
 		const Float s = (znorm[0] - zp[0]);
 		const Float S = sqr(Ht) * m1.X + Z;
-		if (S <= 0.)
+		if (S <= 0)
 			error (BF::Numeric_exception("Conditional feature estimate not PD"));
 		const Float sqrtS  = std::sqrt (S);		// Drop Ht which is a common factor for all weights
 
@@ -266,7 +266,7 @@ Fast_SLAM_Kstatistics::Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter ) 
 
 
 void Fast_SLAM_Kstatistics::statistics_feature(
-		BF::Kalman_state& kstat, std::size_t fs,
+		BF::Kalman_state_filter& kstat, std::size_t fs,
 		const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const
 /*
  * Compute sample mean and covariance statistics of feature
@@ -291,13 +291,13 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 									// Iterate over All feature particles
 	FeatureCondMap::const_iterator fpi, fpi_begin = fm.begin(), fpi_end = fm.end();
 
-	Float mean_f = 0.;				// Feature mean
+	Float mean_f = 0;				// Feature mean
 	for (fpi = fpi_begin; fpi < fpi_end; ++fpi)	{
 		mean_f += (*fpi).x;
 	}
 	mean_f /= Float(nparticles);
 
-	Float var_f = 0.;				// Feature variance: is ML estimate given estimated mean
+	Float var_f = 0;				// Feature variance: is ML estimate given estimated mean
 	for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
 		var_f += (*fpi).X + sqr((*fpi).x - mean_f);
 	}
@@ -309,7 +309,7 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 									// Location,feature covariance
 	for (std::size_t si = 0; si < nL; ++si)
 	{
-		Float covar_f_si = 0.;
+		Float covar_f_si = 0;
 		std::size_t spi = 0;
 		const Float mean_si = kstat.x[si];
 		for (fpi = fpi_begin; fpi < fpi_end; ++fpi, ++spi) {
@@ -323,7 +323,7 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 	std::size_t fsj = nL;				// Feature subscript
 	for (AllFeature::const_iterator fj = M.begin(); fj != fend; ++fj, ++fsj)
 	{
-		Float covar_f_fi = 0.;
+		Float covar_f_fi = 0;
 		FeatureCondMap::const_iterator fpj = (*fj).second.begin();
 		const Float mean_fi = kstat.x[fsj];
 		for (fpi = fpi_begin; fpi < fpi_end; ++fpi) {
@@ -336,7 +336,7 @@ void Fast_SLAM_Kstatistics::statistics_feature(
 }
 
 
-void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state& kstat )
+void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& kstat )
 /*
  * Compute sample mean and covariance statistics of filter
  *  
@@ -359,8 +359,8 @@ void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state& kstat )
 	if (nL > kstat.x.size())
 		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
 	L.update_statistics();
-	FM::noalias (kstat.x.sub_range(0,nL)) = L.x;
-	FM::noalias (kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
+	FM::noalias(kstat.x.sub_range(0,nL)) = L.x;
+	FM::noalias(kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
 
 								// Iterated over feature statistics (that there is space for in kstat)
 	std::size_t fs = nL;						// Feature subscript
@@ -371,7 +371,7 @@ void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state& kstat )
 }//statistics_compressed
 
 
-void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state& kstat )
+void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
 /*
  * Compute sample mean and covariance statistics of filter
  *  
@@ -394,8 +394,8 @@ void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state& kstat )
 	if (nL > kstat.x.size())
 		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
 	L.update_statistics();
-	FM::noalias (kstat.x.sub_range(0,nL)) = L.x;
-	FM::noalias (kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
+	FM::noalias(kstat.x.sub_range(0,nL)) = L.x;
+	FM::noalias(kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
 
 								// Iterated over feature statistics (that there is space for in kstat)
 	for (AllFeature::const_iterator fi = M.begin(); fi != M.end(); ++fi)

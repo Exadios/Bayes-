@@ -1,9 +1,10 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
- * $Id$*/
+ * $Id$
+ */
 
 /*
  * Information Root Filter.
@@ -19,26 +20,21 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_root_bscheme::Information_root_bscheme (std::size_t x_size) :
-		Kalman_state(x_size),
+Information_root_scheme::Information_root_scheme (std::size_t x_size, std::size_t /*z_initialsize*/) :
+		Kalman_state_filter(x_size),
 		r(x_size), R(x_size,x_size)
 /*
  * Set the size of things we know about
  */
 {}
 
-Information_root_scheme::Information_root_scheme (std::size_t x_size) :
-		Kalman_state (x_size),
-		Information_root_bscheme (x_size)
-{}
-
-Information_root_info_scheme::Information_root_info_scheme (std::size_t x_size) :
-		Kalman_state (x_size), Information_state (x_size), 
-		Information_root_scheme (x_size)
+Information_root_info_scheme::Information_root_info_scheme (std::size_t x_size, std::size_t z_initialsize) :
+		Kalman_state_filter(x_size), Information_state_filter (x_size), 
+		Information_root_scheme (x_size, z_initialsize)
 {}
 
 
-void Information_root_bscheme::init ()
+void Information_root_scheme::init ()
 /*
  * Inialise the filter from x,X
  * Predcondition:
@@ -78,8 +74,9 @@ void Information_root_info_scheme::init_yY ()
 		std::size_t i,j;
 		for (i = 0; i < n; ++i)
 		{
+			using namespace std;		// for sqrt
 			LTriMatrix::value_type sd = LC(i,i);
-			sd = std::sqrt(sd);
+			sd = sqrt(sd);
 			LC(i,i) = sd;
 						// Multiply columns by square of non zero diagonal. TODO use column operation
 			for (j = i+1; j < n; ++j)
@@ -97,7 +94,7 @@ void Information_root_info_scheme::init_yY ()
 	noalias(r) = prod(FM::trans(RI),y);
 }
 
-void Information_root_bscheme::update ()
+void Information_root_scheme::update ()
 /*
  * Recompute x,X from r,R
  * Precondition:
@@ -134,7 +131,7 @@ void Information_root_info_scheme::update_yY ()
 }
 
 
-void Information_root_bscheme::inverse_Fx (DenseColMatrix& invFx, const Matrix& Fx)
+void Information_root_scheme::inverse_Fx (FM::DenseColMatrix& invFx, const FM::Matrix& Fx)
 /*
  * Numerical Inversion of Fx using LU factorisation
  * Required LAPACK getrf (with PIVOTING) and getrs
@@ -152,13 +149,13 @@ void Information_root_bscheme::inverse_Fx (DenseColMatrix& invFx, const Matrix& 
 	FM::identity(invFx);				// Invert
 	info = LAPACK::getrs('N', FxLU, ipivot, invFx);
 	if (info != 0)
-		error (Numeric_exception("Predict Fx not LU invertible"));
+		error (Numeric_exception("Predict Fx not LU invertable"));
 }
 
 
 
 Bayes_base::Float
- Information_root_bscheme::bypredict (Linrz_predict_model& f, const ColMatrix& invFx, bool linear_r)
+ Information_root_scheme::predict (Linrz_predict_model& f, const FM::ColMatrix& invFx, bool linear_r)
 /* Linrz Prediction: using precomputed inverse of f.Fx
  * Precondition:
  *   r(k|k),R(k|k)
@@ -167,7 +164,7 @@ Bayes_base::Float
  *   R(k+1|k)
  *
  * r can be computed in two was:
- * Either directly in the linear form or using extended form via R*f.f(x)
+ * Either directly in the linear form or  using extended form via R*f.f(x)
  *
  * Requires LAPACK geqrf for QR decomposition (without PIVOTING)
  */
@@ -188,13 +185,13 @@ Bayes_base::Float
 	const std::size_t q_size = f.q.size();
 						// Column major required for LAPACK, also this property is using in indexing
 	DenseColMatrix A(q_size+x_size, q_size+x_size+unsigned(linear_r));
-	FM::identity (A);	// Prefill with identity for topleft and zeros in off diagonals
+	FM::identity (A);	// Prefill with identity for topleft and zero's in off diagonals
 
 	Matrix RFxI (prod(R, invFx));
-	noalias(A.sub_matrix(q_size,q_size+x_size, 0,q_size)) = prod(RFxI, Gqr);
-	noalias(A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size)) =RFxI;
+	A.sub_matrix(q_size,q_size+x_size, 0,q_size) .assign (prod(RFxI, Gqr));
+	A.sub_matrix(q_size,q_size+x_size, q_size,q_size+x_size) .assign (RFxI);
 	if (linear_r)
-		noalias(A.sub_column(q_size,q_size+x_size, q_size+x_size)) = r;
+		A.sub_column(q_size,q_size+x_size, q_size+x_size) .assign (r);
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(q_size+x_size);
@@ -221,7 +218,7 @@ Bayes_base::Float
 	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
 	inverse_Fx (FxI, f.Fx);
 
-	return bypredict (f, ColMatrix(FxI), false);
+	return predict (f, ColMatrix(FxI), false);
 }
 
 
@@ -234,11 +231,11 @@ Bayes_base::Float
 	DenseColMatrix FxI(f.Fx.size1(), f.Fx.size2());
 	inverse_Fx (FxI, f.Fx);
 
-	return bypredict (f, ColMatrix(FxI), true);
+	return predict (f, ColMatrix(FxI), true);
 }
 
 
-Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
+Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
 /* Extended linrz correlated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)
@@ -263,10 +260,10 @@ Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_correlated
 	assert (!singular); (void)singular;
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
-	noalias(A.sub_matrix(0,x_size, 0,x_size)) = R;
-	noalias(A.sub_matrix(x_size,x_size+z_size, 0,x_size)) = prod(Zir, h.Hx);
-	noalias(A.sub_column(0,x_size, x_size)) = r;
-	noalias(A.sub_column(x_size,x_size+z_size, x_size)) = prod(Zir, s+prod(h.Hx,x));
+	A.sub_matrix(0,x_size, 0,x_size) .assign (R);
+	A.sub_matrix(x_size,x_size+z_size, 0,x_size) .assign (prod(Zir, h.Hx));
+	A.sub_column(0,x_size, x_size) .assign (r);
+	A.sub_column(x_size,x_size+z_size, x_size) .assign (prod(Zir, s+prod(h.Hx,x)));
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(x_size+1);
@@ -281,7 +278,7 @@ Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_correlated
 }
 
 
-Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
+Bayes_base::Float Information_root_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
 /* Extended linrz uncorrelated observe
  * Precondition:
  *		r(k+1|k),R(k+1|k)
@@ -308,10 +305,10 @@ Bayes_base::Float Information_root_bscheme::observe_innovation (Linrz_uncorrelat
 	}
 						// Form Augmented matrix for factorisation
 	DenseColMatrix A(x_size+z_size, x_size+1);	// Column major required for LAPACK, also this property is using in indexing
-	noalias(A.sub_matrix(0,x_size, 0,x_size)) = R;
-	noalias(A.sub_matrix(x_size,x_size+z_size, 0,x_size)) = prod(Zir, h.Hx);
-	noalias(A.sub_column(0,x_size, x_size)) = r;
-	noalias(A.sub_column(x_size,x_size+z_size, x_size)) = prod(Zir, s+prod(h.Hx,x));
+	A.sub_matrix(0,x_size, 0,x_size) .assign(R);
+	A.sub_matrix(x_size,x_size+z_size, 0,x_size) .assign (prod(Zir, h.Hx));
+	A.sub_column(0,x_size, x_size) .assign (r);
+	A.sub_column(x_size,x_size+z_size, x_size) .assign (prod(Zir, s+prod(h.Hx,x)));
 
 						// Calculate factorisation so we have and upper triangular R
 	DenseVec tau(x_size+1);

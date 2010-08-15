@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -10,7 +10,7 @@
  * Linear algebra support functions for filter classes
  * Cholesky and Modified Cholesky factorisations
  *
- * UdU' and LdL' factorisations of positive semi-definite matrices. Where
+ * UdU' and LdL' factorisations of Positive semi-definite matrices. Where
  *  U is unit upper triangular
  *  d is diagonal
  *  L is unit lower triangular
@@ -111,6 +111,7 @@ inline typename V::value_type rcond_ignore_infinity_internal (const V& D)
 	assert (mind <= maxd);		// check sanity
 
 	rcond = mind / maxd; 		// rcond from min/max norm
+								// CRITICAL CHECK requires NaN != NaN
 	if (rcond != rcond)			// NaN, singular due to (mind == maxd) == infinity
 		rcond = 0;
 	assert (rcond <= 1);
@@ -496,7 +497,7 @@ LTriMatrix::value_type LdLfactor (LTriMatrix& LD, const SymMatrix& M)
  *    see in-place LdLfactor
  */
 {
-	noalias(LD) = LowerTri(M);
+	noalias(LD) = M;
 	LTriMatrix::value_type rcond = LdLfactor (LD, M.size1());
 
 	return rcond;
@@ -603,7 +604,7 @@ bool UTinverse (UTriMatrix& U)
 
 			for (std::size_t j = n-1; j > i; --j)
 			{
-				UTriMatrix::value_type e = 0;
+				UTriMatrix::value_type e = 0.;
 				for (std::size_t k = i+1; k <= j; ++k)
 					e -= Ui[k] * U(k,j);
 				Ui[j] = e*d;
@@ -802,12 +803,12 @@ void UdUseperate (RowMatrix& U, Vec& d, const RowMatrix& UD)
 
 void UdUrecompose (SymMatrix& X, const RowMatrix& M)
 {
-					// Abuse X as a RowMatrix
+						// Abuse X as a RowMatrix
 	RowMatrix& X_matrix = X.asRowMatrix();
-					// Assign elements of common top left block of R into L
+		// assign elements of common top left block of R into L
 	std::size_t top = std::min(X_matrix.size1(), M.size1());
 	std::size_t left = std::min(X_matrix.size2(), M.size2());
-	noalias(X_matrix.sub_matrix(0,top, 0,left)) = M.sub_matrix(0,top, 0,left);
+	X_matrix.sub_matrix(0,top, 0,left) .assign (M.sub_matrix(0,top, 0,left));
 
 	UdUrecompose (X_matrix);
 }
@@ -831,7 +832,7 @@ SymMatrix::value_type UdUinversePDignoreInfinity (SymMatrix& M)
 	SymMatrix::value_type rcond = rcond_ignore_infinity_internal (diag(M_matrix));
 	assert (rcond == orig_rcond || orig_rcond == 0); (void)orig_rcond;
 
-					// Only invert and recompose if PD
+	// Only invert and recompose if PD
 	if (rcond > 0) {
 		bool singular = UdUinverse (M_matrix);
 		assert (!singular); (void)singular;
@@ -854,7 +855,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M)
 					// Abuse as a RowMatrix
 	RowMatrix& M_matrix = M.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (M_matrix, M_matrix.size1());
-					// Only invert and recompose if PD
+	// Only invert and recompose if PD
 	if (rcond > 0) {
 		bool singular = UdUinverse (M_matrix);
 		assert (!singular); (void)singular;
@@ -871,7 +872,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& M, SymMatrix::value_type& detM)
 					// Abuse as a RowMatrix
 	RowMatrix& M_matrix = M.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (M_matrix, M_matrix.size1());
-					// Only invert and recompose if PD
+	// Only invert and recompose if PD
 	if (rcond > 0) {
 		detM = UdUdet(M_matrix);
 		bool singular = UdUinverse (M_matrix);
@@ -897,7 +898,7 @@ SymMatrix::value_type UdUinversePD (SymMatrix& MI, const SymMatrix& M)
 					// Abuse as a RowMatrix
 	RowMatrix& MI_matrix = MI.asRowMatrix();
 	SymMatrix::value_type rcond = UdUfactor (MI_matrix, MI_matrix.size1());
-					// Only invert and recompose if PD
+	// Only invert and recompose if PD
 	if (rcond > 0) {
 		bool singular = UdUinverse (MI_matrix);
 		assert (!singular); (void)singular;

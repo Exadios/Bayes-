@@ -3,8 +3,8 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -162,7 +162,7 @@ private:
 };
 
 typedef Sampled_general_predict_model<Linear_predict_model> Sampled_LiAd_predict_model;
-typedef Sampled_general_predict_model<Linear_invertible_predict_model> Sampled_LiInAd_predict_model;
+typedef Sampled_general_predict_model<Linear_invertable_predict_model> Sampled_LiInAd_predict_model;
 // Sampled predict model generalisations
 //  Names a shortened to first two letters of their model properties
 
@@ -235,7 +235,7 @@ private:
 };
 
 
-class SIR_kalman_scheme : public SIR_scheme, virtual public Kalman_state
+class SIR_kalman_scheme : public SIR_scheme, virtual public Kalman_state_filter
 /*
  * SIR implementation of a Kalman filter
  *  Updates Kalman statistics of SIR_filter
@@ -250,12 +250,12 @@ public:
 	void init ();
 
 	void update ()
-	// Implement Kalman_filter::update using default SIR_scheme resampler
+	// Implement Kalman_filter::update identically to SIR_scheme
 	{	(void)SIR_scheme::update_resample();
 	}
 
 	Float update_resample ()
-	// Implement identically to SIR_scheme - would be hidden by next overload
+	// Implement identically to SIR_scheme
 	{	return SIR_scheme::update_resample();
 	}
 

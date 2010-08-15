@@ -3,16 +3,34 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
 
 /*
  * Unscented Filter Scheme.
- *
  *  A Julier-Uhlmann Unscented non-linear Kalman filter
+ *  Uses the classic implementation of Duplex Unscented transform.
+ * The Unscented transform is used for non-linear state and observation predictions
+ *
+ * Observations are fused using innovation gain equations from a Covariance filter
+ *
+ * Predictions of state and state covariance (and observation) use
+ * unscented transformations to interpolate the non-linear predict and observe
+ * models. unscented transforms can be further optimised by vary the Kappa
+ * parameter from its usual value of 1.
+ * Discontinous observe models require that a normailisation function.
+ *
+ * The predict model is represtented by the state prediction function and a 
+ * seperate prediction noise matrix.
+ * The observe model is represtented by the observation prediction function and
+ * a function to normalise observeations.
+ *
+ * The filter is operated by performing a
+ *  predict, observe
+ * cycle defined by the base class
  */
 #include "bayesFlt.hpp"
 
@@ -20,110 +38,92 @@
 namespace Bayesian_filter
 {
 
-/** Specific Unscented predict model for Additive noise.
- * 
- * predict equation x(k|k-1) = f(x(k-1|k-1)) + w(x(k))
+class Unscented_predict_model : public Predict_model_base
+/* Specific Unscented prediction model for Addative noise
+ *  x(k|k-1) = f(x(k-1|k-1)) + w(x(k))
  *
  * Unscented filter requires
  *  f the function part of the non-linear model
- *  Q the covariance of the additive w(x(k)), w is specificly allow to be a function of state
+ *  Q the covariance of the addative w(x(k)), w is specificly allow to be a function of state
  */
-class Unscented_predict_model : public Predict_model_base
 {
 public:
-	Unscented_predict_model ()
-	{}
+	Unscented_predict_model (std::size_t q_size)
+	{
+		q_unscented = q_size;
+	}
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
-	/// Functional part of additive model
-	//  Note: Reference return value as a speed optimisation, MUST be copied by caller.
+	// Functional part of addative model
+	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
 
 	virtual const FM::SymMatrix& Q(const FM::Vec& x) const = 0;
-	/// Covariance of additive noise
-	//  Note: Reference return value as a speed optimisation, MUST be copied by caller.
+	// Covariance of addative noise
+	// Note: Reference return value as a speed optimisation, MUST be copied by caller.
+private:
+	friend class Unscented_filter;	// Filter implementation need to know noise size
+	std::size_t q_unscented;
 };
 
 
-/** A Julier-Uhlmann Unscented non-linear Kalman filter.
- * 
- * The Unscented transform is used for non-linear state and observation predicts.
- * Uses the original Duplex Unscented transform implementation
- *
- * Observations are fused using innovation gain equations from a Covariance filter.
- *
- * Predicts of state and state covariance (and observation) use
- * unscented transformations to interpolate the non-linear predict and observe
- * models. The Unscented transforms can be optimised by varying the Kappa
- * parameter.
- * Discontinous observe models require a normailisation function.
- *
- * The predict model is represtented by the state predict function and a 
- * seperate predict noise matrix.
- * The observe model is represtented by the observation predict function and
- * a function to normalise observations.
- */
 class Unscented_scheme : public Linrz_kalman_filter, public Functional_filter
 {
 private:
 	std::size_t q_max;			// Maxiumum size allocated for noise model, constructed before XX
 public:
-	FM::ColMatrix XX;		///< Unscented form of state, with associated kappa
+	FM::ColMatrix XX;		// Unscented form of state, with associated kappa
 	Float kappa;
 
-	Unscented_scheme (std::size_t x_size);
+	Unscented_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
 	Unscented_scheme& operator= (const Unscented_scheme&);
+	// Optimise copy assignment to only copy filter state
 
- 	void init ();
+	void init ();
 	void init_XX ();
 	void update ();
 	void update_XX (Float kappa);
 
 	void predict (Unscented_predict_model& f);
-	///< Efficient Unscented predict 
+	// Efficient Unscented prediction 
 	void predict (Functional_predict_model& f);
-	void predict (Additive_predict_model& f);
+	void predict (Addative_predict_model& f);
 	Float predict (Linrz_predict_model& f)
-	{	///< Linrz_kalman_filter predict
-		predict(static_cast<Additive_predict_model&>(f));
-		return 1.;		// Always well condition for additive predict
+	{	// Adapt to use the more general addative model
+		predict(static_cast<Addative_predict_model&>(f));
+		return 1.;		// Always well condition for addative predict
 	}
+	
+	Float observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z);
+	Float observe (Correlated_addative_observe_model& h, const FM::Vec& z);
+	// Unscented filter implements general addative observe models 
 	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
-	{	///< Linrz_kalman_filter observe
-		const std::size_t z_size = h.Hx.size1();
-		FM::Vec s(z_size);
-		FM::SymMatrix S(z_size,z_size), SI(z_size,z_size);
-		FM::Matrix W(h.Hx.size2(), z_size);
-		return byobserve (static_cast<Uncorrelated_additive_observe_model&>(h), z, s,S,SI,W);
+	{	// Adapt to use the more general addative model
+		return observe (static_cast<Uncorrelated_addative_observe_model&>(h),z);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
-	{	///< Linrz_kalman_filter observe
-		const std::size_t z_size = h.Hx.size1();
-		FM::Vec s(z_size);
-		FM::SymMatrix S(z_size,z_size), SI(z_size,z_size);
-		FM::Matrix W(h.Hx.size2(), z_size);
-		return byobserve (static_cast<Correlated_additive_observe_model&>(h), z, s,S,SI,W);
+	{	// Adapt to use the more general addative model
+		return observe (static_cast<Correlated_addative_observe_model&>(h),z);
 	}
-	
-	Float byobserve (Uncorrelated_additive_observe_model& h, const FM::Vec& z,
-				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
-	Float byobserve (Correlated_additive_observe_model& h, const FM::Vec& z,
-				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
-	///< General additive observe models form, with explict byproduct
-	
+
+public:						// Exposed Numerical Results
+	FM::Vec s;					// Innovation
+	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
 
 protected:
-	//@{
-	/** Unscented transform Kappa values.
-	    Defaults use the rule which minimise mean squared error of 4th order term
-	*/
 	virtual Float predict_Kappa (std::size_t size) const;
 	virtual Float observe_Kappa (std::size_t size) const;
-	//@}
+	/* unscented Kappa values
+	   default uses the rule which minimise mean squared error of 4th order term
+	*/
+
+protected:					// allow fast operation if z_size remains constant
+	std::size_t last_z_size;
+	void observe_size (std::size_t z_size);
 
 private:
 	void unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale);
-	// Determine Unscented points for a distribution
+	/* Determine Unscented points for a distribution */
 	std::size_t x_size;
 	std::size_t XX_size;	// 2*x_size+1
 

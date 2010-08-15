@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -56,7 +56,7 @@ Gaussian_predict_model::Gaussian_predict_model (std::size_t x_size, std::size_t 
  */
 {}
 
-Additive_predict_model::Additive_predict_model (std::size_t x_size, std::size_t q_size) :
+Addative_predict_model::Addative_predict_model (std::size_t x_size, std::size_t q_size) :
 		q(q_size), G(x_size, q_size)
 /*
  * Set the size of things we know about
@@ -67,7 +67,7 @@ Linrz_predict_model::Linrz_predict_model (std::size_t x_size, std::size_t q_size
 /*
  * Set the size of things we know about
  */
-		Additive_predict_model(x_size, q_size),
+		Addative_predict_model(x_size, q_size),
 		Fx(x_size,x_size)
 {}
 
@@ -79,7 +79,7 @@ Linear_predict_model::Linear_predict_model (std::size_t x_size, std::size_t q_si
 		xp(x_size)
 {}
 
-Linear_invertible_predict_model::Linear_invertible_predict_model (std::size_t x_size, std::size_t q_size) :
+Linear_invertable_predict_model::Linear_invertable_predict_model (std::size_t x_size, std::size_t q_size) :
 /*
  * Set the size of things we know about
  */
@@ -87,12 +87,12 @@ Linear_invertible_predict_model::Linear_invertible_predict_model (std::size_t x_
 		inv(x_size)
 {}
 
-Linear_invertible_predict_model::inverse_model::inverse_model (std::size_t x_size) :
+Linear_invertable_predict_model::inverse_model::inverse_model (std::size_t x_size) :
 		Fx(x_size,x_size)
 {}
 
 
-Expected_state::Expected_state (std::size_t x_size) :
+State_filter::State_filter (std::size_t x_size) :
 	x(x_size)
 /*
  * Initialise filter and set the size of things we know about
@@ -103,27 +103,27 @@ Expected_state::Expected_state (std::size_t x_size) :
 }
 
 
-Kalman_state::Kalman_state (std::size_t x_size) :
+Kalman_state_filter::Kalman_state_filter (std::size_t x_size) :
 /*
  * Initialise state size
  */
-		Expected_state(x_size), X(x_size,x_size)
+		State_filter(x_size), X(x_size,x_size)
 {}
 
-void Kalman_state::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
+void Kalman_state_filter::init_kalman (const FM::Vec& x, const FM::SymMatrix& X)
 /*
  * Initialise from a state and state covariance
  *  Parameters that reference the instance's x and X members are valid
  */
 {
-	Kalman_state::x = x;
-	Kalman_state::X = X;
+	Kalman_state_filter::x = x;
+	Kalman_state_filter::X = X;
 	init ();
 }
 
 
 Bayes_base::Float
- Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z, FM::Vec& innov)
+ Extended_kalman_filter::observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 /*
  * Extended linrz correlated observe, compute innovation for observe_innovation
  */
@@ -131,14 +131,14 @@ Bayes_base::Float
 	update ();
 	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
 
-	innov = z;
-	h.normalise(innov, zp);
-	FM::noalias(innov) -= zp;
-	return observe_innovation (h, innov);
+	FM::Vec s = z;
+	h.normalise(s, zp);
+	FM::noalias(s) -= zp;
+	return observe_innovation (h, s);
 }
 
 Bayes_base::Float
- Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z, FM::Vec& innov)
+ Extended_kalman_filter::observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 /*
  * Extended kalman uncorrelated observe, compute innovation for observe_innovation
  */
@@ -146,33 +146,33 @@ Bayes_base::Float
 	update ();
 	const FM::Vec& zp = h.h(x);		// Observation model, zp is predicted observation
 
-	innov = z;
-	h.normalise(innov, zp);
-	FM::noalias(innov) -= zp;
-	return observe_innovation (h, innov);
+	FM::Vec s = z;
+	h.normalise(s, zp);
+	FM::noalias(s) -= zp;
+	return observe_innovation (h, s);
 }
 
 
-Information_state::Information_state (std::size_t x_size) :
+Information_state_filter::Information_state_filter (std::size_t x_size) :
 /*
  * Initialise state size
  */
 		y(x_size), Y(x_size,x_size)
 {}
 
-void Information_state::init_information (const FM::Vec& y, const FM::SymMatrix& Y)
+void Information_state_filter::init_information (const FM::Vec& y, const FM::SymMatrix& Y)
 /*
  * Initialise from a information state and information
  *  Parameters that reference the instance's y and Y members are valid
  */
 {
-	Information_state::y = y;
-	Information_state::Y = Y;
+	Information_state_filter::y = y;
+	Information_state_filter::Y = Y;
 	init_yY ();
 }
 
 
-Sample_state::Sample_state (std::size_t x_size, std::size_t s_size) :
+Sample_state_filter::Sample_state_filter (std::size_t x_size, std::size_t s_size) :
 		S(x_size,s_size)
 
 /*
@@ -184,12 +184,20 @@ Sample_state::Sample_state (std::size_t x_size, std::size_t s_size) :
 		error (Logic_exception("Zero sample filter constructed"));
 }
 
-void Sample_state::init_sample (const FM::ColMatrix& S)
+Sample_state_filter::~Sample_state_filter()
+/*
+ * Default definition required for a pure virtual distructor
+ * ISSUE Cannot be defined if Matrix has private distructor
+ */
+{
+}
+
+void Sample_state_filter::init_sample (const FM::ColMatrix& initS)
 /*
  * Initialise from a sampling
  */
 {
-	Sample_state::S = S;
+	S = initS;
 	init_S();
 }
 
@@ -224,7 +232,7 @@ namespace {
 	};
 }//namespace
 
-std::size_t Sample_state::unique_samples () const
+std::size_t Sample_state_filter::unique_samples () const
 /*
  * Count number of unique (unequal value) samples in S
  * Implementation requires std::sort on sample column references
@@ -257,7 +265,7 @@ std::size_t Sample_state::unique_samples () const
 
 
 Sample_filter::Sample_filter (std::size_t x_size, std::size_t s_size) :
-		Sample_state(x_size,s_size)
+		Sample_state_filter(x_size,s_size)
 
 /*
  * Initialise filter and set the size of things we know about
@@ -276,7 +284,7 @@ void Sample_filter::predict (Functional_predict_model& f)
 						// Predict particles S using supplied predict model
 	const std::size_t nSamples = S.size2();
 	for (std::size_t i = 0; i != nSamples; ++i) {
-		FM::Vec Si = FM::ColMatrix::Column (S,i);
+		FM::ColMatrix::Column Si(S,i);
 		FM::noalias(Si) = f.fx(Si);
 	}
 }

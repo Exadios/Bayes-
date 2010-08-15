@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -18,23 +18,21 @@ namespace Bayesian_filter
 	using namespace Bayesian_filter_matrix;
 
 
-Information_bscheme::Information_bscheme (std::size_t x_size) :
-		Kalman_state(x_size), Information_state(x_size),
-		tempX(x_size,x_size)
+Information_scheme::Information_scheme (std::size_t x_size, std::size_t z_initialsize) :
+		Kalman_state_filter(x_size), Information_state_filter(x_size),
+		tempX(x_size,x_size),
+		i(x_size), I(x_size,x_size),
+		ZI(Empty)
 /*
  * Initialise filter and set the size of things we know about
  */
 {
+	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
+	observe_size (z_initialsize);
 	update_required = true;	// Not a valid state, init is required before update can be used
 }
 
-Information_scheme::Information_scheme (std::size_t x_size) :
-		Kalman_state(x_size), Information_state(x_size),
-		Information_bscheme(x_size)
-{
-}
-
-Information_bscheme::Predict_linear_byproduct::Predict_linear_byproduct (std::size_t x_size, std::size_t q_size) :
+Information_scheme::Linear_predict_byproducts::Linear_predict_byproducts (std::size_t x_size, std::size_t q_size) :
 /* Set size of by-products for linear predict
  */
 		 A(x_size,x_size), tempG(x_size,q_size),
@@ -42,18 +40,18 @@ Information_bscheme::Predict_linear_byproduct::Predict_linear_byproduct (std::si
 		 y(x_size)
 {}
 
-Information_bscheme& Information_bscheme::operator= (const Information_bscheme& a)
+Information_scheme& Information_scheme::operator= (const Information_scheme& a)
 /* Optimise copy assignment to only copy filter state
  * Precond: matrix size conformance
  */
 {
-	Information_state::operator=(a);
-	Kalman_state::operator=(a);
+	Information_state_filter::operator=(a);
+	Kalman_state_filter::operator=(a);
 	return *this;
 }
 
 
-void Information_bscheme::init ()
+void Information_scheme::init ()
 /*
  * Initialise the filter from x,X
  * Precondition:
@@ -71,7 +69,7 @@ void Information_bscheme::init ()
 	update_required = false;
 }
 
-void Information_bscheme::init_yY ()
+void Information_scheme::init_yY ()
 /*
  * Initialisation directly from Information
  * Precondition:
@@ -86,7 +84,7 @@ void Information_bscheme::init_yY ()
 	update_required = true;
 }
 
-void Information_bscheme::update_yY ()
+void Information_scheme::update_yY ()
 /*
  * Postcondition:
  *		y, Y is PSD
@@ -94,7 +92,7 @@ void Information_bscheme::update_yY ()
 {
 }
 
-void Information_bscheme::update ()
+void Information_scheme::update ()
 /*
  * Recompute x,X from y,Y
  *  Optimised using update_required (postcondition met iff update_required false)
@@ -116,25 +114,16 @@ void Information_bscheme::update ()
 }
 
 Bayes_base::Float
- Information_scheme::predict (Linear_invertible_predict_model& f)
-/* Linear information predict, without byproduct
- */
-{
-	Predict_linear_byproduct b(f.Fx.size1(),f.q.size());
-	return bypredict (f, b);	
-}
-
-Bayes_base::Float
- Information_bscheme::predict (Linrz_predict_model& f)
+ Information_scheme::predict (Linrz_predict_model& f)
 /*
- * Extended_kalman_filter predict via state
- *  Computation is through state to accommodate linrz model
+ * Extented linrz information prediction
+ *  Computation is through state to accommodate linearied model
  */
 {
 	update ();			// x,X required
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict information matrix, and state covariance
-	noalias(X) = prod_SPD(f.Fx, X, tempX);
+	noalias(X) = prod_SPD(f.Fx,X, tempX);
 	noalias(X) += prod_SPD(f.G, f.q, tempX);
 
 						// Information
@@ -145,8 +134,7 @@ Bayes_base::Float
 	return rcond;
 }
 
-Bayes_base::Float
- Information_bscheme::bypredict (Linear_invertible_predict_model& f, Predict_linear_byproduct& b)
+Float Information_scheme::predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b)
 /*
  * Linear information predict
  *  Computation is through information state y,Y only
@@ -190,41 +178,31 @@ Bayes_base::Float
 }
 
 
-Bayes_base::Float
- Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s)
-/* Extended_kalman_filter observe, unused byproduct
+inline void Information_scheme::observe_size (std::size_t z_size)
+/*
+ * Optimised dynamic observation sizing
  */
 {
-	const std::size_t x_size = h.Hx.size2();
-	FM::Vec i(x_size);
-	FM::SymMatrix I(x_size,x_size);
-	return byobserve_innovation (h, s, i,I);
-}	
+	if (z_size != last_z_size) {
+		last_z_size = z_size;
+
+		ZI.resize(z_size,z_size, false);
+	}
+}
 
 Bayes_base::Float
- Information_scheme::observe_innovation (Linrz_correlated_observe_model& h, const Vec& s)
-/* Extended_kalman_filter observe, unused byproduct
- */
-{
-	const std::size_t x_size = h.Hx.size2();
-	FM::Vec i(x_size);
-	FM::SymMatrix I(x_size,x_size);
-	return byobserve_innovation (h, s, i,I);
-}	
-
-Bayes_base::Float
- Information_bscheme::byobserve_innovation (Linrz_correlated_observe_model& h, const Vec& s, FM::Vec& i, FM::SymMatrix& I)
-/* Correlated innovation observe with explict byproduct
+ Information_scheme::observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s)
+/* correlated innovation observe
  */
 {
 						// Size consistency, z to model
 	if (s.size() != h.Z.size1())
 		error (Logic_exception("observation and model size inconsistent"));
+	observe_size (s.size());// Dynamic sizing
 
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF observation object
 
 						// Observation Information
-	SymMatrix ZI(s.size(),s.size());
 	Float rcond = UdUinversePD (ZI, h.Z);
 	rclimit.check_PD(rcond, "Z not PD in observe");
 
@@ -243,13 +221,14 @@ Bayes_base::Float
 }
 
 Bayes_base::Float
- Information_bscheme::byobserve_innovation (Linrz_uncorrelated_observe_model& h, const Vec& s, FM::Vec& i, FM::SymMatrix& I)
-/* Uncorrelated innovation observe with explict byproduct
+ Information_scheme::observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s)
+/* Extended linrz uncorrelated observe
  */
 {
 						// Size consistency, z to model
 	if (s.size() != h.Zv.size())
 		error (Logic_exception("observation and model size inconsistent"));
+	observe_size (s.size());// Dynamic sizing
 
 	Vec zz(s + prod(h.Hx,x));		// Strange EIF observation object
 

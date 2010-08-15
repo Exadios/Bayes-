@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -34,11 +34,7 @@ public:
 
 									// Single Feature observations (single element vectors)
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );
-	void observe_new( unsigned feature, const BF::Uncorrelated_additive_observe_model& fom, const FM::Vec& z );
-	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
-	{
-		observe_new (feature, static_cast<const BF::Uncorrelated_additive_observe_model&>(fom), z);
-	}
+	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z );
 	void observe_new( unsigned feature, const FM::Float& t, const FM::Float& T );
 
 	void forget( unsigned feature, bool must_exist = true );
@@ -91,15 +87,15 @@ public:
 	Fast_SLAM_Kstatistics( BF::SIR_kalman_scheme& L_filter );
 	// Construct Fast_SLAM filter using referenced filter for resampling
 	
-	void statistics_compressed( BF::Kalman_state& kstats );
+	void statistics_compressed( BF::Kalman_state_filter& kstats );
 	// Compute statistics of particles: Sample mean and covariance of particle.
 	// Statistics are returned in a compressed form with location states augmented with active feature states
-	void statistics_sparse( BF::Kalman_state& kstats );
+	void statistics_sparse( BF::Kalman_state_filter& kstats );
 	// Compute statistics of particles: Sample mean and covariance of particle.
 	// Statistics are returned in a sparse form indexed by feature number
 
 protected:
-	void statistics_feature( BF::Kalman_state& kstat, std::size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
+	void statistics_feature( BF::Kalman_state_filter& kstat, std::size_t fs, const AllFeature::const_iterator& fi, const AllFeature::const_iterator& fend ) const;
 	// Compute statistics of particles for a map feature: Sample mean and covariance of particle.
 
 	BF::SIR_kalman_scheme& L;			// Reference to filter parameter in constructor

@@ -19,7 +19,7 @@
 				</P>
 			</TD>
 			<TD WIDTH=330>
-				<H2 ALIGN=RIGHT><A HREF="mailto:michael.stevens@epost.de">Michael.Stevens@epost.de</A></H2>
+				<H2 ALIGN=RIGHT><A HREF="mailto:mail@michael-stevens.de">mail@michael-stevens.de</A></H2>
 				<H2 ALIGN=RIGHT><A HREF="http://www.acfr.usyd.edu.au/">Australian
 				Centre for Field Robotics</A></H2>
 			</TD>
@@ -39,9 +39,9 @@
 			<TD WIDTH=330>
 				<H3 ALIGN=RIGHT><A NAME="download"></A><A HREF="http://sourceforge.net/projects/bayesclasses/">Project
 				Summary</A> and <A HREF="http://sourceforge.net/project/showfiles.php?group_id=54729">Download</A></H3>
-				<P ALIGN=RIGHT><A NAME="CVS_Repository"></A><IMG SRC="http://sourceforge.net/sflogo.php?group_id=54729&amp;type=5" NAME="Grafik1" ALT="SourceForge Logo" ALIGN=TOP WIDTH=120 HEIGHT=40 BORDER=0>
-				<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/bayesclasses">CVS
-				Repository</A><BR>Bayes++ uses the <A HREF="http://www.boost.org/" TARGET="_top"><FONT SIZE=5>Boost</FONT></A><BR>peer-reviewed
+				<P ALIGN=RIGHT><A NAME="SVN_Repository"></A><IMG SRC="http://sourceforge.net/sflogo.php?group_id=54729&amp;type=5" NAME="Grafik1" ALT="SourceForge Logo" ALIGN=TOP WIDTH=120 HEIGHT=40 BORDER=0>
+				<A HREF="http://svn.sourceforge.net/bayesclasses">SVN Repository</A>
+				<BR>Bayes++ uses the <A HREF="http://www.boost.org/" TARGET="_top"><FONT SIZE=5>Boost</FONT></A><BR>peer-reviewed
 				portable C++ source libraries</P>
 			</TD>
 		</TR>
@@ -72,7 +72,10 @@ prediction model, the second the observation model. In this example
 they represent a simple linear problem with only one state variable
 and constant model noises. A filter fuses the results of prediction
 and observation.</P>
-<P>Compiling the Examples</P>
+<P>See the <A HREF="Bayesian Filtering Classes.html">Bayesian
+Filtering classes</A> for a description of the classes used and
+all three examples provided with Bayes++.</P>
+<H2>Compiling the Examples</H2>
 <P>First <A HREF="#download">download</A> and extract <B>Bayes++</B>
 and also the <B>Boost</B> library. <B>Boost</B> is used to provide
 compiler independence, and a common build system. Two Boost header
@@ -92,39 +95,45 @@ structure:</P>
 				<DD>Test</DD>
 		</DL></DD>
 		<DD><DL>
-			<DT>boost_1_32_0 <I>(or boost_1_31_0)</I></DT>
+			<DT>boost_1_33_1</DT>
 				<DD>boost</DD>
 				<DD><I>etc</I></DD>
 		</DL></DD>
 	</DL></DD>
 </DL>
 <P>
-Using the Boost Build system is the best way to compile the examples.
-This uses the <B>bjam</B> (Boost jam) program to compute dependencies
-and invoke the compiler. The documentation in your downloaded copy of
-Boost explains how to obtain bjam and the sources to compile it
-yourself. For everything to work <B>bjam</B> must be placed in the
-path. <BR>To build Bayes++ and the examples simply execute: (Bayes++
-should be the current directory)</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam -sBOOST_ROOT=&quot;../boost_1_32_0&quot;</PRE><P>
+<P>
+Using the Boost Build system version 2 is the best way to compile the
+examples. This uses the <B>bjam</B> (Boost jam) program to compute
+dependencies and invoke the compiler. The documentation in your
+downloaded copy of Boost explains how to obtain compile the latest
+version of bjam yourself. For everything to work <B>bjam</B> must be
+placed in the path. <BR>To build Bayes++ and the examples simply
+execute: (Bayes++ should be the current directory)</P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam --v2 -sBOOST_ROOT=&quot;../boost_1_33_1&quot;</PRE><P>
 If there is more then one toolsets (compiler etc) available you may
-want to tell bjam which to use. For example to use Visual C++ 7.1
+want to tell bjam which to use. For example to use Visual C++
 execute:</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam -sTOOLS=vc-7_1 -sBOOST_ROOT=&quot;../boost_1_32_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam --v2 msvc -sBOOST_ROOT=&quot;../boost_1_33_1&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a
-<B>bin/lib</B>. The <B>bin </B>directory and its subdirectories are
-created automatically. See the <A HREF="Bayesian Filtering Classes.html">Bayesian
-Filtering classes</A> overview for a description of the classes and
-all three examples.
+<B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
+by setting it as an environment variable.</P>
 </P>
+<H4>Location of compiled examples and libraries</H4>
+<P>The executables for the three examples will be placed inside a
+directory hierarchy named <B>target</B>. Static libraries for debug
+and release builds of the <B>BayesFilter</B> library are placed in
+<B>target/BayesFilter</B>. The <B>target</B> directory and its subdirectories
+are created automatically.</P?
 <H4>Visual C++ solution</H4>
-<P>For Visual C++ 7.1 you can also use the <B>Bayes++.sln</B> solution
+<P>For Visual C++ 7.0/7.1/8.0 etc, you can also use the <B>Bayes++.sln</B> solution
 and the active configuration <B>uBLAS Debug</B>. The compiler options
 must be set so the <B>Boost</B> include files can be found. That is,
 the <U>include path</U> must contain the base directory of Boost. In
 this case the local <B>boost</B> directory. In VC7.1 you should do
 this by choosing the <I>Tools/Options/Projects/VC++ Directories</I>
 option.</P>
+<P>Visual C++ 7.0 requires the use of Boost version 1_32_0. Visual C++ 7.1 (or later) requires Boost version 1_33_0 (or later).I</P>
 <H2>Licensing</H2>
 <P>All Bayes++ source code files are copyright with the license
 conditions as given here. The copyright notice is that of the MIT
@@ -186,16 +195,13 @@ the C++ template system directly. However the Boost libraries used
 Boost also includes many workarounds for compiler deficiencies.
 Therefore with few alterations Bayes++ should work with any modern
 C++ compiler supported by Boost.</P>
-<P>Bayes++ is tested with: <B>Boost 1.31.0</B> and <B>Boost 1.32.0</B></P>
-<P>Bayes++ is tested with: <B>GCC 3.3.3</B>, <B>GCC 3.4.2</B>,
+<P>Bayes++ is tested with: <B>Boost 1.33.0</B></P>
+<P>Bayes++ is tested with: <B>GCC 3.3.5</B>, <B>GCC 3.4.4, <B>GCC 4.0.0</B>,
 <B>VisualC++ 7.1</B> and <B>IntelC++ 8.1</B></P>
 <P>Later versions of GCC 3.x and GCC 4.x should also run Bayes++ with ease.
 However GCC 3.3.0 is know to be incompatible with uBLAS and to
 produce incorrect code with -O2 optimization.</P>
-<P>Previously Bayes++ was compatible with Visual C++6, but new
-releases have not been tested. Be aware that VC6 can get very
-confused! Particular when complex templates compiled. The order that
-headers are included can be important. Similarly VC7.1 often requires
+<P>VisualC++ 7.1 often requires
 the /Zm option to be used so it can compile complex headers.</P>
 <H2>Release Criteria</H2>
 <P>This releases is validated using the compilers and Boost versions
@@ -205,7 +211,7 @@ listed above using the following tests.
 <LI><P>Build system: Compatibility with both Boost Build version 1
 and version 2.<BR>Successfully complete <B>bjam</B> to build default
 libraries and examples.<BR>Successfully complete <B>bjam</B> to build
-SLAM system.<BR>Successfully build with VC7.1 from <B>Bayes++.sln</B>.</P>
+SLAM system.</P>
 <LI><P>Test examples: simpleExample, PV, QuadCalib <BR>Compile debug
 and release builds (using Boost Build version 2) :- with no errors
 and no warnings.<BR>Execution output :- Identical to expected
@@ -322,12 +328,17 @@ Bayes++ is built. This just requires a new version of <I>matSubSup.hpp</I>
 to be found before the one supplied in Bayes++ itself. However
 Bayes++ makes extensive use of uBLAS syntax, so a change is a
 significant task.</P>
-<H2><A NAME="whatsnew"></A>What's new in Bayes++ 2003.8-4</H2>
+<H2><A NAME="whatsnew"></A>What's new in Bayes++ 2003.8-5</H2>
+<P>Support for and requires <B>Boost 1_33_0</B>.</P>
+<H3>Compiler support</H3>
+<P>The list of compilers for which Bayes++ is built and tested has
+been update.
+<H2>What's new in Bayes++ 2003.8-4</H2>
 <P>New Documentation and support for <B>Boost 1_32_0</B>.</P>
 <P>Sample covariances are now computed using the definition for the Maximum Likelihood (biased) estimate. This estimate simply
 devides by 1/n the number of samples, rather then 1/(n-1). See <A href="http://en.wikipedia.org/wiki/Bias_(statistics)"> Sample Statistics in Wikipedia</A>.</P>
 <H3>Compiler support</H3>
-<P>The list of compiler for which Bayes++ is built and tested has
+<P>The list of compilers for which Bayes++ is built and tested has
 been update.
 <H2>Bayes++ 2003.8-3</H2>
 <P>Corrects documentation and support for Boost Build (version 1).</P>

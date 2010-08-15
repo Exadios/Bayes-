@@ -1,9 +1,9 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
- * $Id$
+ * $ID$
  */
 
 /*
@@ -28,13 +28,17 @@ bool Counted_iterated_terminator::term_or_relinearize (const Iterated_covariance
 }
 
 
-Iterated_covariance_scheme::Iterated_covariance_scheme (std::size_t x_size) :
-		Kalman_state(x_size),
-		tempX(x_size,x_size)
-/*
+Iterated_covariance_scheme::Iterated_covariance_scheme(std::size_t x_size, std::size_t z_initialsize) :
+		Kalman_state_filter(x_size),
+		S(Empty), SI(Empty),
+		tempX(x_size,x_size),
+		s(Empty), HxT(Empty)
+/*`
  * Initialise filter and set the size of things we know about
  */
 {
+	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
+	observe_size (z_initialsize);
 }
 
 Iterated_covariance_scheme&
@@ -43,7 +47,7 @@ Iterated_covariance_scheme&
  * Precond: matrix size conformance
  */
 {
-	Kalman_state::operator=(a);
+	Kalman_state_filter::operator=(a);
 	return *this;
 }
 
@@ -65,26 +69,29 @@ Bayes_base::Float
 	x = f.f(x);			// Extended Kalman state predict is f(x) directly
 						// Predict state covariance
 	noalias(X) = prod_SPD(f.Fx,X, tempX);
-	noalias(X) += prod_SPD(f.G,f.q, tempX);
+	noalias(X) += prod_SPD(f.G, f.q, tempX);
 
 	return 1;
 }
 
-Bayes_base::Float
- Iterated_covariance_scheme::predict (Gaussian_predict_model& f)
-/* Specialised 'stationary' predict, only addative noise
+
+void Iterated_covariance_scheme::observe_size (std::size_t z_size)
+/*
+ * Optimised dynamic observation sizing
  */
 {
-						// Predict state covariance, simply add in noise
-	noalias(X) += prod_SPD(f.G, f.q, tempX);
-  
-	return 1;
+	if (z_size != last_z_size) {
+		last_z_size = z_size;
+
+		s.resize(z_size, false);
+		S.resize(z_size,z_size, false);
+		SI.resize(z_size,z_size, false);
+		HxT.resize(x.size(),z_size, false);
+	}
 }
 
-
 Bayes_base::Float
- Iterated_covariance_scheme::byobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const Vec& z,
-				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
+ Iterated_covariance_scheme::observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)
@@ -95,12 +102,11 @@ Bayes_base::Float
 {
 						// ISSUE: Implement simplified uncorrelated noise equations
 	Adapted_Linrz_correlated_observe_model hh(h);
-	return byobserve (hh, term, z, s,S,SI,W);
+	return observe (hh, term, z);
 }
 
 Bayes_base::Float
- Iterated_covariance_scheme::byobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const Vec& z,
-				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W)
+ Iterated_covariance_scheme::observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z)
 /*
  * Iterated Extended Kalman Filter
  * Bar-Shalom and Fortmann p.119 (full scheme)

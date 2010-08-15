@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -26,7 +26,7 @@ inline scalar sqr(scalar x)
 {
 	return x*x;
 }
-}//namespace
+};//namespace
 
 
 /* Filter Matrix Namespace */
@@ -91,7 +91,7 @@ bool isSymmetric (const Matrix &M)
 	std::size_t size = M.size1();
 	for (std::size_t r = 0; r < size; ++r) {
 		for (std::size_t c = 0; c <= r; ++c) {
-			if (M(r,c) != M(c,r)) {
+			if( M(r,c) != M(c,r) ) {
 				bSym = false;
 			}
 		}

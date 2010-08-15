@@ -1,10 +1,10 @@
 # Bayes++ Project Managment Makefile
-#   Provides interface for project development and sourceforge maintainance
+#   Provides interface project development and sourceforge maintance
 #   Use bjam to compile and build Bayes++
 
-RELEASE=2005
-RELEASE_SUB=-1
-BOOST_VERSION=boost_1_32_0
+RELEASE=2010.8
+RELEASE_SUB=-1\
+BOOST_VERSION=boost_1_43_0
 
 help:
 	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
@@ -23,14 +23,14 @@ archivedoc:
 
 archivesrc:
 	ln -s "../../Bayes++$(RELEASE)" Bayes++
-	zip -r "Bayes++/bf-C++source-$(RELEASE)$(RELEASE_SUB).zip" Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Makefile Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html "Bayes++/Bayesian Filtering Classes.html"  -x '*/.svn/*'
+	zip -r "Bayes++/bf-C++source-$(RELEASE)$(RELEASE_SUB).zip" Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/PV_SIR Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/Jamrules Bayes++/Jamfile.v2 Bayes++/project-root.jam Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html "Bayes++/Bayesian Filtering Classes.html"  -x '*/.svn/*'
 	rm Bayes++
 
 buildall :
-	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release compressed_debug compressed_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1/link-runtime=static  . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../Boost/$(BOOST_VERSION) debug release msvc-7.0 . SLAM rtheta
+	cd ..; bjam -sBOOST_VERSION=$(BOOST_VERSION) debug release compressed_debug compressed_release gcc-3.4 gcc-4.0 gcc-4.1 intel-9.0  . SLAM rtheta
+	cd ..; bjam -sBOOST_VERSION=$(BOOST_VERSION) debug release link-runtime=static msvc-7.1  . SLAM rtheta
 
 buildallCVS :
-	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release compressed_debug compressed_release gcc-3.3 gcc-3.4 intel-linux-8.0 msvc-7.1 . SLAM rtheta
-	cd ..; bjam -sBOOST_ROOT=../Boost/boost_CVS debug release msvc-7.0 . SLAM rtheta
+	cd ..; bjam -sBOOST_VERSION=boost_CVS debug release compressed_debug compressed_release gcc-3.4 gcc-4.0 gcc-4.1 intel-8.1  . SLAM rtheta
+	cd ..; bjam -sBOOST_VERSION=boost_CVS debug release link-runtime=static msvc-7.1 . SLAM rtheta
 	

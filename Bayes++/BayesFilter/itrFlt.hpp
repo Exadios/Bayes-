@@ -3,8 +3,8 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -83,7 +83,7 @@ public:
 class Iterated_covariance_scheme : public Linrz_kalman_filter
 {
 public:
-	Iterated_covariance_scheme (std::size_t x_size);
+	Iterated_covariance_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
 	/* Initialised filter requries an addition iteration limit for the
 	   observe algorithm */
 	Iterated_covariance_scheme& operator= (const Iterated_covariance_scheme&);
@@ -91,38 +91,34 @@ public:
 
 	void init ();
 	void update ();
-
 	Float predict (Linrz_predict_model& f);
-	// Linrz_kalman_filter predict
-	Float predict (Gaussian_predict_model& f);
-	// Specialised 'stationary' predict, only addative noise
 
+	Float observe (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z);
+	Float observe (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z);
+	// Observe with iteration
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
-	{	// Linrz_kalman_filter observe with default termination
+	{	// Observe with default termination
 		Iterated_terminator term;
-		const std::size_t z_size = h.Hx.size1();
-		FM::Vec s(z_size);
-		FM::SymMatrix S(z_size,z_size), SI(z_size, z_size);
-		FM::Matrix W(h.Hx.size2(), z_size);
-		return byobserve (h, term, z, s,S,SI,W);
+		return observe (h, term, z);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
-	{	// Linrz_kalman_filter observe with default termination
+	{	// Observe with default termination
 		Iterated_terminator term;
-		const std::size_t z_size = h.Hx.size1();
-		FM::Vec s(z_size);
-		FM::SymMatrix S(z_size,z_size), SI(z_size, z_size);
-		FM::Matrix W(h.Hx.size2(), z_size);
-		return byobserve (h, term, z, s,S,SI,W);
+		return observe (h, term, z);
 	}
-	Float byobserve (Linrz_uncorrelated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
-				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
-	Float byobserve (Linrz_correlated_observe_model& h, Iterated_terminator& term, const FM::Vec& z,
-				FM::Vec& s, FM::SymMatrix& S, FM::SymMatrix& SI, FM::Matrix& W);
-	// Observe with iteration and explict byproduct
+
+public:						// Exposed Numerical Results
+	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
 
 protected:			   		// Permenantly allocated temps
 	FM::RowMatrix tempX;
+
+protected:					// allow fast operation if z_size remains constant
+	std::size_t last_z_size;
+	void observe_size (std::size_t z_size);
+							// Permenantly allocated temps
+	FM::Vec s;
+	FM::Matrix HxT;
 };
 
 

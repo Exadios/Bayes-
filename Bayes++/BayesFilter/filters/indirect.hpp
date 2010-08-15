@@ -3,8 +3,8 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -22,14 +22,14 @@ namespace Bayesian_filter
 
 
 template <typename Error_base>
-class Indirect_state_filter : public Expected_state {
+class Indirect_state_filter : public State_filter {
 /*
  * Indirect state filter
  *  Estimates state using an associated observation error filter
  */
 public:
 	Indirect_state_filter (Error_base& error_filter)
-		: Expected_state(error_filter.x.size()), direct(error_filter)
+		: State_filter(error_filter.x.size()), direct(error_filter)
 	{	// Construct and zero initial error filter
 		direct.x.clear();
 	}
@@ -38,38 +38,31 @@ public:
 	void predict (P_model& f)
 	{
 		x = f.f(x);
-		direct.predict(f);				// May be optimised for linear f as direct.x = 0
+		direct.predict(f);				// May be optimised for linear f as x = 0
 	};
 
-	void observe (Linear_uncorrelated_observe_model& h, const FM::Vec& z)
-	{
-				// Observe error (explict temporary)
-		FM::Vec z_error (h.h(x) - z);
-		observe_error (h, z_error);
-	}
-
-	void observe (Linear_correlated_observe_model& h, const FM::Vec& z)
-	{
-				// Observe error (explict temporary)
-		FM::Vec z_error (h.h(x) - z);
-		observe_error (h, z_error);
-	}
-
 	template <typename O_model>
-	void observe_error (O_model& h, const FM::Vec& z_error)
-	/*
-	 * Observe with precomputed indirect observation error
-	 * The observation model here can be non-linear but must then
-	 * be modified to return h(x_error) - h(x=0)
-	 */
+	void observe (O_model& h, const FM::Vec& z)
 	{
+				// Observe error (explict temporary)
+		FM::Vec z_error(z.size());
+		z_error = h.h(x);
+		z_error -= z;
 		direct.observe (h, z_error);
-		direct.update ();
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
 		direct.x.clear();
-		direct.init();
+	}
+
+	template <typename O_model>
+	void observe_error (O_model& h, const FM::Vec& z_error)
+	{
+		direct.observe (h, z_error);
+				// Update State estimate with error
+		x -= direct.x;
+				// Reset the error
+		direct.x.clear();
 	}
 
 	void update ()
@@ -84,14 +77,14 @@ private:
 
 
 template <typename Error_base>
-class Indirect_kalman_filter : public Kalman_state {
+class Indirect_kalman_filter : public Kalman_state_filter {
 /*
  * Indirect kalman filter
  *  Estimates state using an associated observation error filter
  */
 public:
 	Indirect_kalman_filter (Error_base& error_filter)
-		: Kalman_state(error_filter.x.size()), direct(error_filter)
+		: Kalman_state_filter(error_filter.x.size()), direct(error_filter)
 	{	
 	}
 
@@ -111,35 +104,30 @@ public:
 		direct.predict(f);				// May be optimised for linear f as x = 0
 	};
 
-	void observe (Linear_uncorrelated_observe_model& h, const FM::Vec& z)
-	{
-				// Observe error (explict temporary)
-		FM::Vec z_error (h.h(x) - z);
-		observe_error (h, z_error);
-	}
-
-	void observe (Linear_correlated_observe_model& h, const FM::Vec& z)
-	{
-				// Observe error (explict temporary)
-		FM::Vec z_error (h.h(x) - z);
-		observe_error (h, z_error);
-	}
-
 	template <typename O_model>
-	void observe_error (O_model& h, const FM::Vec& z_error)
-	/*
-	 * Observe with precomputed indirect observation error
-	 * The observation model here can be non-linear but must then
-	 * be modified to return h(x_error) - h(x=0)
-	 */
+	void observe (O_model& h, const FM::Vec& z)
 	{
+				// Observe error (explict temporary)
+		FM::Vec z_error(z.size());
+		z_error = h.h(x);
+		z_error -= z;
 		direct.observe (h, z_error);
 		direct.update();
 				// Update State estimate with error
 		x -= direct.x;
 				// Reset the error
 		direct.x.clear();
-		direct.init();
+		direct.init ();
+	}
+
+	template <typename O_model>
+	void observe_error (O_model& h, const FM::Vec& z_error)
+	{
+		direct.observe (h, z_error);
+				// Update State estimate with error
+		x -= direct.x;
+				// Reset the error
+		direct.clear();
 	}
 
 	void update ()

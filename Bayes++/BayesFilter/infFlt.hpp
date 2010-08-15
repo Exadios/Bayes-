@@ -3,8 +3,8 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -23,8 +23,8 @@
  *
  * Two alternative algorithms are used for predict functions:
  *  For linrz models an extended predict form is used so information state 'y' is predicted via the
- *  non-linear function. This requires that X, and Y are invertible so 'x' can be computed.
- * For linear invertible models predict can be done directly without computing x
+ *  non-linear function. This requires that X, and Y are invertable so 'x' can be computed.
+ * For linear invertable models predict can be done directly without computing x
  * Discontinous observe models require that predict is normailised with
  * respect to the observation.
  * NUMERICS
@@ -42,21 +42,22 @@
 namespace Bayesian_filter
 {
 
-class Information_bscheme : public Extended_kalman_filter, virtual public Information_state
+class Information_scheme : public Extended_kalman_filter, virtual public Information_state_filter
 {
 public:
-	Information_bscheme (std::size_t x_size);
-	Information_bscheme& operator= (const Information_bscheme&);
+	Information_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
+	Information_scheme& operator= (const Information_scheme&);
 	// Optimise copy assignment to only copy filter state
 
-	struct Predict_linear_byproduct
+	struct Linear_predict_byproducts
 	{
-		 Predict_linear_byproduct (std::size_t x_size, std::size_t q_size);
+		 Linear_predict_byproducts (std::size_t x_size, std::size_t q_size);
 		 FM::SymMatrix A;
 		 FM::Matrix tempG;
 		 FM::SymMatrix B;
 		 FM::Vec y;
 	};
+
 
 	void init ();
 	void update ();
@@ -64,38 +65,33 @@ public:
 	void update_yY ();
 	// Covariance and information form state interface
 
-	Float predict (Linrz_predict_model& f);
-	// Extended_kalman_filter predict - via state
-	Float bypredict (Linear_invertible_predict_model& f, Predict_linear_byproduct& b);
-	// Linear predict with explict byproduct. In information form as in Ref[2]
+	Float predict (Linear_invertable_predict_model& f, Linear_predict_byproducts& b);
+	// Linear Prediction in information form as in Ref[2]
+	Float predict (Linear_invertable_predict_model& f)
+	{
+		Linear_predict_byproducts b(f.Fx.size1(),f.q.size());
+		return predict (f, b);	
+	}
 
-	Float byobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
-				FM::Vec& i, FM::SymMatrix& I);
-	Float byobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
-				FM::Vec& i, FM::SymMatrix& I);
-	// Innovation observe with explict byproduct
+	Float predict (Linrz_predict_model& f);
+	// Extended Prediction via state
+
+	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
+	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
 
 protected:
 	bool update_required;	// Postcondition of update is not met
 
 protected:			   		// Permenantly allocated temps
 	FM::RowMatrix tempX;
+	FM::Vec i;
+	FM::SymMatrix I;
+					// allow fast operation if z_size remains constant
+	FM::SymMatrix ZI;
+	std::size_t last_z_size;
+	void observe_size (std::size_t z_size);
 };
 
-
-class Information_scheme : public Information_bscheme
-{
-public:
-	Information_scheme (std::size_t x_size);
-
-	using Information_bscheme::predict;
-	Float predict (Linear_invertible_predict_model& f);
-	// Linear invertible predict - via information state y,Y only
-
-	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
-	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
-	// Extended_kalman_filter observe
-};
 
 }//namespace
 #endif

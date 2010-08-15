@@ -1,16 +1,16 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
 
 /*
  * SLAM : Simultaneous Locatization and Mapping
- *  Kalman filter representation of SLAM
- *  A very simplistic and INEFFICIENT full correlation implementation.
- *  The feature numbers should be sequential to avoid sparseness in the full filter.
+ *  Kalman filter representing representation of SLAM
+ *  A very simple full filter implementation.
+ *  The Feature number should be incremented by one to avoid sparseness in the full filter.
  *  The filter size grows with the feature number, but never shrinks
  *
  * Reference
@@ -39,7 +39,7 @@ public:
 	Kalman_SLAM( Kalman_filter_generator& filter_generator );
 	~Kalman_SLAM();
 	void init_kalman( const FM::Vec& x, const FM::SymMatrix& X );
-	void predict( Bayesian_filter::Linear_predict_model& m );
+	void predict( Bayesian_filter::Linrz_predict_model& m );
 
 	void observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z );
 	void observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z );
@@ -52,11 +52,17 @@ public:
 		full->update();
 	}
 
-	void statistics_sparse( BF::Kalman_state& kstats ) const;
+	void statistics_sparse( BF::Kalman_state_filter& kstats ) const
+	{
+		kstats = *full;
+	}
+	
 	void decorrelate( Bayesian_filter::Bayes_base::Float d);
 
 protected:
 	Kalman_filter_generator& fgenerator;
+	// Location filter for prediction
+	Kalman_filter_generator::Filter_type* loc;
 	// Full Kalman representation of state
 	Kalman_filter_generator::Filter_type* full;
 

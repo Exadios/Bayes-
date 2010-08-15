@@ -1,14 +1,27 @@
-Shrew Pentium III (Katmai step 0) 450MHz
+2006-04-14 Boost 1_33_1  1,000,000 particles
+Shrew Athlon 64 3000+
+GCC-4.0.2 (x64)		0:13.6
+VC7.1 (wine)		0:30.0
 
-2003-10-15 Boost_CVS
-GCC-3.3 1m4.993s release
+2005-07-16 Boost 1_33_0  1,000,000 particles
 
-2003-09-29 Boost_CVS
-GCC-3.2 1m1.300s hardoptimize-release -march=pentium3 -msse
-GCC-3.2 1m2.420s hardoptimize-release 
+Shrew Athlon 64 3000+
+GCC-4.0.0 (x64)		0:13.8
+
+2005-01-18 Boost 1_32_0  1,000,000 particles
+
+Shrew Athlon 64
+GCC-3.4.2 (x64)		0:13.0
+GCC-3.4.2 (i386)	0:15.7
+GCC-3.3.3 (x64)		0:13.4
+GCC-3.3.3 (32bit)	0:15.3
+VC7.1 (wine)		1:00	Why so slow?
+IntelC-8.1			0:10.8 Good
 
 2003-07-29 Boost 1_30_0
-GCC-3.2 1:09
+
+Shrew Pentium II (Katmai step 0) 450MHz
+GCC-3.2		1:09
 GCC-2.95	1:09
 VC7 (wine)	1:13
 IntelC-71	2:30	-mp1 -O3 -Ob2

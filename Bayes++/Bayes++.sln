@@ -1,53 +1,55 @@
-Microsoft Visual Studio Solution File, Format Version 7.00
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BayesFilter", "VClib\VClib.vcproj", "{F90E045F-A6E0-4933-9477-1C135987F920}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PV", "PV\PV.vcproj", "{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F90E045F-A6E0-4933-9477-1C135987F920} = {F90E045F-A6E0-4933-9477-1C135987F920}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Quadradtic Calib", "QuadCalib\QuadCalib.vcproj", "{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F90E045F-A6E0-4933-9477-1C135987F920} = {F90E045F-A6E0-4933-9477-1C135987F920}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple", "Simple\simple.vcproj", "{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F90E045F-A6E0-4933-9477-1C135987F920} = {F90E045F-A6E0-4933-9477-1C135987F920}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SLAM", "SLAM\FastSLAM.vcproj", "{302C014F-09BC-4073-8A81-3C2E0B3B7592}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F90E045F-A6E0-4933-9477-1C135987F920} = {F90E045F-A6E0-4933-9477-1C135987F920}
+	EndProjectSection
 EndProject
 Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		ConfigName.0 = uBLAS Debug
-		ConfigName.1 = uBLAS Release
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		uBLAS Debug|Win32 = uBLAS Debug|Win32
+		uBLAS Release|Win32 = uBLAS Release|Win32
 	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
-		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.0 = {F90E045F-A6E0-4933-9477-1C135987F920}
-		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.0 = {F90E045F-A6E0-4933-9477-1C135987F920}
-		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.0 = {F90E045F-A6E0-4933-9477-1C135987F920}
-		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.0 = {F90E045F-A6E0-4933-9477-1C135987F920}
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Debug|Win32.ActiveCfg = uBLAS Debug|Win32
+		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Debug|Win32.Build.0 = uBLAS Debug|Win32
+		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Release|Win32.ActiveCfg = uBLAS Release|Win32
+		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Release|Win32.Build.0 = uBLAS Release|Win32
+		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Debug|Win32.ActiveCfg = uBLAS Debug|Win32
+		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Debug|Win32.Build.0 = uBLAS Debug|Win32
+		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Release|Win32.ActiveCfg = uBLAS Release|Win32
+		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Release|Win32.Build.0 = uBLAS Release|Win32
+		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Debug|Win32.ActiveCfg = uBLAS Debug|Win32
+		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Debug|Win32.Build.0 = uBLAS Debug|Win32
+		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Release|Win32.ActiveCfg = uBLAS Release|Win32
+		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Release|Win32.Build.0 = uBLAS Release|Win32
+		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Debug|Win32.ActiveCfg = uBLAS Debug|Win32
+		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Debug|Win32.Build.0 = uBLAS Debug|Win32
+		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Release|Win32.ActiveCfg = uBLAS Release|Win32
+		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Release|Win32.Build.0 = uBLAS Release|Win32
+		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Debug|Win32.ActiveCfg = uBLAS Debug|Win32
+		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Debug|Win32.Build.0 = uBLAS Debug|Win32
+		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Release|Win32.ActiveCfg = uBLAS Release|Win32
+		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Release|Win32.Build.0 = uBLAS Release|Win32
 	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Debug.ActiveCfg = uBLAS Debug|Win32
-		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Debug.Build.0 = uBLAS Debug|Win32
-		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Release.ActiveCfg = uBLAS Release|Win32
-		{F90E045F-A6E0-4933-9477-1C135987F920}.uBLAS Release.Build.0 = uBLAS Release|Win32
-		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Debug.ActiveCfg = uBLAS Debug|Win32
-		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Debug.Build.0 = uBLAS Debug|Win32
-		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Release.ActiveCfg = uBLAS Release|Win32
-		{7E7DBA7B-F28A-4FF2-A7C5-C3102F604680}.uBLAS Release.Build.0 = uBLAS Release|Win32
-		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Debug.ActiveCfg = uBLAS Debug|Win32
-		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Debug.Build.0 = uBLAS Debug|Win32
-		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Release.ActiveCfg = uBLAS Release|Win32
-		{1BAE984A-83B6-45C6-8CF4-8D3779140B5C}.uBLAS Release.Build.0 = uBLAS Release|Win32
-		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Debug.ActiveCfg = uBLAS Debug|Win32
-		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Debug.Build.0 = uBLAS Debug|Win32
-		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Release.ActiveCfg = uBLAS Release|Win32
-		{EC5888EA-D1C7-4048-84D1-EB75E68E0B5A}.uBLAS Release.Build.0 = uBLAS Release|Win32
-		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Debug.ActiveCfg = uBLAS Debug|Win32
-		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Debug.Build.0 = uBLAS Debug|Win32
-		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Release.ActiveCfg = uBLAS Release|Win32
-		{302C014F-09BC-4073-8A81-3C2E0B3B7592}.uBLAS Release.Build.0 = uBLAS Release|Win32
-	EndGlobalSection
-	GlobalSection(SolutionItems) = postSolution
-		Item:1 = Bayes++.html
-		Item:2 = Bayesian Filtering Classes.html
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,14 @@
+# Bayes++ Jamfile - See Boost.build
+
+# FastSLAM Test. Compare Kalman and FastSLAM results
+project
+     :
+     : default-build release
+;
+
+exe SLAM :
+     testFastSLAM.cpp
+     fastSLAM.cpp
+     kalmanSLAM.cpp
+     ../BayesFilter//BayesFilter
+;

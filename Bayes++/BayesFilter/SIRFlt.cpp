@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -37,7 +37,7 @@ namespace Bayesian_filter
 
 
 Standard_resampler::Float
- Standard_resampler::resample (Resamples_t& presamples, std::size_t& uresamples, DenseVec& w, SIR_random& r) const
+ Standard_resampler::resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const
 /*
  * Standard resampler from [1]
  * Algorithm:
@@ -108,7 +108,7 @@ Standard_resampler::Float
 	}
 	assert (pri==presamples.end());	// must traverse all of P
 	
-	if (ui != ui_end)				// resample failed due non numeric weights
+	if (ui != ui_end)				// resample failed due no non numeric weights
 		error (Numeric_exception("weights are not numeric and cannot be resampled"));
 	
 	uresamples = unique;
@@ -117,7 +117,7 @@ Standard_resampler::Float
 
 
 Systematic_resampler::Float
- Systematic_resampler::resample (Resamples_t& presamples, std::size_t& uresamples, DenseVec& w, SIR_random& r) const
+ Systematic_resampler::resample (Resamples_t& presamples, std::size_t& uresamples, FM::DenseVec& w, SIR_random& r) const
 /*
  * Systematic resample algorithm from [2]
  * Algorithm:
@@ -200,7 +200,7 @@ const SIR_scheme::Float SIR_scheme::rougheningKinit = 1;
 		// use 1 std.dev. per sample as default roughening
 
 SIR_scheme::SIR_scheme (std::size_t x_size, std::size_t s_size, SIR_random& random_helper) :
-		Sample_state (x_size, s_size),
+		Sample_state_filter (x_size, s_size),
 		Sample_filter (x_size, s_size),
 		random (random_helper),
 		resamples (s_size), wir (s_size)
@@ -285,7 +285,7 @@ void
 						// Predict particles S using supplied predict model
 	const std::size_t nSamples = S.size2();
 	for (std::size_t i = 0; i != nSamples; ++i) {
-		ColMatrix::Column Si(S,i);
+		FM::ColMatrix::Column Si(S,i);
 		noalias(Si) = f.fw(Si);
 	}
 	stochastic_samples = S.size2();
@@ -378,8 +378,9 @@ void SIR_scheme::roughen_minmax (ColMatrix& P, Float K) const
  *		unchanged: P
  */
 {
+	using namespace std;
 						// Scale Sigma by constant and state dimensions
-	Float SigmaScale = K * std::pow (Float(P.size2()), -1/Float(x_size));
+	Float SigmaScale = K * pow (Float(P.size2()), -1/Float(x_size));
 
 						// Find min and max states in all P, precond P not empty
 	Vec xmin(x_size); noalias(xmin) = column(P,0);
@@ -426,7 +427,7 @@ void SIR_scheme::roughen_minmax (ColMatrix& P, Float K) const
  * SIR implementation of a Kalman filter
  */
 SIR_kalman_scheme::SIR_kalman_scheme (std::size_t x_size, std::size_t s_size, SIR_random& random_helper) :
-	Sample_state (x_size, s_size), Kalman_state (x_size),
+	Sample_state_filter (x_size, s_size), Kalman_state_filter(x_size),
 	SIR_scheme (x_size, s_size, random_helper),
 	roughen_model (x_size,x_size, random_helper)
 {
@@ -442,7 +443,7 @@ void SIR_kalman_scheme::init ()
 						// Samples at mean
 	const std::size_t nSamples = S.size2();
 	for (std::size_t i = 0; i != nSamples; ++i) {
-		ColMatrix::Column Si(S,i);
+		FM::ColMatrix::Column Si(S,i);
 		noalias(Si) = x;
 	}
 						// Decorrelate init state noise
@@ -472,7 +473,7 @@ void SIR_kalman_scheme::mean ()
 	x.clear();
 	const std::size_t nSamples = S.size2();
 	for (std::size_t i = 0; i != nSamples; ++i) {
-		ColMatrix::Column Si(S,i);
+		FM::ColMatrix::Column Si(S,i);
 		x.plus_assign (Si);
 	}
 	x /= Float(S.size2());
@@ -502,15 +503,6 @@ void SIR_kalman_scheme::update_statistics ()
  *  Pre : S (s_size >=1 enforced by state_filter base)
  *  Post: x,X,S	(X may be non PSD)
  *
- * Sample Covariance := Sum_i [transpose(S[i]-mean)*(S[i]-mean)] / (s_size-1)
- *  The definition is the unbiased estimate of covariance given samples with unknown (estimated) mean
- *  Implies X is indeterminate when size == 1
- * Semi-definite covariance X due to colapse of S:
- *  If the number of unique samples in S is small relative to the state size then
- *  X will become semi-definite and numerically may appear be negative
- *  As this situation is quite common and due to the normal circumstances and
- *  not an algorithm failure no assertion is made.
- *  Use with care and check the results of any algorithms relying on X
  * Sample Covariance := Sum_i [transpose(S[i]-mean)*(S[i]-mean)] / (s_size)
  *  The definition is the Maximum Likelihood (biased) estimate of covariance given samples with unknown (estimated) mean
  * Numerics
@@ -522,11 +514,11 @@ void SIR_kalman_scheme::update_statistics ()
     mean ();
     X.clear();              // Covariance
 
-    const std::size_t nSamples = S.size2();
-    for (std::size_t i = 0; i != nSamples; ++i) {
-        FM::ColMatrix::Column Si(S,i);
-        X.plus_assign (FM::outer_prod(Si-x, Si-x));
-    }
+	const std::size_t nSamples = S.size2();
+	for (std::size_t i = 0; i != nSamples; ++i) {
+		FM::ColMatrix::Column Si(S,i);
+		X.plus_assign (FM::outer_prod(Si-x, Si-x));
+	}
 	X /= Float(nSamples);
 }
 
@@ -539,15 +531,16 @@ void SIR_kalman_scheme::roughen_correlated (ColMatrix& P, Float K)
  *  into account the correlation of P
  *  K is scaleing factor for roughening noise
  * Numerical colapse of P
- *  Numerically when covariance of P semi-definite (or close), X's UdU factorisation
+ *  Numerically when covariance of P semi definite (or close), X's UdU factorisation
  *  may be negative.
  * Exceptions:
  *   Bayes_filter_exception due colapse of P
  *    unchanged: P
  */
 {
+	using namespace std;
 						// Scale variance by constant and state dimensions
-	Float VarScale = sqr(K) * std::pow (Float(P.size2()), Float(-2.)/Float(x_size));
+	Float VarScale = sqr(K) * pow (Float(P.size2()), Float(-2.)/Float(x_size));
 
 	update_statistics();	// Estimate sample mean and covariance
 

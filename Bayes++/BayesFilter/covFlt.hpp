@@ -3,8 +3,8 @@
 
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -31,53 +31,35 @@
 namespace Bayesian_filter
 {
 
-class Covariance_bscheme : virtual public Kalman_state
+class Covariance_scheme : public Extended_kalman_filter
 {
 public:
-	Covariance_bscheme (std::size_t x_size);
-	Covariance_bscheme& operator= (const Covariance_bscheme&);
+	Covariance_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
+	Covariance_scheme& operator= (const Covariance_scheme&);
 	// Optimise copy assignment to only copy filter state
 
 	void init ();
 	void update ();
 
+	Float predict (Linrz_predict_model& f);
+	// Standard Linrz prediction
 	Float predict (Gaussian_predict_model& f);
-	// Specialised 'stationary' predict, only additive noise
-
-	Float byobserve_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s,
-				FM::SymMatrix& S, FM::UTriMatrix& Sci, FM::Matrix& W, FM::Matrix& Wc, FM::Matrix& XtHx);
-	Float byobserve_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s,
-				FM::SymMatrix& S, FM::UTriMatrix& Sci, FM::Matrix& W, FM::Matrix& Wc, FM::Matrix& XtHx);
-	// Observe with explict byproduct
-	// Innovation observe using Cholesky factor innovation covariance
-
-protected:			   		// Permenantly allocated temps
-	FM::RowMatrix tempX;
-};
-
-
-class Covariance_scheme : public Extended_kalman_filter, public Covariance_bscheme
-{
-public:
-	Covariance_scheme (std::size_t x_size, std::size_t z_initialsize = 0);
+	// Specialised 'stationary' prediction, only addative noise
 
 	Float observe_innovation (Linrz_uncorrelated_observe_model& h, const FM::Vec& s);
 	Float observe_innovation (Linrz_correlated_observe_model& h, const FM::Vec& s);
-	// Extended_kalman_filter observe
 
-	Float predict (Linrz_predict_model& f);
-	// Extended_kalman_filter predict
+public:						// Exposed Numerical Results
+	FM::SymMatrix S, SI;		// Innovation Covariance and Inverse
+	FM::Matrix W;				// Kalman Gain
 
-protected:					// Allow fast operation if z_size remains constant
+protected:			   		// Permenantly allocated temps
+	FM::RowMatrix tempX;
+protected:					// allow fast operation if z_size remains constant
 	std::size_t last_z_size;
 	void observe_size (std::size_t z_size);
-							// Numerical byproducts
-	FM::SymMatrix S;		// Innovation Covariance
-	FM::UTriMatrix Sci;		// Sci'*Sci = inv(S)
-	FM::Matrix W;			// Kalman Gain
-	FM::Matrix Wc;			// W = Wc * Sci
-	FM::Matrix XtHx;		// X * Hx'
 };
+
 
 }//namespace
 #endif

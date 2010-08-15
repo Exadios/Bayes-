@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
- * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * Copyright (c) 2002 Michael Stevens
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -22,16 +22,16 @@ inline scalar sqr(scalar x)
 {
 	return x*x;
 }
-}//namespace
+};//namespace
 
 
 /* Filter namespace */
 namespace Bayesian_filter
 {
 
-Simple_additive_predict_model::Simple_additive_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+Simple_addative_predict_model::Simple_addative_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 // Precondition: G, q are conformantly dimensioned (not checked)
-	Additive_predict_model (G_init.size1(), q_init.size()),
+	Addative_predict_model (G_init.size1(), q_init.size()),
 	ff(f_init)
 {
 	G = G_init;
@@ -67,7 +67,7 @@ Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (St
 {
 	Hx = Hx_init;
 	Z = Z_init;
-}
+};
 
 Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
 	Linrz_uncorrelated_observe_model (Hx_init.size2(), Hx_init.size1()),
@@ -79,7 +79,7 @@ Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model
 {
 	Hx = Hx_init;
 	Zv = Zv_init;
-}
+};
 
 Simple_linear_correlated_observe_model::Simple_linear_correlated_observe_model (const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
 	Linear_correlated_observe_model (Hx_init.size2(), Hx_init.size1())
@@ -90,7 +90,7 @@ Simple_linear_correlated_observe_model::Simple_linear_correlated_observe_model (
 {
 	Hx = Hx_init;
 	Z = Z_init;
-}
+};
 
 Simple_linear_uncorrelated_observe_model::Simple_linear_uncorrelated_observe_model (const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
 	Linear_uncorrelated_observe_model (Hx_init.size2(), Hx_init.size1())
@@ -101,14 +101,14 @@ Simple_linear_uncorrelated_observe_model::Simple_linear_uncorrelated_observe_mod
 {
 	Hx = Hx_init;
 	Zv = Zv_init;
-}
+};
 
 
 
 Bayes_base::Float
- General_LzUnAd_observe_model::Likelihood_uncorrelated::L(const Uncorrelated_additive_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
+ General_LzUnAd_observe_model::Likelihood_uncorrelated::L(const Uncorrelated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
 /*
- * Definition of likelihood given an additive Gaussian observation model:
+ * Definition of likelihood given an addative Gaussian observation model:
  *  p(z|x) = exp(-0.5*(z-h(x))'*inv(Z)*(z-h(x))) / sqrt(2pi^nz*det(Z));
  *  L(x) the the Likelihood L(x) doesn't depend on / sqrt(2pi^nz) for constant z size
  * Precond: Observation Information: z,Zv_inv,detZterm
@@ -131,10 +131,11 @@ Bayes_base::Float
 	}
 	Float logL = FM::inner_prod(zInnov, Zv_inv);
 
-	return std::exp(Float(-0.5)*(logL + logdetZ));
+	using namespace std;
+	return exp(Float(-0.5)*(logL + logdetZ));
 }
 
-void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelated_additive_observe_model& model)
+void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelated_addative_observe_model& model)
 /* Set the observation zz and Zv about which to evaluate the Likelihood function
  * Postcond: Observation Information: z,Zv_inv,detZterm
  */
@@ -144,20 +145,20 @@ void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelat
 	Float rcond = FM::UdUrcond(model.Zv);
 	model.rclimit.check_PD(rcond, "Z not PD in observe");
 
-						// Zv[i] > 0 as Zv PD
 	Bayes_base::Float detZ = 1;
+	
 	for (FM::Vec::const_iterator zi = model.Zv.begin(), zi_end = model.Zv.end(); zi != zi_end; ++zi) {
 		detZ *= *zi;
 		Zv_inv[zi.index()] = 1 / (*zi);		// Protected from /0 by rcond check
 	}
-						// detZ > 0 as Zv PD
-	logdetZ = std::log(detZ);
+	using namespace std;
+	logdetZ = log(detZ);		// Protected from ln(0) by rcond check
 }
 
 Bayes_base::Float
- General_LzCoAd_observe_model::Likelihood_correlated::L(const Correlated_additive_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
+ General_LzCoAd_observe_model::Likelihood_correlated::L(const Correlated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
 /*
- * Definition of likelihood given an additive Gaussian observation model:
+ * Definition of likelihood given an addative Gaussian observation model:
  *  p(z|x) = exp(-0.5*(z-h(x))'*inv(Z)*(z-h(x))) / sqrt(2pi^nz*det(Z));
  *  L(x) the the Likelihood L(x) doesn't depend on / sqrt(2pi^nz) for constant z size
  * Precond: Observation Information: z,Z_inv,detZterm
@@ -171,10 +172,11 @@ Bayes_base::Float
 	FM::noalias(zInnov) -= zp;
 
 	Float logL = scaled_vector_square(zInnov, Z_inv);
-	return std::exp(Float(-0.5)*(logL + logdetZ));
+	using namespace std;
+	return exp(Float(-0.5)*(logL + logdetZ));
 }
 
-void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_additive_observe_model& model)
+void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_addative_observe_model& model)
 /* Set the observation zz and Z about which to evaluate the Likelihood function
  * Postcond: Observation Information: z,Z_inv,detZterm
  */
@@ -185,7 +187,8 @@ void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_a
 	Float rcond = FM::UdUinversePD (Z_inv, detZ, model.Z);
 	model.rclimit.check_PD(rcond, "Z not PD in observe");
 						// detZ > 0 as Z PD
-	logdetZ = std::log(detZ);
+	using namespace std;
+	logdetZ = log(detZ);
 }
 
 
@@ -199,8 +202,8 @@ Bayes_base::Float
 }
 
 
-Adapted_Correlated_additive_observe_model::Adapted_Correlated_additive_observe_model (Uncorrelated_additive_observe_model& adapt) :
-		Correlated_additive_observe_model(adapt.Zv.size()),
+Adapted_Correlated_addative_observe_model::Adapted_Correlated_addative_observe_model (Uncorrelated_addative_observe_model& adapt) :
+		Correlated_addative_observe_model(adapt.Zv.size()),
 		unc(adapt)
 {
 	Z.clear();

@@ -159,7 +159,7 @@
 			RelativePath=".\TestResult.txt">
 		</File>
 		<File
-			RelativePath="..\..\CLAPACK3\Release\clapack7.lib">
+			RelativePath="..\..\CLAPACK3\clapack7.lib">
 		</File>
 		<File
 			RelativePath=".\rtheta.cpp">

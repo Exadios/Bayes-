@@ -1,7 +1,7 @@
 /*
  * Bayes++ the Bayesian Filtering Library
  * Copyright (c) 2004 Michael Stevens
- * See accompanying Bayes++.html for terms and conditions of use.
+ * See accompanying Bayes++.htm for terms and conditions of use.
  *
  * $Id$
  */
@@ -76,8 +76,8 @@ struct SLAMDemo
 		Simple_observe (Float i_Zv) : Linear_uncorrelated_observe_model(2,1)
 		// Construct a linear model with const Hx
 		{
-			Hx(0,0) = -1.;	// location
-			Hx(0,1) = 1.;	// map
+			Hx(0,0) = -1.;	// Location
+			Hx(0,1) = 1.;	// Map
 			Zv[0] = i_Zv;
 		}
 	};
@@ -91,10 +91,10 @@ struct SLAMDemo
 		}
 	};
 
-	struct Kalman_statistics : public BF::Kalman_state
+	struct Kalman_statistics : public BF::Kalman_state_filter
 	// Kalman_statistics without any filtering
 	{
-		Kalman_statistics (std::size_t x_size) : Kalman_state(x_size) {}
+		Kalman_statistics (std::size_t x_size) : Kalman_state_filter(x_size) {}
 		void init() {}
 		void update() {}
 	};
@@ -114,7 +114,7 @@ struct SLAMDemo
 	};
 
 
-	void display( const std::string label, const BF::Kalman_state& stats)
+	void display( const std::string label, const BF::Kalman_state_filter& stats)
 	{
 		std::cout << label << stats.x << stats.X << std::endl;
 	}
@@ -132,11 +132,11 @@ void SLAMDemo::OneDExperiment ()
 	// Construct simple Prediction models
 	BF::Sampled_LiAd_predict_model location_predict(nL,1, goodRandom);
 	// Stationary Prediction model (Identity)
-	location_predict.Fx(0,0) = 1;
+	FM::identity(location_predict.Fx);
 				// Constant Noise model
 	location_predict.q[0] = 1000.;
 	location_predict.G.clear();
-	location_predict.G(0,0) = 1;
+	location_predict.G(0,0) = 1.;
 
 	// Relative Observation with  Noise model
 	Simple_observe observe0(5.), observe1(3.);
@@ -146,7 +146,7 @@ void SLAMDemo::OneDExperiment ()
 	// Location with no uncertainty
 	FM::Vec x_init(nL); FM::SymMatrix X_init(nL, nL);
 	x_init[0] = 20.;
-	X_init(0,0) = 1.;
+	X_init(0,0) = 0.;
 
 	// Truth model : location plus one map feature
 	FM::Vec true0(nL+1), true1(nL+1);
@@ -167,25 +167,21 @@ void SLAMDemo::OneDExperiment ()
 	fast_location.init_kalman (x_init, X_init);
 	Fast_SLAM_Kstatistics fast (fast_location);
 
-	fast.update(); fast.statistics_sparse(stat); display("Initial Fast", stat);
-	kalm.update(); kalm.statistics_sparse(stat); display("Initial Kalm", stat);
-
 	// Initial feature states
 	z = observe0.h(true0);		// Observe a relative position between location and map landmark
 	z[0] += 0.5;			
-	fast.observe_new (0, observe_new0, z);
 	kalm.observe_new (0, observe_new0, z);
-	fast.update(); fast.statistics_sparse(stat); display("Featur0 Fast", stat);
-	kalm.update(); kalm.statistics_sparse(stat); display("Featur0 Kalm", stat);
+	fast.observe_new (0, observe_new0, z);
 
 	z = observe1.h(true1);
 	z[0] += -1.0;		
-	fast.observe_new (1, observe_new1, z);
 	kalm.observe_new (1, observe_new1, z);
-	fast.update(); fast.statistics_sparse(stat); display("Featur1 Fast", stat);
-	kalm.update(); kalm.statistics_sparse(stat); display("Featur1 Kalm", stat);
+	fast.observe_new (1, observe_new1, z);
 
-	// Predict the filter forward
+	fast.update(); fast.statistics_sparse(stat); display("Feature Fast", stat);
+	kalm.update(); kalm.statistics_sparse(stat); display("Feature Kalm", stat);
+
+	// Predict the location state forward
 	fast_location.predict (location_predict);
 	kalm.predict (location_predict);
 	fast.update(); fast.statistics_sparse(stat); display("Predict Fast", stat);
@@ -326,7 +322,7 @@ int main (int argc, char* argv[])
 	std::cout.flags(std::ios::fixed); std::cout.precision(4);
 
 	unsigned nParticles = 1000;
-	if (argv[1] != 0)
+	if (argv[1])
 	{
     	try {
 			nParticles = boost::lexical_cast<unsigned>(argv[1]);
