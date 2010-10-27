@@ -294,7 +294,7 @@ Bayes_base::Float
 								// Observation model, extracted for a single z element
 		const Vec& zp = h.h(x);
 		h.normalise(znorm = z, zp);
-		h1 = row(h.Hx,o);
+		noalias(h1) = row(h.Hx, o);
 								// Check Z precondition
 		if (h.Zv[o] < 0)
 			error (Numeric_exception("Zv not PSD in observe"));
