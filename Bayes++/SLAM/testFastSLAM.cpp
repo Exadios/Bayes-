@@ -339,7 +339,7 @@ int main (int argc, char* argv[])
 		test.OneDExperiment();
 		//test.InformationLossExperiment();
 	}
-	catch (BF::Filter_exception ne)
+	catch (const BF::Filter_exception& ne)
 	{
 		std::cout << ne.what() << std::endl;
 	}
