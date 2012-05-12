@@ -9,7 +9,7 @@
  *	The algorithm has proven to be the most numerically acurate.
  *  For implementations where the cost of fmod is low it is also the most
  *	efficient in all cases.
- *	The class is templatised for a model of real for which std::fmod and arithmatic
+ *	The class is templatised for a model of real for which std::fmod and arithmetic
  *  and comparison operation are defined.
  */
 

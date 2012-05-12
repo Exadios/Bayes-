@@ -26,13 +26,12 @@ Unscented_scheme::Unscented_scheme (std::size_t x_size, std::size_t z_initialsiz
 		XX(x_size, 2*x_size+1),
 		s(Empty), S(Empty), SI(Empty),
 		fXX(x_size, 2*x_size+1)
-/*
- * Initialise filter and set the size of things we know about
+/* Initialise filter and set the size of things we know about
  */
 {
 	Unscented_scheme::x_size = x_size;
 	Unscented_scheme::XX_size = 2*x_size+1;
-	last_z_size = 0;	// Leave z_size dependants Empty if z_initialsize==0
+	last_z_size = 0;	// Matrices conform to z_initialsize, they are left Empty if z_initialsize==0
 	observe_size (z_initialsize);
 }
 
@@ -48,18 +47,18 @@ Unscented_scheme& Unscented_scheme::operator= (const Unscented_scheme& a)
 
 void Unscented_scheme::unscented (FM::ColMatrix& XX, const FM::Vec& x, const FM::SymMatrix& X, Float scale)
 /*
- * Generate the unscented point representing a distribution
+ * Generate the Unscented point representing a distribution
  * Fails if scale is negative
  */
 {
 	UTriMatrix Sigma(x_size,x_size);
 
-						// Get a upper Cholesky factoriation
+						// Get a upper Cholesky factorisation
 	Float rcond = UCfactor(Sigma, X);
 	rclimit.check_PSD(rcond, "X not PSD");
 	Sigma *= std::sqrt(scale);
 
-						// Generate XX with the same sample Mean and Covar as before
+						// Generate XX with the same sample Mean and Covariance as before
 	column(XX,0) = x;
 
 	for (std::size_t c = 0; c < x_size; ++c) {
@@ -84,8 +83,7 @@ Unscented_scheme::Float Unscented_scheme::observe_Kappa (std::size_t size) const
 }
 
 void Unscented_scheme::init ()
-/*
- * Initialise state
+/* Initialise state
  *  Pre : x,X
  *  Post: x,X is PSD
  */
@@ -96,8 +94,7 @@ void Unscented_scheme::init ()
 }
 
 void Unscented_scheme::init_XX ()
-/*
- * Initialise from unscented state
+/* Initialise from Unscented state
  *  Pre : XX, kappa
  *  Post: x,X is PSD
  */
@@ -114,13 +111,13 @@ void Unscented_scheme::init_XX ()
 	for (std::size_t i = 0; i < XX_size; ++i) {
 		column(fXX,i).minus_assign (x);
 	}
-							// Center point, premult here by 2 for efficency
+							// Center point, premult here by 2 for efficiency
     {
 		ColMatrix::Column fXX0 = column(fXX,0);
 		noalias(X) = FM::outer_prod(fXX0, fXX0);
 		X *= 2*kappa;
 	}
-							// Remaining unscented points
+							// Remaining Unscented points
 	for (std::size_t i = 1; i < XX_size; ++i) {
 		ColMatrix::Column fXXi = column(fXX,i);
 		noalias(X) += FM::outer_prod(fXXi, fXXi);
@@ -129,8 +126,7 @@ void Unscented_scheme::init_XX ()
 }
 
 void Unscented_scheme::update ()
-/*
- * Update state
+/* Update state
  *  Pre : x,X
  *  Post: x,X
  */
@@ -138,8 +134,7 @@ void Unscented_scheme::update ()
 }
 
 void Unscented_scheme::update_XX (Float kappa)
-/*
- * Update unscented state
+/* Update Unscented state
  *  Pre : x,X
  *  Post: x,X, XX, kappa
  */
@@ -150,7 +145,7 @@ void Unscented_scheme::update_XX (Float kappa)
 }
 
 
-// ISSUE GCC2.95 cannot link if these are localy defined in member function
+// ISSUE GCC2.95 cannot link if these are locally defined in member function
 // Move them back into member functions for standard compilers
 namespace {
 	class Adapted_zero_model : public Unscented_predict_model
@@ -199,9 +194,8 @@ namespace {
 
 
 void Unscented_scheme::predict (Functional_predict_model& f)
-/*
- * Adapt model by creating an Unscented predict with zero noise
- * ISSUE: A simple specialisation is possible, rather then this adapted implemenation
+/* Adapt model by creating an Unscented predict with zero noise
+ * ISSUE: A simple specialisation is possible, rather then this adapted implementation
  */
 {
 	Adapted_zero_model adaptedmodel(f);
@@ -210,8 +204,7 @@ void Unscented_scheme::predict (Functional_predict_model& f)
 
 
 void Unscented_scheme::predict (Addative_predict_model& f)
-/*
- * Adapt model by creating an Unscented predict with addative noise
+/* Adapt model by creating an Unscented predict with additive noise
  *  Computes noise covariance Q = GqG'
  */
 {
@@ -221,16 +214,15 @@ void Unscented_scheme::predict (Addative_predict_model& f)
 
 
 void Unscented_scheme::predict (Unscented_predict_model& f)
-/*
- * Predict forward
+/* Predict forward
  *  Pre : x,X
  *  Post: x,X is PSD
- * Implementation uses specific model for fast unscented computation
+ * Implementation uses specific model for fast Unscented computation
  */
 {
 	const std::size_t XX_size = XX.size2();
 
-						// Create unscented distribution
+						// Create Unscented distribution
 	kappa = predict_Kappa(x_size);
 	Float x_kappa = Float(x_size) + kappa;
 	unscented (XX, x, X, x_kappa);
@@ -242,14 +234,13 @@ void Unscented_scheme::predict (Unscented_predict_model& f)
 	}
 
 	init_XX ();
-						// Addative Noise Prediction, computed about center point
+						// Additive Noise Prediction, computed about center point
 	noalias(X) += f.Q( column(fXX,0) );
 }
 
 
 void Unscented_scheme::observe_size (std::size_t z_size)
-/*
- * Optimised dynamic observation sizing
+/* Optimised dynamic observation sizing
  */
 {
 	if (z_size != last_z_size) {
@@ -263,13 +254,12 @@ void Unscented_scheme::observe_size (std::size_t z_size)
 
 
 Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z)
-/*
- * Observation fusion
+/* Observation fusion
  *  Pre : x,X
  *  Post: x,X is PSD
  *
  * Uncorrelated noise
- * ISSUE: Simplified implemenation using uncorrelated noise equations
+ * ISSUE: Simplified implementation using uncorrelated noise equations
  */
 {
 	Adapted_Correlated_addative_observe_model hh(h);
@@ -278,8 +268,7 @@ Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model
 
 
 Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& h, const FM::Vec& z)
-/*
- * Observation fusion
+/* Observation fusion
  *  Pre : x,X
  *  Post: x,X is PSD
  */
@@ -293,7 +282,7 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 
 	observe_size (z.size());	// Dynamic sizing
 
-						// Create unscented distribution
+						// Create Unscented distribution
 	kappa = observe_Kappa(x_size);
 	Float x_kappa = Float(x_size) + kappa;
 	unscented (XX, x, X, x_kappa);
@@ -323,13 +312,13 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	for (std::size_t i = 0; i < XX_size; ++i) {
 		column(zXX,i).minus_assign (zp);
 	}
-							// Center point, premult here by 2 for efficency
+							// Center point, premult here by 2 for efficiency
 	{
 		ColMatrix::Column zXX0 = column(zXX,0);
 		noalias(Xzz) = FM::outer_prod(zXX0, zXX0);
 		Xzz *= 2*kappa;
 	}
-							// Remaining unscented points
+							// Remaining Unscented points
 	for (std::size_t i = 1; i < zXX.size2(); ++i) {
 		ColMatrix::Column zXXi = column(zXX,i);
 		noalias(Xzz) += FM::outer_prod(zXXi, zXXi);
@@ -337,12 +326,12 @@ Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& 
 	Xzz /= 2*x_kappa;
 
 						// Correlation of state with observation: Xxz
-							// Center point, premult here by 2 for efficency
+							// Center point, premult here by 2 for efficiency
 	{
 		noalias(Xxz) = FM::outer_prod(column(XX,0) - x, column(zXX,0));
 		Xxz *= 2*kappa;
 	}
-							// Remaining unscented points
+							// Remaining Unscented points
 	for (std::size_t i = 1; i < zXX.size2(); ++i) {
 		noalias(Xxz) += FM::outer_prod(column(XX,i) - x, column(zXX,i));
 	}

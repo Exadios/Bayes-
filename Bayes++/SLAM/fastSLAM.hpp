@@ -25,7 +25,7 @@ class Fast_SLAM : public SLAM
  * FastSLAM Filter
  *  Implements mechanisation of FastSLAM Algorithm:
  *  Restricted to single state features represented by mean and covariance
- *  Requires a SIR_filter (contructor parameter) to represent the location part of the state and provied resampling
+ *  Requires a SIR_filter (constructor parameter) to represent the location part of the state and provide resampling
  */
 {
 public:
@@ -43,7 +43,7 @@ public:
 	/* Resampling Update: resample particles using weights and then roughen
 	 *	Returns lcond, Smallest normalised likelihood weight, represents conditioning of resampling solution
 	 *          lcond == 1. if no resampling performed
-	 *			This should by multipled by the number of samples to get the Likelihood function conditioning
+	 *			This should by multiplied by the number of samples to get the Likelihood function conditioning
 	 */
 
 	virtual void update()
@@ -74,7 +74,7 @@ protected:
 private:
 	typedef Bayesian_filter::Importance_resampler::Resamples_t Resamples_t;
 	FM::DenseVec wir;		// Likelihood weights of map augmented particles
-	bool wir_update;		// weights have been updated requring a resampling on update
+	bool wir_update;		// weights have been updated requiring a resampling on update
 };
 
 

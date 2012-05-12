@@ -60,7 +60,7 @@ Simple_linear_predict_model::Simple_linear_predict_model (const FM::Matrix& Fx_i
 Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
 	Linrz_correlated_observe_model (Hx_init.size2(), Hx_init.size1()),
 	ff(f_init)
-/* Linrz observe model initialised from function and model matricies
+/* Linrz observe model initialised from function and model matrices
    Precondition:
    Hx, Z are conformantly dimensioned (not checked)
  */
@@ -72,7 +72,7 @@ Simple_linrz_correlated_observe_model::Simple_linrz_correlated_observe_model (St
 Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model (State_function f_init, const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
 	Linrz_uncorrelated_observe_model (Hx_init.size2(), Hx_init.size1()),
 	ff(f_init)
-/* Linrz observe model initialised from function and model matricies
+/* Linrz observe model initialised from function and model matrices
    Precondition:
    Hx, Z are conformantly dimensioned (not checked)
  */
@@ -83,7 +83,7 @@ Simple_linrz_uncorrelated_observe_model::Simple_linrz_uncorrelated_observe_model
 
 Simple_linear_correlated_observe_model::Simple_linear_correlated_observe_model (const FM::Matrix& Hx_init, const FM::SymMatrix& Z_init) :
 	Linear_correlated_observe_model (Hx_init.size2(), Hx_init.size1())
-/* Linear observe model initialised from model matricies
+/* Linear observe model initialised from model matrices
    Precondition:
    Hx, Z are conformantly dimensioned (not checked)
  */
@@ -94,7 +94,7 @@ Simple_linear_correlated_observe_model::Simple_linear_correlated_observe_model (
 
 Simple_linear_uncorrelated_observe_model::Simple_linear_uncorrelated_observe_model (const FM::Matrix& Hx_init, const FM::Vec& Zv_init) :
 	Linear_uncorrelated_observe_model (Hx_init.size2(), Hx_init.size1())
-/* Linear observe model initialised from model matricies
+/* Linear observe model initialised from model matrices
    Precondition:
    Hx, Z are conformantly dimensioned (not checked)
  */
@@ -107,8 +107,7 @@ Simple_linear_uncorrelated_observe_model::Simple_linear_uncorrelated_observe_mod
 
 Bayes_base::Float
  General_LzUnAd_observe_model::Likelihood_uncorrelated::L(const Uncorrelated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
-/*
- * Definition of likelihood given an addative Gaussian observation model:
+/* Definition of likelihood given an additive Gaussian observation model:
  *  p(z|x) = exp(-0.5*(z-h(x))'*inv(Z)*(z-h(x))) / sqrt(2pi^nz*det(Z));
  *  L(x) the the Likelihood L(x) doesn't depend on / sqrt(2pi^nz) for constant z size
  * Precond: Observation Information: z,Zv_inv,detZterm
@@ -121,9 +120,9 @@ Bayes_base::Float
 	model.normalise (zInnov, zp);
 	FM::noalias(zInnov) -= zp;
 
-	// Likelihood w of observation z given particlar state xi is true state
-	// The state, xi, defines a predicted observation with a gaussian 
-	// distribution with variance Zd. Thus, the likelihood can be determined directly from the gaussian
+	// Likelihood w of observation z given particular state xi is true state
+	// The state, xi, defines a predicted observation with a Gaussian
+	// distribution with variance Zd. Thus, the likelihood can be determined directly from the Gaussian
 
 	FM::Vec::iterator zi = zInnov.begin(), zi_end = zInnov.end();
 	for (; zi != zi_end; ++zi) {
@@ -157,8 +156,7 @@ void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelat
 
 Bayes_base::Float
  General_LzCoAd_observe_model::Likelihood_correlated::L(const Correlated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
-/*
- * Definition of likelihood given an addative Gaussian observation model:
+/* Definition of likelihood given an additive Gaussian observation model:
  *  p(z|x) = exp(-0.5*(z-h(x))'*inv(Z)*(z-h(x))) / sqrt(2pi^nz*det(Z));
  *  L(x) the the Likelihood L(x) doesn't depend on / sqrt(2pi^nz) for constant z size
  * Precond: Observation Information: z,Z_inv,detZterm
@@ -194,8 +192,7 @@ void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_a
 
 Bayes_base::Float
  General_LzCoAd_observe_model::Likelihood_correlated::scaled_vector_square(const FM::Vec& v, const FM::SymMatrix& V)
-/*
- * Compute covariance scaled square inner product of a Vector: v'*V*v
+/* Compute covariance scaled square inner product of a Vector: v'*V*v
  */
 {
 	return FM::inner_prod(v, FM::prod(V,v));

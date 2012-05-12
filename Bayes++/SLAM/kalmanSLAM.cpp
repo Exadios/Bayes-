@@ -67,7 +67,7 @@ void Kalman_SLAM::predict( BF::Linrz_predict_model& lpred )
 		// extract location part of full
 	loc->x = full->x.sub_range(0,nL);
 	loc->X = full->X.sub_matrix(0,nL,0,nL);
-		// predict location, independant of map
+		// predict location, independent of map
 	loc->init();
 	loc->predict (lpred);
 	loc->update();
@@ -79,7 +79,7 @@ void Kalman_SLAM::predict( BF::Linrz_predict_model& lpred )
 
 void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM::Vec& z )
 {
-	// Assume features added sequenatialy
+	// Assume features added sequentially
 	if (feature >= nM) {
 		error (BF::Logic_exception("Observe non existing feature"));
 		return;
@@ -95,7 +95,7 @@ void Kalman_SLAM::observe( unsigned feature, const Feature_observe& fom, const F
 }
 
 void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fom, const FM::Vec& z )
-// fom: must have a the special from required for SLAM::obeserve_new
+// fom: must have a the special form required for SLAM::obeserve_new
 {
 		// size consistency, single state feature
 	if (fom.Hx.size1() != 1)
@@ -125,7 +125,7 @@ void Kalman_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& 
 
 		// feature covariance with existing location and features
         // X+ = [0 Ha] X [0 Ha]' + Hb Z Hb'
-        // - zero exisiting feature covariance
+        // - zero existing feature covariance
 	zero( full->X.sub_matrix(0,full->X.size1(), nL+feature,nL+feature+1) );
 	full->X.sub_matrix(nL+feature,nL+feature+1,0,nL+nM) = FM::prod(Ha,full->X.sub_matrix(0,nL, 0,nL+nM) );
 		// feature state and variance

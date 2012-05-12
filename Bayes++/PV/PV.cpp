@@ -17,7 +17,7 @@
  *  
  * Two implementations are demonstrated
  *  1) A direct filter
- *  2) An indirect filter where the filter is preformed on error and state is estimated indirectly
+ *  2) An indirect filter where the filter is performed on error and state is estimated indirectly
  * Reference
  * [1] "Bayesian Multiple Target Tracking" Lawrence D Stone, Carl A Barlow, Thomas L Corwin
  */
@@ -76,7 +76,7 @@ public:
 
 PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 {
-	// Position Velocity dependance
+	// Position Velocity dependence
 	const Float Fvv = exp(-dt*V_GAMMA);
 	Fx(0,0) = 1.;
 	Fx(0,1) = dt;
@@ -91,7 +91,7 @@ PVpredict::PVpredict() : Linear_predict_model(NX, 1)
 
 /*
  * Position Observation model
- * Linear observation is addative uncorrelated model
+ * Linear observation is additive uncorrelated model
  */
 class PVobserve : public Linrz_uncorrelated_observe_model
 {
@@ -175,7 +175,7 @@ int main()
 		localRng.normal (u);		// normally distributed mean 0., stdDev for stationary IOU
 		x_true[1] += u[0]* sqr(V_NOISE) / (2*V_GAMMA);
 
-		// Predict filter with known pertubation
+		// Predict filter with known perturbation
 		f1.predict (linearPredict);
 		f2.predict (linearPredict);
 		time += dt;
@@ -186,7 +186,7 @@ int main()
 			// True Observation
 			z_true[0] = x_true[0];
 
-			// Observation with addative noise
+			// Observation with additive noise
 			localRng.normal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
 
 			// Filter observation

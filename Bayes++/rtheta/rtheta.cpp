@@ -129,7 +129,7 @@ pred_model::pred_model () :
  * Observation model: gradient linearised versions
  *  Linearisation state must be set before use
  *  Both uncorrelated and correlated representation
- *  Correlated represtation is just the uncorrelated adapted so the
+ *  Correlated representation is just the uncorrelated adapted so the
  *  correlation term are added.
  */
 #ifndef MODEL_LINEAR
@@ -457,7 +457,7 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 		const Vec& f1x = f1.x(); const SymMatrix& f1X = f1.X();
 		const Vec& f2x = f2.x(); const SymMatrix& f2X = f2.X();
 
-		// Compomparision and truth line
+		// Comparison and truth line
 		//	x(0)diff, x(1)diff, truth.x(0), truth.x(1), zx, zy)
 		cout << format("*%11.4g %11.4g * %10.3f %10.3f  %10.3f %10.3f")
 			 	% (f1x[0]-f2x[0]) % (f1x[1]-f2x[1])
@@ -466,13 +466,13 @@ void CCompare<Tf1, Tf2>::dumpCompare ()
 		format state(" %11.4g %11.4g * %10.3f %10.3f");
 		format covariance(" %12.4e %12.4e %12.4e");
 
-		// Filter f1 performace
+		// Filter f1 performance
 		//		x[0]err, x[1]err, x[0], x[1],  Xpred*3, X*3
 		cout << state % (f1x[0]-truth.x[0]) % (f1x[1]-truth.x[1])
 				% f1x[0] % f1x[1] << endl;
 		cout << covariance % f1_Xpred(0,0) % f1_Xpred(1,1) % f1_Xpred(1,0);
 		cout << covariance % f1X(0,0) % f1X(1,1) % f1X(1,0) << endl;
-		// Filter f2 performace
+		// Filter f2 performance
 		//		x[0]err, x[1]err, x[0], x[1], x[01]dist,  Xpred*3, X*3
 		cout << state % (f2x[0]-truth.x[0]) % (f2x[1]-truth.x[1])
 				% f2x[0] % f2x[1] << endl;
@@ -541,7 +541,7 @@ int main()
 	Random2.seed();
 	
 	// Setup the test filters
-		// Cartessian start position (in meters)
+		// Cartesian start position (in meters)
 	Vec x_init (NX);
 	x_init.clear();
  	x_init[0] = INIT_XY[0];

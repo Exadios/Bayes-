@@ -10,12 +10,12 @@
  * Example of using Bayesian Filter Class to solve a simple problem.
  *
  * The example implements a simple quadratic observer.
- *  This trys to estimate the state of system while also trying to
+ *  This tries to estimate the state of system while also trying to
  *  calibrate a simple linear model of the system which includes
  *  a scale factor and a bias.
  *  Estimating both the system state and a scale factor results in a
- *  quadtratic (product of two states and therefore non-linear) observation.
- *  The system model is a 1D brownian motion with a known pertubation.
+ *  quadratic (product of two states and therefore non-linear) observation.
+ *  The system model is a 1D brownian motion with a known perturbation.
  */
 
 #include "BayesFilter/infFlt.hpp"
@@ -78,7 +78,7 @@ public:
 	}
 	const FM::Vec& f(const FM::Vec& x) const
 	{
-		// Constant scale and bias, system state pertubed by control input
+		// Constant scale and bias, system state perturbed by control input
 		fx = x;
 		fx[0] += motion;
 		return fx;
@@ -169,13 +169,13 @@ int main()
 		x_true[0] += u[0];
 		linearPredict.predict (u);
 
-		// Predict filter with known pertubation
+		// Predict filter with known perturbation
 		obsAndCalib.predict (linearPredict);
 
 		// True Observation: Quadratic observation model
 		z_true[0] = x_true[0] * x_true[1] + x_true[2];
 
-		// Observation with addative noise
+		// Observation with additive noise
 		localRng.normal (z, z_true[0], OBS_NOISE);	// normally distributed mean z_true[0], stdDev OBS_NOISE.
 
 		// Filter observation using model linearised at state estimate x

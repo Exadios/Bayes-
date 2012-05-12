@@ -17,14 +17,14 @@ namespace FM = Bayesian_filter_matrix;
 
 class SLAM : public BF::Bayes_filter_base
 /*
- * SLAM : Simulataneous Location and Mapping
+ * SLAM : Simultaneous Location and Mapping
  *  Abstract representation of general SLAM
  * The abstraction represents the feature observe functions. The observe functions
- * depend on current locatation and map feature states. Map features are defined as scalers.
+ * depend on current location and map feature states. Map features are defined as scalers.
  * Multiple features must be used to represent vector map states.
  *
  * Observe function parameters are defined:
- *   feature: a arbitary unique number to label each feature in the map
+ *   feature: a arbitrary unique number to label each feature in the map
  *   fom: feature observe model
  *   z: observation vector
  *
@@ -58,8 +58,8 @@ public:
 	// Forget information associated with a feature: feature number can be reused for a new feature
 
 										// Observation associated with multiple features
-                                                // use a vector to store multiple feasure associations
-                                                // the 'fom' is constructed to conform with feature state stacked in the order they apear in 'features'
+                                                // use a vector to store multiple feature associations
+                                                // the 'fom' is constructed to conform with feature state stacked in the order they appear in 'features'
 	typedef std::vector<unsigned> Multi_features_t;
 	virtual void multi_observe( const Multi_features_t& features, const Feature_observe& fom, const FM::Vec& z )
 	{

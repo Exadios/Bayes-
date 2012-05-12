@@ -290,7 +290,7 @@ public:
 	// Functional part of additive model
 	virtual void normalise (FM::Vec& /*z_denorm*/, const FM::Vec& /*z_from*/) const
 	// Discontinuous h. Normalise one observation (z_denorm) from another
-	{}	//  Default normalistion, z_denorm unchanged
+	{}	//  Default normalisation, z_denorm unchanged
 	
 	Numerical_rcond rclimit;
 	// Reciprocal condition number limit of linear components when factorised or inverted
@@ -405,7 +405,7 @@ private:
  * Bayesian Filter
  *
  * A Bayesian Filter uses Bayes rule to fuse the state probabilities
- * of a prior and a likelhood function
+ * of a prior and a likelihood function
  */
 class Bayes_filter_base : public Bayes_base
 {
@@ -473,7 +473,7 @@ public:
  * Kalman State Filter - Abstract filtering property
  * Linear filter representation for 1st (mean) and 2nd (covariance) moments of a distribution
  *
- * Probability distributions are represented by state vector (x) and a covariance matix.(X)
+ * Probability distributions are represented by state vector (x) and a covariance matrix.(X)
  *
  * State (x) sizes is assumed to remain constant.
  * The state and state covariance are public so they can be directly manipulated.
@@ -572,7 +572,7 @@ public:
 	virtual Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z) = 0;
 	virtual Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z) = 0;
 	/* Observation z(k) and with (Un)correlated observation noise model
-	    Requires x(k|k), X(k|k) or internal equivilent
+	    Requires x(k|k), X(k|k) or internal equivalent
 	    Returns: Reciprocal condition number of primary matrix used in observe computation (1. if none)
 	*/
 };
@@ -582,7 +582,7 @@ public:
  * Linearizable Kalman Filter
  *  Kalman state representation and linearizable models
  *
- * Common abstration for many linear filters
+ * Common abstraction for many linear filters
  *  Has a virtual base to represent the common state
  */
 class Linrz_kalman_filter : public Linrz_filter, virtual public Kalman_state_filter

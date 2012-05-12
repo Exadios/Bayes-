@@ -7,9 +7,9 @@
  */
 
 /*
- * SLAM : Simultaneous Locatization and Mapping
+ * SLAM : Simultaneous Localisation and Mapping
  *  FastSLAM augmented particle algorithm
- *  Direct implementation without log(n) tree pruneing for associated observations
+ *  Direct implementation without log(n) tree pruning for associated observations
  */
 
 		// Bayes++ Bayesian filtering schemes
@@ -50,7 +50,7 @@ void Fast_SLAM::observe_new( unsigned feature, const Feature_observe_inverse& fo
  *
  * This implies
  *  a) There has no information about location so no resampling is requires
- *  b) Feature Posterior estimated directly from observation using inormation form
+ *  b) Feature Posterior estimated directly from observation using information form
  *
  * fom: must have a the special from required for SLAM::obeserve_new
  */
@@ -83,8 +83,8 @@ void Fast_SLAM::observe_new( unsigned feature, const FM::Float& t, const FM::Flo
 	Feature_1 m1;  				// single map feature
 	FeatureCondMap fmap(nparticles);
 
-	m1.x = t;			   // Initial particle conditional map is sample
-	m1.X = T;		    // independant
+	m1.x = t;			// Initial particle conditional map is sample
+	m1.X = T;		    // Independent
 	std::fill(fmap.begin(),fmap.end(), m1);
 	M.insert (std::make_pair(feature, fmap));
 }
@@ -94,7 +94,7 @@ void Fast_SLAM::observe( unsigned feature, const Feature_observe& fom, const FM:
  * SLAM Feature observation
  *  Uses Extended Fast_SLAM observation equations
  * Note: Mathematically only weight ratios are important. Numerically however the range should be restricted.
- * The weights are computed here using the simplist form with common factor Ht removed.
+ * The weights are computed here using the simplest form with common factor Ht removed.
  */
 {
 	assert(z.size() == 1);		// Only single state observation supported
@@ -150,7 +150,7 @@ Fast_SLAM::Float
  Fast_SLAM::update_resample( const Bayesian_filter::Importance_resampler& resampler )
 /* Resampling Update
  *  Resample particles using weights
- *  Propogate resampling to All features
+ *  Propagate resampling to All features
  *  Only resamples if weights have been updated
  */
 {
@@ -167,7 +167,7 @@ Fast_SLAM::Float
 									// Update S bases on resampling, and init filter
 		L.copy_resamples (L.S, presamples);
 		L.init_S ();
-									// Propogate resampling to All features
+									// Propagate resampling to All features
 		FeatureCondMap fmr(nparticles);		// Resampled feature map
 		for (AllFeature::iterator fi = M.begin(); fi != M.end(); ++fi)	// All Features
 		{
@@ -341,13 +341,13 @@ void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& ksta
  * Compute sample mean and covariance statistics of filter
  *  
  *  kstat elements are filled first with Location statistics and then the Map feature statistics
- *  Feature statisics are are computed in feature number order and only for those for which there is space in kstat
+ *  Feature statistics are are computed in feature number order and only for those for which there is space in kstat
  * Note: Covariance values are indeterminate for nparticles ==1
  * Precond:
- *   nparticles >=1 (enforced by Sample_filter contruction)
+ *   nparticles >=1 (enforced by Sample_filter construction)
  *   kstat must have space for Location statistics
  * Postcond:
- *  kstat compressed sample statisics of filter
+ *  kstat compressed sample statistics of filter
  */
 {	
 	const std::size_t nL = L.S.size1();	// No of location states
@@ -357,7 +357,7 @@ void Fast_SLAM_Kstatistics::statistics_compressed( BF::Kalman_state_filter& ksta
 
 								// Get Location statistics
 	if (nL > kstat.x.size())
-		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
+		error (BF::Logic_exception("kstat to small to hold filter location statistics"));
 	L.update_statistics();
 	FM::noalias(kstat.x.sub_range(0,nL)) = L.x;
 	FM::noalias(kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;
@@ -376,13 +376,13 @@ void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
  * Compute sample mean and covariance statistics of filter
  *  
  *  kstat elements are filled first with Location statistics and then the Map feature statistics
- *  Feature statisics are are computed in feature number as index (after location) and only for those for which there is space in kstat
+ *  Feature statistics are are computed in feature number as index (after location) and only for those for which there is space in kstat
  * Note: Covariance values are indeterminate for nparticles ==1
  * Precond:
- *   nparticles >=1 (enforced by Sample_filter contruction)
+ *   nparticles >=1 (enforced by Sample_filter construction)
  *   kstat must have space for Location statistics
  * Postcond:
- *  kstat sparse sample statisics of filter
+ *  kstat sparse sample statistics of filter
  */
 {	
 	const std::size_t nL = L.S.size1();	// No of location states
@@ -392,7 +392,7 @@ void Fast_SLAM_Kstatistics::statistics_sparse( BF::Kalman_state_filter& kstat )
 
 								// Get Location statistics
 	if (nL > kstat.x.size())
-		error (BF::Logic_exception("kstat to small to hold filter locatition statistics"));
+		error (BF::Logic_exception("kstat to small to hold filter location statistics"));
 	L.update_statistics();
 	FM::noalias(kstat.x.sub_range(0,nL)) = L.x;
 	FM::noalias(kstat.X.sub_matrix(0,nL, 0,nL)) = L.X;

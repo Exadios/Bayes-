@@ -18,19 +18,19 @@
  *      Section 5.7
  * [2] "Kalman Filtering, Theory and Practice", Mohinder S. Grewal, Angus P. Andrews ISBN 0-13-211335-X
  * To work with with Linear and Linrz models
- *  a) a seperate state and information (via covariance) predict is used.
+ *  a) a separate state and information (via covariance) predict is used.
  *  b) a EIF modified innovation update algorithm is used.
  *
  * Two alternative algorithms are used for predict functions:
  *  For linrz models an extended predict form is used so information state 'y' is predicted via the
- *  non-linear function. This requires that X, and Y are invertable so 'x' can be computed.
- * For linear invertable models predict can be done directly without computing x
- * Discontinous observe models require that predict is normailised with
+ *  non-linear function. This requires that X, and Y are invertible so 'x' can be computed.
+ * For linear invertible models predict can be done directly without computing x
+ * Discontinuous observe models require that predict is normailised with
  * respect to the observation.
  * NUMERICS
- *  The state x is respresented by prod(X,y). This may be illconditioned if the product is
- *  illconditioned. At present only the conditioning of X if checked, if y has a large range the product
- *  may be illconditioned. This is not checked
+ *  The state x is represented by prod(X,y). This may be ill conditioned if the product is
+ *  ill conditioned. At present only the conditioning of X if checked, if y has a large range the product
+ *  may be ill conditioned. This is not checked
  *
  * The filter is operated by performing a
  *  predict, observe
@@ -82,7 +82,7 @@ public:
 protected:
 	bool update_required;	// Postcondition of update is not met
 
-protected:			   		// Permenantly allocated temps
+protected:			   		// Permanently allocated temps
 	FM::RowMatrix tempX;
 	FM::Vec i;
 	FM::SymMatrix I;

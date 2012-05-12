@@ -10,7 +10,7 @@
  */
 
 /*
- * Exception types: Exception heirarchy for Bayesian filtering 
+ * Exception types: Exception hierarchy for Bayesian filtering
  */
  
 // Common headers required for declerations
@@ -23,7 +23,7 @@ namespace Bayesian_filter
 
 class Filter_exception : virtual public std::exception
 /*
- *	Base class for all exception produced by filter heirachy
+ *	Base class for all exception produced by filter hierarchy
  */
 {
 public:

@@ -7,7 +7,7 @@
  */
 
 /*
- * Test the FastSLAM alogorithm
+ * Test the FastSLAM algorithm
  */
 
 		// Bayes++ Bayesian filtering schemes
