@@ -6,7 +6,7 @@
 
 /*
  * MATLAB MEX interface for Bayes++
- *  bf_predict_linrz:  Predict filter through non-linear f(x) with Gq addative noise
+ *  bf_predict_linrz:  Predict filter through non-linear f(x) with Gq additive noise
  */
 
 #include <mex.h>

@@ -681,10 +681,10 @@ MFUNC( predict_functional, MCnop )
 } MFEND
 
 
-MFUNC( predict_addative, MCnop )
+MFUNC( predict_additive, MCnop )
 /*
- * DOM_REAL predict_addative (DOM_INT hFilter, DOM_PROC f, DOM_Array q, DOM_Array G)
- *  Predict filter with addative noise Gq
+ * DOM_REAL predict_additive (DOM_INT hFilter, DOM_PROC f, DOM_Array q, DOM_Array G)
+ *  Predict filter with additive noise Gq
  */
 {
 	MFnargsCheck (4);
@@ -709,7 +709,7 @@ MFUNC( predict_addative, MCnop )
 	{
 		// Predict filter using MuPAD expression
 		MuPAD_function_model mu_f(MFarg(2));
-		Bayesian_filter::Simple_addative_predict_model model(mu_f, G, q);
+		Bayesian_filter::Simple_additive_predict_model model(mu_f, G, q);
 		MFerror ("Not implemented");
 
 #ifdef UNIMPLEMENTED
@@ -745,7 +745,7 @@ MFUNC( predict_addative, MCnop )
 MFUNC( predict_linear, MCnop )
 /*
  * DOM_REAL predict_linear (DOM_INT hFilter, DOM_Array F, DOM_Array G, DOM_Array q)
- *  Predict filter with addative noise Gq
+ *  Predict filter with additive noise Gq
  */
 {
 	MFnargsCheck (4);

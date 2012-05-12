@@ -42,10 +42,10 @@ public:
  * Nonlinear Observation model
  * Observation is distance from origin squared
  */
-class Nonlinear_observe : public Uncorrelated_addative_observe_model
+class Nonlinear_observe : public Uncorrelated_additive_observe_model
 {
 public:
-	Nonlinear_observe () : Uncorrelated_addative_observe_model(1), hx(1)
+	Nonlinear_observe () : Uncorrelated_additive_observe_model(1), hx(1)
 	// Construct a noise model
 	{
 				// Constant Observation Noise model with variance of one

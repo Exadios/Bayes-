@@ -296,25 +296,25 @@ public:
 	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
-class Uncorrelated_addative_observe_model : public Parametised_observe_model
+class Uncorrelated_additive_observe_model : public Parametised_observe_model
 /* Observation model, uncorrelated additive observation noise
 	Z(k) = I * Zv(k) observe noise variance vector Zv
  */
 {
 public:
-	Uncorrelated_addative_observe_model (std::size_t z_size) :
+	Uncorrelated_additive_observe_model (std::size_t z_size) :
 		Parametised_observe_model(z_size), Zv(z_size)
 	{}
 	FM::Vec Zv;			// Noise Variance
 };
 
-class Correlated_addative_observe_model : public Parametised_observe_model
+class Correlated_additive_observe_model : public Parametised_observe_model
 /* Observation model, correlated additive observation noise
     Z(k) = observe noise covariance
  */
 {
 public:
-	Correlated_addative_observe_model (std::size_t z_size) :
+	Correlated_additive_observe_model (std::size_t z_size) :
 		Parametised_observe_model(z_size), Z(z_size,z_size)
 	{}
 	FM::SymMatrix Z;	// Noise Covariance (not necessarily dense)
@@ -334,7 +334,7 @@ protected: // Jacobian model is not sufficient, it is used to build Linrz observ
 	{}
 };
 
-class Linrz_correlated_observe_model : public Correlated_addative_observe_model, public Jacobian_observe_model
+class Linrz_correlated_observe_model : public Correlated_additive_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with respect to state x (fixed size)
     correlated observation noise
     zp(k) = h(x(k-1|k-1)
@@ -344,11 +344,11 @@ class Linrz_correlated_observe_model : public Correlated_addative_observe_model,
 {
 public:
 	Linrz_correlated_observe_model (std::size_t x_size, std::size_t z_size) :
-		Correlated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
+		Correlated_additive_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 };
 
-class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_model, public Jacobian_observe_model
+class Linrz_uncorrelated_observe_model : public Uncorrelated_additive_observe_model, public Jacobian_observe_model
 /* Linrz observation model Hx, h with respect to state x (fixed size)
     uncorrelated observation noise
     zp(k) = h(x(k-1|k-1)
@@ -358,7 +358,7 @@ class Linrz_uncorrelated_observe_model : public Uncorrelated_addative_observe_mo
 {
 public:
 	Linrz_uncorrelated_observe_model (std::size_t x_size, std::size_t z_size) :
-		Uncorrelated_addative_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
+		Uncorrelated_additive_observe_model(z_size), Jacobian_observe_model(x_size, z_size)
 	{}
 };
 

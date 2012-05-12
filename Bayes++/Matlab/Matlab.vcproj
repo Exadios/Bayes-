@@ -74,7 +74,7 @@
 				RelativePath="bf_observe_linrz_uncorrelated.cpp">
 			</File>
 			<File
-				RelativePath="bf_predict_addative.cpp">
+				RelativePath="bf_predict_additive.cpp">
 			</File>
 			<File
 				RelativePath="bf_predict_functional.cpp">

@@ -253,7 +253,7 @@ void Unscented_scheme::observe_size (std::size_t z_size)
 }
 
 
-Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z)
+Bayes_base::Float Unscented_scheme::observe (Uncorrelated_additive_observe_model& h, const FM::Vec& z)
 /* Observation fusion
  *  Pre : x,X
  *  Post: x,X is PSD
@@ -262,12 +262,12 @@ Bayes_base::Float Unscented_scheme::observe (Uncorrelated_addative_observe_model
  * ISSUE: Simplified implementation using uncorrelated noise equations
  */
 {
-	Adapted_Correlated_addative_observe_model hh(h);
+	Adapted_Correlated_additive_observe_model hh(h);
 	return observe (hh, z);
 }
 
 
-Bayes_base::Float Unscented_scheme::observe (Correlated_addative_observe_model& h, const FM::Vec& z)
+Bayes_base::Float Unscented_scheme::observe (Correlated_additive_observe_model& h, const FM::Vec& z)
 /* Observation fusion
  *  Pre : x,X
  *  Post: x,X is PSD

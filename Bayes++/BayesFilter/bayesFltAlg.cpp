@@ -29,7 +29,7 @@ inline scalar sqr(scalar x)
 namespace Bayesian_filter
 {
 
-Simple_addative_predict_model::Simple_addative_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
+Simple_additive_predict_model::Simple_additive_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 // Precondition: G, q are conformantly dimensioned (not checked)
 	Addative_predict_model (G_init.size1(), q_init.size()),
 	ff(f_init)
@@ -106,7 +106,7 @@ Simple_linear_uncorrelated_observe_model::Simple_linear_uncorrelated_observe_mod
 
 
 Bayes_base::Float
- General_LzUnAd_observe_model::Likelihood_uncorrelated::L(const Uncorrelated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
+ General_LzUnAd_observe_model::Likelihood_uncorrelated::L(const Uncorrelated_additive_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
 /* Definition of likelihood given an additive Gaussian observation model:
  *  p(z|x) = exp(-0.5*(z-h(x))'*inv(Z)*(z-h(x))) / sqrt(2pi^nz*det(Z));
  *  L(x) the the Likelihood L(x) doesn't depend on / sqrt(2pi^nz) for constant z size
@@ -134,7 +134,7 @@ Bayes_base::Float
 	return exp(Float(-0.5)*(logL + logdetZ));
 }
 
-void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelated_addative_observe_model& model)
+void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelated_additive_observe_model& model)
 /* Set the observation zz and Zv about which to evaluate the Likelihood function
  * Postcond: Observation Information: z,Zv_inv,detZterm
  */
@@ -155,7 +155,7 @@ void General_LzUnAd_observe_model::Likelihood_uncorrelated::Lz (const Uncorrelat
 }
 
 Bayes_base::Float
- General_LzCoAd_observe_model::Likelihood_correlated::L(const Correlated_addative_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
+ General_LzCoAd_observe_model::Likelihood_correlated::L(const Correlated_additive_observe_model& model, const FM::Vec& z, const FM::Vec& zp) const
 /* Definition of likelihood given an additive Gaussian observation model:
  *  p(z|x) = exp(-0.5*(z-h(x))'*inv(Z)*(z-h(x))) / sqrt(2pi^nz*det(Z));
  *  L(x) the the Likelihood L(x) doesn't depend on / sqrt(2pi^nz) for constant z size
@@ -174,7 +174,7 @@ Bayes_base::Float
 	return exp(Float(-0.5)*(logL + logdetZ));
 }
 
-void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_addative_observe_model& model)
+void General_LzCoAd_observe_model::Likelihood_correlated::Lz (const Correlated_additive_observe_model& model)
 /* Set the observation zz and Z about which to evaluate the Likelihood function
  * Postcond: Observation Information: z,Z_inv,detZterm
  */
@@ -199,8 +199,8 @@ Bayes_base::Float
 }
 
 
-Adapted_Correlated_addative_observe_model::Adapted_Correlated_addative_observe_model (Uncorrelated_addative_observe_model& adapt) :
-		Correlated_addative_observe_model(adapt.Zv.size()),
+Adapted_Correlated_additive_observe_model::Adapted_Correlated_additive_observe_model (Uncorrelated_additive_observe_model& adapt) :
+		Correlated_additive_observe_model(adapt.Zv.size()),
 		unc(adapt)
 {
 	Z.clear();

@@ -6,7 +6,7 @@
 
 /*
  * MATLAB MEX interface for Bayes++
- *  bf_predict_addative:  Predict filter through function f(x) with Gq addative noise
+ *  bf_predict_additive:  Predict filter through function f(x) with Gq additive noise
  */
 
 #include <mex.h>
@@ -30,7 +30,7 @@ void mexFunction(
 		usageOk = false;
 
 	if (!usageOk)
-		mexErrMsgTxt("usage: [ <rcond>= ]predict_addative(<handle>, <function>, <G>, <q>)");
+		mexErrMsgTxt("usage: [ <rcond>= ]predict_additive(<handle>, <function>, <G>, <q>)");
 
 	// Check handle and get filter pointer
 	Run_Filter* filter = Run_Filter::from_handle(prhs[0]);

@@ -18,7 +18,7 @@ clean:
 bf_all : \
 	bf_scheme.dll \
 	bf_predict_functional.dll \
-	bf_predict_addative.dll \
+	bf_predict_additive.dll \
 	bf_predict_linear.dll \
 	bf_predict_linrz.dll \
 	bf_observe_likelihood.dll \
@@ -43,8 +43,8 @@ bf_scheme.dll : bf_scheme.cpp matlabConvert.h matlabBfilter.h
 bf_predict_functional.dll : bf_predict_functional.cpp matlabConvert.h matlabBfilter.h
 	mex $(MEXOPTS) bf_predict_functional.cpp $(LIBS)
 
-bf_predict_addative.dll : bf_predict_addative.cpp matlabConvert.h matlabBfilter.h
-	mex $(MEXOPTS) bf_predict_addative.cpp $(LIBS)
+bf_predict_additive.dll : bf_predict_additive.cpp matlabConvert.h matlabBfilter.h
+	mex $(MEXOPTS) bf_predict_additive.cpp $(LIBS)
 
 bf_predict_linear.dll : bf_predict_linear.cpp matlabConvert.h matlabBfilter.h
 	mex $(MEXOPTS) bf_predict_linear.cpp $(LIBS)

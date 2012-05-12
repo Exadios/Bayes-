@@ -44,7 +44,7 @@ class Unscented_predict_model : public Predict_model_base
  *
  * Unscented filter requires
  *  f the function part of the non-linear model
- *  Q the covariance of the addaiive w(x(k)), w is specifically allow to be a function of state
+ *  Q the covariance of the additive w(x(k)), w is specifically allow to be a function of state
  */
 {
 public:
@@ -93,17 +93,17 @@ public:
 		return 1.;		// Always well condition for additive predict
 	}
 	
-	Float observe (Uncorrelated_addative_observe_model& h, const FM::Vec& z);
-	Float observe (Correlated_addative_observe_model& h, const FM::Vec& z);
+	Float observe (Uncorrelated_additive_observe_model& h, const FM::Vec& z);
+	Float observe (Correlated_additive_observe_model& h, const FM::Vec& z);
 	// Unscented filter implements general additive observe models
 	
 	Float observe (Linrz_uncorrelated_observe_model& h, const FM::Vec& z)
 	{	// Adapt to use the more general additive model
-		return observe (static_cast<Uncorrelated_addative_observe_model&>(h),z);
+		return observe (static_cast<Uncorrelated_additive_observe_model&>(h),z);
 	}
 	Float observe (Linrz_correlated_observe_model& h, const FM::Vec& z)
 	{	// Adapt to use the more general additive model
-		return observe (static_cast<Correlated_addative_observe_model&>(h),z);
+		return observe (static_cast<Correlated_additive_observe_model&>(h),z);
 	}
 
 public:						// Exposed Numerical Results
