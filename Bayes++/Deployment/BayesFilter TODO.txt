@@ -11,27 +11,27 @@ FOR RELEASE
 
 DOCUMENTATION
 	Describe generic schemes
-	Why Gq noise model. It is always non signular. Important for any numerics
+	Why Gq noise model. It is always non singular. Important for any numerics
 		Q may have zeros. But if we have G then linear algebra can still use inverse.
-		This is also why inverse(G) is not needed in inverse model. It would not be defined for signular Q
+		This is also why inverse(G) is not needed in inverse model. It would not be defined for singular Q
 	Numeric postcondition. May not be PSD
-	Models are implicity/explictly parameterised by state
-	Use BoostBook to consistenently document pre/postconditions
+	Models are implicitly/explicitly parameterised by state
+	Use BoostBook to consistently document pre/postconditions
 
 TODO
 	Extend error with module identity and function location
 	By products: add observe parameterisation for by products and temps
 		observe innovation, surely it is something that is always computable by all schemes
 			This should be the first "by_product"
-	Extended_fiilter would be the place for an update managment helper
+	Extended_fiilter would be the place for an update management helper
 	Replace UdU function with UdU class. Requires a general uBLAS factor object
 
 NEW FILTERS
 	Factorised UKF or DDF2
 	VSDF (factorised from) from Matt Deans
-	SIR with Auxilary variables
+	SIR with Auxiliary variables
 	Sparse matrix implementations: Requires sparse UdU. Great care of ublas sparse_matrix as it is row/column major
-	 This make a big difference to speed. Hard for prod(L,R) need to have oposite orienation
+	 This make a big difference to speed. Hard for prod(L,R) need to have opposite orientation
 
 TO REVIEW
 	Sharing state in filters, alternative to MI is constructors with state references (closures)
@@ -39,18 +39,18 @@ TO REVIEW
 		Validate (z to h.Z) model sizes in predict and observe
 	Check when numerics fail:
 		For both state and obs semi-definite
-		Negtive matrices
+		Negative matrices
 		UDpredict catching Negative matrices in observe
-	Use normalisation dtandard form for Jacobian_obersve. Should be to normalise(z,zp).
+	Use normalisation standard form for Jacobian_obersve. Should be to normalise(z,zp).
 
 CODE RULES
 	filter
-		assigment operator, optimised to remove temps
+		assignment operator, optimised to remove temps
 	predict/observe
 		in BayesFlt.h	must be virtual. The types are polymorphic
-		in xxFlt.h		no vitual. These are specialised forms
+		in xxFlt.h		no virtual. These are specialised forms
 	filter_matrix
-		use Vec/Matrix noalias(x) = prod(a,b); avoiding copy overhead. However a=b; is automatical efficient
+		use Vec/Matrix noalias(x) = prod(a,b); avoiding copy overhead. However a=b; is automatically efficient
 
 TESTING
 	Unscented_filter
