@@ -6,6 +6,7 @@
 
 build-project BayesFilter ;
 build-project Simple ;
+build-project NonLinearSimple ;
 build-project PV ;
 build-project PV_SIR ;
 build-project QuadCalib ;
