@@ -20,36 +20,6 @@ namespace Bayesian_filter_test
 
 namespace
 {
-	// ISSUE variate_generator cannot be used without Partial template specialistion
-	template<class Engine, class Distribution>
-	class simple_generator_01
-	{
-	public:
-		typedef typename Distribution::result_type result_type;
-		simple_generator_01(Engine& e, Distribution& d)
-			: urng01(e), _dist(d)
-		{}
-		result_type operator()()
-		{	return _dist(urng01);
-		 }
-	private:
-		class uniform_01
-		{	// Simple uniform [0..1) distribution
-			typedef typename Distribution::input_type result_type;
-			Engine& _eng;
-		public:
-			uniform_01(Engine& e)
-				: _eng(e)
-			{}
-			result_type operator()()
-			{
-				result_type factor = result_type(1) / result_type(_eng.max()-_eng.min() +  result_type(1)); 
-              	return result_type(_eng() - _eng.min()) * factor;
-			}
-		};
-		uniform_01 urng01;
-		Distribution& _dist;
-	};
 	template<class Engine, class Distribution>
 	class simple_generator
 	{
@@ -77,23 +47,22 @@ public:
 	Bayesian_filter_matrix::Float normal(const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<Float> dist(mean, sigma);
-		simple_generator_01<URng, boost::normal_distribution<Float> > gen(rng, dist);
-		return gen();
+		return dist(rng);
 	}
 	void normal(Bayesian_filter_matrix::DenseVec& v, const Float mean, const Float sigma)
 	{
 		boost::normal_distribution<Float> dist(mean, sigma);
-		simple_generator_01<URng, boost::normal_distribution<Float> > gen(rng, dist);
+		simple_generator<URng, boost::normal_distribution<Float> > gen(rng, dist);
 		std::generate (v.begin(), v.end(), gen);
 	}
 	void normal(Bayesian_filter_matrix::DenseVec& v)
 	{
-		simple_generator_01<URng, boost::normal_distribution<Float> > gen(rng, dist_normal_01);
+		simple_generator<URng, boost::normal_distribution<Float> > gen(rng, dist_normal_01);
 		std::generate (v.begin(), v.end(), gen);
 	}
 	void uniform_01(Bayesian_filter_matrix::DenseVec& v)
 	{
-		simple_generator<URng, boost::uniform_real<Float> > gen(rng, dist_uniform_01);
+		simple_generator<URng, boost::uniform_01<Float> > gen(rng, dist_uniform_01);
 		std::generate (v.begin(), v.end(), gen);
 	}
 #ifdef BAYES_FILTER_GAPPY
@@ -112,7 +81,7 @@ public:
 	}
 	void uniform_01(Bayesian_filter_matrix::Vec& v)
 	{
-		simple_generator_01<URng, boost::uniform_real<Float> > gen(rng, dist_uniform_01);
+		simple_generator<URng, boost::uniform_01<Float> > gen(rng, dist_uniform_01);
 		for (std::size_t i = 0, iend=v.size(); i < iend; ++i)
 			v[i] = gen();
 	}
@@ -123,7 +92,7 @@ public:
 	}
 private:
 	URng rng;
-	boost::uniform_real<Float> dist_uniform_01;
+	boost::uniform_01<Float> dist_uniform_01;
 	boost::normal_distribution<Float> dist_normal_01;
 };
 
