@@ -2,7 +2,7 @@
 #   Provides interface project development and sourceforge maintance
 #   Use bjam to compile and build Bayes++
 
-RELEASE=2010.8
+RELEASE=2012.5
 RELEASE_SUB=-1
 BOOST_VERSION=boost_1_43_0
 
