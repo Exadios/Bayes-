@@ -86,10 +86,10 @@ public:
 	void predict (Unscented_predict_model& f);
 	// Efficient Unscented prediction 
 	void predict (Functional_predict_model& f);
-	void predict (Addative_predict_model& f);
+	void predict (Additive_predict_model& f);
 	Float predict (Linrz_predict_model& f)
 	{	// Adapt to use the more general additive model
-		predict(static_cast<Addative_predict_model&>(f));
+		predict(static_cast<Additive_predict_model&>(f));
 		return 1.;		// Always well condition for additive predict
 	}
 	

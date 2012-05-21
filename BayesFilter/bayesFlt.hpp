@@ -151,7 +151,7 @@ public:
 	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
-class Addative_predict_model : virtual public Predict_model_base
+class Additive_predict_model : virtual public Predict_model_base
 /* Additive Gaussian noise predict model
    This fundamental model for non-linear filtering with additive noise
     x(k|k-1) = f(x(k-1|k-1)) + G(k)w(k)
@@ -161,7 +161,7 @@ class Addative_predict_model : virtual public Predict_model_base
 */
 {
 public:
-	Addative_predict_model (std::size_t x_size, std::size_t q_size);
+	Additive_predict_model (std::size_t x_size, std::size_t q_size);
 
 	virtual const FM::Vec& f(const FM::Vec& x) const = 0;
 	// Functional part of additive model
@@ -174,7 +174,7 @@ public:
 	// Reciprocal condition number limit of linear components when factorised or inverted
 };
 
-class Linrz_predict_model : public Addative_predict_model
+class Linrz_predict_model : public Additive_predict_model
 /* Linrz predict model
    This fundamental model for linear/linearised filtering
     x(k|k-1) = f(x(k-1|k-1)

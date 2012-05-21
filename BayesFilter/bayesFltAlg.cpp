@@ -31,7 +31,7 @@ namespace Bayesian_filter
 
 Simple_additive_predict_model::Simple_additive_predict_model (State_function f_init, const FM::Matrix& G_init, const FM::Vec& q_init) :
 // Precondition: G, q are conformantly dimensioned (not checked)
-	Addative_predict_model (G_init.size1(), q_init.size()),
+	Additive_predict_model (G_init.size1(), q_init.size()),
 	ff(f_init)
 {
 	G = G_init;

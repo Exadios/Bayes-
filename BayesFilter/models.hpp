@@ -26,7 +26,7 @@ typedef boost::function1<const FM::Vec&, const FM::Vec&> State_function;
 // A generalised function of state. Compatible with predict and observe models
 
 
-class Simple_additive_predict_model : public Addative_predict_model
+class Simple_additive_predict_model : public Additive_predict_model
 // Additive predict model initialised from function and model matricies
 {
 	State_function ff;

@@ -171,7 +171,7 @@ namespace {
 	class Adapted_model : public Unscented_predict_model
 	{
 	public:
-		Adapted_model(Addative_predict_model& am) :
+		Adapted_model(Additive_predict_model& am) :
 			Unscented_predict_model(am.G.size1()),
 			amodel(am), QGqG(am.G.size1(),am.G.size1())		// Q gets size from GqG'
 		{
@@ -187,7 +187,7 @@ namespace {
 			return QGqG;
 		}
 	private:
-		Addative_predict_model& amodel;
+		Additive_predict_model& amodel;
 		mutable SymMatrix QGqG;
 	};
 }//namespace
@@ -203,7 +203,7 @@ void Unscented_scheme::predict (Functional_predict_model& f)
 }
 
 
-void Unscented_scheme::predict (Addative_predict_model& f)
+void Unscented_scheme::predict (Additive_predict_model& f)
 /* Adapt model by creating an Unscented predict with additive noise
  *  Computes noise covariance Q = GqG'
  */
