@@ -121,22 +121,20 @@ downloaded copy of Boost explains how to obtain compile the latest
 version of bjam yourself. For everything to work <B>bjam</B> executed
 with the required toolset, or sometimes you need to configure the Build
 system to tell it where your compiler is.
-<BR>To build Bayes++ and the examples simply
-execute: (Bayes++ should be the current directory)</P>
+<BR>To build Bayes++ and the examples with GCC simply execute: (Bayes++ should be the current directory)</P>
 <PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=gcc -sBOOST_ROOT=&quot;../boost_1_43_0&quot;</PRE><P>
-<P>OR for C++ execute:</P>
+<P>OR for Visual C++ execute:</P>
 <PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=msvc -sBOOST_ROOT=&quot;../boost_1_43_0&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
 by setting it as an environment variable.</P>
-</P>
 <H4>Location of compiled examples and libraries</H4>
 
 <P>The executables for the three examples will be placed inside a
 directory hierarchy named <B>target</B>. Static libraries for debug
 and release builds of the <B>BayesFilter</B> library are placed in
 <B>target/BayesFilter</B>. The <B>target</B> directory and its subdirectories
-are created automatically.</P?
+are created automatically.</P>
 <H4>Visual C++ solution</H4>
 <P>For Visual C++ 2008 etc, you can also use the <B>Bayes++.sln</B> solution
 and the active configuration <B>uBLAS Debug</B>. The compiler options
@@ -252,7 +250,7 @@ of FastSLAM result with 1,000,000 samples with Kalman SLAM.
 Deviations of state and covariance expected to be approx 1/1000th.</P>
 </OL>
 <H2><A NAME="FAQ"></A>FAQ</H2>
-<a ref="Bayes++FAQ">Questions are answered in the Bayes++ FAQ</a>
+<a href="Bayes++FAQ">Questions are answered in the Bayes++ FAQ</a>
 
 <H2><A NAME="whatsnew"></A>What's new in Bayes++ 2012.5-1</H2>
 <P>Renamed all classes which were previously named 'addative' to be called 'additive'.<P>
