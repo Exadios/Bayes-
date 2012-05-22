@@ -15,7 +15,7 @@ CPP_SOURCES =
 
 # Declare the BayesFilter static link library
 lib BayesFilter : $(CPP_SOURCES).cpp
-    : <link>static
+    :
       <toolset>msvc:<define>"_SECURE_SCL_DEPRECATE=0"
       <toolset>gcc:<cxxflags>"-Wall"
       <toolset>intel:<cxxflags>"-mp1"		# Require IEEE NaN comparisons
