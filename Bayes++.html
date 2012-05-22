@@ -105,7 +105,7 @@ structure:</P>
                                 <DD>Test</DD>
                 </DL></DD>
                 <DD><DL>
-                        <DT>boost_1_43_0</DT>
+                        <DT>boost_1_49_0</DT>
                                 <DD>boost</DD>
                                 <DD><I>etc</I></DD>
 
@@ -122,9 +122,9 @@ version of bjam yourself. For everything to work <B>bjam</B> executed
 with the required toolset, or sometimes you need to configure the Build
 system to tell it where your compiler is.
 <BR>To build Bayes++ and the examples with GCC simply execute: (Bayes++ should be the current directory)</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=gcc -sBOOST_ROOT=&quot;../boost_1_43_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=gcc -sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
 <P>OR for Visual C++ execute:</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=msvc -sBOOST_ROOT=&quot;../boost_1_43_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=msvc -sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
 by setting it as an environment variable.</P>
@@ -207,8 +207,7 @@ the C++ template system directly. However the Boost libraries used
 Boost also includes many workarounds for compiler deficiencies.
 Therefore with few alterations Bayes++ should work with any modern
 C++ compiler supported by Boost.</P>
-<P>Bayes++ is tested with: <B>Boost 1.43.0</B></P>
-<P>Bayes++ is tested with: <B>GCC 4.6.0</B>, and
+<P>Bayes++ is tested with: <B>GCC 4.x</B>, and
 <B>VisualC++ 2008</B></P>
 <P>Later versions of GCC 3.x and GCC 4.x should also run Bayes++ with ease.
 However GCC 3.3.0 is know to be incompatible with uBLAS and to
