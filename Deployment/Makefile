@@ -23,7 +23,7 @@ archivedoc:
 
 archivesrc:
 	ln -s "../../Bayes++" Bayes++
-	zip -r "bf-C++source-$(RELEASE)$(RELEASE_SUB).zip" Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/PV_SIR Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/project-root.jam Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html "Bayes++/Bayesian Filtering Classes.html"  -x '*/.svn/*'
+	zip -r "bf-C++source-$(RELEASE)$(RELEASE_SUB).zip" Bayes++/BayesFilter Bayes++/Simple Bayes++/PV Bayes++/PV_SIR Bayes++/QuadCalib Bayes++/SLAM Bayes++/Test Bayes++/VClib  Bayes++/Jamfile Bayes++/project-root.jam Bayes++/Bayes++.sln Bayes++/.project Bayes++/Bayes++.doxygen Bayes++/Bayes++.html Bayes++/Bayes++FAQ.html "Bayes++/Bayesian Filtering Classes.html"  -x '*/.svn/*'
 	rm Bayes++
 
 buildgcc :
