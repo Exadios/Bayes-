@@ -1,4 +1,8 @@
-2012-05-214 Boost 1_43_0  1,000,000 particles
+2014-05 Boost_1_55_0   1,000,000 particles
+Intel(R) Core(TM) i7-3520M CPU @ 2.90GHz
+gcc-4.8.2 (x64)	0:02.06
+
+2012-05-21 Boost 1_43_0  1,000,000 particles
 Intel(R) Core(TM)2 Duo CPU     T7500  @ 2.20GHz
 4.6.3 (x64)		0:04.05
 
@@ -13,7 +17,7 @@ GCC-4.0.0 (x64)		0:13.8
 
 2005-01-18 Boost 1_32_0  1,000,000 particles
 Athlon 64
-GCC-3.4.2 (x64)		0:13.0
+GCC-3.4.2 (x64)		0:13.0q
 GCC-3.4.2 (i386)	0:15.7
 GCC-3.3.3 (x64)		0:13.4
 GCC-3.3.3 (32bit)	0:15.3

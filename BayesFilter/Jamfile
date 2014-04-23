@@ -17,7 +17,7 @@ CPP_SOURCES =
 lib BayesFilter : $(CPP_SOURCES).cpp
     :
       <toolset>msvc:<define>"_SECURE_SCL_DEPRECATE=0"
-      <toolset>gcc:<cxxflags>"-Wall"
+      <toolset>gcc:<cxxflags>""
       <toolset>intel:<cxxflags>"-mp1"		# Require IEEE NaN comparisons
 #    <toolset>gcc:<cxxflags>"-pedantic"		# Pedantic checks for validation with GCC (will include long long warnings)
 ;

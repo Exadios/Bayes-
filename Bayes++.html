@@ -122,7 +122,7 @@ version of bjam yourself. For everything to work <B>bjam</B> executed
 with the required toolset, or sometimes you need to configure the Build
 system to tell it where your compiler is.
 <BR>To build Bayes++ and the examples with GCC simply execute: (Bayes++ should be the current directory)</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=gcc link=static sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=gcc link=static cxxflags=-Wno-unused-local-typedefs -sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
 <P>OR for Visual C++ execute:</P>
 <PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=msvc link=static -sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
 It is possible to drop the BOOST_ROOT variable by either creating a

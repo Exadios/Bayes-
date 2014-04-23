@@ -2,9 +2,9 @@
 #   Provides interface project development and sourceforge maintance
 #   Use bjam to compile and build Bayes++
 
-RELEASE=2012.5
+RELEASE=2014.5
 RELEASE_SUB=-1
-BOOST_VERSION=boost_1_43_0
+BOOST_VERSION=boost_1_55_0
 
 help:
 	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
@@ -27,9 +27,9 @@ archivesrc:
 	rm Bayes++
 
 buildgcc :
-	cd ..; bjam -sBOOST_VERSION=$(BOOST_VERSION) debug release compressed_debug compressed_release toolset=gcc  . SLAM rtheta
+	cd ..; bjam link=static cxxflags=-Wno-unused-local-typedefs -sBOOST_VERSION=$(BOOST_VERSION) debug release compressed_debug compressed_release toolset=gcc  . SLAM rtheta
 
 buildmsvc:
-	cd ..; bjam -sBOOST_VERSION=$(BOOST_VERSION) debug release link-runtime=static toolset=msvc  . SLAM rtheta
+	cd ..; bjam link=static -sBOOST_VERSION=$(BOOST_VERSION) debug release toolset=msvc  . SLAM rtheta
 
 
