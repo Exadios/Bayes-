@@ -105,7 +105,7 @@ structure:</P>
                                 <DD>Test</DD>
                 </DL></DD>
                 <DD><DL>
-                        <DT>boost_1_49_0</DT>
+                        <DT>boost_1_55_0</DT>
                                 <DD>boost</DD>
                                 <DD><I>etc</I></DD>
 
@@ -115,21 +115,19 @@ structure:</P>
 <P>
 <P>
 Using the Boost Build system version 2 is the best way to compile the
-examples. Use the <B>bjam</B> (Boost jam) program build Bayes++ in
+examples. Use the <B>b2</B> (Boost jam) program to build Bayes++ in
 a single step. The documentation in your
-downloaded copy of Boost explains how to obtain compile the latest
-version of bjam yourself. For everything to work <B>bjam</B> executed
-with the required toolset, or sometimes you need to configure the Build
-system to tell it where your compiler is.
+downloaded copy of Boost explains how to obtain and install the latest
+version of the Boost Build system yourself. For everything to work execute <B>b2</B>
+with the required toolset, and the location where you installed Boost.
 <BR>To build Bayes++ and the examples with GCC simply execute: (Bayes++ should be the current directory)</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=gcc link=static cxxflags=-Wno-unused-local-typedefs -sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
+<PRE STYLE="margin-bottom: 0.5cm">        b2 toolset=gcc link=static cxxflags=-Wno-unused-local-typedefs -sBOOST_ROOT=&quot;../boost_1_55_0&quot;</PRE><P>
 <P>OR for Visual C++ execute:</P>
-<PRE STYLE="margin-bottom: 0.5cm">        bjam toolset=msvc link=static -sBOOST_ROOT=&quot;../boost_1_49_0&quot;</PRE><P>
-It is possible to drop the BOOST_ROOT variable by either creating a
+<PRE STYLE="margin-bottom: 0.5cm">        b2 toolset=msvc link=static -sBOOST_ROOT=&quot;../boost_1_55_0&quot;</PRE><P>
+It is possible to work without the BOOST_ROOT variable by either creating a
 <B>build_build.jam</B> file in <I>sourceDirectory</I> (or above) or
 by setting it as an environment variable.</P>
 <H4>Location of compiled examples and libraries</H4>
-
 <P>The executables for the three examples will be placed inside a
 directory hierarchy named <B>target</B>. Static libraries for debug
 and release builds of the <B>BayesFilter</B> library are placed in
@@ -220,8 +218,8 @@ listed above using the following tests.
 </P>
 <OL>
 <LI><P>Build system: Compatibility with Boost Build version 2.
-<BR>Successfully complete <B>bjam</B> to build default
-libraries and examples.<BR>Successfully complete <B>bjam</B> to build
+<BR>Successfully complete build of default
+libraries and examples.<BR>Successfully complete build of
 SLAM system.</P>
 
 <LI><P>Test examples: simpleExample, PV, QuadCalib <BR>Compile debug
@@ -253,7 +251,12 @@ Deviations of state and covariance expected to be approx 1/1000th.</P>
 
 <H2>Translations</H2>
 This article is translated to <a href="http://science.webhostinggeeks.com/bayes-klase">Serbo-Croatian</a> language by Jovana Milutinovich from <a href="http://webhostinggeeks.com/"> Geeks Education</a>.
-<H2><A NAME="whatsnew"></A>What's new in Bayes++ 2012.5-1</H2>
+<H2><A NAME="whatsnew"></A>What's new in Bayes++ 2014.5-1</H2>
+<P>Tested with <B>Boost 1.55.0</B> and <B>gcc-4.8</B>.</P>
+<P>Compile with <code>link=static</code></P>
+<P>For GCC 4.8 recommend using <code>suppresscxxflags=-Wno-unused-local-typedefs</code> to avoid lots of warning text.</P> 
+
+<H2>What's new in Bayes++ 2012.5-1</H2>
 <P>Renamed all classes which were previously named 'addative' to be called 'additive'.<P>
 <P>Tested with <B>Boost 1.49.0</B>.</P>
 <P>Cleanup comments in source.<P>
@@ -295,9 +298,8 @@ boost::random. So things migrate smoothly I have added a new
 
 <P>The very excellent <B>Boost Build system version 2 </B>has
 advanced a great deal recently. Bayes++ is built with standard Boost
-Build system. To select the version 2 build system, simply use &quot;bjam
---v2&quot;. Bayes++ has all the necessary &quot;Jamfiles.v2&quot; to
-use the new system.</P>
+Build system. Bayes++ has all the necessary &quot;Jamfiles.v2&quot; to
+be build with the Boost Build system.</P>
 <H3>Scheme extensions</H3>
 <P>The UD_scheme observe functions have had their numerical
 capabilities extended. It is now possible to work with singular (zero

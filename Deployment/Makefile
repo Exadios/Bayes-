@@ -7,7 +7,7 @@ RELEASE_SUB=-1
 BOOST_VERSION=boost_1_55_0
 
 help:
-	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc] [buildallCVS]
+	echo Usage: make [uploaddoc] [uploadstyle] [archivedoc] [archivesrc]
 
 SFWEBLIST = *.html Simple/simpleExample.cpp "ClassDocumentation"
 uploaddoc:
@@ -18,6 +18,7 @@ uploadstyle:
 
 
 archivedoc:
+	cd ..; doxygen Bayes++.doxygen
 	cd ..; tar --create --file=Deployment/bf-classdocumentation-$(RELEASE).tar.bz2 --use-compress-program=bzip2 ClassDocumentation/*
 	cd ..; zip -r Deployment/bf-classdocumentation-$(RELEASE).zip ClassDocumentation
 
@@ -27,9 +28,9 @@ archivesrc:
 	rm Bayes++
 
 buildgcc :
-	cd ..; bjam link=static cxxflags=-Wno-unused-local-typedefs -sBOOST_VERSION=$(BOOST_VERSION) debug release compressed_debug compressed_release toolset=gcc  . SLAM rtheta
+	cd ..; b2 link=static cxxflags=-Wno-unused-local-typedefs -sBOOST_VERSION=$(BOOST_VERSION) debug release compressed_debug compressed_release toolset=gcc  . SLAM rtheta
 
 buildmsvc:
-	cd ..; bjam link=static -sBOOST_VERSION=$(BOOST_VERSION) debug release toolset=msvc  . SLAM rtheta
+	cd ..; b2 link=static -sBOOST_VERSION=$(BOOST_VERSION) debug release toolset=msvc  . SLAM rtheta
 
 
