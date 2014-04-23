@@ -34,8 +34,7 @@
                                 <BLOCKQUOTE><A HREF="ClassDocumentation/html/classBayesian__filter_1_1Bayes__filter__base.html">Filter
                                 hierarchy</A><BR><A HREF="ClassDocumentation/html/classBayesian__filter_1_1Predict__model__base.html">Prediction
                                 models</A> and <A HREF="ClassDocumentation/html/classBayesian__filter_1_1Observe__model__base.html">Observation
-                                models</A><BR><BR><A HREF="ClassDocumentation/html/functions.html">Class
-                                members</A> and <A HREF="ClassDocumentation/html/files.html">File
+                                models</A><BR><BR><A HREF="ClassDocumentation/html/annotated.html">Classes</A> and <A HREF="ClassDocumentation/html/files.html">File
                                 list of Bayes++</A>
                                 </BLOCKQUOTE>
                         </TD>
@@ -43,8 +42,8 @@
 
                                 <H3 ALIGN=RIGHT><A NAME="download"></A><A HREF="http://sourceforge.net/projects/bayesclasses/">Project
                                 Summary</A> and <A HREF="http://sourceforge.net/project/showfiles.php?group_id=54729">Download</A></H3>
-                                <P ALIGN=RIGHT><A NAME="SVN_Repository"></A><IMG SRC="http://sourceforge.net/sflogo.php?group_id=54729&amp;type=5" NAME="Grafik1" ALT="SourceForge Logo" ALIGN=TOP WIDTH=120 HEIGHT=40 BORDER=0>
-                                <A HREF="http://svn.sourceforge.net/bayesclasses">SVN Repository</A>
+                                <P ALIGN=RIGHT><A NAME="Sourceforge"></A><IMG SRC="http://sourceforge.net/sflogo.php?group_id=54729&amp;type=5" NAME="Grafik1" ALT="SourceForge Logo" ALIGN=TOP WIDTH=120 HEIGHT=40 BORDER=0>
+                                <A HREF="http://sourceforge.net/p/bayesclasses/bayes/ci/Release/tree/">GIT Repository</A>
                                 <BR>Bayes++ uses the <A HREF="http://www.boost.org/" TARGET="_top"><FONT SIZE=5>Boost</FONT></A><BR>peer-reviewed
                                 portable C++ source libraries</P>
                         </TD>
@@ -150,7 +149,7 @@ make using our source code. As long as you respect the copyright and
 license conditions, Michael Stevens and the Australian Centre for
 Field Robotics are happy to for you to use it in any way you wish.</P>
 <P>Bayes++ the Bayesian Filtering Library</P>
-<P>Copyright (c) 2003,2004,2005 Michael Stevens, Copyright (c) 2002
+<P>Copyright (c) 2003,2004,2005,2006,2011,2012,2014 Michael Stevens, Copyright (c) 2002
 Michael Stevens and Australian Centre for Field Robotics</P>
 <P>Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation files
@@ -195,8 +194,7 @@ filtering results. However they are all rather slow, and it is very
 easy to produce very poorly implemented filters in their programming
 languages. Fortunately all these tools provide mechanisms for
 extension with external programs. Example interface code is provided
-in the <A HREF="#CVS_Repository">Bayes++ CVS repository</A> for
-Matlab and MuPAD. An interface to Scilab is not yet available.</P>
+in the Bayes++ GIT repository</A> for Matlab.</P>
 <H2>Portability</H2>
 <P>Bayes++ only makes use of ISO standard C++. The source code uses
 moderately advance C++ constructs. It only makes restricted use of
@@ -253,8 +251,8 @@ Deviations of state and covariance expected to be approx 1/1000th.</P>
 This article is translated to <a href="http://science.webhostinggeeks.com/bayes-klase">Serbo-Croatian</a> language by Jovana Milutinovich from <a href="http://webhostinggeeks.com/"> Geeks Education</a>.
 <H2><A NAME="whatsnew"></A>What's new in Bayes++ 2014.5-1</H2>
 <P>Tested with <B>Boost 1.55.0</B> and <B>gcc-4.8</B>.</P>
-<P>Compile with <code>link=static</code></P>
-<P>For GCC 4.8 recommend using <code>suppresscxxflags=-Wno-unused-local-typedefs</code> to avoid lots of warning text.</P> 
+<P>Document that <code>b2</code> requires <code>link=static</code> option when compiling examples.</P>
+<P>Recommend using <code>cxxflags=-Wno-unused-local-typedefs</code> for the GCC toolset, to avoid lots of warning text with GCC 4.8.</P> 
 
 <H2>What's new in Bayes++ 2012.5-1</H2>
 <P>Renamed all classes which were previously named 'addative' to be called 'additive'.<P>
